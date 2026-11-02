@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import { RotateCw } from 'lucide-react'
 import type { Position, Team } from '@/types/entities'
 import { POSITION_LABEL, POSITION_LONG } from '@/lib/format'
-import { teamLogoSvg } from '@/lib/logos'
+import { isBrandLogo, teamLogoSvg } from '@/lib/logos'
 import { cn } from '@/lib/utils'
 import { RankDelta } from '@/components/league/Bits'
 import { BADGE_ICONS } from './BadgeMedal'
@@ -96,7 +96,7 @@ export function PlayerCard(p: PlayerCardProps) {
                 <div className="mt-[.3em] text-[.85em] font-bold tracking-wide" style={{ color: tier.text }}>{p.ratingLabel}</div>
                 {p.position && <div className="mt-[.4em] font-display text-[1.55em] font-extrabold leading-none text-white/90" title={POSITION_LONG[p.position]}>{POSITION_LABEL[p.position]}</div>}
               </div>
-              {logo && <img src={logo} alt="" className="size-[4em] object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,.5)]" />}
+              {logo && <img src={logo} alt="" className={cn('size-[4em] object-contain', isBrandLogo(logo) ? 'rounded-[22%] bg-white shadow-[0_4px_12px_rgba(0,0,0,.45)]' : 'drop-shadow-[0_4px_8px_rgba(0,0,0,.5)]')} />}
             </div>
             {/* portrait */}
             <div className="relative mx-auto -mt-[4%] flex aspect-square w-[46%] items-center justify-center">
@@ -132,7 +132,7 @@ export function PlayerCard(p: PlayerCardProps) {
         <div className="pcard-face pcard-back pcard-shape overflow-hidden rounded-b-2xl" style={{ background: tier.frame, padding: 2 }}>
           <div className="pcard-shape flex h-full flex-col rounded-b-[14px] bg-white px-[8%] pb-[6%] pt-[12%] text-ink">
             <div className="flex items-center gap-[.6em]">
-              {logo && <img src={logo} alt="" className="size-[2.8em] object-contain" />}
+              {logo && <img src={logo} alt="" className={cn('size-[2.8em] object-contain', isBrandLogo(logo) && 'rounded-[22%] ring-1 ring-black/10')} />}
               <div className="min-w-0">
                 <div className="truncate font-display text-[1.8em] font-black uppercase leading-none">{p.lastName}</div>
                 <div className="truncate text-[.95em] text-ink/60">{p.firstName} · {teamLabel}</div>

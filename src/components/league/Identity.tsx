@@ -2,11 +2,12 @@ import { Link } from 'react-router-dom'
 import type { Player, Position, Team } from '@/types/entities'
 import { cn } from '@/lib/utils'
 import { initials, POSITION_COLOR, POSITION_LABEL, playerName } from '@/lib/format'
-import { teamLogoSvg } from '@/lib/logos'
+import { isBrandLogo, teamLogoSvg } from '@/lib/logos'
 
 export function TeamLogo({ team, size = 32, className }: { team?: Team | null; size?: number; className?: string }) {
   const src = team?.logo_url || teamLogoSvg(team?.short_name ?? '?', team?.primary_color, team?.secondary_color)
-  return <img src={src} alt={team?.name ?? ''} width={size} height={size} style={{ width: size, height: size }} className={cn('shrink-0 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,.5)]', className)} loading="lazy" />
+  const brand = isBrandLogo(team?.logo_url)
+  return <img src={src} alt={team?.name ?? ''} width={size} height={size} style={{ width: size, height: size }} className={cn('shrink-0 object-contain', brand ? 'rounded-[22%] bg-white shadow-[0_2px_10px_rgba(0,0,0,.35)] ring-1 ring-black/5' : 'drop-shadow-[0_2px_8px_rgba(0,0,0,.5)]', className)} loading="lazy" />
 }
 
 export function TeamName({ team, link = true, short = false, className }: { team?: Team | null; link?: boolean; short?: boolean; className?: string }) {

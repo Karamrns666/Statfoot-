@@ -22,7 +22,7 @@ export function VisualTeam({ team, big }: { team?: Team; big?: boolean }) {
   const s = big ? 300 : 200
   return (
     <div className="flex flex-col items-center gap-4" style={{ width: s + 40 }}>
-      <img src={team?.logo_url || teamLogoSvg(team?.short_name ?? '?')} width={s} height={s} alt="" />
+      <img src={team?.logo_url || teamLogoSvg(team?.short_name ?? '?')} width={s} height={s} alt="" style={{ borderRadius: '22%' }} />
       <div className="title-caps text-white" style={{ fontSize: big ? 52 : 40 }}>{team?.short_name}</div>
     </div>
   )

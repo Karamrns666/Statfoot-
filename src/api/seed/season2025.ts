@@ -3,7 +3,6 @@
 // Le fichier Excel ne contient ni dates, ni minutes, ni postes : les dates sont estimées (une journée par semaine),
 // les postes sont déduits des statistiques (gardien = joueur avec des arrêts) et modifiables dans l'admin.
 import type { Competition, Lineup, Match, MatchEvent, Player, Season, Team } from '@/types/entities'
-import { companyLogoSvg, teamLogoSvg } from '@/lib/logos'
 import { addDays } from '@/lib/schedule'
 import { S25_MATCHES, S25_PLAYERS, S25_TEAMS } from './season2025.data'
 
@@ -11,7 +10,12 @@ export const SEASON_2025_ID = 'season_2025'
 export const S25_FIRST_ROUND = '2025-10-04'
 const SLOTS = ['18:00', '18:45', '19:30', '20:15']
 
-export const s25TeamId = (i: number) => `t25_${S25_TEAMS[i][1].toLowerCase()}`
+export const s25TeamId = (i: number | string) => `t25_${(typeof i === 'string' ? i : S25_TEAMS[i][1]).toLowerCase()}`
+/** Raison sociale affichée sous le nom d'équipe */
+const COMPANY: Record<string, string> = {
+  CAC: 'Centrale Automobile Chérifienne', CTR: 'Construction & Travaux Routiers', ALM: 'Stock Box Self-Storage (Almav Group)', MPT: 'Mega Post-Tension',
+  DEL: 'Dell Technologies', CVG: 'Casavigilance Sécurité Incendie', MDS: 'Groupe Mondial Service', DSW: 'Disway', COP: 'Cooper Pharma', CHL: 'Chaabi LLD',
+}
 export const s25PlayerId = (i: number) => `p25_${i}`
 
 export interface Season2025 {
@@ -29,8 +33,10 @@ export function buildSeason2025(): Season2025 {
     id: SEASON_2025_ID, name: 'Saison 2025-2026', start_date: '2025-09-27', end_date: '2026-03-27',
     status: 'closed', is_active: true, league_phase_rounds: 15, cup_rounds: 0, gold_size: 16, closed_at: '2026-03-27T20:00:00',
   }
-  const teams: Team[] = S25_TEAMS.map(([name, short, c1, c2], i) => ({
-    id: s25TeamId(i), name, short_name: short, company: name, logo_url: teamLogoSvg(short, c1, c2, i), company_logo_url: companyLogoSvg(name, c1),
+  const teams: Team[] = S25_TEAMS.map(([name, short, c1, c2]) => ({
+    id: s25TeamId(short), name, short_name: short, company: COMPANY[short] ?? name,
+    // logos officiels (public/logos) : emblème carré + logo complet
+    logo_url: `/logos/${short.toLowerCase()}.png`, company_logo_url: `/logos/${short.toLowerCase()}-full.png`,
     primary_color: c1, secondary_color: c2, status: 'active',
   }))
   const competition: Competition = {

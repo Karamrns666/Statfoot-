@@ -2,14 +2,14 @@ import json, re, collections, sys, openpyxl
 # Usage : python3 scripts/import_excel_build.py <sortie.json de l'étape 1> <IPG.xlsx> src/api/seed/season2025.data.ts
 d=json.load(open(sys.argv[1]))
 TEAMS={ # clé: (nom, court, couleur1, couleur2)
- 'MONDIAL SERVICES':('Mondial Services','MDS','#1E88E5','#0A2A5E'),'DISTRA':('Distra','DST','#E53935','#2B0A0A'),
- 'DELL':('Dell','DEL','#0076CE','#062645'),'WAFASALAF':('Wafasalaf','WAF','#00A651','#06261A'),
- 'ATELIER VERT RABAT':('Atelier Vert Rabat','AVR','#43A047','#0D2410'),'ARROW ECS':('Arrow ECS','ARW','#F5A623','#2A1B04'),
- 'CAC':('CAC','CAC','#8E24AA','#1F0A26'),'CASA VIGILANCE':('Casa Vigilance','CVG','#FDD835','#262106'),
- 'ALMAV GROUP':('Almav Group','ALM','#00ACC1','#04252A'),'COOPER PHARMA':('Cooper Pharma','COP','#D81B60','#2A0716'),
- 'CHAABI LLD':('Chaabi LLD','CHL','#FB8C00','#2A1503'),'VIVALIS':('Vivalis','VIV','#7CB342','#18240A'),
- 'DISWAY':('Disway','DSW','#3949AB','#0D1230'),'CTR':('CTR','CTR','#90A4AE','#1C2529'),
- 'MEGA PT':('Mega PT','MPT','#F4511E','#2B0F06'),'ATELIER VERT CASA':('Atelier Vert Casa','AVC','#2E7D32','#0A1F0C'),
+ 'MONDIAL SERVICES':('Mondial Services','MDS','#B3262E','#2A0A0C'),'DISTRA':('Distra','DST','#8CC63F','#13240A'),
+ 'DELL':('Dell','DEL','#0076CE','#062645'),'WAFASALAF':('Wafasalaf','WAF','#00A0B0','#04262A'),
+ 'ATELIER VERT RABAT':('Atelier Vert Rabat','AVR','#4A7729','#0E1A08'),'ARROW ECS':('Arrow ECS','ARW','#D9DDE2','#1A1D21'),
+ 'CAC':('CAC','CAC','#2E5072','#0A1724'),'CASA VIGILANCE':('Casa Vigilance','CVG','#F5B731','#0F2244'),
+ 'ALMAV GROUP':('Almav Group','ALM','#E30613','#2A0406'),'COOPER PHARMA':('Cooper Pharma','COP','#00A99D','#0A2A4F'),
+ 'CHAABI LLD':('Chaabi LLD','CHL','#F26722','#2A1205'),'VIVALIS':('Vivalis','VIV','#1A8DB5','#05202A'),
+ 'DISWAY':('Disway','DSW','#E8312F','#141414'),'CTR':('CTR','CTR','#3BB54A','#121A55'),
+ 'MEGA PT':('Mega PT','MPT','#1E90FF','#0A1E33'),'ATELIER VERT CASA':('Atelier Vert Casa','AVC','#4A7729','#0E1A08'),
 }
 tkeys=list(TEAMS)
 def cap(s):

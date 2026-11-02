@@ -38,7 +38,7 @@ export default function TeamDetail() {
           <div className="text-center sm:text-left">
             <h1 className="title-caps text-4xl sm:text-6xl">{team.name}</h1>
             <div className="mt-1 flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground sm:justify-start">
-              {team.company_logo_url && <img src={team.company_logo_url} alt="" className="size-6 rounded" />}{team.company}<CompetitionBadge competition={cup} />{row && <span>{row.rank}e · {row.points} pts</span>}
+              {team.company_logo_url && <img src={team.company_logo_url} alt={team.company ?? ''} className={team.company_logo_url.startsWith('/logos/') ? 'h-10 w-auto rounded-lg bg-white' : 'size-6 rounded'} />}<span>{team.company}</span><CompetitionBadge competition={cup} />{row && <span>{row.rank}e · {row.points} pts</span>}
             </div>
             <div className="mt-3 flex justify-center sm:justify-start"><FormPills form={teamForm(matches, team.id)} size="md" /></div>
           </div>

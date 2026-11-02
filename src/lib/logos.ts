@@ -1,4 +1,7 @@
 // Génération de logos / visuels SVG (aucune image externe) — utilisés par le seed et en repli dans l'UI.
+/** Logo officiel d'entreprise (PNG carré sur fond blanc, dossier /public/logos) : affiché sur une plaque blanche arrondie */
+export const isBrandLogo = (u?: string | null) => !!u && u.startsWith('/logos/')
+
 const enc = (svg: string) => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
 
 export function teamLogoSvg(short: string, c1 = '#22d3ee', c2 = '#0f172a', variant = 0) {

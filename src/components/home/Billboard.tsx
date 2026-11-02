@@ -59,7 +59,7 @@ export function Billboard({ slides, leagueName, seasonLabel, logoUrl }: { slides
                 {s.href && <Link to={s.href} className="mt-4 inline-block text-sm font-bold underline decoration-2 underline-offset-4 transition hover:text-neon" style={{ color: tone }}>Voir le détail</Link>}
               </div>
               <div className="flex items-center gap-5 sm:flex-col sm:items-end sm:gap-2">
-                {s.image && <img src={s.image} alt="" className="size-20 object-contain drop-shadow-[0_0_24px_rgba(108,180,204,.35)] sm:size-28" />}
+                {s.image && <img src={s.image} alt="" className={cn('size-20 object-contain sm:size-28', s.image.startsWith('/logos/') ? 'rounded-[22%] bg-white shadow-[0_0_40px_rgba(108,180,204,.35)]' : 'drop-shadow-[0_0_24px_rgba(108,180,204,.35)]')} />}
                 {s.value != null && (
                   <div className="led-glow text-right font-display font-black leading-none" style={{ color: tone }}>
                     <span className="text-[clamp(3.4rem,11vw,8rem)]">{s.value}</span>

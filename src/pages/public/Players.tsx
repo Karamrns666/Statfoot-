@@ -7,7 +7,7 @@ import { useRace } from '@/hooks/useStats'
 import { PageHeader, RankDelta, RookieBadge } from '@/components/league/Bits'
 import { FilterSelect } from '@/components/league/FilterSelect'
 import { PlayerAvatar, PositionBadge, TeamLogo } from '@/components/league/Identity'
-import { IPGCard, XPCard } from '@/components/players/Cards'
+import { IPGCard, MaterialLegend, XPCard } from '@/components/players/Cards'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -83,6 +83,7 @@ export default function Players() {
 
           {view === 'cartes' ? (
             <>
+              <MaterialLegend className="mb-4" />
               <div className="grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3 sm:gap-x-4 lg:grid-cols-4 xl:grid-cols-5">
                 {rows.slice(0, shown).map((r) => {
                   const p = L.player.get(r.item.player_id)!

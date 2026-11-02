@@ -1,18 +1,24 @@
 import { PlayerCard } from './PlayerCard'
 import { RookieBadge } from '@/components/league/Bits'
 import { useLookup } from '@/hooks/useData'
+import { usePlayerBadges } from '@/hooks/useStats'
+import { SEASON_2025_ID } from '@/api/seed/season2025'
 import { isRookie, type PlayerXP, type Ranked } from '@/lib/stats'
 import { POSITION_LONG } from '@/lib/format'
 import { splitName, type IPGEntry } from '@/lib/ipg'
 import type { Player, Team } from '@/types/entities'
+import { TIER_LABEL, TIER_ORDER, TIER_STYLE } from '@/lib/badges'
+import { cn } from '@/lib/utils'
 
 /** Carte d'un joueur au classement XP */
 export function XPCard({ r, player: p, team: t, className }: { r: Ranked<PlayerXP>; player: Player; team?: Team | null; className?: string }) {
   const s = r.item
   const gk = p.position === 'GK'
+  const bs = usePlayerBadges().get(p.id)
   return (
     <PlayerCard
       className={className}
+      material={bs?.material} medals={bs?.unlocked} badgeTotal={bs?.total}
       firstName={p.first_name} lastName={p.last_name} position={p.position} team={t} photoUrl={p.photo_url}
       rating={s.xp} ratingLabel="XP" rank={r.rank} delta={r.delta}
       badge={isRookie(p) ? <RookieBadge /> : undefined}
@@ -21,7 +27,6 @@ export function XPCard({ r, player: p, team: t, className }: { r: Ranked<PlayerX
         : [{ label: 'MJ', value: s.matches }, { label: 'BUT', value: s.goals }, { label: 'PAS', value: s.assists, hint: 'Passes décisives' }, { label: 'CJ', value: s.yellow, hint: 'Cartons jaunes' }]}
       backTitle={POSITION_LONG[p.position]}
       back={[
-        { label: 'Matchs avec stats', value: s.matches },
         { label: 'V / N / D', value: `${s.wins} / ${s.draws} / ${s.losses}`, hint: 'Victoires / nuls / défaites' },
         { label: 'Buts', value: s.goals },
         { label: 'Passes décisives', value: s.assists },
@@ -37,9 +42,11 @@ export function XPCard({ r, player: p, team: t, className }: { r: Ranked<PlayerX
 export function IPGCard({ e, className }: { e: IPGEntry; className?: string }) {
   const { player, team } = useIPGLinks(e)
   const n = splitName(e.name)
+  const bs = usePlayerBadges(SEASON_2025_ID).get(player?.id ?? '')
   return (
     <PlayerCard
       className={className}
+      material={bs?.material} medals={bs?.unlocked} badgeTotal={bs?.total}
       firstName={player?.first_name ?? n.first} lastName={player?.last_name ?? n.last} position={player?.position}
       team={team} teamName={e.team.toLowerCase().replace(/(^|\s)\S/g, (x) => x.toUpperCase())} photoUrl={player?.photo_url}
       rating={e.ipg.toFixed(1)} ratingLabel="IPG" rank={e.rank}
@@ -50,12 +57,11 @@ export function IPGCard({ e, className }: { e: IPGEntry; className?: string }) {
         { label: 'Contribution aux buts', value: `${e.contribution.toFixed(1)} %` },
         { label: 'Victoires de l’équipe', value: `${e.win_pct.toFixed(1)} %` },
         { label: 'Buts / passes décisifs', value: `${e.clutch_goals} / ${e.clutch_assists}`, hint: 'Actions « clutch »' },
-        { label: 'Score décisif', value: e.clutch_score },
         { label: 'Adversité', value: `${e.adversity.toFixed(0)} %` },
         { label: 'Pénalité cartons', value: `−${e.card_penalty}` },
         { label: 'IPG brut', value: Math.round(e.raw) },
       ]}
-      backNote="IPG ramené sur 100 (le meilleur joueur = 100)."
+      backNote={bs?.unlocked.length ? undefined : 'IPG ramené sur 100 (le meilleur joueur = 100).'}
       href={player ? `/joueurs/${player.id}` : undefined}
     />
   )
@@ -67,3 +73,19 @@ function useIPGLinks(e: IPGEntry) {
   return { player, team: player ? L.team.get(player.team_id) : undefined }
 }
 
+
+/** Légende des couleurs de carte */
+export function MaterialLegend({ className }: { className?: string }) {
+  return (
+    <div className={cn('flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-muted-foreground', className)}>
+      <span>Couleur de la carte = meilleur badge obtenu :</span>
+      {TIER_ORDER.map((t) => (
+        <span key={t} className="inline-flex items-center gap-1.5">
+          <span className="h-3.5 w-5 rounded-sm" style={{ background: `linear-gradient(135deg, ${TIER_STYLE[t].light}, ${TIER_STYLE[t].edge} 50%, ${TIER_STYLE[t].dark})` }} />
+          <span className="font-semibold text-white/85">{TIER_LABEL[t]}</span>
+        </span>
+      ))}
+      <span className="inline-flex items-center gap-1.5"><span className="h-3.5 w-5 rounded-sm bg-gradient-to-br from-sky to-mbl" />Bleu MBL : pas encore de badge</span>
+    </div>
+  )
+}

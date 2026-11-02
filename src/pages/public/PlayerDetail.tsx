@@ -9,12 +9,12 @@ import { useSeason } from '@/hooks/useSeason'
 import { useEffectiveSeason, useRace } from '@/hooks/useStats'
 import { EmptyState, RankDelta, RookieBadge, SectionTitle } from '@/components/league/Bits'
 import { PlayerAvatar, PositionBadge, TeamLogo } from '@/components/league/Identity'
-import { XPCard } from '@/components/players/Cards'
+import { MaterialLegend, XPCard } from '@/components/players/Cards'
 import { BadgeMedal, BadgeTile } from '@/components/players/BadgeMedal'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { AXIS, ChartBox, GRID, Legend, SERIES, TOOLTIP } from '@/components/charts/theme'
 import { AWARD_LABELS, computePlayerXP, isRookie, ageAt, type XPLine } from '@/lib/stats'
-import { BADGES, RATING_RULES, TIER_LABEL, challengeResult, challengeTargets, decisiveStreak, nextBadges, playerBadges, playerMatchLog, type BadgeGroup } from '@/lib/badges'
+import { BADGES, RATING_RULES, TIER_LABEL, TIER_STYLE, cardMaterial, challengeResult, challengeTargets, decisiveStreak, nextBadges, playerBadges, playerMatchLog, type BadgeGroup } from '@/lib/badges'
 import { fmtDate, POSITION_LONG, ordinal, playerName, playerShort } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
@@ -45,6 +45,7 @@ export default function PlayerDetail() {
   const keeper = p.position === 'GK' || (s?.gk_matches ?? 0) > 0
   const badges = playerBadges(log, { keeper })
   const unlocked = badges.filter((b) => b.unlocked).length
+  const material = cardMaterial(badges)
   const next = nextBadges(badges)
   const streak = decisiveStreak(log)
   const scorerRank = scorers.find((r) => r.item.player_id === id)
@@ -95,6 +96,7 @@ export default function PlayerDetail() {
           <div className="min-w-0 flex-1 text-center sm:text-left">
             <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
               <PositionBadge position={p.position} />{isRookie(p) && <RookieBadge />}
+              {material && <span className="rounded-full px-2.5 py-0.5 text-[11px] font-extrabold" style={{ background: `linear-gradient(135deg, ${TIER_STYLE[material].light}, ${TIER_STYLE[material].edge})`, color: material === 'black' ? '#fff' : '#0A0F33' }}>Carte {TIER_LABEL[material]}</span>}
               {p.is_captain && <span className="rounded bg-award-gold/20 px-2 py-0.5 text-[11px] font-bold text-award-gold">Capitaine</span>}
             </div>
             <h1 className="title-caps mt-2 text-4xl sm:text-6xl">{p.first_name} <span className="text-neon">{p.last_name}</span></h1>
@@ -194,6 +196,7 @@ export default function PlayerDetail() {
       {/* COLLECTION */}
       <section>
         <SectionTitle title={`Collection de badges · ${unlocked} / ${badges.length}`} subtitle="La condition de chaque badge est indiquée sous son nom" />
+        <MaterialLegend className="mb-4" />
         <div className="space-y-6">
           {GROUPS.map((g) => {
             const list = badges.filter((b) => b.def.group === g)

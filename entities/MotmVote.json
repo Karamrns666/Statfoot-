@@ -1,0 +1,21 @@
+{
+  "name": "MotmVote",
+  "type": "object",
+  "properties": {
+    "match_id": {
+      "type": "string"
+    },
+    "player_id": {
+      "type": "string"
+    },
+    "voter_key": {
+      "type": "string",
+      "description": "empreinte anonyme (1 vote / appareil / match)"
+    }
+  },
+  "required": [
+    "match_id",
+    "player_id",
+    "voter_key"
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "name": "Competition",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "ex. Gold Cup"
+    },
+    "short_name": {
+      "type": "string"
+    },
+    "season_id": {
+      "type": "string"
+    },
+    "division_id": {
+      "type": "string"
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "league",
+        "group_stage",
+        "cup",
+        "other"
+      ],
+      "description": "championnat / groupes + éliminatoires / élimination directe / autre"
+    },
+    "legs": {
+      "type": "string",
+      "enum": [
+        "single",
+        "double"
+      ],
+      "default": "double"
+    },
+    "logo_url": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string",
+      "description": "accent néon hex"
+    },
+    "description": {
+      "type": "string"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "location": {
+      "type": "string"
+    },
+    "team_count": {
+      "type": "integer"
+    },
+    "team_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "qualified_per_group": {
+      "type": "integer",
+      "default": 2
+    },
+    "knockout_rounds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "round_of_16",
+          "quarter",
+          "semi",
+          "third_place",
+          "final"
+        ]
+      }
+    },
+    "tiebreakers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "surcharge de Settings.tiebreakers (optionnel)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "finished",
+        "archived"
+      ],
+      "default": "draft"
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    }
+  },
+  "required": [
+    "name",
+    "season_id",
+    "format"
+  ]
+}

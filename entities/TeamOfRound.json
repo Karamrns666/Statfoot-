@@ -1,0 +1,47 @@
+{
+  "name": "TeamOfRound",
+  "type": "object",
+  "properties": {
+    "season_id": {
+      "type": "string"
+    },
+    "competition_id": {
+      "type": "string"
+    },
+    "round": {
+      "type": "integer"
+    },
+    "formation": {
+      "type": "string"
+    },
+    "slots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "player_id": {
+            "type": "string"
+          },
+          "position": {
+            "type": "string"
+          },
+          "rating": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "generated",
+        "published"
+      ],
+      "default": "generated"
+    }
+  },
+  "required": [
+    "season_id",
+    "round"
+  ]
+}

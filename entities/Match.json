@@ -1,0 +1,142 @@
+{
+  "name": "Match",
+  "type": "object",
+  "properties": {
+    "season_id": {
+      "type": "string"
+    },
+    "competition_id": {
+      "type": "string"
+    },
+    "group_id": {
+      "type": "string"
+    },
+    "round": {
+      "type": "integer",
+      "description": "journée"
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "league",
+        "group",
+        "round_of_16",
+        "quarter",
+        "semi",
+        "third_place",
+        "final"
+      ],
+      "default": "league"
+    },
+    "bracket_slot": {
+      "type": "string",
+      "description": "QF1, SF2, F…"
+    },
+    "home_source": {
+      "type": "object",
+      "description": "{type:'group_rank'|'winner'|'loser', ref, rank} pour l'automatisation du tableau"
+    },
+    "away_source": {
+      "type": "object"
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "venue_id": {
+      "type": "string"
+    },
+    "pitch": {
+      "type": "string"
+    },
+    "home_team_id": {
+      "type": "string"
+    },
+    "away_team_id": {
+      "type": "string"
+    },
+    "home_score": {
+      "type": "integer"
+    },
+    "away_score": {
+      "type": "integer"
+    },
+    "home_ht_score": {
+      "type": "integer"
+    },
+    "away_ht_score": {
+      "type": "integer"
+    },
+    "extra_time": {
+      "type": "boolean",
+      "default": false
+    },
+    "penalties": {
+      "type": "boolean",
+      "default": false
+    },
+    "home_pens": {
+      "type": "integer"
+    },
+    "away_pens": {
+      "type": "integer"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "scheduled",
+        "live",
+        "finished",
+        "postponed",
+        "cancelled"
+      ],
+      "default": "scheduled"
+    },
+    "published": {
+      "type": "boolean",
+      "default": true
+    },
+    "motm_player_id": {
+      "type": "string",
+      "description": "homme du match officiel"
+    },
+    "motm_vote_open": {
+      "type": "boolean",
+      "default": false
+    },
+    "motm_vote_closes_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "referee": {
+      "type": "string"
+    },
+    "assistant_referees": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "scorer_user_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "marqueurs assignés"
+    },
+    "live": {
+      "type": "object",
+      "description": "{period:'1H'|'HT'|'2H'|'ET'|'PENS'|'FT', running, started_at, elapsed_ms, possession:{home_ms,away_ms,dead_ms,current}, operator_name}"
+    },
+    "sheet": {
+      "type": "object",
+      "description": "{status:'draft'|'validated', referee_signature, manager_signature, validated_at, validated_by, notes}"
+    }
+  },
+  "required": [
+    "season_id",
+    "competition_id",
+    "home_team_id",
+    "away_team_id"
+  ]
+}

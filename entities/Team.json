@@ -1,0 +1,57 @@
+{
+  "name": "Team",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "short_name": {
+      "type": "string",
+      "maxLength": 3
+    },
+    "company": {
+      "type": "string"
+    },
+    "logo_url": {
+      "type": "string"
+    },
+    "company_logo_url": {
+      "type": "string"
+    },
+    "primary_color": {
+      "type": "string"
+    },
+    "secondary_color": {
+      "type": "string"
+    },
+    "division_id": {
+      "type": "string",
+      "description": "série actuelle"
+    },
+    "captain_player_id": {
+      "type": "string"
+    },
+    "contact_name": {
+      "type": "string"
+    },
+    "contact_email": {
+      "type": "string"
+    },
+    "contact_phone": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "pending",
+        "inactive"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "name",
+    "short_name"
+  ]
+}

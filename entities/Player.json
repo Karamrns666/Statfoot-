@@ -1,0 +1,66 @@
+{
+  "name": "Player",
+  "type": "object",
+  "properties": {
+    "first_name": {
+      "type": "string"
+    },
+    "last_name": {
+      "type": "string"
+    },
+    "photo_url": {
+      "type": "string"
+    },
+    "position": {
+      "type": "string",
+      "enum": [
+        "GK",
+        "DEF",
+        "MID",
+        "FWD"
+      ],
+      "description": "GB / DEF / MIL / ATT"
+    },
+    "number": {
+      "type": "integer"
+    },
+    "team_id": {
+      "type": "string"
+    },
+    "birth_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "injured",
+        "suspended",
+        "inactive"
+      ],
+      "default": "active"
+    },
+    "is_captain": {
+      "type": "boolean",
+      "default": false
+    },
+    "season_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "saisons jouées → badge Recrue si 1 seule"
+    },
+    "email": {
+      "type": "string",
+      "description": "compte joueur (accès à sa carte)"
+    }
+  },
+  "required": [
+    "first_name",
+    "last_name",
+    "position",
+    "team_id"
+  ]
+}

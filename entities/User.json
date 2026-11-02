@@ -1,0 +1,31 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "app_role": {
+      "type": "string",
+      "enum": [
+        "super_admin",
+        "league_admin",
+        "scorer",
+        "player"
+      ]
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    },
+    "activated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_login": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "player_id": {
+      "type": "string",
+      "description": "pour les comptes joueurs"
+    }
+  }
+}

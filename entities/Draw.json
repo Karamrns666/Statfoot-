@@ -1,0 +1,73 @@
+{
+  "name": "Draw",
+  "type": "object",
+  "properties": {
+    "competition_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "setup",
+        "in_progress",
+        "done"
+      ],
+      "default": "setup"
+    },
+    "pots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "pot": {
+            "type": "integer"
+          },
+          "team_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "locked": {
+      "type": "boolean",
+      "default": false
+    },
+    "one_team_per_pot_per_group": {
+      "type": "boolean",
+      "default": true
+    },
+    "picks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "team_id": {
+            "type": "string"
+          },
+          "pot": {
+            "type": "integer"
+          },
+          "group_id": {
+            "type": "string"
+          },
+          "at": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "applied_to_groups": {
+      "type": "boolean",
+      "default": false
+    },
+    "performed_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "competition_id"
+  ]
+}

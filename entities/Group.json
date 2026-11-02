@@ -1,0 +1,26 @@
+{
+  "name": "Group",
+  "type": "object",
+  "properties": {
+    "competition_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "description": "Groupe A"
+    },
+    "team_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "order": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "competition_id",
+    "name"
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "name": "Media",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "photo",
+        "video",
+        "article"
+      ]
+    },
+    "url": {
+      "type": "string"
+    },
+    "thumbnail_url": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string",
+      "description": "contenu article (markdown)"
+    },
+    "match_id": {
+      "type": "string"
+    },
+    "season_id": {
+      "type": "string"
+    },
+    "team_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "round": {
+      "type": "integer",
+      "description": "tag journée (J1, J2…)"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "upload",
+        "url",
+        "google_drive",
+        "generated"
+      ],
+      "default": "url"
+    },
+    "published": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "title",
+    "type",
+    "url"
+  ]
+}

@@ -165,7 +165,7 @@ export default function MatchCenter() {
 
   const readOnlyBanner = !canWrite && m.status !== 'finished'
   return (
-    <div className={cn('min-h-screen pb-24', bright && 'mc-bright')}>
+    <div className={cn('min-h-screen overflow-x-hidden pb-24', bright && 'mc-bright')}>
       {/* barre d'outils */}
       <div className="sticky top-14 z-20 flex flex-wrap items-center gap-2 border-b border-white/5 bg-night-900/95 px-3 py-2 backdrop-blur">
         <Button asChild variant="ghost" size="sm"><Link to="/admin/match-center"><ArrowLeft />Programme</Link></Button>
@@ -281,7 +281,7 @@ export default function MatchCenter() {
 function ScoreSide({ team, scorers, xp, align = 'left' }: { team?: { name: string; short_name: string; primary_color?: string } & Parameters<typeof TeamLogo>[0]['team']; scorers: MatchEvent[]; xp: Map<string, number>; align?: 'left' | 'right' }) {
   const L = useLookup()
   return (
-    <div className={cn('flex flex-col items-center gap-1 text-center')}>
+    <div className="flex min-w-0 flex-col items-center gap-1 text-center">
       <TeamLogo team={team} size={64} />
       <div className="title-caps text-base leading-tight sm:text-xl">{team?.name}</div>
       <ul className={cn('w-full space-y-0.5 text-[11px] sm:text-xs', align === 'right' ? 'text-right' : 'text-left')}>

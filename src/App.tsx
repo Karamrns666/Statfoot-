@@ -3,6 +3,8 @@ import { Route, Routes } from 'react-router-dom'
 import { PublicLayout } from '@/components/layout/PublicLayout'
 import { Spinner } from '@/components/league/Bits'
 import { useData } from '@/hooks/useData'
+import { AdminLayout, RequireArea } from '@/components/admin/AdminLayout'
+import type { Area } from '@/lib/permissions'
 
 const P = {
   Home: lazy(() => import('@/pages/public/Home')),
@@ -21,6 +23,27 @@ const P = {
   Rules: lazy(() => import('@/pages/public/Rules')),
   Tv: lazy(() => import('@/pages/public/TvMode')),
 }
+const named = <T extends string>(loader: () => Promise<Record<T, React.ComponentType>>, name: T) => lazy(() => loader().then((m) => ({ default: m[name] })))
+const sport = () => import('@/pages/admin/SportPages')
+const content = () => import('@/pages/admin/ContentPages')
+const misc = () => import('@/pages/admin/AdminMisc')
+const A = {
+  Login: lazy(() => import('@/pages/admin/Login')),
+  Dashboard: lazy(() => import('@/pages/admin/Dashboard')),
+  Seasons: named(sport, 'Seasons'), Competitions: named(sport, 'Competitions'), Divisions: named(sport, 'Divisions'), Teams: named(sport, 'Teams'),
+  Players: lazy(() => import('@/pages/admin/PlayersAdmin')),
+  Groups: lazy(() => import('@/pages/admin/Groups')),
+  Draw: lazy(() => import('@/pages/admin/DrawSwiss')),
+  Matches: lazy(() => import('@/pages/admin/MatchesAdmin')),
+  QuickEntry: lazy(() => import('@/pages/admin/QuickEntry')),
+  Sheet: lazy(() => import('@/pages/admin/MatchSheet')),
+  McProgram: lazy(() => import('@/pages/admin/MatchCenterProgram')),
+  McLive: lazy(() => import('@/pages/admin/MatchCenter')),
+  XP: lazy(() => import('@/pages/admin/XPRules')),
+  Stats: named(misc, 'StatsAdmin'), Awards: named(misc, 'AwardsAdmin'), Import: named(misc, 'ImportCsv'), Broadcast: named(misc, 'Broadcast'),
+  Media: named(content, 'MediaAdmin'), Rules: named(content, 'RulesEditor'), Settings: named(content, 'SettingsPage'), Admins: named(content, 'AdminsPage'), Audit: named(content, 'AuditPage'),
+}
+const guard = (area: Area, el: React.ReactNode) => <RequireArea area={area}>{el}</RequireArea>
 
 export default function App() {
   const { ready } = useData()
@@ -30,6 +53,32 @@ export default function App() {
       <Routes>
         <Route path="/tv" element={<P.Tv />} />
         <Route path="/live/:terrain" element={<P.Tv />} />
+        <Route path="/admin/login" element={<A.Login />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={guard('dashboard', <A.Dashboard />)} />
+          <Route path="saisons" element={guard('sport', <A.Seasons />)} />
+          <Route path="competitions" element={guard('sport', <A.Competitions />)} />
+          <Route path="divisions" element={guard('sport', <A.Divisions />)} />
+          <Route path="equipes" element={guard('sport', <A.Teams />)} />
+          <Route path="joueurs" element={guard('sport', <A.Players />)} />
+          <Route path="groupes" element={guard('sport', <A.Groups />)} />
+          <Route path="tirage" element={guard('sport', <A.Draw />)} />
+          <Route path="matchs" element={guard('sport', <A.Matches />)} />
+          <Route path="matchs/:id/saisie" element={guard('match_center', <A.QuickEntry />)} />
+          <Route path="matchs/:id/feuille" element={guard('match_center', <A.Sheet />)} />
+          <Route path="match-center" element={guard('match_center', <A.McProgram />)} />
+          <Route path="match-center/:id" element={guard('match_center', <A.McLive />)} />
+          <Route path="xp" element={guard('xp', <A.XP />)} />
+          <Route path="statistiques" element={guard('sport', <A.Stats />)} />
+          <Route path="trophees" element={guard('awards', <A.Awards />)} />
+          <Route path="import" element={guard('import', <A.Import />)} />
+          <Route path="medias" element={guard('media', <A.Media />)} />
+          <Route path="reglement" element={guard('settings', <A.Rules />)} />
+          <Route path="diffusion" element={guard('match_center', <A.Broadcast />)} />
+          <Route path="journal" element={guard('audit', <A.Audit />)} />
+          <Route path="administrateurs" element={guard('admins', <A.Admins />)} />
+          <Route path="parametres" element={guard('settings', <A.Settings />)} />
+        </Route>
         <Route element={<PublicLayout />}>
           <Route index element={<P.Home />} />
           <Route path="matchs" element={<P.Matches />} />

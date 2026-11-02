@@ -19,14 +19,14 @@ export function XPCard({ r, player: p, team: t, className }: { r: Ranked<PlayerX
       front={gk
         ? [{ label: 'MJ', value: s.matches }, { label: 'ARR', value: s.saves, hint: 'Arrêts' }, { label: 'CS', value: s.clean_sheets, hint: 'Clean sheets' }, { label: 'BE', value: s.conceded, hint: 'Buts encaissés' }]
         : [{ label: 'MJ', value: s.matches }, { label: 'BUT', value: s.goals }, { label: 'PAS', value: s.assists, hint: 'Passes décisives' }, { label: 'CJ', value: s.yellow, hint: 'Cartons jaunes' }]}
-      backTitle={`${POSITION_LONG[p.position]} · rang XP n°${r.rank}`}
+      backTitle={POSITION_LONG[p.position]}
       back={[
         { label: 'Matchs avec stats', value: s.matches },
-        { label: 'Victoires / nuls / défaites', value: `${s.wins} / ${s.draws} / ${s.losses}` },
+        { label: 'V / N / D', value: `${s.wins} / ${s.draws} / ${s.losses}`, hint: 'Victoires / nuls / défaites' },
         { label: 'Buts', value: s.goals },
         { label: 'Passes décisives', value: s.assists },
         ...(gk || s.gk_matches ? [{ label: 'Arrêts', value: s.saves }, { label: 'Clean sheets', value: s.clean_sheets }, { label: 'Buts encaissés', value: s.conceded }] : []),
-        { label: 'Cartons jaunes / rouges', value: `${s.yellow} / ${s.red}` },
+        { label: 'Cartons J / R', value: `${s.yellow} / ${s.red}`, hint: 'Cartons jaunes / rouges' },
       ]}
       href={`/joueurs/${p.id}`}
     />
@@ -44,7 +44,7 @@ export function IPGCard({ e, className }: { e: IPGEntry; className?: string }) {
       team={team} teamName={e.team.toLowerCase().replace(/(^|\s)\S/g, (x) => x.toUpperCase())} photoUrl={player?.photo_url}
       rating={e.ipg.toFixed(1)} ratingLabel="IPG" rank={e.rank}
       front={[{ label: 'BUT', value: e.goals }, { label: 'PAS', value: e.assists, hint: 'Passes décisives' }, { label: 'CONT', value: `${Math.round(e.contribution)}%`, hint: 'Part des buts de l’équipe' }, { label: 'VIC', value: `${Math.round(e.win_pct)}%`, hint: 'Victoires de l’équipe' }]}
-      backTitle={`Indice de performance · n°${e.rank}`}
+      backTitle="Indice de performance"
       back={[
         { label: 'Buts / passes', value: `${e.goals} / ${e.assists}` },
         { label: 'Contribution aux buts', value: `${e.contribution.toFixed(1)} %` },

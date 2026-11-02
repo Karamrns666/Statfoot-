@@ -15,7 +15,7 @@ export function Logo({ to = '/', subtitle, className }: { to?: string; subtitle?
       <img src={settings.logo_url || MBL_LOGO} alt="" className="h-11 w-auto shrink-0 drop-shadow-[0_4px_10px_rgba(0,0,0,.45)]" />
       <div className="leading-none">
         <div className="font-display text-[22px] font-black uppercase tracking-[.01em] text-white">{settings.short_name ?? 'MBL'}</div>
-        <div className="mt-0.5 text-[11px] font-semibold text-sky-soft">{subtitle ?? name}</div>
+        {subtitle !== '' && <div className="mt-0.5 whitespace-nowrap text-[11px] font-semibold text-sky-soft">{subtitle ?? name}</div>}
       </div>
     </Link>
   )

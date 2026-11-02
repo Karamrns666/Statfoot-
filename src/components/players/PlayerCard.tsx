@@ -63,10 +63,6 @@ export function PlayerCard(p: PlayerCardProps) {
         {/* ---------- RECTO ---------- */}
         <div className="pcard-face pcard-shape overflow-hidden rounded-b-2xl" style={{ background: `linear-gradient(160deg, ${tier.edge}, ${tier.edge}55 40%, ${tier.edge})`, padding: 2, filter: `drop-shadow(0 14px 22px ${tier.glow})` }}>
           <div className="pcard-shape relative flex h-full flex-col overflow-hidden rounded-b-[14px]" style={{ background: `radial-gradient(120% 70% at 50% 0%, ${color}40, transparent 60%), linear-gradient(180deg, #0D3380 0%, #061A47 55%, #031033 100%)` }}>
-            {/* filigrane terrain */}
-            <svg className="pointer-events-none absolute inset-x-0 bottom-[22%] h-1/2 w-full opacity-[.07]" viewBox="0 0 100 60" preserveAspectRatio="none" aria-hidden>
-              <g fill="none" stroke="#fff" strokeWidth=".8"><rect x="4" y="4" width="92" height="52" /><line x1="50" y1="4" x2="50" y2="56" /><circle cx="50" cy="30" r="10" /></g>
-            </svg>
             <div className="pcard-sheen pointer-events-none absolute inset-0" />
             <div className="relative flex items-start justify-between px-[8%] pt-[14%]">
               <div className="leading-none">
@@ -106,7 +102,7 @@ export function PlayerCard(p: PlayerCardProps) {
         </div>
         {/* ---------- VERSO ---------- */}
         <div className="pcard-face pcard-back pcard-shape overflow-hidden rounded-b-2xl" style={{ background: tier.edge, padding: 2 }}>
-          <div className="pcard-shape flex h-full flex-col rounded-b-[14px] bg-white px-[8%] pb-4 pt-[15%] text-ink">
+          <div className="pcard-shape flex h-full flex-col rounded-b-[14px] bg-white px-[8%] pb-4 pt-[13%] text-ink">
             <div className="flex items-center gap-2">
               {logo && <img src={logo} alt="" className="size-8 object-contain" />}
               <div className="min-w-0">
@@ -114,15 +110,15 @@ export function PlayerCard(p: PlayerCardProps) {
                 <div className="truncate text-[11px] text-ink/60">{p.firstName} · {teamLabel}</div>
               </div>
             </div>
-            <div className="mt-3 flex items-baseline justify-between border-b-2 pb-1" style={{ borderColor: tier.edge }}>
-              <span className="text-[11px] font-bold text-ink/70">{p.backTitle}</span>
-              <span className="font-display text-2xl font-black leading-none" style={{ color: '#0B2E73' }}>{p.rating}<span className="ml-1 text-xs text-ink/50">{p.ratingLabel}</span></span>
+            <div className="mt-2.5 flex items-end justify-between gap-2 border-b-2 pb-1.5" style={{ borderColor: tier.edge }}>
+              <span className="min-w-0 text-[10.5px] font-bold leading-tight text-ink/65">{p.backTitle}</span>
+              <span className="shrink-0 font-display text-2xl font-black leading-none text-mbl">{p.rating}<span className="ml-0.5 text-[10px] text-ink/50">{p.ratingLabel}</span></span>
             </div>
-            <dl className="mt-1 flex-1 divide-y divide-ink/10 overflow-hidden">
+            <dl className="mt-0.5 min-h-0 flex-1 divide-y divide-ink/10 overflow-hidden">
               {p.back.map((s) => (
-                <div key={s.label} className="flex items-center justify-between py-[5px] text-[12px]" title={s.hint}>
+                <div key={s.label} className="flex items-center justify-between gap-2 py-[3px] text-[11px] leading-tight" title={s.hint}>
                   <dt className="text-ink/70">{s.label}</dt>
-                  <dd className="font-display text-base font-extrabold leading-none">{s.value}</dd>
+                  <dd className="shrink-0 font-display text-[15px] font-extrabold leading-none">{s.value}</dd>
                 </div>
               ))}
             </dl>

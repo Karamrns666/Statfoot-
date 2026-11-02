@@ -2,7 +2,7 @@ import { store } from '../localStore'
 import { generateDemoData } from './generate'
 import type { EntityName } from '@/types/entities'
 
-const SEED_VERSION = '3-mbl-2025'
+const SEED_VERSION = '4-mbl-2025'
 
 /** Charge les données de démo au premier lancement (ou si la version du seed change). */
 export function ensureSeeded() {

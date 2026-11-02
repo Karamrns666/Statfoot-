@@ -6,6 +6,7 @@ import { useSeason } from '@/hooks/useSeason'
 import { useEffectiveSeason, useRace } from '@/hooks/useStats'
 import { EmptyState, RankDelta, RookieBadge, StatTile } from '@/components/league/Bits'
 import { PlayerAvatar, PositionBadge, TeamLogo } from '@/components/league/Identity'
+import { XPCard } from '@/components/players/Cards'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { AXIS, ChartBox, GRID, Legend, SERIES, TOOLTIP } from '@/components/charts/theme'
@@ -34,13 +35,13 @@ export default function PlayerDetail() {
     <div className="space-y-6">
       <section className="relative overflow-hidden rounded-3xl border border-white/10 p-6 sm:p-8" style={{ background: `radial-gradient(ellipse 60% 100% at 100% 0%, ${t?.primary_color}40, transparent 70%), linear-gradient(180deg,#0D2B66,#04163D)` }}>
         <div className="flex flex-col items-center gap-6 sm:flex-row">
-          <PlayerAvatar player={p} team={t} size={132} />
+          {me ? <XPCard r={me} player={p} team={t} className="w-48 shrink-0" /> : <PlayerAvatar player={p} team={t} size={132} />}
           <div className="flex-1 text-center sm:text-left">
             <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start"><PositionBadge position={p.position} />{isRookie(p) && <RookieBadge />}{p.is_captain && <span className="rounded bg-award-gold/20 px-2 py-0.5 text-[10px] font-bold uppercase text-award-gold">Capitaine</span>}</div>
             <h1 className="title-caps mt-2 text-4xl sm:text-6xl">{p.first_name} <span className="text-neon">{p.last_name}</span></h1>
             <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-sm text-muted-foreground sm:justify-start">
               <Link to={`/equipes/${t?.id}`} className="flex items-center gap-2 hover:text-neon"><TeamLogo team={t} size={22} />{t?.name}</Link>
-              <span>#{p.number}</span><span>{POSITION_LONG[p.position]}</span>{p.birth_date && <span>{ageAt(p.birth_date)} ans</span>}
+              {p.number != null && <span>#{p.number}</span>}<span>{POSITION_LONG[p.position]}</span>{p.birth_date && <span>{ageAt(p.birth_date)} ans</span>}
             </div>
           </div>
           <div className="text-center">

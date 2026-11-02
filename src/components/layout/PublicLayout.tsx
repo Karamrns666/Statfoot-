@@ -30,7 +30,7 @@ export function PublicLayout() {
       <ScoreTicker />
       <header className="sticky top-0 z-40 border-b border-white/5 bg-night-900/80 backdrop-blur-xl no-print">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
-          <Logo subtitle="Morocco Business League" />
+          <Logo subtitle="" />
           <nav className="ml-4 hidden flex-1 items-center gap-0.5 xl:flex">
             {PUBLIC_NAV.map((n) => (
               <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => cn('whitespace-nowrap rounded-lg px-2 py-1.5 font-display text-[14px] font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:text-white', isActive && 'text-neon bg-neon/10')}>{n.label}</NavLink>

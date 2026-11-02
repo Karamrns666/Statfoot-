@@ -66,7 +66,7 @@ export default function Media() {
             const k = kindOf(m)
             const featured = i === 0 && kind === 'tout' && !team
             return (
-              <button key={m.id} onClick={() => openItem(m)} className={cn('group relative cursor-pointer overflow-hidden rounded-2xl bg-night-950 text-left', featured ? 'col-span-2 row-span-2 aspect-square sm:aspect-auto' : 'aspect-[4/5]')}>
+              <button key={m.id} onClick={() => openItem(m)} className={cn('group relative cursor-pointer overflow-hidden rounded-2xl bg-night-950 text-left', featured ? 'col-span-2 row-span-2 aspect-[4/3]' : 'aspect-[4/3]')}>
                 {k === 'lien' && !m.thumbnail_url
                   ? <div className="flex size-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-mbl to-night-950"><FileText className="size-10 text-sky" /></div>
                   : <img src={m.thumbnail_url ?? m.url} alt="" className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />}

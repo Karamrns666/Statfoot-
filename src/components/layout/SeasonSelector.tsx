@@ -14,7 +14,7 @@ export function SeasonSelector({ className }: { className?: string }) {
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="all">Toutes saisons</SelectItem>
-        {seasons.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}{s.is_active ? ' (en cours)' : ''}</SelectItem>)}
+        {seasons.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}{s.is_active && s.status !== 'closed' ? ' (en cours)' : ''}</SelectItem>)}
       </SelectContent>
     </Select>
   )

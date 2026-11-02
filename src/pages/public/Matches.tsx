@@ -130,7 +130,7 @@ export default function Matches() {
       <div className="space-y-8">
         {groups.map(([k, ms]) => (
           <section key={k}>
-            <h2 className="mb-3 flex items-center gap-3 font-display text-2xl font-black"><span>{k}</span><span className="h-px flex-1 bg-gradient-to-r from-white/15 to-transparent" /><span className="text-xs font-semibold text-muted-foreground">{ms.length} match{ms.length > 1 ? 's' : ''}</span></h2>
+            <h2 className="mb-3 flex items-center gap-3 font-display text-xl font-black sm:text-2xl"><span>{k}</span><span className="h-px flex-1 bg-gradient-to-r from-white/15 to-transparent" /><span className="whitespace-nowrap text-xs font-semibold text-muted-foreground">{ms.length} match{ms.length > 1 ? 's' : ''}</span></h2>
             <div className="grid gap-2.5 md:grid-cols-2">{ms.map((m) => <MatchRow key={m.id} match={m} favorites={fav} onToggleFavorite={toggle} />)}</div>
           </section>
         ))}

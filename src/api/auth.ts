@@ -2,13 +2,13 @@
 // Règle reprise de cac-foot : liste blanche — seuls les comptes créés/invités par un admin peuvent se connecter.
 import { store, newId } from './localStore'
 import { getSessionUser, setSession } from './session'
-import type { Invitation, User } from '@/types/entities'
+import type { BaseEntity, Invitation, User } from '@/types/entities'
 
 function touchLogin(u: User) {
   const users = store.all<User>('User').map((x) => (x.id === u.id ? { ...x, last_login: new Date().toISOString() } : x))
   store.replace('User', users)
   setSession(u.id)
-  store.replace('ActivityLog', [{ id: newId(), created_date: new Date().toISOString(), action: 'login', entity: 'User', entity_id: u.id, entity_label: u.email, author_email: u.email, author_name: u.full_name }, ...store.all('ActivityLog')])
+  store.replace('ActivityLog', [{ id: newId(), created_date: new Date().toISOString(), action: 'login', entity: 'User', entity_id: u.id, entity_label: u.email, author_email: u.email, author_name: u.full_name } as BaseEntity, ...store.all('ActivityLog')])
 }
 
 function acceptInvitation(email: string): User | null {

@@ -117,7 +117,7 @@ export function buildBracket(opts: { groupIds?: string[]; leagueRef?: string; qu
   }
   const out: BracketMatchDraft[] = []
   const stageOrder: MatchStage[] = ['round_of_16', 'quarter', 'semi', 'final']
-  let stage = firstStage
+  let stage: MatchStage = firstStage
   let prev: string[] = []
   const nFirst = entrants.length / 2
   for (let i = 0; i < nFirst; i++) {
@@ -126,7 +126,7 @@ export function buildBracket(opts: { groupIds?: string[]; leagueRef?: string; qu
     prev.push(slot)
   }
   while (stage !== 'final') {
-    const next = stageOrder[stageOrder.indexOf(stage) + 1]
+    const next: MatchStage = stageOrder[stageOrder.indexOf(stage) + 1]
     const cur: string[] = []
     if (next === 'final' && opts.thirdPlace && prev.length === 2) {
       out.push({ stage: 'third_place', bracket_slot: '3P', home_source: { type: 'loser', ref: prev[0] }, away_source: { type: 'loser', ref: prev[1] } })

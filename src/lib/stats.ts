@@ -19,7 +19,7 @@ export interface LeagueData {
   events: MatchEvent[]
   lineups: Lineup[]
   xpRules: XPRule[]
-  settings: Settings
+  settings: Partial<Settings>
 }
 
 /** Périmètre d'un calcul */
@@ -65,7 +65,7 @@ export const DEFAULT_XP_RULES: Omit<XPRule, 'id'>[] = [
   { action: 'red_card', label: 'Carton rouge', points: -5, order: 16 },
 ].map((r) => ({ active: true, ...r })) as Omit<XPRule, 'id'>[]
 
-export function settingsWithDefaults(s?: Settings | null) {
+export function settingsWithDefaults(s?: Partial<Settings> | null) {
   return { ...DEFAULT_SETTINGS, ...(s ?? {}), tiebreakers: s?.tiebreakers?.length ? s.tiebreakers : DEFAULT_SETTINGS.tiebreakers }
 }
 
@@ -171,7 +171,7 @@ function emptyRow(team_id: string): StandingRow {
 }
 
 export function computeTable(
-  matches: Match[], teamIds: string[], settings: Settings | null | undefined, events: MatchEvent[] = [],
+  matches: Match[], teamIds: string[], settings: Partial<Settings> | null | undefined, events: MatchEvent[] = [],
 ): Map<string, StandingRow & { results: Result[] }> {
   const s = settingsWithDefaults(settings)
   const rows = new Map<string, StandingRow & { results: Result[] }>()
@@ -217,7 +217,7 @@ function criterionValue(c: Tiebreaker, r: StandingRow): number {
 }
 
 /** Tri récursif par critères ; 'head_to_head' = mini-classement entre les équipes encore à égalité. */
-export function sortStandings(rows: StandingRow[], criteria: Tiebreaker[], matches: Match[], settings?: Settings | null, nameOf?: (id: string) => string): StandingRow[] {
+export function sortStandings(rows: StandingRow[], criteria: Tiebreaker[], matches: Match[], settings?: Partial<Settings> | null, nameOf?: (id: string) => string): StandingRow[] {
   if (rows.length <= 1) return rows
   if (criteria.length === 0) {
     return [...rows].sort((a, b) => (nameOf ? nameOf(a.team_id).localeCompare(nameOf(b.team_id)) : a.team_id.localeCompare(b.team_id)))
@@ -240,7 +240,7 @@ export function sortStandings(rows: StandingRow[], criteria: Tiebreaker[], match
 }
 
 export function computeStandings(
-  matches: Match[], teamIds: string[], settings?: Settings | null, events: MatchEvent[] = [],
+  matches: Match[], teamIds: string[], settings?: Partial<Settings> | null, events: MatchEvent[] = [],
   tiebreakers?: Tiebreaker[], nameOf?: (id: string) => string,
 ): StandingRow[] {
   const s = settingsWithDefaults(settings)
@@ -859,4 +859,31 @@ export function groupBy<T, K>(arr: T[], key: (x: T) => K): Map<K, T[]> {
   const m = new Map<K, T[]>()
   for (const x of arr) { const k = key(x); if (!m.has(k)) m.set(k, []); m.get(k)!.push(x) }
   return m
+}
+
+// ---------------------------------------------------------------------------
+//  Stats collectives d'un match depuis les événements du Match Center
+//  ("Remplir depuis le Match Center" de la feuille de match)
+//  Règle : un but ou un arrêt adverse = tir cadré (si non déjà saisi comme tir cadré auto).
+// ---------------------------------------------------------------------------
+export interface TeamMatchNumbers {
+  goals: number; shots: number; shots_on_target: number; corners: number; fouls: number; offsides: number
+  yellow_cards: number; red_cards: number; saves: number; throw_ins: number; free_kicks: number
+}
+export function teamStatsFromEvents(m: Pick<Match, 'home_team_id' | 'away_team_id'>, events: MatchEvent[], teamId: string, period?: '1H' | '2H'): TeamMatchNumbers {
+  const opp = teamId === m.home_team_id ? m.away_team_id : m.home_team_id
+  const evs = events.filter((e) => !period || e.period === period)
+  const mine = evs.filter((e) => e.team_id === teamId)
+  const c = (t: MatchEvent['type'], list = mine) => list.filter((e) => e.type === t).length
+  const goals = c('goal') + c('penalty_goal') + evs.filter((e) => e.type === 'own_goal' && e.team_id === opp).length
+  const autoOn = mine.filter((e) => e.type === 'shot_on_target' && e.auto).length
+  const manualOn = c('shot_on_target') - autoOn
+  // tirs cadrés = tirs cadrés saisis manuellement + buts (hors CSC) + arrêts du gardien adverse (+ penalty arrêté)
+  const oppSaves = c('save', evs.filter((e) => e.team_id === opp)) + c('penalty_saved', evs.filter((e) => e.team_id === opp))
+  const onTarget = manualOn + c('goal') + c('penalty_goal') + oppSaves
+  return {
+    goals, shots_on_target: onTarget, shots: onTarget + c('shot_off_target') + c('penalty_missed'),
+    corners: c('corner'), fouls: c('foul'), offsides: c('offside'), yellow_cards: c('yellow_card'), red_cards: c('red_card'),
+    saves: c('save') + c('penalty_saved'), throw_ins: c('throw_in'), free_kicks: c('free_kick'),
+  }
 }

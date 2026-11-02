@@ -16,10 +16,10 @@ export const PUBLIC_NAV = [
   { to: '/joueurs', label: 'Joueurs' },
   { to: '/trophees', label: 'Trophées' },
   { to: '/statistiques', label: 'Stats' },
-  { to: '/equipe-de-la-journee', label: 'Équipe type' },
+  { to: '/equipe-de-la-journee', label: 'Équipe type', wide: true },
   { to: '/media', label: 'Média' },
-  { to: '/historique', label: 'Historique' },
-]
+  { to: '/historique', label: 'Historique', wide: true },
+] as { to: string; label: string; end?: boolean; wide?: boolean }[]
 
 export function PublicLayout() {
   const [open, setOpen] = useState(false)
@@ -30,10 +30,10 @@ export function PublicLayout() {
       <ScoreTicker />
       <header className="sticky top-0 z-40 border-b border-white/5 bg-night-900/80 backdrop-blur-xl no-print">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
-          <Logo subtitle="" />
-          <nav className="ml-4 hidden flex-1 items-center gap-0.5 xl:flex">
+          <Logo subtitle="" className="shrink-0" />
+          <nav className="ml-6 hidden min-w-0 flex-1 items-center gap-0.5 xl:flex">
             {PUBLIC_NAV.map((n) => (
-              <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => cn('whitespace-nowrap rounded-lg px-2 py-1.5 font-display text-[14px] font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:text-white', isActive && 'text-neon bg-neon/10')}>{n.label}</NavLink>
+              <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => cn('whitespace-nowrap rounded-lg px-2 py-1.5 font-display text-[15px] font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:text-white', n.wide && 'hidden 2xl:block', isActive && 'text-neon bg-neon/10')}>{n.label}</NavLink>
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-2">

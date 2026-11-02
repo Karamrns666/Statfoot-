@@ -1,0 +1,120 @@
+## tsc
+exit=0
+## tests
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.0.5 [39m[90m/home/runner/work/Statfoot-/Statfoot-[39m
+
+ [32m✓[39m src/lib/matchEngine.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/lib/stats.test.ts [2m([22m[2m29 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32m✓[39m src/lib/schedule.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+[90mstdout[2m | src/api/seed/generate.test.ts[2m > [22m[2mseed MBL[2m > [22m[2m1 match en direct, XP calculé, passes > 0
+[22m[39mTaille JSON (Ko) : [33m2244[39m
+
+ [32m✓[39m src/api/seed/generate.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 76[2mms[22m[39m
+ [32m✓[39m src/lib/badges.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m5 passed[39m[22m[90m (5)[39m
+[2m      Tests [22m [1m[32m58 passed[39m[22m[90m (58)[39m
+[2m   Start at [22m 17:53:03
+[2m   Duration [22m 665ms[2m (import 51%, transform 36%, tests 11%, worker 2%)[22m
+
+exit=0
+## build
+[36mvite v8.3.5 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 4025 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                   1.42 kB │ gzip:   0.65 kB
+dist/assets/index-BybWjyZN.css                   84.45 kB │ gzip:  14.52 kB
+dist/assets/square-THOOYqdf.js                    0.17 kB │ gzip:   0.17 kB
+dist/assets/plus-Cp4ePgFU.js                      0.18 kB │ gzip:   0.16 kB
+dist/assets/arrow-left-DT1y8iui.js                0.19 kB │ gzip:   0.18 kB
+dist/assets/loader-circle-A7wuKTnh.js             0.19 kB │ gzip:   0.18 kB
+dist/assets/search-BB6Y892g.js                    0.20 kB │ gzip:   0.18 kB
+dist/assets/play-DestCCW0.js                      0.22 kB │ gzip:   0.19 kB
+dist/assets/user-Cc2q6lkh.js                      0.22 kB │ gzip:   0.20 kB
+dist/assets/rotate-ccw-BG8ruQTb.js                0.23 kB │ gzip:   0.20 kB
+dist/assets/pause-DzbF4zjl.js                     0.24 kB │ gzip:   0.18 kB
+dist/assets/link-2-qM7DNZtu.js                    0.27 kB │ gzip:   0.22 kB
+dist/assets/goal-F17J9kKZ.js                      0.27 kB │ gzip:   0.22 kB
+dist/assets/pencil-CvlrWuBF.js                    0.30 kB │ gzip:   0.24 kB
+dist/assets/send-HuYvAZSc.js                      0.32 kB │ gzip:   0.24 kB
+dist/assets/gavel-BuMyw454.js                     0.34 kB │ gzip:   0.24 kB
+dist/assets/shield-check-DcrJJke6.js              0.35 kB │ gzip:   0.26 kB
+dist/assets/save-JU1e0lGw.js                      0.35 kB │ gzip:   0.24 kB
+dist/assets/image-down-CHTPuyuL.js                0.36 kB │ gzip:   0.27 kB
+dist/assets/trash-Dppa8qhv.js                     0.37 kB │ gzip:   0.24 kB
+dist/assets/list-ordered-SlD6LqmK.js              0.38 kB │ gzip:   0.25 kB
+dist/assets/file-text-B17ZW9Im.js                 0.41 kB │ gzip:   0.27 kB
+dist/assets/hand-CCERpF15.js                      0.43 kB │ gzip:   0.27 kB
+dist/assets/clipboard-list-CulroCLX.js            0.44 kB │ gzip:   0.28 kB
+dist/assets/star-CdD8kE2I.js                      0.50 kB │ gzip:   0.31 kB
+dist/assets/Rules-BFEVjmBO.js                     0.53 kB │ gzip:   0.35 kB
+dist/assets/sparkles-CJySBI45.js                  0.54 kB │ gzip:   0.31 kB
+dist/assets/wand-sparkles-CYh9vVBh.js             0.56 kB │ gzip:   0.32 kB
+dist/assets/swords-CZ6G5QPv.js                    0.56 kB │ gzip:   0.32 kB
+dist/assets/label-CZbdJ-Gv.js                     0.60 kB │ gzip:   0.42 kB
+dist/assets/card-DYei3Li0.js                      0.62 kB │ gzip:   0.29 kB
+dist/assets/rolldown-runtime-XKyaHtl9.js          0.72 kB │ gzip:   0.42 kB
+dist/assets/input-M8BkASvi.js                     0.87 kB │ gzip:   0.40 kB
+dist/assets/badge-CxGdkyGS.js                     0.90 kB │ gzip:   0.47 kB
+dist/assets/table-DeW3wKuZ.js                     0.93 kB │ gzip:   0.43 kB
+dist/assets/footprints-CLanlYmr.js                0.99 kB │ gzip:   0.53 kB
+dist/assets/History-DKTX-LYn.js                   1.38 kB │ gzip:   0.71 kB
+dist/assets/Teams-DUXp5m3l.js                     1.53 kB │ gzip:   0.79 kB
+dist/assets/Identity-JN-ozfif.js                  1.71 kB │ gzip:   0.88 kB
+dist/assets/VisualFrame-DFuWVbMV.js               1.77 kB │ gzip:   0.85 kB
+dist/assets/button-Gx7TNfyp.js                    1.93 kB │ gzip:   1.01 kB
+dist/assets/TeamOfRound-GojQBJy0.js               2.38 kB │ gzip:   1.25 kB
+dist/assets/TrophyBadge-DYxGYOwc.js               2.87 kB │ gzip:   1.31 kB
+dist/assets/Standings-C1tLHeHr.js                 3.04 kB │ gzip:   1.66 kB
+dist/assets/dist-DUA2pKOt.js                      3.17 kB │ gzip:   1.43 kB
+dist/assets/Login-B_AFqMmm.js                     3.21 kB │ gzip:   1.48 kB
+dist/assets/MatchCard-C70xnv3-.js                 3.33 kB │ gzip:   1.25 kB
+dist/assets/zones-D4-vW0ZG.js                     3.34 kB │ gzip:   1.12 kB
+dist/assets/TeamStatsBars-CJYmb6dq.js             3.53 kB │ gzip:   1.49 kB
+dist/assets/react-dom-Ctcc3e7J.js                 3.90 kB │ gzip:   1.42 kB
+dist/assets/Stats-eug7yGhx.js                     4.14 kB │ gzip:   1.91 kB
+dist/assets/matchOps-DoGr3Ew-.js                  4.72 kB │ gzip:   2.05 kB
+dist/assets/dialog-DeSeV3tv.js                    5.91 kB │ gzip:   2.29 kB
+dist/assets/MatchCenterProgram-CPKVlZio.js        6.05 kB │ gzip:   2.38 kB
+dist/assets/TvMode-DZE-ZJms.js                    6.28 kB │ gzip:   2.25 kB
+dist/assets/Media-ggoU4z_x.js                     6.74 kB │ gzip:   2.58 kB
+dist/assets/tabs-CLF5qCYz.js                      7.24 kB │ gzip:   2.97 kB
+dist/assets/Players-Bps2E4Pt.js                   7.76 kB │ gzip:   2.91 kB
+dist/assets/QuickEntry-BOkEbSgN.js                7.77 kB │ gzip:   3.02 kB
+dist/assets/Dashboard-DrgBB17A.js                 8.50 kB │ gzip:   2.99 kB
+dist/assets/Groups-CSi9vyPr.js                    8.65 kB │ gzip:   3.11 kB
+dist/assets/PlayersAdmin-R5WlVtsh.js              9.43 kB │ gzip:   3.67 kB
+dist/assets/useStats-C26R67p_.js                 10.12 kB │ gzip:   3.74 kB
+dist/assets/EntityCrud-D59p3ePT.js               10.38 kB │ gzip:   3.96 kB
+dist/assets/Matches-qjk5R8Uv.js                  10.61 kB │ gzip:   4.01 kB
+dist/assets/XPRules-LsV1GdxO.js                  10.69 kB │ gzip:   3.99 kB
+dist/assets/DrawSwiss-CPBVT3Oc.js                10.74 kB │ gzip:   3.89 kB
+dist/assets/SportPages-BYYjvCUl.js               11.05 kB │ gzip:   3.72 kB
+dist/assets/Awards-DlZL5ZTY.js                   12.41 kB │ gzip:   3.50 kB
+dist/assets/es-Dffm3g8n.js                       12.49 kB │ gzip:   4.97 kB
+dist/assets/ContentPages-NawlUgn1.js             12.81 kB │ gzip:   4.60 kB
+dist/assets/Home-CJ79LV1P.js                     13.70 kB │ gzip:   4.99 kB
+dist/assets/MatchesAdmin-Cg-1dtem.js             14.13 kB │ gzip:   4.99 kB
+dist/assets/MatchSheet-C-L57Ro0.js               14.55 kB │ gzip:   4.87 kB
+dist/assets/Cards-DlF-ykNJ.js                    16.09 kB │ gzip:   5.38 kB
+dist/assets/TeamDetail-BcUXQdM0.js               22.76 kB │ gzip:   7.45 kB
+dist/assets/PlayerDetail-BloPIrba.js             22.86 kB │ gzip:   7.50 kB
+dist/assets/QrCode-BjFiqBIT.js                   23.96 kB │ gzip:   9.11 kB
+dist/assets/MatchDetail-BTRSV3lv.js              27.99 kB │ gzip:   8.40 kB
+dist/assets/format-BdrRNLOB.js                   28.63 kB │ gzip:   8.29 kB
+dist/assets/purify.es-Dqk5qvad.js                29.02 kB │ gzip:  11.45 kB
+dist/assets/AdminMisc-WDh0PRCu.js                36.89 kB │ gzip:  12.67 kB
+dist/assets/MatchCenter-DbFw5D-x.js              46.17 kB │ gzip:  13.93 kB
+dist/assets/lib-BvpIQd5O.js                     117.33 kB │ gzip:  35.49 kB
+dist/assets/utils-D3SAjA1r.js                   143.08 kB │ gzip:  47.29 kB
+dist/assets/index.es-CGkumTvw.js                151.43 kB │ gzip:  48.91 kB
+dist/assets/html2canvas-Bw0OShmD.js             199.40 kB │ gzip:  46.74 kB
+dist/assets/theme-t5Q_bwei.js                   358.15 kB │ gzip: 103.82 kB
+dist/assets/index-Bkl75ndN.js                   378.07 kB │ gzip: 122.00 kB
+dist/assets/jspdf.plugin.autotable-DjYuqRhP.js  429.57 kB │ gzip: 139.12 kB
+
+[32m✓ built in 596ms[39m
+exit=0

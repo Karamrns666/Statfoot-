@@ -23,6 +23,7 @@ def cap(s):
     return ' '.join(out)
 players=[];pidx={}
 for p in d['players']:
+    if 'OWN GOAL' in p['key']: continue  # ligne technique du fichier Excel, pas un joueur
     k=(p['team'],p['key']); 
     if k in pidx: continue
     pidx[k]=len(players); players.append(dict(team=p['team'],first=cap(p['prenom']),last=cap(p['nom']),key=p['key']))

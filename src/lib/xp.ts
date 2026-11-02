@@ -387,4 +387,4 @@ export function raceWithEvolution(data: XPData, scope: XPScope, key: RaceKey): R
   return cur.map((r) => { const p = pr.get(r.item.player_id) ?? null; return { ...r, previousRank: p, delta: p == null ? null : p - r.rank } })
 }
 
-export const isRookie = (p: Pick<Player, 'season_ids'>) => (p.season_ids?.length ?? 0) <= 1
+export const isRookie = (p: Pick<Player, 'season_ids' | 'rookie'>) => p.rookie ?? (p.season_ids?.length ?? 0) <= 1

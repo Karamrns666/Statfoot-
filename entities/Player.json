@@ -48,6 +48,10 @@
       },
       "description": "1 seule → badge « Recrue · 1re saison »"
     },
+    "rookie": {
+      "type": "boolean",
+      "description": "Recrue (1re saison dans la ligue). Si absent : déduit du nombre de saisons jouées."
+    },
     "email": {
       "type": "string",
       "description": "compte joueur"

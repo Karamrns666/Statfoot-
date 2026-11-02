@@ -81,6 +81,8 @@ export interface Player extends BaseEntity {
   status?: 'active' | 'injured' | 'inactive'
   is_captain?: boolean
   season_ids?: string[]
+  /** recrue (1re saison dans la ligue) ; à défaut, déduit du nombre de saisons jouées */
+  rookie?: boolean
   email?: string
   documents?: Partial<Record<DocType, PlayerDoc>>
 }

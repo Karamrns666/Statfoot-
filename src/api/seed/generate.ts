@@ -1,5 +1,7 @@
-// Jeu de données de démonstration (fictif) au format MBL :
-// 20 équipes · 240 joueurs · 5 chapeaux · phase de ligue suisse J1–J5 · Gold Cup / Silver Cup J6–J10.
+// Données de la plateforme :
+//  • Saison 2025-2026 RÉELLE, importée du tracker Excel de la ligue (voir ./season2025.ts) — saison affichée par défaut ;
+//  • Saison 2026-2027 de DÉMONSTRATION (fictive) au format MBL pour montrer le direct, le Match Center et les cups :
+//    20 équipes · 240 joueurs · 5 chapeaux · phase de ligue suisse J1–J5 · Gold Cup / Silver Cup J6–J10.
 // Pur : renvoie { Entité: lignes[] }.
 import type {
   AdminUser, Award, Competition, Draw, EntityMap, EntityName, Lineup, LiveState, Match, MatchEvent, MatchTeamStats, Media,
@@ -11,6 +13,7 @@ import { competitionStandings, computeAwards, computePlayerXP, teamRankBefore, X
 import { buildAction, newLiveState, type NewEvent } from '@/lib/matchEngine'
 import { companyLogoSvg, photoPlaceholderSvg, teamLogoSvg } from '@/lib/logos'
 import { RULES_MARKDOWN } from './rules'
+import { buildSeason2025 } from './season2025'
 
 type DB = { [N in EntityName]: EntityMap[N][] }
 
@@ -46,7 +49,7 @@ export function generateDemoData(now = new Date()): DB {
 
   const settings: Settings = {
     id: 'settings', league_name: 'Morocco Business League', short_name: 'MBL', tagline: 'Le championnat de football des entreprises',
-    organizer: 'Ardentia', contact_email: 'contact@mbl.ma', contact_phone: '+212 5 00 00 00 00', address: 'Complexe sportif — Casablanca',
+    organizer: 'Ardentia', logo_url: '/brand/mbl-logo.png', contact_email: 'contact@mbl.ma', contact_phone: '+212 5 00 00 00 00', address: 'Complexe sportif — Casablanca',
     socials: { instagram: 'https://instagram.com/', facebook: 'https://facebook.com/', linkedin: 'https://linkedin.com/', youtube: 'https://youtube.com/' },
     points_win: 3, points_draw: 1, points_loss: 0, tiebreakers: ['points', 'goal_diff', 'goals_for', 'head_to_head', 'fair_play'],
     starters_count: 6, motm_vote_minutes_after: 15, young_max_age: 23,
@@ -71,8 +74,10 @@ export function generateDemoData(now = new Date()): DB {
   // J8 = aujourd'hui ; journées hebdomadaires
   const curJ1 = addDays(iso(today), -7 * 7)
   const pastJ1 = addDays(curJ1, -364)
-  const past: Season = { id: 'season_past', name: `Saison ${pastJ1.slice(0, 4)}-${+pastJ1.slice(0, 4) + 1}`, start_date: addDays(pastJ1, -7), end_date: addDays(pastJ1, 63), status: 'closed', is_active: false, league_phase_rounds: 5, cup_rounds: 5, gold_size: 10, closed_at: addDays(pastJ1, 64) + 'T20:00:00' }
-  const cur: Season = { id: 'season_current', name: `Saison ${curJ1.slice(0, 4)}-${+curJ1.slice(0, 4) + 1}`, start_date: addDays(curJ1, -7), end_date: addDays(curJ1, 63), status: 'active', is_active: true, league_phase_rounds: 5, cup_rounds: 5, gold_size: 10 }
+  void pastJ1
+  const real = buildSeason2025()
+  const past = real.season
+  const cur: Season = { id: 'season_current', name: `Saison ${curJ1.slice(0, 4)}-${+curJ1.slice(0, 4) + 1} (démo)`, start_date: addDays(curJ1, -7), end_date: addDays(curJ1, 63), status: 'active', is_active: false, league_phase_rounds: 5, cup_rounds: 5, gold_size: 10 }
   db.Season.push(past, cur)
 
   const plan: Position[] = ['GK', 'GK', 'DEF', 'DEF', 'DEF', 'MID', 'MID', 'MID', 'MID', 'FWD', 'FWD', 'FWD']
@@ -90,7 +95,7 @@ export function generateDemoData(now = new Date()): DB {
       players.push({
         id: id('pl'), first_name: first, last_name: last, position: pos, team_id: t.id, number: pos === 'GK' ? (i === 0 ? 1 : 16) : nums[i],
         birth_date: `${year}-${String(1 + Math.floor(rng() * 12)).padStart(2, '0')}-${String(1 + Math.floor(rng() * 28)).padStart(2, '0')}`,
-        status: 'active', is_captain: i === 6, season_ids: rookie ? [cur.id] : [past.id, cur.id],
+        status: 'active', is_captain: i === 6, season_ids: [cur.id], rookie,
         email: i === 6 ? `${first}.${last}`.toLowerCase().normalize('NFD').replace(/[^a-z.]/g, '') + '@exemple.ma' : undefined,
         documents: { id_card: doc(), medical: doc(), license: doc() },
       })
@@ -258,14 +263,18 @@ export function generateDemoData(now = new Date()): DB {
     return { lp, gold, silver }
   }
 
-  // Saison passée : complète + palmarès publié
-  buildSeason(past, pastJ1, { playUntil: 10 })
-  for (const scope of ['season', 'league_phase', 'gold', 'silver'] as const) {
-    const res = computeAwards(league(), { seasonId: past.id, phase: scope === 'season' ? 'all' : scope })
-    for (const a of res) {
-      if (scope !== 'season' && !['ballon_or', 'golden_glove', 'top_scorer', 'top_assist', 'best_team'].includes(a.category)) continue
-      db.Award.push({ id: id('aw'), season_id: past.id, scope, category: a.category, player_id: a.player_id, team_id: a.team_id, value: a.value, snapshot: a.snapshot, not_awarded: a.not_awarded, status: 'published', locked: true } as Award)
-    }
+  // Saison 2025-2026 réelle (import Excel) : rang adverse figé journée par journée, homme du match, palmarès publié
+  db.Team.push(...real.teams); db.Player.push(...real.players); db.Competition.push(real.competition)
+  db.Match.push(...real.matches); db.MatchEvent.push(...real.events); db.Lineup.push(...real.lineups)
+  for (const m of [...real.matches].filter((x) => x.status === 'finished').sort((a, b) => (a.round ?? 0) - (b.round ?? 0))) {
+    m.opponent_rank_snapshot = { home_rank: teamRankBefore(league(), m, m.home_team_id), away_rank: teamRankBefore(league(), m, m.away_team_id) }
+    const evs = real.events.filter((e) => e.match_id === m.id)
+    const x = computePlayerXP({ ...league(), matches: [m], events: evs, suspensions: [], monthlyAwards: [] }, { seasonId: past.id })
+    m.motm_player_id = [...x.values()].filter((p) => p.matches > 0).sort((a, b) => b.xp - a.xp)[0]?.player_id
+    m.validated_at = `${m.date!.slice(0, 10)}T21:00:00`; m.validated_by = 'Import Excel'
+  }
+  for (const a of computeAwards(league(), { seasonId: past.id, phase: 'all' })) {
+    db.Award.push({ id: id('aw'), season_id: past.id, scope: 'season', category: a.category, player_id: a.player_id, team_id: a.team_id, value: a.value, snapshot: a.snapshot, not_awarded: a.not_awarded, status: 'published', locked: true } as Award)
   }
 
   // Saison en cours : J1–J7 jouées, J8 aujourd'hui (1 match en direct)

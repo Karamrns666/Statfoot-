@@ -1,5 +1,7 @@
 # Morocco Business League — plateforme (StatFoot)
 
+Organisée par Ardentia. Identité : bleu du blason MBL, orange Ardentia, blanc — polices Big Shoulders Display et Manrope.
+
 Ligue de football inter-entreprises : site public, administration, **Match Center live**, XP et trophées.
 React + Vite + TypeScript + Tailwind v4 + shadcn/ui + recharts. Données de démo en localStorage, prêtes à migrer vers Base44.
 
@@ -11,6 +13,18 @@ npm run dev        # http://localhost:5173
 npm test           # 54 tests unitaires (XP, classements, Match Center, système suisse, seed)
 npm run build
 ```
+
+### Données
+- **Saison 2025-2026 : données réelles** importées du tracker Excel de la ligue (16 équipes, 120 matchs, buts, passes, arrêts, cartons)
+  et classement **Top 25 IPG** (`src/api/seed/season2025.data.ts`, `src/lib/ipg.ts`). Le fichier Excel ne contenant ni dates ni postes,
+  les dates sont estimées (une journée par semaine à partir du 4 octobre 2025) et les postes déduits des stats (modifiables dans l'admin).
+  Pour réimporter une nouvelle version des fichiers :
+  ```bash
+  python3 scripts/import_excel_parse.py MBL_tracker.xlsx /tmp/mbl.json
+  python3 scripts/import_excel_build.py /tmp/mbl.json IPG_Top25.xlsx src/api/seed/season2025.data.ts
+  ```
+  puis augmenter `SEED_VERSION` dans `src/api/seed/index.ts`.
+- **Saison 2026-2027 (démo)** : jeu fictif conservé pour montrer le direct, le Match Center et les cups.
 
 Au premier lancement, un jeu de démo fictif est généré : 2 saisons, 20 équipes, 240 joueurs, 5 chapeaux,
 phase de ligue suisse J1–J5, Gold/Silver Cup J6–J10 (J1–J7 jouées, J8 aujourd'hui avec **un match en direct**).

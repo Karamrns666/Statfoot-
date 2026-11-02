@@ -17,6 +17,7 @@ export default function Stats() {
   const L = useLookup()
   const { scopeSeasonId } = useSeason()
   const [phase, setPhase] = useState<PhaseFilter>('all')
+  const hasCups = league.competitions.some((c) => (!scopeSeasonId || c.season_id === scopeSeasonId) && (c.phase === 'gold' || c.phase === 'silver'))
   const scope = { seasonId: scopeSeasonId, phase }
   const k = useMemo(() => kpis(league, scope), [league, scopeSeasonId, phase]) // eslint-disable-line react-hooks/exhaustive-deps
   const ts = [...useTeamStats(scope).values()].filter((t) => t.played > 0)
@@ -24,7 +25,7 @@ export default function Stats() {
   return (
     <div className="space-y-8">
       <PageHeader title="Statistiques" subtitle="Leaders et chiffres clés">
-        {(['all', 'league_phase', 'gold', 'silver'] as const).map((p) => <button key={p} onClick={() => setPhase(p)} className={cn('rounded-full border px-3 py-1 text-xs font-bold uppercase cursor-pointer', phase === p ? 'border-neon bg-neon/15 text-neon' : 'border-white/10 text-muted-foreground')}>{{ all: 'Saison', league_phase: 'Phase de ligue', gold: 'Gold', silver: 'Silver' }[p]}</button>)}
+        {hasCups && (['all', 'league_phase', 'gold', 'silver'] as const).map((p) => <button key={p} onClick={() => setPhase(p)} className={cn('rounded-full border px-3 py-1 text-xs font-bold uppercase cursor-pointer', phase === p ? 'border-neon bg-neon/15 text-neon' : 'border-white/10 text-muted-foreground')}>{{ all: 'Saison', league_phase: 'Phase de ligue', gold: 'Gold', silver: 'Silver' }[p]}</button>)}
       </PageHeader>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <StatTile label="Matchs" value={k.matches} icon={<CalendarDays />} color="#e6edf8" />

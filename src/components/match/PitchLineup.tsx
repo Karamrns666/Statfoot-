@@ -1,12 +1,12 @@
-import type { Lineup, Player, Team } from '@/types/entities'
+import type { Lineup, MatchEvent, Player, Team } from '@/types/entities'
+import { playerBadges } from '@/lib/matchEngine'
 import { useLookup } from '@/hooks/useData'
 import { PlayerAvatar } from '@/components/league/Identity'
 import { Link } from 'react-router-dom'
-import { Crown, ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 
 /** Positions automatiques (x,y en %) depuis le poste : le gardien en bas, l'attaque en haut. */
 export function autoPositions(lineup: Lineup, players: Map<string, Player>) {
-  if (lineup.positions?.length) return new Map(lineup.positions.map((p) => [p.player_id, { x: p.x, y: p.y }]))
   const starters = (lineup.starter_ids ?? []).map((id) => players.get(id)).filter(Boolean) as Player[]
   const rows: Record<string, Player[]> = { GK: [], DEF: [], MID: [], FWD: [] }
   for (const p of starters) (p.id === lineup.goalkeeper_id ? rows.GK : rows[p.position === 'GK' ? 'DEF' : p.position]).push(p)
@@ -16,7 +16,8 @@ export function autoPositions(lineup: Lineup, players: Map<string, Player>) {
   return out
 }
 
-export function PitchLineup({ lineup, team, highlight }: { lineup?: Lineup; team?: Team; highlight?: (pid: string) => string | null }) {
+export function PitchLineup({ lineup, team, events = [] }: { lineup?: Lineup; team?: Team; events?: MatchEvent[] }) {
+  const highlight = (pid: string) => { const b = playerBadges(events, pid); return [b.goals ? `⚽${b.goals > 1 ? '×' + b.goals : ''}` : '', b.assists ? '🅰' : '', b.red ? '🟥' : b.yellow ? '🟨' : ''].join('') || null }
   const L = useLookup()
   if (!lineup) return <div className="glass flex aspect-[3/4] items-center justify-center rounded-2xl p-4 text-sm text-muted-foreground">Composition non communiquée</div>
   const pos = autoPositions(lineup, L.player)
@@ -30,13 +31,14 @@ export function PitchLineup({ lineup, team, highlight }: { lineup?: Lineup; team
         <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/10 to-transparent" />
         {(lineup.starter_ids ?? []).map((id) => {
           const p = L.player.get(id); const xy = pos.get(id); if (!p || !xy) return null
-          const tag = highlight?.(id)
+          const tag = highlight(id)
           return (
             <Link key={id} to={`/joueurs/${id}`} className="absolute flex w-20 -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1 text-center" style={{ left: `${xy.x}%`, top: `${xy.y}%` }}>
               <div className="relative">
                 <PlayerAvatar player={p} team={team} size={42} />
-                <span className="absolute -bottom-1 -right-2 flex size-5 items-center justify-center rounded-full bg-night-900 text-[10px] font-black ring-1 ring-white/30">{p.number}</span>
-                {lineup.captain_id === id && <Crown className="absolute -left-2 -top-2 size-4 text-award-gold" />}
+                <span className="absolute -bottom-1 -right-2 flex size-5 items-center justify-center rounded-full bg-night-900 text-[10px] font-black ring-1 ring-white/30">{lineup.numbers?.[id] ?? p.number}</span>
+                {lineup.captain_id === id && <span className="absolute -left-2 -top-2 flex size-4 items-center justify-center rounded-full bg-award-gold text-[9px] font-black text-night-950">C</span>}
+                {lineup.goalkeeper_id === id && <span className="absolute -left-2 -bottom-1 flex size-4 items-center justify-center rounded-full bg-award-blue text-[9px] font-black text-white">G</span>}
                 {tag && <span className="absolute -right-3 -top-2 rounded bg-night-900/90 px-1 text-[10px]">{tag}</span>}
               </div>
               <span className="max-w-full truncate rounded bg-night-950/70 px-1.5 text-[11px] font-semibold">{p.last_name}</span>
@@ -49,7 +51,7 @@ export function PitchLineup({ lineup, team, highlight }: { lineup?: Lineup; team
           <div className="mb-1 text-xs font-bold uppercase text-muted-foreground">Remplaçants</div>
           <div className="flex flex-wrap gap-1.5">
             {lineup.substitute_ids!.map((id) => {
-              const p = L.player.get(id); const entered = lineup.subs_entered_ids?.includes(id)
+              const p = L.player.get(id); const entered = events.some((e) => e.type === 'substitution' && e.player_id === id)
               return <Link to={`/joueurs/${id}`} key={id} className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs ${entered ? 'bg-win/15 text-win' : 'bg-white/5 text-muted-foreground'}`}>{entered && <ArrowUpRight className="size-3" />}{p?.number} {p?.last_name}</Link>
             })}
           </div>

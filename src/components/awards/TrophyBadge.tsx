@@ -14,7 +14,7 @@ export const AWARD_STYLE: Record<AwardCategory, { color: string; icon: LucideIco
   best_defender: { color: '#22c55e', icon: ShieldCheck, label: AWARD_LABELS.best_defender, criteria: 'Défenseurs, note moyenne, min. de matchs' },
   best_midfielder: { color: '#f97316', icon: Compass, label: AWARD_LABELS.best_midfielder, criteria: 'Milieux, note moyenne, min. de matchs' },
   best_forward: { color: '#ef4444', icon: Flame, label: AWARD_LABELS.best_forward, criteria: 'Attaquants, note moyenne, min. de matchs' },
-  best_young: { color: '#22d3ee', icon: Sparkles, label: AWARD_LABELS.best_young, criteria: 'Moins de 23 ans au début de saison' },
+  best_young: { color: '#F26B1D', icon: Sparkles, label: AWARD_LABELS.best_young, criteria: 'Moins de 23 ans au début de saison' },
   best_defense: { color: '#60a5fa', icon: Shield, label: AWARD_LABELS.best_defense, criteria: 'Moins de buts encaissés par match' },
   best_attack: { color: '#fb7185', icon: Swords, label: AWARD_LABELS.best_attack, criteria: 'Plus de buts marqués' },
 }

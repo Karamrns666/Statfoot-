@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { CalendarDays, ListOrdered, Radio, Trophy, Users, Goal, Hand } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
 import { useSeason } from '@/hooks/useSeason'
-import { useEffectiveSeason, useSeasonCompetitions } from '@/hooks/useStats'
+import { useEffectiveSeason, useSeasonCompetitions, useRace, usePlayerXP } from '@/hooks/useStats'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { MatchCard } from '@/components/match/MatchCard'
@@ -11,7 +11,8 @@ import { StandingsTable } from '@/components/standings/StandingsTable'
 import { SectionTitle, StatTile, CompetitionBadge } from '@/components/league/Bits'
 import { PlayerAvatar, PlayerLink, TeamLogo } from '@/components/league/Identity'
 import { TrophyBadge } from '@/components/awards/TrophyBadge'
-import { competitionStandings, keeperStats, kpis, race, computePlayerStats, isPlayed } from '@/lib/stats'
+import { competitionStandings, kpis, isPlayed, race } from '@/lib/stats'
+import { RankDelta } from '@/components/league/Bits'
 import { competitionZones } from '@/lib/zones'
 import { cn } from '@/lib/utils'
 
@@ -27,15 +28,16 @@ export default function Home() {
     const ms = db.Match.filter((m) => m.season_id === sid && m.published !== false)
     const live = ms.filter((m) => m.status === 'live')
     const played = ms.filter(isPlayed)
-    const lr = Math.max(0, ...played.filter((m) => !m.stage || m.stage === 'league' || m.stage === 'group').map((m) => m.round ?? 0))
+    const lr = Math.max(0, ...played.map((m) => m.round ?? 0))
     const lastRound = played.filter((m) => m.round === lr).sort((a, b) => (a.competition_id + a.date).localeCompare(b.competition_id + b.date))
     const next = ms.filter((m) => m.status === 'scheduled').sort((a, b) => (a.date ?? '').localeCompare(b.date ?? '')).slice(0, 4)
     return { lastRound: { round: lr, matches: lastRound }, live, next }
   }, [db.Match, sid])
 
-  const stats = useMemo(() => [...computePlayerStats(league, { seasonId: scopeSeasonId }).values()], [league, scopeSeasonId])
-  const podium = useMemo(() => race(league, stats, 'xp').slice(0, 3), [league, stats])
-  const keepers = useMemo(() => keeperStats(league, { seasonId: scopeSeasonId }).slice(0, 5), [league, scopeSeasonId])
+  // MÊME fonction que la fiche joueur et la page Trophées (computePlayerXP via useRace)
+  const podium = useRace({ seasonId: scopeSeasonId }, 'xp').slice(0, 3)
+  const xpAll = usePlayerXP({ seasonId: scopeSeasonId })
+  const keepers = useMemo(() => race(league, [...xpAll.values()], 'golden_glove', scopeSeasonId).slice(0, 5).map((r) => r.item), [league, xpAll, scopeSeasonId])
   const k = useMemo(() => kpis(league, { seasonId: scopeSeasonId }), [league, scopeSeasonId])
   const teamsInSeason = new Set(comps.flatMap((c) => c.team_ids ?? []))
 
@@ -96,12 +98,12 @@ export default function Home() {
       <section>
         <SectionTitle title="Classements" action={<Button asChild variant="ghost" size="sm"><Link to="/classement">Classement complet →</Link></Button>} />
         <div className="grid gap-4 lg:grid-cols-2">
-          {comps.map((c) => {
+          {comps.filter((c) => c.phase === 'gold' || c.phase === 'silver').concat(comps.some((c) => c.phase === 'gold') ? [] : comps.filter((c) => c.phase === 'league_phase')).map((c) => {
             const rows = competitionStandings(league, c.id)
             return (
               <Card key={c.id}>
-                <CardHeader className="flex-row items-center justify-between"><CardTitle className="flex items-center gap-2"><CompetitionBadge competition={c} className="text-sm" /></CardTitle><span className="text-xs text-muted-foreground">{L.division.get(c.division_id ?? '')?.name}</span></CardHeader>
-                <CardContent className="px-1 sm:px-3"><StandingsTable rows={rows} compact zones={competitionZones(c, L.division.get(c.division_id ?? ''), rows.length)} /></CardContent>
+                <CardHeader className="flex-row items-center justify-between"><CardTitle className="flex items-center gap-2"><CompetitionBadge competition={c} className="text-sm" /></CardTitle><span className="text-xs text-muted-foreground">{c.default_pitch ?? c.description}</span></CardHeader>
+                <CardContent className="px-1 sm:px-3"><StandingsTable rows={rows} compact zones={competitionZones(c, rows.length)} /></CardContent>
               </Card>
             )
           })}
@@ -125,6 +127,7 @@ export default function Home() {
                   <div className="mt-3 w-full truncate font-display text-base font-bold uppercase sm:text-lg">{p?.first_name.charAt(0)}. {p?.last_name}</div>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground"><TeamLogo team={t} size={14} /><span className="truncate">{t?.short_name}</span></div>
                   <div className="num mt-2 text-2xl sm:text-3xl" style={{ color: c }}>{r.item.xp}<span className="ml-1 text-sm text-muted-foreground">XP</span></div>
+                  <RankDelta delta={r.delta} />
                 </Link>
               )
             })}
@@ -136,6 +139,7 @@ export default function Home() {
             <CardContent className="divide-y divide-white/5 p-2 sm:p-3">
               {keepers.map((g, i) => {
                 const p = L.player.get(g.player_id), t = L.team.get(g.team_id)
+                void i
                 return (
                   <div key={g.player_id} className="flex items-center gap-3 px-2 py-2.5">
                     <span className="num w-5 text-lg text-muted-foreground">{i + 1}</span>
@@ -147,7 +151,7 @@ export default function Home() {
                     <div className="grid grid-cols-3 gap-3 text-center">
                       <div><div className="num text-lg text-award-blue">{g.clean_sheets}</div><div className="text-[10px] uppercase text-muted-foreground">CS</div></div>
                       <div><div className="num text-lg">{g.saves}</div><div className="text-[10px] uppercase text-muted-foreground"><Hand className="inline size-3" /> Arr.</div></div>
-                      <div><div className="num text-lg text-loss">{g.conceded}</div><div className="text-[10px] uppercase text-muted-foreground">BC</div></div>
+                      <div><div className="num text-lg text-neon">{g.xp}</div><div className="text-[10px] uppercase text-muted-foreground">XP</div></div>
                     </div>
                   </div>
                 )

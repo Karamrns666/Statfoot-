@@ -171,6 +171,7 @@ export interface Lineup extends BaseEntity {
   substitute_ids?: string[]
   goalkeeper_id?: string
   captain_id?: string
+  formation?: string
   numbers?: Record<string, number>
   validated?: boolean
   validated_by?: string
@@ -257,6 +258,7 @@ export interface Award extends BaseEntity {
   poster_url?: string
 }
 
+export interface DrawPick { team_id: string; pot: number; group_id: string; at: string }
 export interface DrawFixture { round: number; home_team_id: string; away_team_id: string; revealed?: boolean }
 export interface Draw extends BaseEntity {
   season_id: string
@@ -265,6 +267,8 @@ export interface Draw extends BaseEntity {
   pots?: { pot: number; team_ids: string[] }[]
   fixtures?: DrawFixture[]
   groups?: { group_id: string; name?: string; team_ids: string[] }[]
+  picks?: DrawPick[]
+  one_team_per_pot_per_group?: boolean
   revealed_count?: number
   status?: 'draft' | 'revealing' | 'locked' | 'published'
   performed_by?: string

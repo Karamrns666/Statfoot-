@@ -52,6 +52,10 @@
         "type": "object"
       },
       "description": "dérogations Super Admin { player_id, reason: suspended|documents, by, at }"
+    },
+    "formation": {
+      "type": "string",
+      "description": "ex. 2-2-1"
     }
   },
   "required": [

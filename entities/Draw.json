@@ -54,6 +54,17 @@
     "seed": {
       "type": "integer",
       "description": "graine aléatoire → tirage rejouable/auditable"
+    },
+    "picks": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "tirage en groupes : [{ team_id, pot, group_id, at }] dans l'ordre du tirage"
+    },
+    "one_team_per_pot_per_group": {
+      "type": "boolean",
+      "default": true
     }
   },
   "required": [

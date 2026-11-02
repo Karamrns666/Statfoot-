@@ -399,3 +399,8 @@ export function timelineByPeriod(events: MatchEvent[]) {
   return out
 }
 export const PERIOD_LABEL: Record<Period, string> = { '1H': '1re mi-temps', '2H': '2e mi-temps', ET1: 'Prolongation 1', ET2: 'Prolongation 2', PENS: 'Tirs au but' }
+
+/** Durées d'un match (mi-temps 15 min par défaut, prolongation 5 min) */
+export function durationsFor(m?: Pick<Match, 'half_duration_min'> | null, comp?: { half_duration_min?: number; extra_time?: { enabled: boolean; period_min: number } } | null): Durations {
+  return { half: m?.half_duration_min ?? comp?.half_duration_min ?? DEFAULT_HALF_MIN, et: comp?.extra_time?.period_min ?? 5 }
+}

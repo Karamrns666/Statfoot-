@@ -24,7 +24,7 @@ export function RankDelta({ delta }: { delta?: number | null }) {
     : <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-loss" title={`${delta} place(s)`}><ArrowDown className="size-3" />{-delta}</span>
 }
 
-export function SectionTitle({ title, subtitle, action, className, accent = '#22d3ee' }: { title: ReactNode; subtitle?: ReactNode; action?: ReactNode; className?: string; accent?: string }) {
+export function SectionTitle({ title, subtitle, action, className, accent = '#F26B1D' }: { title: ReactNode; subtitle?: ReactNode; action?: ReactNode; className?: string; accent?: string }) {
   return (
     <div className={cn('mb-4 flex flex-wrap items-end justify-between gap-3', className)}>
       <div>
@@ -51,7 +51,7 @@ export function PageHeader({ title, subtitle, children }: { title: ReactNode; su
   )
 }
 
-export function StatTile({ label, value, icon, color = '#22d3ee', sub }: { label: string; value: ReactNode; icon?: ReactNode; color?: string; sub?: ReactNode }) {
+export function StatTile({ label, value, icon, color = '#F26B1D', sub }: { label: string; value: ReactNode; icon?: ReactNode; color?: string; sub?: ReactNode }) {
   return (
     <div className="glass relative overflow-hidden rounded-2xl p-4">
       <div className="pointer-events-none absolute -right-6 -top-6 size-20 rounded-full opacity-30 blur-2xl" style={{ background: color }} />
@@ -80,10 +80,14 @@ export function LiveDot({ label = 'Live' }: { label?: string }) {
 
 export function CompetitionBadge({ competition, className }: { competition?: Competition | null; className?: string }) {
   if (!competition) return null
-  const c = competition.color ?? '#22d3ee'
+  const c = competition.color ?? '#F26B1D'
   return <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 font-display text-[11px] font-extrabold uppercase tracking-wider', className)} style={{ color: c, background: `${c}1f`, boxShadow: `inset 0 0 0 1px ${c}44` }}>{competition.name}</span>
 }
 
 export function Spinner() {
   return <div className="flex min-h-[40vh] items-center justify-center"><div className="size-10 animate-spin rounded-full border-4 border-neon/20 border-t-neon" /></div>
+}
+
+export function RookieBadge() {
+  return <span className="inline-flex items-center rounded-full bg-sky-400/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-sky-300">Recrue · 1re saison</span>
 }

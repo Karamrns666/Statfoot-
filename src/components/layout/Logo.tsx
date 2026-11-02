@@ -1,16 +1,18 @@
 import { Link } from 'react-router-dom'
+import { useData } from '@/hooks/useData'
+
+/** Logo texte de la ligue (nom court + nom complet issus des Paramètres) */
 export function Logo({ to = '/', subtitle }: { to?: string; subtitle?: string }) {
+  const { settings } = useData()
+  const short = settings.short_name ?? 'MBL'
   return (
     <Link to={to} className="flex items-center gap-2.5">
-      <svg viewBox="0 0 64 64" className="size-9 drop-shadow-[0_0_10px_rgb(34_211_238/.6)]" aria-hidden>
-        <rect width="64" height="64" rx="16" fill="#0B1426" stroke="#22d3ee" strokeOpacity=".5" />
-        <circle cx="32" cy="32" r="19" fill="none" stroke="#22d3ee" strokeWidth="4.5" />
-        <path d="M32 19 L40 26 L37 37 H27 L24 26 Z" fill="#22d3ee" />
-        <path d="M32 19 V13 M40 26 L46 23 M37 37 L41 43 M27 37 L23 43 M24 26 L18 23" stroke="#22d3ee" strokeWidth="3" strokeLinecap="round" />
-      </svg>
+      {settings.logo_url
+        ? <img src={settings.logo_url} alt="" className="size-10 rounded-xl object-contain" />
+        : <div className="flex size-10 items-center justify-center rounded-xl bg-neon font-display text-lg font-black text-white shadow-[0_0_18px_-2px_rgb(242_107_29/.8)]">{short.slice(0, 3)}</div>}
       <div className="leading-none">
-        <div className="title-caps text-2xl"><span className="text-white">Stat</span><span className="text-neon neon-text">Foot</span></div>
-        {subtitle && <div className="text-[10px] font-semibold uppercase tracking-[.2em] text-muted-foreground">{subtitle}</div>}
+        <div className="title-caps text-xl text-white">{settings.league_name ?? 'StatFoot'}</div>
+        {subtitle && <div className="mt-0.5 text-[10px] font-semibold uppercase tracking-[.2em] text-neon">{subtitle}</div>}
       </div>
     </Link>
   )

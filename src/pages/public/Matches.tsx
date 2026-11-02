@@ -8,6 +8,7 @@ import { FilterSelect } from '@/components/league/FilterSelect'
 import { MatchCard } from '@/components/match/MatchCard'
 import { STATUS_LABEL, fmtDate } from '@/lib/format'
 import { STAGE_LABELS } from '@/lib/schedule'
+import { isKnockout } from '@/lib/standings'
 import type { Match, MatchStatus } from '@/types/entities'
 
 export default function Matches() {
@@ -31,7 +32,7 @@ export default function Matches() {
     const g = new Map<string, Match[]>()
     for (const m of filtered) {
       const k = view === 'round'
-        ? `${scopeSeasonId ? '' : L.season.get(m.season_id)?.name + ' · '}${m.stage && m.stage !== 'league' && m.stage !== 'group' ? STAGE_LABELS[m.stage] : `Journée ${m.round}`}`
+        ? `${scopeSeasonId ? '' : L.season.get(m.season_id)?.name + ' · '}${m.stage && isKnockout(m) ? STAGE_LABELS[m.stage] : `Journée ${m.round}`}`
         : fmtDate(m.date, 'EEEE d MMMM yyyy')
       if (!g.has(k)) g.set(k, []); g.get(k)!.push(m)
     }

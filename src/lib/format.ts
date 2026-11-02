@@ -22,10 +22,11 @@ export const POSITION_COLOR: Record<Position, string> = { GK: '#3b82f6', DEF: '#
 export const STATUS_LABEL: Record<MatchStatus, string> = { scheduled: 'Programmé', live: 'En direct', finished: 'Terminé', postponed: 'Reporté', cancelled: 'Annulé' }
 
 export const EVENT_LABEL: Record<EventType, string> = {
-  goal: 'But', assist: 'Passe décisive', own_goal: 'But contre son camp', penalty_goal: 'Penalty marqué', penalty_missed: 'Penalty manqué',
-  penalty_saved: 'Penalty arrêté', yellow_card: 'Carton jaune', red_card: 'Carton rouge', save: 'Arrêt', goal_conceded: 'But encaissé',
-  substitution: 'Remplacement', goal_disallowed: 'But refusé', shootout_scored: 'TAB réussi', shootout_missed: 'TAB manqué', shootout_saved: 'TAB arrêté',
-  shot_on_target: 'Tir cadré', shot_off_target: 'Tir non cadré', corner: 'Corner', throw_in: 'Touche', free_kick: 'Coup franc', foul: 'Faute', offside: 'Hors-jeu',
+  goal: 'But', own_goal: 'But contre son camp', penalty_missed: 'Penalty manqué', goal_disallowed: 'But refusé',
+  shot_on_target: 'Tir cadré', shot_off_target: 'Tir non cadré', save: 'Arrêt', penalty_saved: 'Penalty arrêté',
+  corner: 'Corner', throw_in: 'Touche', free_kick: 'Coup franc', foul: 'Faute', offside: 'Hors-jeu',
+  yellow_card: 'Carton jaune', second_yellow: '2e jaune (rouge)', red_card: 'Carton rouge', substitution: 'Remplacement', gk_change: 'Changement de gardien',
+  shootout_scored: 'TAB réussi', shootout_saved: 'TAB arrêté', shootout_missed: 'TAB manqué',
 }
 
 export const playerName = (p?: Player | null) => (p ? `${p.first_name} ${p.last_name}` : 'Joueur inconnu')

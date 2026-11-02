@@ -33,7 +33,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const settings = db.Settings[0] ?? ({ id: 'settings' } as Settings)
     const league: LeagueData = {
       seasons: db.Season, competitions: db.Competition, divisions: db.Division, groups: db.Group, teams: db.Team,
-      players: db.Player, matches: db.Match, events: db.MatchEvent, lineups: db.Lineup, xpRules: db.XPRule, settings,
+      players: db.Player, matches: db.Match, events: db.MatchEvent, lineups: db.Lineup, xpRules: db.XPRule,
+      suspensions: db.Suspension, monthlyAwards: db.MonthlyAward, settings,
     }
     return { db, league, settings, ready }
   }, [db, ready])
@@ -57,5 +58,6 @@ export function useLookup() {
     venue: new Map(db.Venue.map((v) => [v.id, v])),
     group: new Map(db.Group.map((g) => [g.id, g])),
     division: new Map(db.Division.map((d) => [d.id, d])),
+    live: new Map(db.LiveState.map((l) => [l.match_id, l])),
   }), [db])
 }

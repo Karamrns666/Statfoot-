@@ -16,7 +16,7 @@ export function TeamName({ team, link = true, short = false, className }: { team
 }
 
 export function PlayerAvatar({ player, team, size = 40, className }: { player?: Player | null; team?: Team | null; size?: number; className?: string }) {
-  const color = team?.primary_color ?? '#22d3ee'
+  const color = team?.primary_color ?? '#F26B1D'
   return (
     <div className={cn('relative shrink-0 overflow-hidden rounded-full', className)} style={{ width: size, height: size, boxShadow: `0 0 0 2px ${color}, 0 0 16px -2px ${color}88` }}>
       {player?.photo_url

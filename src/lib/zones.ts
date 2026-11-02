@@ -1,15 +1,12 @@
-import type { Competition, Division } from '@/types/entities'
+import type { Competition } from '@/types/entities'
 import type { Zone } from '@/components/standings/StandingsTable'
 
-/** Zones colorées du classement : qualification phase finale, montée, descente. */
-export function competitionZones(c: Competition, division: Division | undefined, nTeams: number): Zone[] {
-  const zones: Zone[] = []
-  const ko = c.knockout_rounds ?? []
-  if (ko.length) {
-    const q = ko.includes('quarter') ? 8 : ko.includes('semi') ? 4 : 2
-    zones.push({ from: 1, to: q, color: '#22d3ee', label: 'Qualifié phase finale' })
-  }
-  if (division?.promotion_count) zones.push({ from: 1, to: division.promotion_count, color: '#22c55e', label: 'Montée' })
-  if (division?.relegation_count) zones.push({ from: nTeams - division.relegation_count + 1, to: nTeams, color: '#ef4444', label: 'Descente' })
-  return zones
+/** Zones du classement : phase de ligue → Gold (1–10) / Silver (11–20). */
+export function competitionZones(c: Competition, nTeams: number, goldSize = 10): Zone[] {
+  if (c.phase === 'league_phase') return [
+    { from: 1, to: Math.min(goldSize, nTeams), color: '#facc15', label: 'Qualifié Gold Cup' },
+    { from: goldSize + 1, to: nTeams, color: '#94a3b8', label: 'Silver Cup' },
+  ]
+  if (c.phase === 'gold') return [{ from: 1, to: 1, color: '#F26B1D', label: 'Champion' }]
+  return []
 }

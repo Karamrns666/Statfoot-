@@ -1,13 +1,12 @@
 name: CI
 
 # Vérifie chaque push : types, tests unitaires et build de production.
-# Le rapport (et le site construit) est publié sur la branche `ci-results/<branche>` pour consultation.
 on:
   push:
-    branches-ignore: ['ci-results/**']
+    branches: ['**']
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -28,14 +27,5 @@ jobs:
           { echo "## build"; npx vite build; echo "exit=$?"; } >> ci-report.txt 2>&1
           cat ci-report.txt
           if grep -q "exit=[1-9]" ci-report.txt; then echo "failed=1" >> "$GITHUB_OUTPUT"; fi
-      - name: Publier le rapport
-        if: always()
-        run: |
-          BR="ci-results/${GITHUB_REF_NAME}"
-          mkdir -p /tmp/out && cp ci-report.txt /tmp/out/ && [ -d dist ] && cp -r dist /tmp/out/ || true
-          cd /tmp/out && git init -q && git checkout -q -b "$BR"
-          git config user.name "ci" && git config user.email "ci@users.noreply.github.com"
-          git add -A && git commit -qm "CI ${GITHUB_SHA}"
-          git push -qf "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" "$BR"
       - if: steps.checks.outputs.failed == '1'
         run: exit 1

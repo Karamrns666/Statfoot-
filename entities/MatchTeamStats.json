@@ -14,8 +14,7 @@
         "full",
         "1H",
         "2H"
-      ],
-      "default": "full"
+      ]
     },
     "possession": {
       "type": "number"
@@ -55,8 +54,7 @@
       "enum": [
         "manual",
         "match_center"
-      ],
-      "default": "manual"
+      ]
     }
   },
   "required": [

@@ -9,8 +9,7 @@
       "type": "string"
     },
     "voter_key": {
-      "type": "string",
-      "description": "empreinte anonyme (1 vote / appareil / match)"
+      "type": "string"
     }
   },
   "required": [

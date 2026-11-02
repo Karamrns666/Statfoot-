@@ -10,7 +10,8 @@
       "enum": [
         "photo",
         "video",
-        "article"
+        "article",
+        "generated_visual"
       ]
     },
     "url": {
@@ -18,10 +19,6 @@
     },
     "thumbnail_url": {
       "type": "string"
-    },
-    "body": {
-      "type": "string",
-      "description": "contenu article (markdown)"
     },
     "match_id": {
       "type": "string"
@@ -36,12 +33,7 @@
       }
     },
     "round": {
-      "type": "integer",
-      "description": "tag journée (J1, J2…)"
-    },
-    "date": {
-      "type": "string",
-      "format": "date"
+      "type": "integer"
     },
     "source": {
       "type": "string",
@@ -50,12 +42,10 @@
         "url",
         "google_drive",
         "generated"
-      ],
-      "default": "url"
+      ]
     },
     "published": {
-      "type": "boolean",
-      "default": true
+      "type": "boolean"
     }
   },
   "required": [

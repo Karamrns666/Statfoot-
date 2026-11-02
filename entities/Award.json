@@ -5,31 +5,28 @@
     "season_id": {
       "type": "string"
     },
-    "competition_id": {
-      "type": "string",
-      "description": "vide = toute la saison"
-    },
-    "period": {
+    "scope": {
       "type": "string",
       "enum": [
         "season",
         "league_phase",
-        "competition"
+        "gold",
+        "silver"
       ]
     },
     "category": {
       "type": "string",
       "enum": [
-        "player_of_tournament",
         "ballon_or",
+        "golden_glove",
         "top_scorer",
         "top_assist",
-        "golden_glove",
+        "best_team",
+        "player_of_tournament",
         "best_defender",
         "best_midfielder",
         "best_forward",
         "best_young",
-        "best_team",
         "best_defense",
         "best_attack"
       ]
@@ -41,16 +38,13 @@
       "type": "string"
     },
     "value": {
-      "type": "number",
-      "description": "XP, buts, rating… selon catégorie"
+      "type": "number"
     },
     "snapshot": {
-      "type": "object",
-      "description": "stats figées au moment de la validation"
+      "type": "object"
     },
     "not_awarded": {
-      "type": "boolean",
-      "default": false
+      "type": "boolean"
     },
     "status": {
       "type": "string",
@@ -58,19 +52,10 @@
         "generated",
         "verified",
         "published"
-      ],
-      "default": "generated"
+      ]
     },
     "locked": {
-      "type": "boolean",
-      "default": false
-    },
-    "verified_by": {
-      "type": "string"
-    },
-    "published_at": {
-      "type": "string",
-      "format": "date-time"
+      "type": "boolean"
     },
     "poster_url": {
       "type": "string"

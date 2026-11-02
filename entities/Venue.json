@@ -12,11 +12,7 @@
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "description": "Terrain 1, Terrain 2…"
-    },
-    "map_url": {
-      "type": "string"
+      }
     }
   },
   "required": [

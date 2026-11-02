@@ -1,37 +1,41 @@
 {
-  "name": "Invitation",
+  "name": "AdminUser",
   "type": "object",
   "properties": {
     "email": {
       "type": "string"
     },
-    "app_role": {
+    "full_name": {
+      "type": "string"
+    },
+    "role": {
       "type": "string",
       "enum": [
         "super_admin",
-        "league_admin",
-        "scorer"
+        "admin",
+        "operator"
       ]
     },
     "status": {
       "type": "string",
       "enum": [
-        "pending",
-        "accepted",
-        "revoked"
-      ],
-      "default": "pending"
+        "invited",
+        "active",
+        "disabled"
+      ]
     },
     "invited_by": {
       "type": "string"
     },
-    "accepted_at": {
-      "type": "string",
-      "format": "date-time"
+    "activated_at": {
+      "type": "string"
+    },
+    "last_login": {
+      "type": "string"
     }
   },
   "required": [
     "email",
-    "app_role"
+    "role"
   ]
 }

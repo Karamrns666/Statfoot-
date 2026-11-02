@@ -3,29 +3,16 @@
   "type": "object",
   "properties": {
     "name": {
-      "type": "string",
-      "description": "Série A"
+      "type": "string"
     },
     "level": {
-      "type": "integer",
-      "description": "1 = plus haut niveau"
+      "type": "integer"
     },
     "promotion_count": {
-      "type": "integer",
-      "default": 2
+      "type": "integer"
     },
     "relegation_count": {
-      "type": "integer",
-      "default": 2
-    },
-    "playoff_format": {
-      "type": "string",
-      "enum": [
-        "none",
-        "top4_semis",
-        "top8_quarters"
-      ],
-      "default": "none"
+      "type": "integer"
     },
     "color": {
       "type": "string"

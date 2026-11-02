@@ -6,8 +6,7 @@
       "type": "string"
     },
     "name": {
-      "type": "string",
-      "description": "Groupe A"
+      "type": "string"
     },
     "team_ids": {
       "type": "array",

@@ -1,0 +1,56 @@
+{
+  "name": "LiveState",
+  "type": "object",
+  "properties": {
+    "match_id": {
+      "type": "string"
+    },
+    "period": {
+      "type": "string",
+      "enum": [
+        "pre",
+        "1H",
+        "HT",
+        "2H",
+        "ET_BREAK",
+        "ET1",
+        "ET2",
+        "PENS",
+        "FT"
+      ]
+    },
+    "running": {
+      "type": "boolean"
+    },
+    "period_started_at": {
+      "type": "integer"
+    },
+    "period_elapsed_ms": {
+      "type": "integer"
+    },
+    "added_time": {
+      "type": "object",
+      "description": "{ 1H: 2, 2H: 3 }"
+    },
+    "possession": {
+      "type": "object",
+      "description": "{ current: home|away|dead, since, by_period: { 1H: {home_ms, away_ms, dead_ms}, ... } }"
+    },
+    "lock_user_id": {
+      "type": "string"
+    },
+    "lock_user_name": {
+      "type": "string"
+    },
+    "lock_heartbeat_at": {
+      "type": "integer"
+    },
+    "version": {
+      "type": "integer",
+      "description": "contrôle de concurrence"
+    }
+  },
+  "required": [
+    "match_id"
+  ]
+}

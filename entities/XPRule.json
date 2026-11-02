@@ -2,56 +2,45 @@
   "name": "XPRule",
   "type": "object",
   "properties": {
-    "action": {
-      "type": "string",
-      "enum": [
-        "match_played",
-        "win",
-        "draw",
-        "goal",
-        "assist",
-        "penalty_goal",
-        "own_goal",
-        "penalty_missed",
-        "clean_sheet_gk",
-        "clean_sheet_def",
-        "save",
-        "penalty_saved",
-        "goal_conceded_gk",
-        "motm",
-        "yellow_card",
-        "red_card"
-      ]
-    },
-    "label": {
+    "season_id": {
       "type": "string"
     },
-    "points": {
+    "key": {
+      "type": "string",
+      "enum": [
+        "goal",
+        "assist",
+        "mult_top3",
+        "mult_4_6",
+        "mult_7plus",
+        "win",
+        "loss",
+        "yellow",
+        "double_yellow_total",
+        "red_direct",
+        "per_suspension_match",
+        "clean_sheet_gk",
+        "save",
+        "penalty_saved",
+        "shootout_saved",
+        "goal_conceded_gk",
+        "player_of_month",
+        "team_of_month",
+        "goal_of_month",
+        "min_matches_awards",
+        "importance_league_phase",
+        "importance_gold",
+        "importance_silver",
+        "importance_knockout"
+      ]
+    },
+    "value": {
       "type": "number"
-    },
-    "positions": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "enum": [
-          "GK",
-          "DEF",
-          "MID",
-          "FWD"
-        ]
-      },
-      "description": "vide = tous"
-    },
-    "active": {
-      "type": "boolean",
-      "default": true
-    },
-    "order": {
-      "type": "integer"
     }
   },
   "required": [
-    "action",
-    "points"
+    "season_id",
+    "key",
+    "value"
   ]
 }

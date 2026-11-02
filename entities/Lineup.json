@@ -8,15 +8,18 @@
     "team_id": {
       "type": "string"
     },
-    "formation": {
-      "type": "string",
-      "description": "ex. 2-2-1 (hors gardien)"
+    "present_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "starter_ids": {
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "description": "6 max"
     },
     "substitute_ids": {
       "type": "array",
@@ -24,35 +27,31 @@
         "type": "string"
       }
     },
-    "subs_entered_ids": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "remplaçants entrés en jeu (comptent comme MJ)"
-    },
     "goalkeeper_id": {
       "type": "string"
     },
     "captain_id": {
       "type": "string"
     },
-    "positions": {
+    "numbers": {
+      "type": "object",
+      "description": "{ player_id: numéro du jour }"
+    },
+    "validated": {
+      "type": "boolean"
+    },
+    "validated_by": {
+      "type": "string"
+    },
+    "validated_at": {
+      "type": "string"
+    },
+    "waivers": {
       "type": "array",
       "items": {
-        "type": "object",
-        "properties": {
-          "player_id": {
-            "type": "string"
-          },
-          "x": {
-            "type": "number"
-          },
-          "y": {
-            "type": "number"
-          }
-        }
-      }
+        "type": "object"
+      },
+      "description": "dérogations Super Admin { player_id, reason: suspended|documents, by, at }"
     }
   },
   "required": [

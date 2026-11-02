@@ -57,3 +57,54 @@ export function seededRng(seed: number): Rng {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296
   }
 }
+
+// ---------------------------------------------------------------------------
+//  Système suisse par chapeaux (phase de ligue MBL : 5 chapeaux × 4 équipes → 5 journées, 50 matchs)
+// ---------------------------------------------------------------------------
+export interface SwissFixture { round: number; home_team_id: string; away_team_id: string; revealed?: boolean }
+
+/**
+ * Chaque équipe affronte exactement UNE équipe de chaque chapeau (y compris le sien), donc jamais deux fois la même.
+ * Journée r : le chapeau p rencontre le chapeau q = (r − p) mod P. Le chapeau "fixe" (q = p) joue en interne.
+ * Domicile/extérieur équilibré (au plus 1 d'écart) par affectation gloutonne.
+ * Conditions : nombre de chapeaux impair, taille de chapeau paire et identique.
+ */
+export function swissPotsFixtures(pots: string[][], rng: Rng = Math.random): SwissFixture[] {
+  const P = pots.length
+  if (P % 2 === 0) throw new Error('Le nombre de chapeaux doit être impair')
+  const size = pots[0]?.length ?? 0
+  if (pots.some((p) => p.length !== size) || size % 2 !== 0) throw new Error('Les chapeaux doivent avoir la même taille (paire)')
+  const shuffle = <T,>(a: T[]) => { const x = [...a]; for (let i = x.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [x[i], x[j]] = [x[j], x[i]] } return x }
+  const roundOrder = shuffle(Array.from({ length: P }, (_, i) => i))
+  const pairs: { round: number; a: string; b: string }[] = []
+  roundOrder.forEach((r, idx) => {
+    for (let p = 0; p < P; p++) {
+      const q = (((r - p) % P) + P) % P
+      if (q < p) continue
+      if (q === p) {
+        const s = shuffle(pots[p])
+        for (let i = 0; i < s.length; i += 2) pairs.push({ round: idx + 1, a: s[i], b: s[i + 1] })
+      } else {
+        const sa = shuffle(pots[p]), sb = shuffle(pots[q])
+        for (let i = 0; i < size; i++) pairs.push({ round: idx + 1, a: sa[i], b: sb[i] })
+      }
+    }
+  })
+  const home = new Map<string, number>()
+  const out: SwissFixture[] = []
+  for (const pr of shuffle(pairs).sort((x, y) => x.round - y.round)) {
+    const ha = home.get(pr.a) ?? 0, hb = home.get(pr.b) ?? 0
+    const aHome = ha < hb || (ha === hb && rng() < 0.5)
+    const [h, a] = aHome ? [pr.a, pr.b] : [pr.b, pr.a]
+    home.set(h, (home.get(h) ?? 0) + 1)
+    out.push({ round: pr.round, home_team_id: h, away_team_id: a })
+  }
+  return out
+}
+
+/** Chapeaux d'une cup à partir d'un classement : rangs 1-2 → chapeau 1, 3-4 → chapeau 2, … */
+export function potsFromRanking(teamIds: string[], perPot: number): string[][] {
+  const pots: string[][] = []
+  for (let i = 0; i < teamIds.length; i += perPot) pots.push(teamIds.slice(i, i + perPot))
+  return pots
+}

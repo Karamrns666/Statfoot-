@@ -1,6 +1,6 @@
 // Génération de calendrier, planification et tableau final — fonctions pures.
 import type { BracketSource, Match, MatchStage } from '@/types/entities'
-import { isPlayed, loserOf, winnerOf, type StandingRow } from './stats'
+import { isPlayed, loserOf, winnerOf, type StandingRow } from './standings'
 
 export interface Pairing { round: number; home: string; away: string }
 
@@ -81,10 +81,10 @@ export function addDays(date: string, days: number) {
 //  Tableau final
 // ---------------------------------------------------------------------------
 export const STAGE_LABELS: Record<MatchStage, string> = {
-  league: 'Championnat', group: 'Phase de groupes', round_of_16: 'Huitièmes', quarter: 'Quarts de finale',
+  league_phase: 'Phase de ligue', cup: 'Cup', group: 'Phase de groupes', round_of_16: 'Huitièmes', quarter: 'Quarts de finale',
   semi: 'Demi-finales', third_place: 'Petite finale', final: 'Finale',
 }
-export const STAGE_SHORT: Record<MatchStage, string> = { league: 'L', group: 'G', round_of_16: 'R16', quarter: 'QF', semi: 'SF', third_place: '3P', final: 'F' }
+export const STAGE_SHORT: Record<MatchStage, string> = { league_phase: 'L', cup: 'C', group: 'G', round_of_16: 'R16', quarter: 'QF', semi: 'SF', third_place: '3P', final: 'F' }
 
 export interface BracketMatchDraft {
   stage: MatchStage; bracket_slot: string; home_source: BracketSource; away_source: BracketSource
@@ -103,7 +103,7 @@ export function buildBracket(opts: { groupIds?: string[]; leagueRef?: string; qu
     const g = opts.groupIds
     const perGroup = Math.max(1, Math.floor(qualifiers / g.length))
     // ordre en serpentin pour croiser les groupes
-    const gr = (ref: string, rank: number): BracketSource => ({ type: 'group_rank', ref, rank })
+    const gr = (ref: string, rank: number): BracketSource => ({ type: 'rank', ref, rank })
     for (let i = 0; i < g.length; i += 2) {
       const a = g[i], b = g[i + 1] ?? g[0]
       if (perGroup === 1) { entrants.push(gr(a, 1), gr(b, 1)); continue }
@@ -113,7 +113,7 @@ export function buildBracket(opts: { groupIds?: string[]; leagueRef?: string; qu
   } else {
     const ref = opts.leagueRef ?? opts.groupIds?.[0] ?? 'league'
     const ranks = Array.from({ length: qualifiers }, (_, i) => i + 1)
-    for (let i = 0; i < qualifiers / 2; i++) entrants.push({ type: 'league_rank', ref, rank: ranks[i] }, { type: 'league_rank', ref, rank: ranks[qualifiers - 1 - i] })
+    for (let i = 0; i < qualifiers / 2; i++) entrants.push({ type: 'rank', ref, rank: ranks[i] }, { type: 'rank', ref, rank: ranks[qualifiers - 1 - i] })
   }
   const out: BracketMatchDraft[] = []
   const stageOrder: MatchStage[] = ['round_of_16', 'quarter', 'semi', 'final']
@@ -145,7 +145,7 @@ export function buildBracket(opts: { groupIds?: string[]; leagueRef?: string; qu
 /** Résout une source du tableau en id d'équipe (ou null si pas encore déterminable). */
 export function resolveSource(src: BracketSource | undefined, ctx: { tables: Map<string, StandingRow[]>; tablesComplete: Map<string, boolean>; matches: Match[]; competitionId: string }): string | null {
   if (!src) return null
-  if (src.type === 'group_rank' || src.type === 'league_rank') {
+  if (src.type === 'rank') {
     if (!ctx.tablesComplete.get(src.ref)) return null
     return ctx.tables.get(src.ref)?.[(src.rank ?? 1) - 1]?.team_id ?? null
   }
@@ -156,7 +156,6 @@ export function resolveSource(src: BracketSource | undefined, ctx: { tables: Map
 
 export function sourceLabel(src: BracketSource | undefined, groupName: (id: string) => string): string {
   if (!src) return 'À déterminer'
-  if (src.type === 'group_rank') return `${src.rank}${src.rank === 1 ? 'er' : 'e'} ${groupName(src.ref)}`
-  if (src.type === 'league_rank') return `${src.rank}${src.rank === 1 ? 'er' : 'e'} du classement`
+  if (src.type === 'rank') return `${src.rank}${src.rank === 1 ? 'er' : 'e'} ${groupName(src.ref)}`
   return `${src.type === 'winner' ? 'Vainqueur' : 'Perdant'} ${src.ref}`
 }

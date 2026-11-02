@@ -3,8 +3,7 @@
   "type": "object",
   "properties": {
     "name": {
-      "type": "string",
-      "description": "ex. Saison 2026"
+      "type": "string"
     },
     "start_date": {
       "type": "string",
@@ -14,28 +13,32 @@
       "type": "string",
       "format": "date"
     },
-    "is_active": {
-      "type": "boolean",
-      "default": false
-    },
     "status": {
       "type": "string",
       "enum": [
         "upcoming",
         "active",
         "closed"
-      ],
-      "default": "upcoming"
+      ]
+    },
+    "is_active": {
+      "type": "boolean"
+    },
+    "league_phase_rounds": {
+      "type": "integer",
+      "default": 5
+    },
+    "cup_rounds": {
+      "type": "integer",
+      "default": 5
+    },
+    "gold_size": {
+      "type": "integer",
+      "default": 10
     },
     "closed_at": {
       "type": "string",
       "format": "date-time"
-    },
-    "champion_team_id": {
-      "type": "string"
-    },
-    "notes": {
-      "type": "string"
     }
   },
   "required": [

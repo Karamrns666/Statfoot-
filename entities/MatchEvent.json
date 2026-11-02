@@ -8,71 +8,103 @@
     "team_id": {
       "type": "string"
     },
-    "minute": {
-      "type": "integer"
+    "type": {
+      "type": "string",
+      "enum": [
+        "goal",
+        "own_goal",
+        "penalty_missed",
+        "goal_disallowed",
+        "shot_on_target",
+        "shot_off_target",
+        "save",
+        "penalty_saved",
+        "corner",
+        "throw_in",
+        "free_kick",
+        "foul",
+        "offside",
+        "yellow_card",
+        "second_yellow",
+        "red_card",
+        "substitution",
+        "gk_change",
+        "shootout_scored",
+        "shootout_saved",
+        "shootout_missed"
+      ]
+    },
+    "goal_kind": {
+      "type": "string",
+      "enum": [
+        "normal",
+        "header",
+        "penalty",
+        "direct_free_kick"
+      ]
+    },
+    "player_id": {
+      "type": "string"
+    },
+    "player_name_free": {
+      "type": "string",
+      "description": "« Autre joueur » hors compo / joueur inconnu"
+    },
+    "related_player_id": {
+      "type": "string",
+      "description": "passeur / joueur sortant / gardien adverse (TAB)"
     },
     "period": {
       "type": "string",
       "enum": [
         "1H",
         "2H",
-        "ET",
+        "ET1",
+        "ET2",
         "PENS"
       ]
     },
-    "type": {
-      "type": "string",
-      "enum": [
-        "goal",
-        "assist",
-        "own_goal",
-        "penalty_goal",
-        "penalty_missed",
-        "penalty_saved",
-        "yellow_card",
-        "red_card",
-        "save",
-        "goal_conceded",
-        "substitution",
-        "goal_disallowed",
-        "shootout_scored",
-        "shootout_missed",
-        "shootout_saved",
-        "shot_on_target",
-        "shot_off_target",
-        "corner",
-        "throw_in",
-        "free_kick",
-        "foul",
-        "offside"
-      ]
+    "minute": {
+      "type": "integer"
     },
-    "player_id": {
-      "type": "string"
+    "added_minute": {
+      "type": "integer",
+      "description": "15+2' → minute 15, added 2"
     },
-    "related_player_id": {
-      "type": "string",
-      "description": "passeur (but) / joueur sortant (remplacement) / tireur (arrêt)"
-    },
-    "parent_event_id": {
-      "type": "string",
-      "description": "lie un événement dérivé à son origine (passe → but, tir cadré auto → but)"
+    "clock_ms": {
+      "type": "integer"
     },
     "auto": {
       "type": "boolean",
-      "default": false,
-      "description": "créé automatiquement (tir cadré auto)"
+      "description": "tir cadré automatique"
+    },
+    "parent_event_id": {
+      "type": "string"
+    },
+    "shootout_order": {
+      "type": "integer"
+    },
+    "client_id": {
+      "type": "string",
+      "description": "idempotence de la file hors ligne"
+    },
+    "client_ts": {
+      "type": "string"
     },
     "operator": {
       "type": "string"
     },
-    "note": {
-      "type": "string"
+    "revisions": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "historique des corrections { at, by, before }"
     }
   },
   "required": [
     "match_id",
-    "type",
-    "team_id"
+    "team_id",
+    "type"
   ]
 }

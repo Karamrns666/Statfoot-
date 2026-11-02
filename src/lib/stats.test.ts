@@ -1,186 +1,177 @@
 import { describe, expect, it } from 'vitest'
 import { makeLeague, matches } from './__fixtures__/league'
 import {
-  bestAttack, bestDefense, bestTeam, collectAssists, competitionStandings, computeAwards, computePlayerStats,
-  computeStandings, computeTeamStats, keeperStats, kpis, race, raceWithEvolution, scoreFromEvents, teamOfRound, headToHead,
+  bestAttack, bestDefense, bestTeam, competitionStandings, computeAwards, computePlayerXP, computeTeamStats, generalStandings,
+  headToHead, kpis, race, raceWithEvolution, teamRankBefore, xpConfig, opponentMultiplier, matchXPLines, XP_DEFAULTS, teamOfRound,
 } from './stats'
 import type { Match } from '@/types/entities'
 
 const data = makeLeague()
-const stats = computePlayerStats(data, { seasonId: 's1' })
-const S = (id: string) => stats.get(id)!
+const X = computePlayerXP(data, { seasonId: 's1' })
+const P = (id: string) => X.get(id)!
 
 describe('classement', () => {
-  it('calcule MJ V N D BP BC DIFF PTS et l’ordre', () => {
-    const t = competitionStandings(data, 'c1')
+  it('MJ V N D BP BC DIFF PTS et ordre', () => {
+    const t = competitionStandings(data, 'lp')
     expect(t.map((r) => r.team_id)).toEqual(['A', 'B', 'D', 'C'])
-    expect(t[0]).toMatchObject({ played: 3, won: 1, drawn: 1, lost: 1, gf: 3, ga: 2, gd: 1, points: 4, rank: 1 })
-    expect(t[3]).toMatchObject({ team_id: 'C', played: 3, drawn: 3, points: 3, gf: 4, ga: 4 })
-  })
-  it('forme = 5 derniers, du plus ancien au plus récent', () => {
-    const t = competitionStandings(data, 'c1')
+    expect(t[0]).toMatchObject({ played: 3, won: 1, drawn: 1, lost: 1, gf: 3, ga: 2, gd: 1, points: 4 })
     expect(t.find((r) => r.team_id === 'A')!.form).toEqual(['W', 'D', 'L'])
-    expect(t.find((r) => r.team_id === 'D')!.form).toEqual(['D', 'L', 'W'])
   })
-  it('compte les cartons pour le fair-play', () => {
-    const t = competitionStandings(data, 'c1')
-    expect(t.find((r) => r.team_id === 'B')!.yellow).toBe(1)
-    expect(t.find((r) => r.team_id === 'D')!.red).toBe(1)
-  })
-  it('points victoire/nul/défaite configurables', () => {
-    const t = computeStandings(matches, ['A', 'B', 'C', 'D'], { points_win: 2, points_draw: 1, points_loss: 0 })
-    expect(t.find((r) => r.team_id === 'C')!.points).toBe(3)
-    expect(t.find((r) => r.team_id === 'A')!.points).toBe(3)
-  })
-  it('départage par confrontation directe', () => {
-    const ms: Match[] = [
-      { id: 'x1', season_id: 's', competition_id: 'c', home_team_id: 'X', away_team_id: 'Y', home_score: 1, away_score: 0, status: 'finished' },
-      { id: 'x2', season_id: 's', competition_id: 'c', home_team_id: 'Y', away_team_id: 'Z', home_score: 5, away_score: 0, status: 'finished' },
-      { id: 'x3', season_id: 's', competition_id: 'c', home_team_id: 'X', away_team_id: 'Z', home_score: 0, away_score: 1, status: 'finished' },
-    ]
-    // X, Y, Z ont 3 pts. Différence : Y +4, X 0, Z -4.
-    expect(computeStandings(ms, ['X', 'Y', 'Z'], {}, [], ['points', 'goal_diff']).map((r) => r.team_id)).toEqual(['Y', 'X', 'Z'])
-    // En confrontation directe pure (pts h2h égaux) on retombe sur le mini-classement : Y +4 aussi
-    const two: Match[] = [ms[0], { ...ms[1], home_score: 1, away_score: 0 }, { ...ms[2] }, { id: 'x4', season_id: 's', competition_id: 'c', home_team_id: 'W', away_team_id: 'Y', home_score: 9, away_score: 0, status: 'finished' }]
-    // X 3 pts, Y 3 pts, Z 3 pts, W 3 pts ; h2h entre X et ... : on vérifie juste que X devant Y (X a battu Y)
-    const t = computeStandings(two.slice(0, 1), ['X', 'Y'], {}, [], ['head_to_head'])
-    expect(t[0].team_id).toBe('X')
+  it('classement avant une journée', () => {
+    expect(competitionStandings(data, 'lp', { beforeRound: 2 }).map((r) => r.team_id)).toEqual(['A', 'C', 'D', 'B'])
+    expect(competitionStandings(data, 'lp', { beforeRound: 3 }).map((r) => r.team_id)).toEqual(['A', 'B', 'C', 'D'])
   })
   it('ignore les matchs non terminés', () => {
-    const ms = [...matches, { ...matches[0], id: 'live', status: 'live' as const, home_score: 9, away_score: 0 }]
-    expect(computeStandings(ms, ['A', 'B', 'C', 'D'], {}).find((r) => r.team_id === 'A')!.gf).toBe(3)
+    const d = makeLeague({ matches: [...matches, { ...matches[0], id: 'L', status: 'live', home_score: 9, away_score: 0 }] })
+    expect(competitionStandings(d, 'lp')[0].gf).toBe(3)
+  })
+  it('H2H', () => expect(headToHead(matches, 'A', 'B')).toMatchObject({ aWins: 1, aGoals: 2, bGoals: 0 }))
+})
+
+describe('multiplicateur adversaire', () => {
+  it('J1 : pas de classement → ×1', () => {
+    expect(teamRankBefore(data, matches[0], 'B')).toBeNull()
+    expect(opponentMultiplier(null, XP_DEFAULTS)).toBe(1)
+  })
+  it('rang avant la journée → 1-3 ×2, 4-6 ×1.5, 7+ ×1', () => {
+    expect(teamRankBefore(data, matches[2], 'C')).toBe(2)
+    expect(teamRankBefore(data, matches[3], 'B')).toBe(4)
+    expect(opponentMultiplier(2, XP_DEFAULTS)).toBe(2)
+    expect(opponentMultiplier(5, XP_DEFAULTS)).toBe(1.5)
+    expect(opponentMultiplier(9, XP_DEFAULTS)).toBe(1)
+  })
+  it('un rang figé à la clôture fait foi', () => {
+    const m: Match = { ...matches[2], validated: true, opponent_rank_snapshot: { home_rank: 1, away_rank: 7 } }
+    expect(teamRankBefore(data, m, 'C')).toBe(7)
+  })
+  it('cup sans match joué → ordre d’entrée dans la cup', () => {
+    const d = makeLeague({ competitions: [...makeLeague().competitions, { id: 'gold', season_id: 's1', name: 'Gold', phase: 'gold', team_ids: ['D', 'C', 'B', 'A'] }] })
+    const m: Match = { id: 'G1', season_id: 's1', competition_id: 'gold', round: 6, stage: 'cup', home_team_id: 'A', away_team_id: 'D', status: 'scheduled' }
+    expect(teamRankBefore(d, m, 'D')).toBe(1)
   })
 })
 
-describe('événements & passes décisives (correctif assists = 0)', () => {
-  it('score recalculé depuis les événements, CSC pour l’adversaire', () => {
-    expect(scoreFromEvents(matches[2], data.events.filter((e) => e.match_id === 'M3'))).toEqual({ home: 1, away: 1 })
+describe('XP — barème MBL', () => {
+  it('attaquant : buts/passes × multiplicateur, victoire/défaite', () => {
+    // J1 : +50 victoire, 2 buts ×1 = 100 · J2 : passe 20×2 (C 2e) = 40 · J3 : défaite −50
+    expect(P('A_FWD').xp).toBe(140)
+    // J1 : 50 + passe 20 · J2 : but 50×2 = 100 · J3 : −50
+    expect(P('A_MID').xp).toBe(120)
+    // J1 passe 20 · J2 but ×1.5 (B 4e) = 75, défaite −50 · J3 but ×2 (A 1er) = 100, victoire 50
+    expect(P('D_FWD').xp).toBe(195)
   })
-  it('compte les passes via related_player_id ET via événements assist autonomes, sans doublon', () => {
-    const a = collectAssists(data.events)
-    expect(a).toHaveLength(9)
-    expect(S('A_FWD').assists).toBe(1) // M3 : but avec passeur + événement assist rattaché → 1 seule
-    expect(S('D_FWD').assists).toBe(1) // M2 : passe legacy autonome
-    expect(S('C_DEF').assists).toBe(2)
-    expect(S('D_MID').assists).toBe(2)
+  it('cartons : jaune −20, rouge direct −50', () => {
+    // J1 jaune −20 défaite −50 · J2 victoire 50 · J3 but ×2 (C 3e) = 100
+    expect(P('B_DEF').xp).toBe(80)
+    // pas de compo D en M2 → n'a pas joué J1 · J2 défaite −50, rouge −50 · J3 victoire 50
+    expect(P('D_DEF').xp).toBe(-50)
+    expect(P('D_DEF').matches).toBe(2)
   })
-  it('les passes apparaissent dans les KPIs', () => {
-    expect(kpis(data, { seasonId: 's1'}).assists).toBe(9)
-    expect(kpis(data, { seasonId: 's1'}).goals).toBe(15)
+  it('gardien : clean sheet × importance, arrêts, buts encaissés (CSC compris)', () => {
+    // J1 victoire 50, CS 50, 2 arrêts 10 · J2 1 encaissé (CSC) −10 · J3 défaite −50, 1 encaissé −10
+    expect(P('A_GK').xp).toBe(40)
+    expect(P('A_GK')).toMatchObject({ clean_sheets: 1, saves: 2, conceded: 2, gk_matches: 3 })
+    // J2 défaite −50, 3 encaissés −30 · J3 victoire 50, CS 50
+    expect(P('D_GK').xp).toBe(20)
+  })
+  it('importance du match appliquée au clean sheet', () => {
+    const d = makeLeague({ xpRules: [{ id: 'i', season_id: 's1', key: 'importance_league_phase', value: 1.5 }] })
+    expect(computePlayerXP(d, { seasonId: 's1' }).get('D_GK')!.xp).toBe(45)
+  })
+  it('barème éditable', () => {
+    const d = makeLeague({ xpRules: [{ id: 'g', season_id: 's1', key: 'goal', value: 10 }] })
+    expect(computePlayerXP(d, { seasonId: 's1' }).get('A_FWD')!.xp).toBe(140 - 100 + 20)
+  })
+  it('2 jaunes même match = −40 au total (pas 2 × −20)', () => {
+    const extra = [
+      { id: 'y1', match_id: 'M1', team_id: 'B', type: 'yellow_card' as const, player_id: 'B_MID', minute: 3 },
+      { id: 'y2', match_id: 'M1', team_id: 'B', type: 'second_yellow' as const, player_id: 'B_MID', minute: 9 },
+    ]
+    const d = makeLeague({ events: [...makeLeague().events, ...extra] })
+    const base = P('B_MID').xp
+    expect(computePlayerXP(d, { seasonId: 's1' }).get('B_MID')!.xp).toBe(base - 40)
+  })
+  it('suspension : −50 par match', () => {
+    const d = makeLeague({ suspensions: [{ id: 's', season_id: 's1', player_id: 'D_DEF', origin_match_id: 'M4', matches: 2 }] })
+    expect(computePlayerXP(d, { seasonId: 's1' }).get('D_DEF')!.xp).toBe(-150)
+  })
+  it('joueur / équipe / but du mois', () => {
+    const d = makeLeague({ monthlyAwards: [
+      { id: 'a', season_id: 's1', month: '2025-09', type: 'player', player_id: 'A_FWD' },
+      { id: 'b', season_id: 's1', month: '2025-09', type: 'goal', event_id: 'E1' },
+      { id: 'c', season_id: 's1', month: '2025-09', type: 'team', team_id: 'D' },
+    ] })
+    const x = computePlayerXP(d, { seasonId: 's1' })
+    expect(x.get('A_FWD')!.xp).toBe(140 + 100 + 50)
+    expect(x.get('D_GK')!.xp).toBe(20 + 50)
+  })
+  it('un match non clôturé ne compte pas ; la réouverture retire l’XP', () => {
+    const d = makeLeague({ matches: matches.map((m) => (m.id === 'M1' ? { ...m, status: 'live' as const } : m)) })
+    expect(computePlayerXP(d, { seasonId: 's1' }).get('A_FWD')!.xp).toBe(140 - 150)
+  })
+  it('XP en direct d’un match = même calcul', () => {
+    const lines = matchXPLines(data, matches[0], xpConfig([], 's1'), { score: { home: 2, away: 0 } })
+    expect(lines.filter((l) => l.player_id === 'A_FWD').reduce((a, l) => a + l.points, 0)).toBe(150)
   })
 })
 
-describe('stats joueurs', () => {
-  it('buts (penalty inclus, CSC exclus)', () => {
-    expect(S('A_FWD').goals).toBe(2)
-    expect(S('A_FWD').penalty_goals).toBe(1)
-    expect(S('A_DEF').goals).toBe(0)
-    expect(S('A_DEF').own_goals).toBe(1)
-    expect(S('B_FWD').goals).toBe(3)
-  })
-  it('MJ depuis la compo, ou depuis les événements si pas de compo', () => {
-    expect(S('A_FWD').played).toBe(3)
-    expect(S('D_GK').played).toBe(2) // absent des événements de M2 (pas de compo D)
-    expect(S('D_FWD').played).toBe(3)
-  })
-  it('stats gardiens : clean sheets, arrêts, buts encaissés', () => {
-    expect(S('A_GK')).toMatchObject({ gk_matches: 3, clean_sheets: 1, goals_conceded: 2, saves: 2 })
-    expect(S('B_GK')).toMatchObject({ gk_matches: 3, clean_sheets: 0, goals_conceded: 5, saves: 3 })
-    expect(S('D_GK')).toMatchObject({ gk_matches: 2, clean_sheets: 1, goals_conceded: 3 })
-    const k = keeperStats(data, { seasonId: 's1' })
-    expect(k).toHaveLength(4)
-  })
-  it('XP selon les règles par défaut', () => {
-    // 3 MJ ×2 + 1 V ×3 + 1 N ×1 + 1 but ×10 + 1 pen ×8 + 1 passe ×6
-    expect(S('A_FWD').xp).toBe(34)
-    // 3 MJ ×2 + V 3 + N 1 + CS gardien 8 + 2 arrêts − 2 encaissés
-    expect(S('A_GK').xp).toBe(18)
-    // 3 MJ ×2 + V 3 + N 1 − CSC 3 + CS défenseur 4
-    expect(S('A_DEF').xp).toBe(11)
-  })
-  it('règles XP éditables', () => {
-    const d = makeLeague({ xpRules: [{ id: 'g', action: 'goal', points: 1 }] })
-    expect(computePlayerStats(d).get('B_FWD')!.xp).toBe(3)
-  })
-})
-
-describe('courses aux trophées', () => {
-  it("Soulier d'or : buts, puis passes, puis moins de matchs, ex-aequo partagés", () => {
-    const r = race(data, [...stats.values()], 'top_scorer')
+describe('trophées', () => {
+  it("Soulier d'or : buts, puis passes, puis moins de matchs (ex-aequo partagés)", () => {
+    const r = race(data, [...X.values()], 'top_scorer', 's1')
     expect(r[0].item.player_id).toBe('B_FWD')
     expect(r.slice(1, 4).map((x) => x.rank)).toEqual([2, 2, 4])
     expect(r[3].item.player_id).toBe('C_FWD')
   })
   it('Meilleur passeur : passes puis buts', () => {
-    const r = race(data, [...stats.values()], 'top_assist')
-    expect(r[0].item.player_id).toBe('D_MID') // 2 passes + 1 but devant C_DEF (2 passes, 0 but)
+    const r = race(data, [...X.values()], 'top_assist', 's1')
+    expect(r[0].item.player_id).toBe('D_MID')
     expect(r[1].item.player_id).toBe('C_DEF')
   })
-  it("Ballon d'or exclut les gardiens ; Gant d'or uniquement les gardiens", () => {
-    expect(race(data, [...stats.values()], 'ballon_or').every((r) => r.item.position !== 'GK')).toBe(true)
-    expect(race(data, [...stats.values()], 'golden_glove').every((r) => r.item.position === 'GK')).toBe(true)
+  it("Ballon d'or = joueurs de champ ; Gant d'or = gardiens", () => {
+    const b = race(data, [...X.values()], 'ballon_or', 's1')
+    expect(b.every((r) => r.item.position !== 'GK')).toBe(true)
+    // B_FWD : J1 défaite −50 · J2 2 buts ×2 (D 3e) = 200 + victoire 50 · J3 but ×2 + passe ×2 (C 3e) = 140
+    expect(b[0].item).toMatchObject({ player_id: 'B_FWD', xp: 340 })
+    expect(race(data, [...X.values()], 'golden_glove', 's1')[0].item.player_id).toBe('A_GK')
   })
-  it('évolution du rang ▲▼ vs journée précédente', () => {
-    const r = raceWithEvolution(data, { seasonId: 's1' }, 'top_scorer')
-    const b = r.find((x) => x.item.player_id === 'B_FWD')!
-    expect(b.rank).toBe(1)
-    expect(b.previousRank).toBe(2)
-    expect(b.delta).toBe(1)
+  it('minimum de matchs (barème)', () => {
+    const d = makeLeague({ xpRules: [{ id: 'm', season_id: 's1', key: 'min_matches_awards', value: 3 }] })
+    const b = race(d, [...computePlayerXP(d, { seasonId: 's1' }).values()], 'ballon_or', 's1')
+    expect(b.find((r) => r.item.player_id === 'D_FWD')).toBeDefined()
+    expect(b.find((r) => r.item.player_id === 'D_DEF')).toBeUndefined()
   })
-})
-
-describe('meilleure équipe / défense / attaque', () => {
-  it('meilleure équipe = 1er du classement si pas de finale', () => {
-    expect(bestTeam(data, { seasonId: 's1' })).toMatchObject({ team_id: 'A', reason: 'leader' })
+  it('évolution du rang ▲▼', () => {
+    const b = raceWithEvolution(data, { seasonId: 's1' }, 'top_scorer').find((x) => x.item.player_id === 'B_FWD')!
+    expect(b).toMatchObject({ rank: 1, previousRank: 2, delta: 1 })
   })
-  it('meilleure équipe = vainqueur de la finale (tirs au but) si jouée', () => {
-    const final: Match = { id: 'F', season_id: 's1', competition_id: 'c1', stage: 'final', home_team_id: 'A', away_team_id: 'B', home_score: 1, away_score: 1, penalties: true, home_pens: 3, away_pens: 4, status: 'finished', date: '2025-12-01T19:00:00' }
-    expect(bestTeam(makeLeague({ matches: [...matches, final] }), { seasonId: 's1' })).toMatchObject({ team_id: 'B', reason: 'champion' })
-  })
-  it('jamais une équipe à 0 point', () => {
+  it('meilleure équipe = 1er du classement général, jamais à 0 pt', () => {
+    expect(bestTeam(data, { seasonId: 's1' })).toMatchObject({ team_id: 'A' })
     const none = makeLeague({ matches: matches.map((m) => ({ ...m, status: 'scheduled' as const })) })
     expect(bestTeam(none, { seasonId: 's1' })).toBeNull()
-    const awards = computeAwards(none, { seasonId: 's1' })
-    expect(awards.find((a) => a.category === 'best_team')!.not_awarded).toBe(true)
+    expect(computeAwards(none, { seasonId: 's1' }).find((a) => a.category === 'best_team')!.not_awarded).toBe(true)
   })
-  it('meilleure défense = moins de buts encaissés, attaque = plus de buts marqués', () => {
+  it('classement général : Gold puis Silver', () => {
+    const d = makeLeague({ competitions: [...makeLeague().competitions,
+      { id: 'g', season_id: 's1', name: 'Gold', phase: 'gold', team_ids: ['A', 'B'] }, { id: 's', season_id: 's1', name: 'Silver', phase: 'silver', team_ids: ['C', 'D'] }],
+    matches: [...matches, { id: 'S1', season_id: 's1', competition_id: 's', round: 6, stage: 'cup', home_team_id: 'C', away_team_id: 'D', home_score: 5, away_score: 0, status: 'finished' }] })
+    expect(generalStandings(d, 's1').map((r) => r.team_id)).toEqual(['A', 'B', 'C', 'D'])
+  })
+  it('meilleure défense / attaque', () => {
     const ts = [...computeTeamStats(data, { seasonId: 's1' }).values()]
     expect(bestDefense(ts)[0].team_id).toBe('A')
     expect(bestAttack(ts)[0].team_id).toBe('B')
   })
-})
-
-describe('prix par poste et jeune', () => {
-  it('meilleur jeune = âge réel < 23 ans au début de saison', () => {
-    const a = computeAwards(data, { seasonId: 's1' })
-    expect(a.find((x) => x.category === 'best_young')).toMatchObject({ player_id: 'C_MID', not_awarded: false })
+  it('meilleur jeune = âge réel ; sinon Non attribué', () => {
+    expect(computeAwards(data, { seasonId: 's1' }).find((a) => a.category === 'best_young')!.player_id).toBe('C_MID')
+    const d = makeLeague({ settings: { young_max_age: 18 } })
+    expect(computeAwards(d, { seasonId: 's1' }).find((a) => a.category === 'best_young')!.not_awarded).toBe(true)
   })
-  it('« Non attribué » si aucun candidat', () => {
-    const a = computeAwards(makeLeague({ settings: { young_max_age: 18 } }), { seasonId: 's1' })
-    expect(a.find((x) => x.category === 'best_young')!.not_awarded).toBe(true)
+  it('KPIs : passes comptées', () => {
+    expect(kpis(data, { seasonId: 's1' })).toMatchObject({ goals: 15, assists: 9, matches: 6 })
   })
-  it('minimum de matchs joués appliqué aux prix par poste', () => {
-    const a = computeAwards(makeLeague({ settings: { awards_min_matches: 4 } }), { seasonId: 's1' })
-    for (const c of ['best_forward', 'best_midfielder', 'best_defender', 'player_of_tournament'] as const) {
-      expect(a.find((x) => x.category === c)!.not_awarded).toBe(true)
-    }
-    expect(a.find((x) => x.category === 'best_team')!.not_awarded).toBe(false)
-  })
-  it('meilleur attaquant filtre bien le poste', () => {
-    const a = computeAwards(data, { seasonId: 's1' })
-    const fw = a.find((x) => x.category === 'best_forward')!
-    expect(data.players.find((p) => p.id === fw.player_id)!.position).toBe('FWD')
-  })
-})
-
-describe('équipe type & confrontations', () => {
-  it('équipe type de la journée : 1 GB + 5 joueurs de champ', () => {
+  it('équipe type de la journée', () => {
     const t = teamOfRound(data, 's1', 1)
     expect(t).toHaveLength(6)
     expect(t[0].position).toBe('GK')
-    expect(t.filter((s) => s.position !== 'GK').every((s) => data.players.find((p) => p.id === s.player_id)!.position !== 'GK')).toBe(true)
-  })
-  it('H2H', () => {
-    expect(headToHead(matches, 'A', 'B')).toMatchObject({ aWins: 1, bWins: 0, aGoals: 2, bGoals: 0 })
   })
 })

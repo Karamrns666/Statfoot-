@@ -2,90 +2,33 @@
   "name": "Competition",
   "type": "object",
   "properties": {
-    "name": {
-      "type": "string",
-      "description": "ex. Gold Cup"
-    },
-    "short_name": {
-      "type": "string"
-    },
     "season_id": {
       "type": "string"
     },
-    "division_id": {
-      "type": "string"
+    "name": {
+      "type": "string",
+      "description": "Phase de ligue / Gold Cup / Silver Cup / Phase finale"
+    },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "league_phase",
+        "gold",
+        "silver",
+        "knockout",
+        "groups",
+        "other"
+      ]
     },
     "format": {
       "type": "string",
       "enum": [
+        "swiss",
         "league",
-        "group_stage",
-        "cup",
+        "groups_knockout",
+        "knockout",
         "other"
-      ],
-      "description": "championnat / groupes + éliminatoires / élimination directe / autre"
-    },
-    "legs": {
-      "type": "string",
-      "enum": [
-        "single",
-        "double"
-      ],
-      "default": "double"
-    },
-    "logo_url": {
-      "type": "string"
-    },
-    "color": {
-      "type": "string",
-      "description": "accent néon hex"
-    },
-    "description": {
-      "type": "string"
-    },
-    "start_date": {
-      "type": "string",
-      "format": "date"
-    },
-    "end_date": {
-      "type": "string",
-      "format": "date"
-    },
-    "location": {
-      "type": "string"
-    },
-    "team_count": {
-      "type": "integer"
-    },
-    "team_ids": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "qualified_per_group": {
-      "type": "integer",
-      "default": 2
-    },
-    "knockout_rounds": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "enum": [
-          "round_of_16",
-          "quarter",
-          "semi",
-          "third_place",
-          "final"
-        ]
-      }
-    },
-    "tiebreakers": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "surcharge de Settings.tiebreakers (optionnel)"
+      ]
     },
     "status": {
       "type": "string",
@@ -94,17 +37,53 @@
         "active",
         "finished",
         "archived"
-      ],
-      "default": "draft"
+      ]
+    },
+    "team_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "rounds": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "description": "ex. [1..5] ligue, [6..10] cups"
+    },
+    "default_pitch": {
+      "type": "string",
+      "description": "Terrain 1 = Gold, Terrain 2 = Silver"
+    },
+    "half_duration_min": {
+      "type": "integer",
+      "default": 15
+    },
+    "extra_time": {
+      "type": "object",
+      "description": "{ enabled, period_min }"
+    },
+    "foul_alert_threshold": {
+      "type": "integer",
+      "default": 5
+    },
+    "logo_url": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string"
     },
     "order": {
-      "type": "integer",
-      "default": 0
+      "type": "integer"
     }
   },
   "required": [
-    "name",
     "season_id",
-    "format"
+    "name",
+    "phase"
   ]
 }

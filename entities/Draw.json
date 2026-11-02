@@ -2,72 +2,62 @@
   "name": "Draw",
   "type": "object",
   "properties": {
+    "season_id": {
+      "type": "string"
+    },
     "competition_id": {
       "type": "string"
     },
-    "status": {
+    "type": {
       "type": "string",
       "enum": [
-        "setup",
-        "in_progress",
-        "done"
-      ],
-      "default": "setup"
+        "swiss_pots",
+        "groups"
+      ]
     },
     "pots": {
       "type": "array",
       "items": {
-        "type": "object",
-        "properties": {
-          "pot": {
-            "type": "integer"
-          },
-          "team_ids": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      }
+        "type": "object"
+      },
+      "description": "[{ pot: 1..5, team_ids: [4 équipes] }]"
     },
-    "locked": {
-      "type": "boolean",
-      "default": false
-    },
-    "one_team_per_pot_per_group": {
-      "type": "boolean",
-      "default": true
-    },
-    "picks": {
+    "fixtures": {
       "type": "array",
       "items": {
-        "type": "object",
-        "properties": {
-          "team_id": {
-            "type": "string"
-          },
-          "pot": {
-            "type": "integer"
-          },
-          "group_id": {
-            "type": "string"
-          },
-          "at": {
-            "type": "string"
-          }
-        }
-      }
+        "type": "object"
+      },
+      "description": "swiss : [{ round, home_team_id, away_team_id, revealed }] (50)"
     },
-    "applied_to_groups": {
-      "type": "boolean",
-      "default": false
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "groupes : [{ group_id, team_ids }]"
+    },
+    "revealed_count": {
+      "type": "integer"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "revealing",
+        "locked",
+        "published"
+      ]
     },
     "performed_by": {
       "type": "string"
+    },
+    "seed": {
+      "type": "integer",
+      "description": "graine aléatoire → tirage rejouable/auditable"
     }
   },
   "required": [
-    "competition_id"
+    "season_id",
+    "type"
   ]
 }

@@ -1,0 +1,40 @@
+{
+  "name": "Suspension",
+  "type": "object",
+  "properties": {
+    "season_id": {
+      "type": "string"
+    },
+    "player_id": {
+      "type": "string"
+    },
+    "origin_match_id": {
+      "type": "string"
+    },
+    "origin_event_id": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "matches": {
+      "type": "integer",
+      "description": "nombre de match(s) de suspension"
+    },
+    "served_match_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "created_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "season_id",
+    "player_id",
+    "matches"
+  ]
+}

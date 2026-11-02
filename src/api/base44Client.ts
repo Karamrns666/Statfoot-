@@ -37,7 +37,7 @@ function sortRows<T>(rows: T[], sort?: string): T[] {
   })
 }
 
-const NOT_LOGGED: EntityName[] = ['ActivityLog', 'MotmVote']
+const NOT_LOGGED: EntityName[] = ['AuditLog', 'MotmVote', 'LiveState']
 
 function log(action: string, entity: EntityName, row: BaseEntity | undefined, details?: Record<string, unknown>) {
   if (NOT_LOGGED.includes(entity)) return
@@ -48,7 +48,7 @@ function log(action: string, entity: EntityName, row: BaseEntity | undefined, de
     id: newId(), created_date: new Date().toISOString(), action, entity, entity_id: row?.id, entity_label: label,
     details, author_email: user?.email ?? 'public', author_name: user?.full_name ?? 'Public',
   }
-  store.replace('ActivityLog', [entry, ...store.all('ActivityLog')].slice(0, 2000))
+  store.replace('AuditLog', [entry, ...store.all('AuditLog')].slice(0, 3000))
 }
 
 function diff(before: Record<string, unknown>, patch: Record<string, unknown>) {
@@ -99,9 +99,8 @@ export function entityApi<N extends EntityName>(name: N) {
       const next = { ...before, ...patch, id, updated_date: new Date().toISOString() } as T
       const copy = [...rows]; copy[idx] = next
       store.replace(name, copy)
-      // Le chrono live du Match Center change très souvent : on ne journalise pas ces mises à jour techniques.
       const keys = Object.keys(patch)
-      if (!(name === 'Match' && keys.every((k) => k === 'live'))) {
+      if (!(name === 'Lineup' && keys.every((k) => k === 'updated_date'))) {
         log('update', name, next, diff(before as unknown as Record<string, unknown>, patch as Record<string, unknown>))
       }
       return clone(next)
@@ -121,5 +120,5 @@ const entities = Object.fromEntries(ENTITY_NAMES.map((n) => [n, entityApi(n)])) 
 import { auth } from './auth'
 import { integrations } from './integrations'
 
-export const base44 = { entities, auth, integrations, logActivity: (action: string, details?: Record<string, unknown>) => log(action, 'Settings' as EntityName, undefined, details) }
+export const base44 = { entities, auth, integrations, logActivity: (action: string, entity: EntityName, row?: BaseEntity, details?: Record<string, unknown>) => log(action, entity, row, details) }
 export { store }

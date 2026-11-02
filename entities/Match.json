@@ -8,33 +8,27 @@
     "competition_id": {
       "type": "string"
     },
-    "group_id": {
-      "type": "string"
-    },
     "round": {
-      "type": "integer",
-      "description": "journée"
+      "type": "integer"
     },
     "stage": {
       "type": "string",
       "enum": [
-        "league",
+        "league_phase",
+        "cup",
         "group",
         "round_of_16",
         "quarter",
         "semi",
         "third_place",
         "final"
-      ],
-      "default": "league"
+      ]
     },
     "bracket_slot": {
-      "type": "string",
-      "description": "QF1, SF2, F…"
+      "type": "string"
     },
     "home_source": {
-      "type": "object",
-      "description": "{type:'group_rank'|'winner'|'loser', ref, rank} pour l'automatisation du tableau"
+      "type": "object"
     },
     "away_source": {
       "type": "object"
@@ -43,10 +37,10 @@
       "type": "string",
       "format": "date-time"
     },
-    "venue_id": {
+    "pitch": {
       "type": "string"
     },
-    "pitch": {
+    "venue_id": {
       "type": "string"
     },
     "home_team_id": {
@@ -68,12 +62,10 @@
       "type": "integer"
     },
     "extra_time": {
-      "type": "boolean",
-      "default": false
+      "type": "boolean"
     },
     "penalties": {
-      "type": "boolean",
-      "default": false
+      "type": "boolean"
     },
     "home_pens": {
       "type": "integer"
@@ -89,24 +81,30 @@
         "finished",
         "postponed",
         "cancelled"
-      ],
-      "default": "scheduled"
+      ]
     },
     "published": {
+      "type": "boolean"
+    },
+    "validated": {
       "type": "boolean",
-      "default": true
+      "description": "clôturé → XP officiel"
+    },
+    "validated_at": {
+      "type": "string"
+    },
+    "validated_by": {
+      "type": "string"
+    },
+    "opponent_rank_snapshot": {
+      "type": "object",
+      "description": "{ home_rank, away_rank } : rang de chaque équipe avant le match (sert au multiplicateur adversaire), figé à la clôture"
     },
     "motm_player_id": {
-      "type": "string",
-      "description": "homme du match officiel"
-    },
-    "motm_vote_open": {
-      "type": "boolean",
-      "default": false
+      "type": "string"
     },
     "motm_vote_closes_at": {
-      "type": "string",
-      "format": "date-time"
+      "type": "string"
     },
     "referee": {
       "type": "string"
@@ -117,20 +115,25 @@
         "type": "string"
       }
     },
-    "scorer_user_ids": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "marqueurs assignés"
+    "operator_user_id": {
+      "type": "string",
+      "description": "opérateur attribué"
     },
-    "live": {
-      "type": "object",
-      "description": "{period:'1H'|'HT'|'2H'|'ET'|'PENS'|'FT', running, started_at, elapsed_ms, possession:{home_ms,away_ms,dead_ms,current}, operator_name}"
+    "source": {
+      "type": "string",
+      "enum": [
+        "match_center",
+        "quick_entry",
+        "manual"
+      ]
     },
     "sheet": {
       "type": "object",
-      "description": "{status:'draft'|'validated', referee_signature, manager_signature, validated_at, validated_by, notes}"
+      "description": "{ filled_at, filled_by, actions_count, referee_signature, manager_signature, signed_at, status }"
+    },
+    "half_duration_min": {
+      "type": "integer",
+      "default": 15
     }
   },
   "required": [

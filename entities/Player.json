@@ -18,8 +18,7 @@
         "DEF",
         "MID",
         "FWD"
-      ],
-      "description": "GB / DEF / MIL / ATT"
+      ]
     },
     "number": {
       "type": "integer"
@@ -36,25 +35,26 @@
       "enum": [
         "active",
         "injured",
-        "suspended",
         "inactive"
-      ],
-      "default": "active"
+      ]
     },
     "is_captain": {
-      "type": "boolean",
-      "default": false
+      "type": "boolean"
     },
     "season_ids": {
       "type": "array",
       "items": {
         "type": "string"
       },
-      "description": "saisons jouées → badge Recrue si 1 seule"
+      "description": "1 seule → badge « Recrue · 1re saison »"
     },
     "email": {
       "type": "string",
-      "description": "compte joueur (accès à sa carte)"
+      "description": "compte joueur"
+    },
+    "documents": {
+      "type": "object",
+      "description": "{ id_card|medical|license: { status: valid|missing|refused|pending, file_url, reason, validated_by } }"
     }
   },
   "required": [

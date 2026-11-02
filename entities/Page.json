@@ -9,12 +9,10 @@
       "type": "string"
     },
     "content": {
-      "type": "string",
-      "description": "markdown"
+      "type": "string"
     },
     "published": {
-      "type": "boolean",
-      "default": true
+      "type": "boolean"
     }
   },
   "required": [

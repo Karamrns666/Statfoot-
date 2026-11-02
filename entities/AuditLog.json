@@ -1,10 +1,9 @@
 {
-  "name": "ActivityLog",
+  "name": "AuditLog",
   "type": "object",
   "properties": {
     "action": {
-      "type": "string",
-      "description": "create | update | delete | login | close_season | publish_award | ..."
+      "type": "string"
     },
     "entity": {
       "type": "string"
@@ -16,8 +15,7 @@
       "type": "string"
     },
     "details": {
-      "type": "object",
-      "description": "diff avant/après"
+      "type": "object"
     },
     "author_email": {
       "type": "string"

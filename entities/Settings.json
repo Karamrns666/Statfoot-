@@ -27,8 +27,7 @@
       "type": "string"
     },
     "socials": {
-      "type": "object",
-      "description": "{instagram, facebook, linkedin, tiktok, youtube, x}"
+      "type": "object"
     },
     "points_win": {
       "type": "integer",
@@ -45,49 +44,20 @@
     "tiebreakers": {
       "type": "array",
       "items": {
-        "type": "string",
-        "enum": [
-          "points",
-          "head_to_head",
-          "goal_diff",
-          "goals_for",
-          "wins",
-          "fair_play",
-          "fewer_played"
-        ]
-      },
-      "default": [
-        "points",
-        "goal_diff",
-        "goals_for",
-        "head_to_head",
-        "fair_play"
-      ]
+        "type": "string"
+      }
     },
     "starters_count": {
       "type": "integer",
       "default": 6
     },
-    "match_duration_minutes": {
+    "motm_vote_minutes_after": {
       "type": "integer",
-      "default": 40
-    },
-    "awards_min_matches": {
-      "type": "integer",
-      "default": 3
+      "default": 15
     },
     "young_max_age": {
       "type": "integer",
       "default": 23
-    },
-    "motm_vote_enabled": {
-      "type": "boolean",
-      "default": true
-    },
-    "motm_vote_weight": {
-      "type": "number",
-      "default": 0,
-      "description": "0 = vote purement consultatif"
     }
   }
 }

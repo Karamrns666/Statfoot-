@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { Menu, X, Lock, Tv, Camera, ThumbsUp, Briefcase, PlayCircle, Mail, Phone, MapPin } from 'lucide-react'
-import { Logo } from './Logo'
+import { Logo, OrganizedBy, MBL_LOGO } from './Logo'
 import { SeasonSelector } from './SeasonSelector'
 import { ScoreTicker } from '@/components/match/ScoreTicker'
 import { useData } from '@/hooks/useData'
@@ -30,7 +30,7 @@ export function PublicLayout() {
       <ScoreTicker />
       <header className="sticky top-0 z-40 border-b border-white/5 bg-night-900/80 backdrop-blur-xl no-print">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
-          <Logo subtitle="Football entreprises" />
+          <Logo subtitle="Morocco Business League" />
           <nav className="ml-4 hidden flex-1 items-center gap-0.5 xl:flex">
             {PUBLIC_NAV.map((n) => (
               <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => cn('whitespace-nowrap rounded-lg px-2 py-1.5 font-display text-[14px] font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:text-white', isActive && 'text-neon bg-neon/10')}>{n.label}</NavLink>
@@ -73,10 +73,13 @@ function Footer() {
   return (
     <footer className="mt-12 border-t border-white/5 bg-night-950/60 no-print">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:grid-cols-3">
-        <div>
-          <Logo />
-          <p className="mt-3 text-sm text-muted-foreground">{settings.tagline}</p>
-          <p className="mt-1 text-xs text-muted-foreground">Organisé par {settings.organizer}</p>
+        <div className="flex items-start gap-4">
+          <img src={settings.logo_url || MBL_LOGO} alt={settings.league_name ?? 'MBL'} className="h-24 w-auto" />
+          <div>
+            <div className="font-display text-2xl font-black uppercase leading-none">{settings.league_name}</div>
+            <p className="mt-2 max-w-xs text-sm text-muted-foreground">{settings.tagline}</p>
+            <OrganizedBy className="mt-4" />
+          </div>
         </div>
         <div className="space-y-2 text-sm">
           <div className="title-caps text-base">Contact</div>
@@ -92,7 +95,7 @@ function Footer() {
           <div className="flex gap-4 text-sm"><Link to="/reglement" className="text-muted-foreground hover:text-neon">Règlement</Link><Link to="/admin" className="text-muted-foreground hover:text-neon">Espace admin</Link></div>
         </div>
       </div>
-      <div className="border-t border-white/5 py-4 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} {settings.league_name ?? 'StatFoot'} · Données de démonstration fictives</div>
+      <div className="border-t border-white/5 py-4 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} {settings.league_name ?? 'Morocco Business League'} — saison 2025-2026 : données officielles de la ligue ; saison 2026-2027 : démonstration</div>
     </footer>
   )
 }

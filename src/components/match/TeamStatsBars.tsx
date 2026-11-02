@@ -17,7 +17,7 @@ export function TeamStatsBars({ match, events, live, now, manual, compact }: { m
     const conv = (s: MatchTeamStats, ev: TeamLiveStats): TeamLiveStats => ({ ...ev, possession: s.possession ?? ev.possession, shots: s.shots ?? ev.shots, shots_on_target: s.shots_on_target ?? ev.shots_on_target, shots_off_target: Math.max(0, (s.shots ?? 0) - (s.shots_on_target ?? 0)), corners: s.corners ?? ev.corners, fouls: s.fouls ?? ev.fouls, offsides: s.offsides ?? ev.offsides, saves: s.saves ?? ev.saves })
     stats = { home: conv(mh, fromEvents.home), away: conv(ma, fromEvents.away) }
   }
-  const hc = L.team.get(match.home_team_id)?.primary_color ?? '#F26B1D', ac = L.team.get(match.away_team_id)?.primary_color ?? '#38bdf8'
+  const hc = L.team.get(match.home_team_id)?.primary_color ?? '#F85A00', ac = L.team.get(match.away_team_id)?.primary_color ?? '#38bdf8'
   const keys = STAT_LABELS.filter((s) => !(manual && period === 'all' && ['throw_ins', 'free_kicks'].includes(s.key)) || stats.home[s.key] + stats.away[s.key] > 0)
   return (
     <Card>

@@ -50,7 +50,7 @@ export default function DrawSwiss() {
     const seed = Math.floor(Math.random() * 1e9)
     const fixtures = swissPotsFixtures(editPots, seededRng(seed)).map((f) => ({ ...f, revealed: false }))
     let compId = lp?.id
-    if (!compId) compId = (await base44.entities.Competition.create({ season_id: seasonId, name: 'Phase de ligue', phase: 'league_phase', format: 'swiss', status: 'draft', team_ids: editPots.flat(), rounds: [1, 2, 3, 4, 5], half_duration_min: 15, color: '#F26B1D', order: 1 })).id
+    if (!compId) compId = (await base44.entities.Competition.create({ season_id: seasonId, name: 'Phase de ligue', phase: 'league_phase', format: 'swiss', status: 'draft', team_ids: editPots.flat(), rounds: [1, 2, 3, 4, 5], half_duration_min: 15, color: '#F85A00', order: 1 })).id
     await base44.entities.Draw.create({ season_id: seasonId, competition_id: compId, type: 'swiss_pots', pots: editPots.map((t, i) => ({ pot: i + 1, team_ids: t })), fixtures, revealed_count: 0, status: 'revealing', performed_by: user?.email, seed })
     setPots(null)
     toast.success('50 affiches générées — lancez la cérémonie de révélation')
@@ -130,7 +130,7 @@ function Ceremony({ draw, onClose }: { draw: Draw; onClose: () => void }) {
   const last = n > 0 ? fixtures[n - 1] : undefined
   const shown = locked ? fixtures.length : n
   return (
-    <div className="fixed inset-0 z-[60] flex flex-col overflow-hidden bg-night-950 p-4 sm:p-8" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(242,107,29,.25), transparent 70%), #0b1426' }}>
+    <div className="fixed inset-0 z-[60] flex flex-col overflow-hidden bg-night-950 p-4 sm:p-8" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(248,90,0,.25), transparent 70%), #04163D' }}>
       <div className="flex items-center justify-between">
         <div className="title-caps text-2xl sm:text-4xl">Tirage <span className="text-neon">phase de ligue</span></div>
         <div className="num text-2xl sm:text-4xl">{shown} / {fixtures.length} <span className="font-sans text-sm font-normal text-muted-foreground">affiches révélées</span></div>

@@ -45,7 +45,7 @@ export default function MatchDetail() {
         {showScore && <Button variant="outline" size="sm" onClick={() => setShare(true)}><Share2 />Visuels Instagram</Button>}
       </div>
       <section className="relative overflow-hidden rounded-3xl border border-white/10 p-5 sm:p-8">
-        <div className="pointer-events-none absolute inset-0" style={{ background: `radial-gradient(ellipse 50% 90% at 0% 50%, ${home?.primary_color}33, transparent 70%), radial-gradient(ellipse 50% 90% at 100% 50%, ${away?.primary_color}33, transparent 70%), linear-gradient(180deg,#14254a,#0b1426)` }} />
+        <div className="pointer-events-none absolute inset-0" style={{ background: `radial-gradient(ellipse 50% 90% at 0% 50%, ${home?.primary_color}33, transparent 70%), radial-gradient(ellipse 50% 90% at 100% 50%, ${away?.primary_color}33, transparent 70%), linear-gradient(180deg,#0D2B66,#04163D)` }} />
         <div className="relative">
           <div className="mb-5 flex flex-wrap items-center justify-center gap-2 text-sm">
             <CompetitionBadge competition={comp} />

@@ -85,7 +85,7 @@ export function LineupEditor({ match, teamId, onValidated, readOnly }: { match: 
           const isBlocked = blocked(p)
           return (
             <div key={p.id} className={cn('flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm', starters.has(p.id) ? 'bg-neon/15' : present.has(p.id) ? 'bg-white/5' : 'opacity-50', isBlocked && 'ring-1 ring-red-500/50')}>
-              <input type="checkbox" aria-label="Présent" checked={present.has(p.id)} onChange={() => toggle(p.id, 'present')} className="size-4 accent-[#F26B1D]" disabled={readOnly} />
+              <input type="checkbox" aria-label="Présent" checked={present.has(p.id)} onChange={() => toggle(p.id, 'present')} className="size-4 accent-[#F85A00]" disabled={readOnly} />
               <Input type="number" aria-label="Numéro" className="h-7 w-12 px-1 text-center" value={lu.numbers?.[p.id] ?? p.number ?? ''} disabled={readOnly} onChange={(e) => setLu({ ...lu, numbers: { ...(lu.numbers ?? {}), [p.id]: +e.target.value } })} />
               <button className="flex-1 truncate text-left cursor-pointer" onClick={() => toggle(p.id, 'starter')}>{p.first_name} {p.last_name}</button>
               <PositionBadge position={p.position} />

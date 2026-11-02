@@ -32,7 +32,7 @@ export default function PlayerDetail() {
   for (const l of s?.lines ?? []) { const k = l.match_id ?? `hors-match-${l.key}-${l.detail}`; if (!linesByMatch.has(k)) linesByMatch.set(k, []); linesByMatch.get(k)!.push(l) }
   return (
     <div className="space-y-6">
-      <section className="relative overflow-hidden rounded-3xl border border-white/10 p-6 sm:p-8" style={{ background: `radial-gradient(ellipse 60% 100% at 100% 0%, ${t?.primary_color}40, transparent 70%), linear-gradient(180deg,#14254a,#0b1426)` }}>
+      <section className="relative overflow-hidden rounded-3xl border border-white/10 p-6 sm:p-8" style={{ background: `radial-gradient(ellipse 60% 100% at 100% 0%, ${t?.primary_color}40, transparent 70%), linear-gradient(180deg,#0D2B66,#04163D)` }}>
         <div className="flex flex-col items-center gap-6 sm:flex-row">
           <PlayerAvatar player={p} team={t} size={132} />
           <div className="flex-1 text-center sm:text-left">

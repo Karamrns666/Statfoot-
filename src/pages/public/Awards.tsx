@@ -91,7 +91,7 @@ function HeroCard({ r, raceKey, color }: { r: Ranked<PlayerXP>; raceKey: RaceKey
   const L = useLookup()
   const p = L.player.get(r.item.player_id), t = L.team.get(r.item.team_id), m = metric(raceKey, r.item)
   return (
-    <Link to={`/joueurs/${p?.id}`} className="relative overflow-hidden rounded-3xl border p-5 lg:col-span-2" style={{ borderColor: `${color}55`, background: `radial-gradient(ellipse 80% 70% at 50% 0%, ${color}38, transparent 70%), linear-gradient(180deg,#14254a,#0b1426)`, boxShadow: `0 0 50px -20px ${color}` }}>
+    <Link to={`/joueurs/${p?.id}`} className="relative overflow-hidden rounded-3xl border p-5 lg:col-span-2" style={{ borderColor: `${color}55`, background: `radial-gradient(ellipse 80% 70% at 50% 0%, ${color}38, transparent 70%), linear-gradient(180deg,#0D2B66,#04163D)`, boxShadow: `0 0 50px -20px ${color}` }}>
       <div className="flex items-start justify-between"><span className="num text-5xl" style={{ color, textShadow: `0 0 20px ${color}` }}>#1</span><RankDelta delta={r.delta} /></div>
       <div className="mt-2 flex flex-col items-center text-center">
         <PlayerAvatar player={p} team={t} size={112} />
@@ -127,7 +127,7 @@ function TeamRace({ seasonId, phase }: { seasonId: string | null; phase: PhaseFi
       <div className="mb-4 flex items-center gap-3"><TrophyBadge category="best_team" size={52} /><div><h2 className="title-caps text-3xl" style={{ color: st.color }}>{st.label}</h2><p className="text-xs text-muted-foreground">Classement général de la saison</p></div></div>
       {!top ? <EmptyState title="Non attribué" /> : (
         <div className="grid gap-4 lg:grid-cols-5">
-          <Link to={`/equipes/${t?.id}`} className="relative flex flex-col items-center overflow-hidden rounded-3xl border p-6 text-center lg:col-span-2" style={{ borderColor: `${st.color}55`, background: `radial-gradient(ellipse 80% 70% at 50% 0%, ${st.color}33, transparent 70%), linear-gradient(180deg,#14254a,#0b1426)` }}>
+          <Link to={`/equipes/${t?.id}`} className="relative flex flex-col items-center overflow-hidden rounded-3xl border p-6 text-center lg:col-span-2" style={{ borderColor: `${st.color}55`, background: `radial-gradient(ellipse 80% 70% at 50% 0%, ${st.color}33, transparent 70%), linear-gradient(180deg,#0D2B66,#04163D)` }}>
             <span className="num self-start text-5xl" style={{ color: st.color }}>#1</span>
             <TeamLogo team={t} size={120} />
             <div className="title-caps mt-3 text-3xl">{t?.name}</div>

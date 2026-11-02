@@ -30,7 +30,7 @@ export default function TvMode() {
   const pitchName = terrain && terrain !== 'tous' ? db.Match.find((x) => pitchSlug(x.pitch) === terrain)?.pitch ?? terrain : 'Tous les terrains'
   const url = `${location.origin}/live/${terrain ?? 'tous'}`
   return (
-    <div className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-night-950 p-4 sm:p-8" style={{ background: 'radial-gradient(ellipse 50% 50% at 10% 0%, rgba(160,210,255,.18), transparent 70%), radial-gradient(ellipse 50% 50% at 90% 0%, rgba(160,210,255,.15), transparent 70%), #0b1426' }}>
+    <div className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-night-950 p-4 sm:p-8" style={{ background: 'radial-gradient(ellipse 50% 50% at 10% 0%, rgba(160,210,255,.18), transparent 70%), radial-gradient(ellipse 50% 50% at 90% 0%, rgba(160,210,255,.15), transparent 70%), #04163D' }}>
       <div className="flex items-center justify-between">
         <Logo subtitle={settings.league_name} />
         <div className="title-caps text-xl text-neon sm:text-3xl">{pitchName}</div>

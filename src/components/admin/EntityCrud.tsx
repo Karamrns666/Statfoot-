@@ -32,7 +32,7 @@ export function EntityForm({ fields, value, onChange }: { fields: Field[]; value
               : f.type === 'select' ? <FilterSelect className="sm:w-full" value={(v as string) ?? ''} onChange={(x) => set(f.key, x || undefined)} allLabel="—" options={f.options ?? []} />
                 : f.type === 'multiselect' ? <MultiSelect options={f.options ?? []} value={(v as string[]) ?? []} onChange={(x) => set(f.key, x)} />
                   : f.type === 'boolean' ? <div className="pt-1"><Switch id={id} checked={!!v} onCheckedChange={(c) => set(f.key, c)} /></div>
-                    : f.type === 'color' ? <div className="flex gap-2"><input type="color" value={(v as string) ?? '#F26B1D'} onChange={(e) => set(f.key, e.target.value)} className="h-10 w-14 cursor-pointer rounded-lg border border-input bg-transparent" /><Input id={id} value={(v as string) ?? ''} onChange={(e) => set(f.key, e.target.value)} /></div>
+                    : f.type === 'color' ? <div className="flex gap-2"><input type="color" value={(v as string) ?? '#F85A00'} onChange={(e) => set(f.key, e.target.value)} className="h-10 w-14 cursor-pointer rounded-lg border border-input bg-transparent" /><Input id={id} value={(v as string) ?? ''} onChange={(e) => set(f.key, e.target.value)} /></div>
                       : f.type === 'image' ? <ImageInput value={v as string} onChange={(x) => set(f.key, x)} />
                         : <Input id={id} type={f.type === 'number' ? 'number' : f.type === 'date' ? 'date' : f.type === 'datetime' ? 'datetime-local' : f.type === 'email' ? 'email' : 'text'} placeholder={f.placeholder}
                           value={f.type === 'datetime' ? ((v as string) ?? '').slice(0, 16) : ((v as string | number) ?? '')}

@@ -32,7 +32,7 @@ export default function TeamDetail() {
   const timeline = ts?.timeline ?? []
   return (
     <div className="space-y-8">
-      <section className="relative overflow-hidden rounded-3xl border border-white/10 p-6 sm:p-8" style={{ background: `radial-gradient(ellipse 60% 100% at 0% 0%, ${team.primary_color}40, transparent 70%), linear-gradient(180deg,#14254a,#0b1426)` }}>
+      <section className="relative overflow-hidden rounded-3xl border border-white/10 p-6 sm:p-8" style={{ background: `radial-gradient(ellipse 60% 100% at 0% 0%, ${team.primary_color}40, transparent 70%), linear-gradient(180deg,#0D2B66,#04163D)` }}>
         <div className="flex flex-col items-center gap-5 sm:flex-row">
           <TeamLogo team={team} size={120} />
           <div className="text-center sm:text-left">
@@ -46,7 +46,7 @@ export default function TeamDetail() {
       </section>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatTile label="Matchs joués" value={ts?.played ?? 0} sub={`${ts?.won ?? 0} V · ${ts?.drawn ?? 0} N · ${ts?.lost ?? 0} D`} />
-        <StatTile label="Buts marqués" value={ts?.gf ?? 0} color="#e0611a" sub={`${ts?.gf_avg ?? 0} / match`} />
+        <StatTile label="Buts marqués" value={ts?.gf ?? 0} color="#E04E00" sub={`${ts?.gf_avg ?? 0} / match`} />
         <StatTile label="Buts encaissés" value={ts?.ga ?? 0} color="#2a8fc4" sub={`${ts?.ga_avg ?? 0} / match`} />
         <StatTile label="Clean sheets" value={ts?.clean_sheets ?? 0} color="#22c55e" />
       </div>
@@ -83,7 +83,7 @@ export default function TeamDetail() {
                 <ResponsiveContainer><LineChart data={timeline} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
                   <CartesianGrid {...GRID} /><XAxis dataKey="label" {...AXIS} /><YAxis {...AXIS} allowDecimals={false} />
                   <Tooltip {...TOOLTIP} formatter={(v) => [`${v} pts`, 'Points']} />
-                  <Line type="monotone" dataKey="points" stroke={SERIES[0]} strokeWidth={2} dot={{ r: 4, fill: SERIES[0], stroke: '#12203b', strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                  <Line type="monotone" dataKey="points" stroke={SERIES[0]} strokeWidth={2} dot={{ r: 4, fill: SERIES[0], stroke: '#0A2556', strokeWidth: 2 }} activeDot={{ r: 6 }} />
                 </LineChart></ResponsiveContainer>
               </ChartBox>
               <ChartBox title="Buts par match" legend={<Legend items={[{ label: 'Marqués', color: SERIES[0] }, { label: 'Encaissés', color: SERIES[1] }]} />}>

@@ -138,7 +138,7 @@ export function Teams() {
         searchText={(t) => `${t.name} ${t.company} ${t.short_name}`}
         transform={(v) => ({ ...v, short_name: String(v.short_name ?? '').toUpperCase().slice(0, 3) })}
         toolbar={<FilterSelect value={div} onChange={setDiv} allLabel="Toutes séries" options={db.Division.map((d) => ({ value: d.id, label: d.name }))} />}
-        defaults={() => ({ status: 'active', primary_color: '#F26B1D', secondary_color: '#0b1426' })}
+        defaults={() => ({ status: 'active', primary_color: '#F85A00', secondary_color: '#04163D' })}
         columns={[
           { label: 'Équipe', render: (t) => <span className="flex items-center gap-2"><TeamLogo team={t} size={28} /><span><span className="font-semibold">{t.name}</span><span className="ml-2 text-xs text-muted-foreground">{t.short_name}</span></span></span> },
           { label: 'Entreprise', render: (t) => <span className="flex items-center gap-2">{t.company_logo_url && <img src={t.company_logo_url} className="size-5 rounded" alt="" />}{t.company}</span>, className: 'hidden md:table-cell' },

@@ -1,6 +1,11 @@
 import { useMemo } from 'react'
+import { Billboard, type BillboardSlide } from '@/components/home/Billboard'
+import { IPGCard, XPCard } from '@/components/players/Cards'
+import { IPG_RANKING } from '@/lib/ipg'
+import { SEASON_2025_ID } from '@/api/seed/season2025'
+import { playerShort } from '@/lib/format'
 import { Link } from 'react-router-dom'
-import { CalendarDays, ListOrdered, Radio, Trophy, Users, Goal, Hand } from 'lucide-react'
+import { CalendarDays, Trophy, Users, Goal, Hand } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
 import { useSeason } from '@/hooks/useSeason'
 import { useEffectiveSeason, useSeasonCompetitions, useRace, usePlayerXP } from '@/hooks/useStats'
@@ -11,10 +16,8 @@ import { StandingsTable } from '@/components/standings/StandingsTable'
 import { SectionTitle, StatTile, CompetitionBadge } from '@/components/league/Bits'
 import { PlayerAvatar, PlayerLink, TeamLogo } from '@/components/league/Identity'
 import { TrophyBadge } from '@/components/awards/TrophyBadge'
-import { competitionStandings, kpis, isPlayed, race } from '@/lib/stats'
-import { RankDelta } from '@/components/league/Bits'
+import { competitionStandings, generalStandings, kpis, isPlayed, race } from '@/lib/stats'
 import { competitionZones } from '@/lib/zones'
-import { cn } from '@/lib/utils'
 
 export default function Home() {
   const { db, league, settings } = useData()
@@ -35,43 +38,52 @@ export default function Home() {
   }, [db.Match, sid])
 
   // MÊME fonction que la fiche joueur et la page Trophées (computePlayerXP via useRace)
-  const podium = useRace({ seasonId: scopeSeasonId }, 'xp').slice(0, 3)
-  const xpAll = usePlayerXP({ seasonId: scopeSeasonId })
-  const keepers = useMemo(() => race(league, [...xpAll.values()], 'golden_glove', scopeSeasonId).slice(0, 5).map((r) => r.item), [league, xpAll, scopeSeasonId])
-  const k = useMemo(() => kpis(league, { seasonId: scopeSeasonId }), [league, scopeSeasonId])
+  const podium = useRace({ seasonId: sid }, 'xp').slice(0, 3)
+  const xpAll = usePlayerXP({ seasonId: sid })
+  const keepers = useMemo(() => race(league, [...xpAll.values()], 'golden_glove', sid).slice(0, 5).map((r) => r.item), [league, xpAll, sid])
+  const k = useMemo(() => kpis(league, { seasonId: sid }), [league, sid])
   const teamsInSeason = new Set(comps.flatMap((c) => c.team_ids ?? []))
+  const showIPG = sid === SEASON_2025_ID
+
+  const slides = useMemo<BillboardSlide[]>(() => {
+    const out: BillboardSlide[] = []
+    if (!sid) return out
+    const team = (id?: string) => (id ? L.team.get(id) : undefined)
+    for (const m of live.slice(0, 2)) {
+      const h = team(m.home_team_id), a = team(m.away_team_id)
+      out.push({ key: `live-${m.id}`, eyebrow: 'En direct', tone: 'red', title: `${h?.short_name ?? '?'} ${m.home_score ?? 0} – ${m.away_score ?? 0} ${a?.short_name ?? '?'}`, sub: `${h?.name} contre ${a?.name}${m.pitch ? `, ${m.pitch}` : ''}`, href: `/matchs/${m.id}` })
+    }
+    const lead = generalStandings(league, sid)[0]
+    if (lead && lead.played > 0) {
+      const t = team(lead.team_id)
+      out.push({ key: 'leader', eyebrow: season?.status === 'closed' ? `Champion · ${season.name}` : 'Leader du classement', title: t?.name ?? '', value: lead.points, unit: 'PTS', image: t?.logo_url, sub: `${lead.won} victoires, ${lead.drawn} nuls, ${lead.lost} défaites · différence ${lead.gd > 0 ? '+' : ''}${lead.gd}`, href: `/equipes/${lead.team_id}`, tone: 'orange' })
+    }
+    const list = [...xpAll.values()]
+    const pushPlayer = (key: string, eyebrow: string, r: ReturnType<typeof race>[number] | undefined, value: number, unit: string, tone: BillboardSlide['tone']) => {
+      if (!r || !value) return
+      const p = L.player.get(r.item.player_id), t = team(r.item.team_id)
+      out.push({ key, eyebrow, title: playerShort(p), value, unit, image: t?.logo_url, sub: t?.name, href: p ? `/joueurs/${p.id}` : undefined, tone })
+    }
+    const sc = race(league, list, 'top_scorer', sid)[0]; pushPlayer('scorer', 'Meilleur buteur', sc, sc?.item.goals ?? 0, 'BUTS', 'orange')
+    const as = race(league, list, 'top_assist', sid)[0]; pushPlayer('assist', 'Meilleur passeur', as, as?.item.assists ?? 0, 'PASSES', 'sky')
+    const gk = race(league, list, 'golden_glove', sid)[0]; pushPlayer('keeper', 'Gant d’or · meilleur gardien', gk, gk?.item.saves ?? 0, 'ARRÊTS', 'white')
+    if (showIPG && IPG_RANKING[0]) {
+      const e = IPG_RANKING[0]
+      out.push({ key: 'ipg', eyebrow: 'N°1 de l’indice de performance', title: e.name, value: e.ipg.toFixed(0), unit: 'IPG', sub: `${e.team} · ${e.goals} buts, ${e.assists} passes décisives`, href: '/joueurs?vue=ipg', tone: 'sky' })
+    }
+    if (k.matches) out.push({ key: 'kpi', eyebrow: 'La saison en chiffres', title: `${k.matches} matchs`, value: k.goals, unit: 'BUTS', sub: `${k.goals_avg} buts par match · ${k.assists} passes décisives · ${k.yellow} cartons jaunes`, tone: 'white' })
+    return out
+  }, [sid, live, league, xpAll, L, season, showIPG, k])
 
   return (
     <div className="space-y-12">
-      {/* HERO */}
-      <section className="relative overflow-hidden rounded-3xl border border-white/10 px-5 py-10 sm:px-10 sm:py-14">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_15%_0%,rgba(140,210,255,.25),transparent_60%),radial-gradient(ellipse_50%_70%_at_85%_0%,rgba(140,210,255,.18),transparent_60%),linear-gradient(180deg,#14254a,#0b1426)]" />
-        <svg className="pointer-events-none absolute inset-x-0 bottom-0 h-40 w-full opacity-[.12]" viewBox="0 0 800 160" preserveAspectRatio="none" aria-hidden>
-          <g fill="none" stroke="#fff" strokeWidth="2"><rect x="20" y="20" width="760" height="200" /><line x1="400" y1="20" x2="400" y2="200" /><circle cx="400" cy="110" r="60" /><rect x="20" y="60" width="90" height="120" /><rect x="690" y="60" width="90" height="120" /></g>
-        </svg>
-        <div className="relative max-w-3xl">
-          <div className="mb-3 flex flex-wrap items-center gap-2">
-            <span className="rounded-full border border-neon/40 bg-neon/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-neon">{scopeSeasonId ? season?.name : 'Toutes saisons'}</span>
-            {live.length > 0 && <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/20 px-3 py-1 text-xs font-bold uppercase text-red-300"><Radio className="size-3.5" />{live.length} match en direct</span>}
-          </div>
-          <h1 className="title-caps text-5xl leading-[.9] sm:text-7xl">
-            <span className="text-white">{settings.league_name?.split(' ').slice(0, -1).join(' ') || 'StatFoot'}</span>{' '}
-            <span className="text-neon neon-text">{settings.league_name?.split(' ').slice(-1)[0]}</span>
-          </h1>
-          <p className="mt-3 text-lg text-blue-100/80">{settings.tagline}</p>
-          <p className="mt-1 text-sm text-muted-foreground">Organisé par <span className="text-white">{settings.organizer}</span></p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Button asChild size="lg"><Link to="/matchs"><CalendarDays />Calendrier</Link></Button>
-            <Button asChild size="lg" variant="outline"><Link to="/classement"><ListOrdered />Classement</Link></Button>
-          </div>
-        </div>
-        <div className="relative mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <StatTile label="Équipes" value={teamsInSeason.size || db.Team.length} icon={<Users />} />
-          <StatTile label="Matchs joués" value={k.matches} icon={<CalendarDays />} color="#a78bfa" />
-          <StatTile label="Buts" value={k.goals} icon={<Goal />} color="#ef4444" sub={`${k.goals_avg} / match`} />
-          <StatTile label="Passes déc." value={k.assists} icon={<Trophy />} color="#f97316" />
-        </div>
-      </section>
+      <Billboard slides={slides} leagueName={settings.league_name ?? 'Morocco Business League'} seasonLabel={season?.name.replace(/^Saison /, 'saison ') ?? ''} logoUrl={settings.logo_url} />
+      <div className="-mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <StatTile label="Équipes" value={teamsInSeason.size || db.Team.length} icon={<Users />} color="#8FD0E6" />
+        <StatTile label="Matchs joués" value={k.matches} icon={<CalendarDays />} color="#FFFFFF" />
+        <StatTile label="Buts" value={k.goals} icon={<Goal />} color="#F85A00" sub={`${k.goals_avg} par match`} />
+        <StatTile label="Passes décisives" value={k.assists} icon={<Trophy />} color="#FF8A3D" />
+      </div>
 
       {live.length > 0 && (
         <section>
@@ -113,24 +125,14 @@ export default function Home() {
       {/* PODIUM XP + GARDIENS */}
       <section className="grid gap-6 lg:grid-cols-5">
         <div className="lg:col-span-3">
-          <SectionTitle title="Podium XP" subtitle="Les joueurs les plus décisifs" accent="#facc15" action={<Button asChild variant="ghost" size="sm"><Link to="/joueurs">Classement XP →</Link></Button>} />
+          <SectionTitle title="Les meilleurs joueurs" subtitle={showIPG ? 'Indice de Performance Globale — touchez une carte pour la retourner' : 'Classement XP — touchez une carte pour la retourner'} accent="#facc15" action={<Button asChild variant="ghost" size="sm"><Link to={showIPG ? '/joueurs?vue=ipg' : '/joueurs'}>{showIPG ? 'Top 25 IPG' : 'Classement XP'}</Link></Button>} />
           <div className="grid grid-cols-3 items-end gap-2 sm:gap-4">
-            {[1, 0, 2].map((i) => {
-              const r = podium[i]; if (!r) return <div key={i} />
-              const p = L.player.get(r.item.player_id), t = L.team.get(r.item.team_id)
-              const colors = ['#facc15', '#cbd5e1', '#d97706']
-              const c = colors[i]
-              return (
-                <Link to={`/joueurs/${p?.id}`} key={i} className={cn('glass group flex flex-col items-center rounded-2xl px-2 pb-4 pt-5 text-center transition hover:-translate-y-1', i === 0 && 'pb-8 pt-8')} style={{ boxShadow: `0 0 40px -18px ${c}` }}>
-                  <div className="num mb-2 text-4xl" style={{ color: c, textShadow: `0 0 18px ${c}` }}>{i + 1}</div>
-                  <PlayerAvatar player={p} team={t} size={i === 0 ? 84 : 64} />
-                  <div className="mt-3 w-full truncate font-display text-base font-bold uppercase sm:text-lg">{p?.first_name.charAt(0)}. {p?.last_name}</div>
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground"><TeamLogo team={t} size={14} /><span className="truncate">{t?.short_name}</span></div>
-                  <div className="num mt-2 text-2xl sm:text-3xl" style={{ color: c }}>{r.item.xp}<span className="ml-1 text-sm text-muted-foreground">XP</span></div>
-                  <RankDelta delta={r.delta} />
-                </Link>
-              )
-            })}
+            {showIPG
+              ? [1, 0, 2].map((i) => IPG_RANKING[i] && <IPGCard key={i} e={IPG_RANKING[i]} className={i === 0 ? '' : 'origin-bottom scale-[.93]'} />)
+              : [1, 0, 2].map((i) => {
+                const r = podium[i]; const p = r && L.player.get(r.item.player_id)
+                return p ? <XPCard key={i} r={r} player={p} team={L.team.get(p.team_id)} className={i === 0 ? '' : 'origin-bottom scale-[.93]'} /> : <div key={i} />
+              })}
           </div>
         </div>
         <div className="lg:col-span-2">
@@ -169,7 +171,7 @@ export default function Home() {
           <div className="flex w-max animate-marquee gap-10 [animation-duration:60s]">
             {[0, 1].map((k) => (
               <div key={k} className="flex gap-10" aria-hidden={k === 1}>
-                {db.Team.map((t) => (
+                {db.Team.filter((t) => teamsInSeason.has(t.id)).map((t) => (
                   <Link key={t.id} to={`/equipes/${t.id}`} className="flex w-24 flex-col items-center gap-2 opacity-80 transition hover:opacity-100">
                     <TeamLogo team={t} size={64} />
                     <span className="text-center text-xs font-semibold text-muted-foreground">{t.company}</span>

@@ -24,7 +24,7 @@ export function RankDelta({ delta }: { delta?: number | null }) {
     : <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-loss" title={`${delta} place(s)`}><ArrowDown className="size-3" />{-delta}</span>
 }
 
-export function SectionTitle({ title, subtitle, action, className, accent = '#F26B1D' }: { title: ReactNode; subtitle?: ReactNode; action?: ReactNode; className?: string; accent?: string }) {
+export function SectionTitle({ title, subtitle, action, className, accent = '#F85A00' }: { title: ReactNode; subtitle?: ReactNode; action?: ReactNode; className?: string; accent?: string }) {
   return (
     <div className={cn('mb-4 flex flex-wrap items-end justify-between gap-3', className)}>
       <div>
@@ -51,7 +51,7 @@ export function PageHeader({ title, subtitle, children }: { title: ReactNode; su
   )
 }
 
-export function StatTile({ label, value, icon, color = '#F26B1D', sub }: { label: string; value: ReactNode; icon?: ReactNode; color?: string; sub?: ReactNode }) {
+export function StatTile({ label, value, icon, color = '#F85A00', sub }: { label: string; value: ReactNode; icon?: ReactNode; color?: string; sub?: ReactNode }) {
   return (
     <div className="glass relative overflow-hidden rounded-2xl p-4">
       <div className="pointer-events-none absolute -right-6 -top-6 size-20 rounded-full opacity-30 blur-2xl" style={{ background: color }} />
@@ -80,7 +80,7 @@ export function LiveDot({ label = 'Live' }: { label?: string }) {
 
 export function CompetitionBadge({ competition, className }: { competition?: Competition | null; className?: string }) {
   if (!competition) return null
-  const c = competition.color ?? '#F26B1D'
+  const c = competition.color ?? '#F85A00'
   return <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 font-display text-[11px] font-extrabold uppercase tracking-wider', className)} style={{ color: c, background: `${c}1f`, boxShadow: `inset 0 0 0 1px ${c}44` }}>{competition.name}</span>
 }
 

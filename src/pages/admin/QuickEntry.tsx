@@ -116,7 +116,7 @@ export default function QuickEntry() {
                     return (
                       <TableRow key={p.id} className={r.played ? '' : 'opacity-60'}>
                         <TableCell className="text-xs"><span className="num mr-1 text-muted-foreground">{p.number}</span>{playerName(p)} <PositionBadge position={p.position} /></TableCell>
-                        <TableCell className="text-center"><input type="checkbox" className="size-4 accent-[#F26B1D]" checked={r.played} onChange={(e) => set(p.id, { played: e.target.checked })} aria-label="A joué" /></TableCell>
+                        <TableCell className="text-center"><input type="checkbox" className="size-4 accent-[#F85A00]" checked={r.played} onChange={(e) => set(p.id, { played: e.target.checked })} aria-label="A joué" /></TableCell>
                         {COLS.map((c) => (c.k === 'saves' || c.k === 'pens' || c.k === 'tab') && p.position !== 'GK'
                           ? <TableCell key={c.k} />
                           : <TableCell key={c.k} className="p-1"><Input type="number" min={0} max={c.k === 'yc' ? 2 : c.k === 'rc' ? 1 : 20} value={r[c.k] || ''} placeholder="0" onChange={(e) => set(p.id, { [c.k]: Math.max(0, +e.target.value || 0) })} className="h-8 w-12 px-1 text-center" aria-label={c.l} /></TableCell>)}

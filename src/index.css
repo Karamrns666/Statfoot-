@@ -3,16 +3,22 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Barlow Condensed", "Arial Narrow", ui-sans-serif, sans-serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Big Shoulders Display", "Arial Narrow", ui-sans-serif, sans-serif;
 
-  --color-night-950: #070d1a;
-  --color-night-900: #0b1426;
-  --color-night-800: #111d35;
-  --color-night-700: #1a2a4a;
-  --color-night-600: #263a62;
-  --color-neon: #F26B1D;
-  --color-neon-soft: #ff9a5a;
+  /* Bleus du blason MBL */
+  --color-night-950: #020D27;
+  --color-night-900: #04163D;
+  --color-night-800: #071D48;
+  --color-night-700: #0B2E73;
+  --color-night-600: #15408A;
+  --color-mbl: #0B2E73;
+  --color-sky: #6CB4CC;
+  --color-sky-soft: #A9D6E5;
+  --color-ink: #0A0F33;
+  /* Orange Ardentia */
+  --color-neon: #F85A00;
+  --color-neon-soft: #FF8A3D;
   --color-neon-pink: #f472b6;
   --color-win: #22c55e;
   --color-draw: #94a3b8;
@@ -21,30 +27,30 @@
   /* code couleur des prix */
   --color-award-gold: #facc15;   /* Ballon d'or */
   --color-award-red: #ef4444;    /* Soulier d'or */
-  --color-award-orange: #f97316; /* Meilleur passeur */
-  --color-award-blue: #3b82f6;   /* Gant d'or */
+  --color-award-orange: #F85A00; /* Meilleur passeur */
+  --color-award-blue: #6CB4CC;   /* Gant d'or */
   --color-award-green: #22c55e;  /* Meilleure équipe */
 
-  --color-background: #0b1426;
-  --color-foreground: #e6edf8;
-  --color-card: #12203b;
-  --color-card-foreground: #e6edf8;
-  --color-popover: #111d35;
-  --color-popover-foreground: #e6edf8;
-  --color-primary: #F26B1D;
+  --color-background: #04163D;
+  --color-foreground: #F3F7FC;
+  --color-card: #0A2556;
+  --color-card-foreground: #F3F7FC;
+  --color-popover: #071D48;
+  --color-popover-foreground: #F3F7FC;
+  --color-primary: #F85A00;
   --color-primary-foreground: #ffffff;
-  --color-secondary: #1a2a4a;
-  --color-secondary-foreground: #e6edf8;
-  --color-muted: #16233f;
-  --color-muted-foreground: #8ea3c7;
-  --color-accent: #1d2f52;
-  --color-accent-foreground: #e6edf8;
+  --color-secondary: #11336F;
+  --color-secondary-foreground: #F3F7FC;
+  --color-muted: #0D2B66;
+  --color-muted-foreground: #9DB8DE;
+  --color-accent: #123A7C;
+  --color-accent-foreground: #F3F7FC;
   --color-destructive: #ef4444;
-  --color-border: rgb(255 255 255 / 0.1);
-  --color-input: rgb(255 255 255 / 0.14);
-  --color-ring: #F26B1D;
+  --color-border: rgb(169 214 229 / 0.13);
+  --color-input: rgb(169 214 229 / 0.2);
+  --color-ring: #F85A00;
 
-  --radius: 0.9rem;
+  --radius: 0.75rem;
   --animate-marquee: marquee 40s linear infinite;
   --animate-pulse-live: pulse-live 1.6s ease-in-out infinite;
 
@@ -57,34 +63,35 @@
   html { color-scheme: dark; }
   body {
     @apply bg-night-900 text-foreground font-sans antialiased min-h-screen;
-    background-image: linear-gradient(180deg, #0b1426 0%, #111d35 55%, #0b1426 100%);
+    background-image: linear-gradient(180deg, #04163D 0%, #062052 50%, #04163D 100%);
     background-attachment: fixed;
   }
   /* Halos des projecteurs */
   body::before {
     content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
     background:
-      radial-gradient(ellipse 40% 55% at 8% -8%, rgb(120 200 255 / .16), transparent 70%),
-      radial-gradient(ellipse 40% 55% at 92% -8%, rgb(120 200 255 / .14), transparent 70%),
-      radial-gradient(ellipse 60% 30% at 50% 110%, rgb(242 107 29 / .06), transparent 70%);
+      radial-gradient(ellipse 45% 50% at 6% -10%, rgb(108 180 204 / .22), transparent 70%),
+      radial-gradient(ellipse 45% 50% at 94% -10%, rgb(108 180 204 / .16), transparent 70%),
+      radial-gradient(ellipse 60% 30% at 50% 112%, rgb(248 90 0 / .08), transparent 70%);
   }
   #root { position: relative; z-index: 1; }
-  h1, h2, h3, .font-display { font-family: var(--font-display); letter-spacing: .02em; }
-  ::selection { background: rgb(242 107 29 / .35); }
+  h1, h2, h3, .font-display { font-family: var(--font-display); letter-spacing: .01em; }
+  :focus-visible { outline: 2px solid var(--color-neon); outline-offset: 2px; }
+  ::selection { background: rgb(248 90 0 / .35); }
 }
 
 @utility glass {
-  background: linear-gradient(180deg, #14254a, #0f1c36);
-  border: 1px solid rgb(255 255 255 / .08);
-  box-shadow: 0 10px 30px -12px rgb(0 0 0 / .55), inset 0 1px 0 rgb(255 255 255 / .06);
+  background: linear-gradient(180deg, #0C2A63, #08204D);
+  border: 1px solid rgb(169 214 229 / .12);
+  box-shadow: 0 14px 34px -16px rgb(1 8 28 / .7), inset 0 1px 0 rgb(255 255 255 / .07);
 }
 @utility title-caps {
-  font-family: var(--font-display); font-weight: 900; text-transform: uppercase; letter-spacing: .04em;
+  font-family: var(--font-display); font-weight: 900; text-transform: uppercase; letter-spacing: .02em;
 }
 @utility num {
   font-family: var(--font-display); font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: .01em;
 }
-@utility neon-text { text-shadow: 0 0 18px rgb(242 107 29 / .55); }
+@utility neon-text { text-shadow: 0 0 18px rgb(248 90 0 / .55); }
 @utility scrollbar-none { scrollbar-width: none; &::-webkit-scrollbar { display: none; } }
 
 @media print {
@@ -101,7 +108,7 @@
 @keyframes fadein { from { opacity: 0; transform: scale(.92) translateY(10px) } to { opacity: 1; transform: none } }
 
 /* Mode haute luminosité (soleil) du Match Center */
-.mc-bright { background: #f8fafc; color: #0b1426; }
+.mc-bright { background: #f8fafc; color: #04163D; }
 .mc-bright .glass { background: #ffffff; border-color: #cbd5e1; box-shadow: none; }
 .mc-bright .text-muted-foreground { color: #334155 !important; }
 .mc-bright .bg-white\/5, .mc-bright .bg-white\/10 { background: #e2e8f0 !important; }
@@ -114,4 +121,39 @@
   .sheet .glass { background: #fff !important; }
   header, aside { display: none !important; }
   @page { size: A4; margin: 12mm; }
+}
+
+/* ---------------------------------------------------------------------------
+   Billboard LED (accueil)
+--------------------------------------------------------------------------- */
+.led-board {
+  background:
+    radial-gradient(circle at center, rgb(255 255 255 / .06) 0 1px, transparent 1.6px) 0 0 / 5px 5px,
+    linear-gradient(180deg, #03102E, #020A20);
+  box-shadow: inset 0 0 0 1px rgb(169 214 229 / .14), inset 0 0 60px rgb(0 0 0 / .6), 0 30px 60px -30px rgb(0 0 0 / .8);
+}
+.led-glow { text-shadow: 0 0 2px currentColor, 0 0 18px color-mix(in srgb, currentColor 55%, transparent); }
+.led-scan::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(180deg, rgb(0 0 0 / .18) 0 1px, transparent 1px 3px);
+}
+@keyframes board-in { from { opacity: 0; transform: translateY(14px); filter: blur(4px) } to { opacity: 1; transform: none; filter: none } }
+.board-in { animation: board-in .7s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes board-progress { from { transform: scaleX(0) } to { transform: scaleX(1) } }
+
+/* ---------------------------------------------------------------------------
+   Carte joueur retournable
+--------------------------------------------------------------------------- */
+.pcard { perspective: 1100px; container-type: inline-size; }
+.pcard-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .75s cubic-bezier(.3,.9,.25,1.05); }
+.pcard[data-flipped="true"] .pcard-inner { transform: rotateY(180deg); }
+.pcard-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.pcard-back { transform: rotateY(180deg); }
+.pcard-shape { clip-path: polygon(0 7%, 50% 0, 100% 7%, 100% 100%, 0 100%); }
+.pcard-sheen { background: linear-gradient(115deg, transparent 30%, rgb(255 255 255 / .16) 45%, transparent 60%); background-size: 250% 100%; background-position: 120% 0; transition: background-position .9s ease; }
+.pcard:hover .pcard-sheen { background-position: -40% 0; }
+@media (prefers-reduced-motion: reduce) {
+  .pcard-inner, .pcard-sheen { transition: none; }
+  .board-in { animation: none; }
+  .animate-marquee { animation: none; }
 }

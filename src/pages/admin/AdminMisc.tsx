@@ -180,7 +180,7 @@ function AwardPoster({ award, onClose }: { award: Award; onClose: () => void }) 
 //  Import CSV (équipes, joueurs) : glisser-déposer, aperçu, validation, modèles
 // ---------------------------------------------------------------------------
 const TEMPLATES = {
-  teams: 'nom;nom_court;entreprise;couleur_principale\nAtlas Digital FC;ATD;Atlas Digital;#F26B1D',
+  teams: 'nom;nom_court;entreprise;couleur_principale\nAtlas Digital FC;ATD;Atlas Digital;#F85A00',
   players: 'prenom;nom;numero;poste;equipe_nom_court;date_naissance;email\nYassine;Benali;9;ATT;ATD;1995-04-12;yassine.benali@exemple.ma',
 }
 const POS: Record<string, Position> = { GB: 'GK', GK: 'GK', DEF: 'DEF', MIL: 'MID', MID: 'MID', ATT: 'FWD', FWD: 'FWD' }
@@ -200,7 +200,7 @@ export function ImportCsv() {
   }
   const ok = rows.filter((r) => !check(r))
   const run = async () => {
-    if (kind === 'teams') await base44.entities.Team.bulkCreate(ok.map((r) => ({ name: r.nom, short_name: r.nom_court.toUpperCase(), company: r.entreprise, primary_color: r.couleur_principale || '#F26B1D', secondary_color: '#0b1426', logo_url: teamLogoSvgFn(r.nom_court.toUpperCase(), r.couleur_principale), status: 'active' as const })))
+    if (kind === 'teams') await base44.entities.Team.bulkCreate(ok.map((r) => ({ name: r.nom, short_name: r.nom_court.toUpperCase(), company: r.entreprise, primary_color: r.couleur_principale || '#F85A00', secondary_color: '#04163D', logo_url: teamLogoSvgFn(r.nom_court.toUpperCase(), r.couleur_principale), status: 'active' as const })))
     else await base44.entities.Player.bulkCreate(ok.map((r) => ({ first_name: r.prenom, last_name: r.nom, number: r.numero ? +r.numero : undefined, position: POS[r.poste.toUpperCase()], team_id: db.Team.find((t) => t.short_name === r.equipe_nom_court.toUpperCase())!.id, birth_date: r.date_naissance || undefined, email: r.email || undefined, status: 'active' as const, season_ids: [seasonId], documents: {} })))
     toast.success(`${ok.length} ligne(s) importée(s)`); setRows([])
   }

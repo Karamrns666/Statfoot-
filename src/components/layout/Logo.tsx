@@ -1,19 +1,32 @@
 import { Link } from 'react-router-dom'
 import { useData } from '@/hooks/useData'
+import { cn } from '@/lib/utils'
 
-/** Logo texte de la ligue (nom court + nom complet issus des Paramètres) */
-export function Logo({ to = '/', subtitle }: { to?: string; subtitle?: string }) {
+export const MBL_LOGO = '/brand/mbl-logo.png'
+export const ARDENTIA_LOGO_LIGHT = '/brand/ardentia-logo-light.png'
+export const ARDENTIA_MARK = '/brand/ardentia-mark.png'
+
+/** Blason MBL + nom de la ligue (issus des Paramètres) */
+export function Logo({ to = '/', subtitle, className }: { to?: string; subtitle?: string; className?: string }) {
   const { settings } = useData()
-  const short = settings.short_name ?? 'MBL'
+  const name = settings.league_name ?? 'Morocco Business League'
   return (
-    <Link to={to} className="flex items-center gap-2.5">
-      {settings.logo_url
-        ? <img src={settings.logo_url} alt="" className="size-10 rounded-xl object-contain" />
-        : <div className="flex size-10 items-center justify-center rounded-xl bg-neon font-display text-lg font-black text-white shadow-[0_0_18px_-2px_rgb(242_107_29/.8)]">{short.slice(0, 3)}</div>}
+    <Link to={to} className={cn('flex items-center gap-2.5', className)} aria-label={`${name} — accueil`}>
+      <img src={settings.logo_url || MBL_LOGO} alt="" className="h-11 w-auto shrink-0 drop-shadow-[0_4px_10px_rgba(0,0,0,.45)]" />
       <div className="leading-none">
-        <div className="title-caps text-xl text-white">{settings.league_name ?? 'StatFoot'}</div>
-        {subtitle && <div className="mt-0.5 text-[10px] font-semibold uppercase tracking-[.2em] text-neon">{subtitle}</div>}
+        <div className="font-display text-[22px] font-black uppercase tracking-[.01em] text-white">{settings.short_name ?? 'MBL'}</div>
+        <div className="mt-0.5 text-[11px] font-semibold text-sky-soft">{subtitle ?? name}</div>
       </div>
     </Link>
+  )
+}
+
+/** Signature « Organisé par Ardentia » */
+export function OrganizedBy({ className, size = 'md' }: { className?: string; size?: 'sm' | 'md' }) {
+  return (
+    <span className={cn('inline-flex items-center gap-2.5 text-muted-foreground', className)}>
+      <span className={size === 'sm' ? 'text-xs' : 'text-sm'}>Organisé par</span>
+      <img src={ARDENTIA_LOGO_LIGHT} alt="Ardentia" className={size === 'sm' ? 'h-5 w-auto' : 'h-7 w-auto'} />
+    </span>
   )
 }

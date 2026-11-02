@@ -18,7 +18,7 @@ import { buildSeason2025 } from './season2025'
 type DB = { [N in EntityName]: EntityMap[N][] }
 
 const TEAMS: [string, string, string, string, string][] = [
-  ['Atlas Digital FC', 'ATD', 'Atlas Digital', '#F26B1D', '#1b1208'], ['Casa Finance', 'CAF', 'Casa Finance Group', '#facc15', '#1e293b'],
+  ['Atlas Digital FC', 'ATD', 'Atlas Digital', '#F85A00', '#1b1208'], ['Casa Finance', 'CAF', 'Casa Finance Group', '#facc15', '#1e293b'],
   ['Rabat Telecom', 'RBT', 'Rabat Télécom', '#3b82f6', '#0b1739'], ['Souss Énergie', 'SOU', 'Souss Énergie', '#22c55e', '#06210f'],
   ['Marrakech Tech', 'MKT', 'Marrakech Tech', '#ef4444', '#2b0b0b'], ['Tanger Logistique', 'TNG', 'Tanger Logistique', '#06b6d4', '#062a30'],
   ['Fès Assurances', 'FES', 'Fès Assurances', '#a855f7', '#1e0b3a'], ['Agadir Ports', 'AGP', 'Agadir Ports', '#0ea5e9', '#082235'],
@@ -217,7 +217,7 @@ export function generateDemoData(now = new Date()): DB {
     // chapeaux : 4 équipes chacun, par "force" décroissante (têtes de série)
     const ranked = [...teams].sort((a, b) => strength.get(b.id)! - strength.get(a.id)! + (rng() - 0.5) * 0.3)
     const potList = potsFromRanking(ranked.map((t) => t.id), 4)
-    const lp: Competition = { id: id('comp'), season_id: season.id, name: 'Phase de ligue', phase: 'league_phase', format: 'swiss', status: 'active', team_ids: teams.map((t) => t.id), rounds: [1, 2, 3, 4, 5], half_duration_min: 15, foul_alert_threshold: 5, color: '#F26B1D', order: 1, description: 'Système suisse par chapeaux : 5 journées, 50 matchs.' }
+    const lp: Competition = { id: id('comp'), season_id: season.id, name: 'Phase de ligue', phase: 'league_phase', format: 'swiss', status: 'active', team_ids: teams.map((t) => t.id), rounds: [1, 2, 3, 4, 5], half_duration_min: 15, foul_alert_threshold: 5, color: '#F85A00', order: 1, description: 'Système suisse par chapeaux : 5 journées, 50 matchs.' }
     db.Competition.push(lp)
     const seed = Math.floor(rng() * 1e6)
     const fixtures = swissPotsFixtures(potList, seededRng(seed))

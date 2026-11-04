@@ -10,6 +10,7 @@ import { PageHeader, EmptyState } from '@/components/league/Bits'
 import { FilterSelect } from '@/components/league/FilterSelect'
 import { MatchRow } from '@/components/match/MatchRow'
 import { CompetitionTabs } from '@/components/league/CompetitionTabs'
+import { SeasonNotStarted } from '@/components/league/SeasonNotStarted'
 import { STAGE_LABELS } from '@/lib/schedule'
 import { isKnockout } from '@/lib/standings'
 import { cn } from '@/lib/utils'
@@ -93,6 +94,7 @@ export default function Matches() {
       <PageHeader title="Matchs" subtitle={`${season?.name ?? 'Toutes saisons'} · Calendrier et résultats`} />
       {seasonComps.length > 1 && <CompetitionTabs comps={seasonComps} value={comp} onChange={(v) => set('competition', v)} className="mb-4" />}
 
+      {base.length === 0 ? <SeasonNotStarted what="Le calendrier et les résultats" /> : <>
       {/* journées */}
       <div ref={strip} className="scrollbar-none -mx-4 mb-3 flex gap-2 overflow-x-auto px-4 pb-1" role="tablist" aria-label="Journées">
         <button role="tab" aria-selected={round == null} onClick={() => set('journee', 'toutes')} className={cn('shrink-0 cursor-pointer rounded-xl border px-4 py-2 text-left transition', round == null ? 'border-neon bg-neon text-white' : 'border-white/10 bg-white/[.03] text-muted-foreground hover:text-white')}>
@@ -142,6 +144,7 @@ export default function Matches() {
           </section>
         ))}
       </div>
+      </>}
     </div>
   )
 }

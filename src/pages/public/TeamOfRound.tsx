@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react'
+import { SeasonNotStarted } from '@/components/league/SeasonNotStarted'
 import { Link } from 'react-router-dom'
 import { useData, useLookup } from '@/hooks/useData'
 import { useEffectiveSeason } from '@/hooks/useStats'
-import { PageHeader, EmptyState } from '@/components/league/Bits'
+import { PageHeader } from '@/components/league/Bits'
 import { FilterSelect } from '@/components/league/FilterSelect'
 import { PlayerAvatar } from '@/components/league/Identity'
 import { teamOfRound, isPlayed } from '@/lib/stats'
@@ -23,7 +24,7 @@ export default function TeamOfRoundPage() {
       <PageHeader title="Équipe type" subtitle={`Les meilleurs XP de la journée · ${season?.name ?? ''}`}>
         <FilterSelect value={round || String(r ?? '')} onChange={setRound} allLabel={null} options={rounds.map((x) => ({ value: String(x), label: `Journée ${x}` }))} />
       </PageHeader>
-      {!slots.length ? <EmptyState title="Pas encore de journée jouée" /> : (
+      {!slots.length ? <SeasonNotStarted what="Les équipes types" /> : (
         <div className="mx-auto max-w-xl">
           <div className="relative aspect-[3/4] overflow-hidden rounded-3xl border border-white/10" style={{ background: 'repeating-linear-gradient(180deg,#0f3d2e 0 12.5%,#0d3528 12.5% 25%)' }}>
             <svg className="absolute inset-0 size-full opacity-40" viewBox="0 0 300 400" preserveAspectRatio="none" aria-hidden><g fill="none" stroke="#fff" strokeWidth="2"><rect x="10" y="10" width="280" height="380" /><line x1="10" y1="200" x2="290" y2="200" /><circle cx="150" cy="200" r="40" /><rect x="80" y="330" width="140" height="60" /><rect x="80" y="10" width="140" height="60" /></g></svg>

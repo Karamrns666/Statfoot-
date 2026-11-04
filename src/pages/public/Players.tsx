@@ -9,6 +9,7 @@ import { FilterSelect } from '@/components/league/FilterSelect'
 import { PlayerAvatar, PositionBadge, TeamLogo } from '@/components/league/Identity'
 import { IPGCard, MaterialLegend, XPCard } from '@/components/players/Cards'
 import { Input } from '@/components/ui/input'
+import { SeasonNotStarted } from '@/components/league/SeasonNotStarted'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { isRookie, type PhaseFilter } from '@/lib/stats'
@@ -90,7 +91,7 @@ export default function Players() {
                   return <XPCard key={p.id} r={r} player={p} team={L.team.get(p.team_id)} />
                 })}
               </div>
-              {!rows.length && <p className="glass rounded-2xl p-8 text-center text-muted-foreground">Aucun joueur ne correspond à ces filtres.</p>}
+              {!rows.length && (ranking.length ? <p className="glass rounded-2xl p-8 text-center text-muted-foreground">Aucun joueur ne correspond à ces filtres.</p> : <SeasonNotStarted what="Les effectifs et le classement des joueurs" />)}
               {rows.length > shown && <div className="mt-6 flex justify-center"><Button variant="outline" onClick={() => setShown((n) => n + 40)}>Afficher 40 joueurs de plus ({rows.length - shown} restants)</Button></div>}
             </>
           ) : (

@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { TeamLogo } from '@/components/league/Identity'
 import { bestAttack, bestDefense, kpis, type PhaseFilter } from '@/lib/stats'
 import { cn } from '@/lib/utils'
+import { SeasonNotStarted } from '@/components/league/SeasonNotStarted'
 
 export default function Stats() {
   const { league } = useData()
@@ -27,6 +28,7 @@ export default function Stats() {
       <PageHeader title="Statistiques" subtitle="Leaders et chiffres clés">
         {hasCups && (['all', 'league_phase', 'gold', 'silver'] as const).filter((x) => x === 'all' || league.competitions.some((c) => (!scopeSeasonId || c.season_id === scopeSeasonId) && c.phase === x)).map((p) => <button key={p} onClick={() => setPhase(p)} className={cn('rounded-full border px-3 py-1 text-xs font-bold uppercase cursor-pointer', phase === p ? 'border-neon bg-neon/15 text-neon' : 'border-white/10 text-muted-foreground')}>{{ all: 'Toutes', league_phase: 'Phase de ligue', gold: 'Gold Cup', silver: 'Silver Cup' }[p]}</button>)}
       </PageHeader>
+      {k.matches === 0 ? <SeasonNotStarted what="Les statistiques" /> : <>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <StatTile label="Matchs" value={k.matches} icon={<CalendarDays />} color="#e6edf8" />
         <StatTile label="Buts" value={k.goals} icon={<Goal />} sub={`${k.goals_avg} / match`} />
@@ -49,6 +51,7 @@ export default function Stats() {
           </CardContent></Card>
         ))}
       </div>
+      </>}
     </div>
   )
 }

@@ -292,6 +292,17 @@ export interface Media extends BaseEntity {
   published?: boolean
 }
 
+/** Équipe type d'une journée choisie à la main dans l'admin (sinon : sélection automatique) */
+export interface TeamOfWeek extends BaseEntity {
+  season_id: string
+  round: number
+  competition_id?: string | null
+  formation?: string
+  slots: { position: Position; player_id: string }[]
+  note?: string
+  chosen_by?: string
+}
+
 export interface MotmVote extends BaseEntity { match_id: string; player_id: string; voter_key: string }
 
 export type Tiebreaker = 'points' | 'head_to_head' | 'goal_diff' | 'goals_for' | 'wins' | 'fair_play'
@@ -360,6 +371,7 @@ export interface EntityMap {
   Draw: Draw
   Media: Media
   MotmVote: MotmVote
+  TeamOfWeek: TeamOfWeek
   Settings: Settings
   Page: Page
   AuditLog: AuditLog
@@ -368,5 +380,5 @@ export interface EntityMap {
 export type EntityName = keyof EntityMap
 export const ENTITY_NAMES: EntityName[] = [
   'Season', 'Competition', 'Division', 'Group', 'Venue', 'Team', 'Player', 'Match', 'MatchEvent', 'Lineup', 'LiveState',
-  'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'Settings', 'Page', 'AuditLog', 'AdminUser',
+  'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser',
 ]

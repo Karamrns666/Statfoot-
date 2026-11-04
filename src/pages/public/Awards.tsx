@@ -1,5 +1,12 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
+import { CompetitionTabs } from '@/components/league/CompetitionTabs'
+import { SeasonNotStarted } from '@/components/league/SeasonNotStarted'
+import { FilterSelect } from '@/components/league/FilterSelect'
+import { RewardsList } from '@/components/teamweek/RewardsList'
+import { seasonMonths, seasonRounds, type Period } from '@/lib/rewards'
 import { useData, useLookup } from '@/hooks/useData'
 import { useSeason } from '@/hooks/useSeason'
 import { useEffectiveSeason, usePlayerXP, useRace } from '@/hooks/useStats'
@@ -30,7 +37,8 @@ export default function Awards() {
         {hasCups && PHASES.filter((x) => x.value === 'all' || db.Competition.some((c) => c.season_id === seasonId && c.phase === x.value)).map((p) => <button key={p.value} onClick={() => setPhase(p.value)} className={cn('rounded-full border px-4 py-1.5 font-display text-sm font-bold uppercase tracking-wide cursor-pointer', phase === p.value ? 'border-neon bg-neon/15 text-neon' : 'border-white/10 text-muted-foreground hover:text-white')}>{p.label}</button>)}
       </div>
       <Tabs defaultValue="race">
-        <TabsList><TabsTrigger value="race">Course aux trophées</TabsTrigger><TabsTrigger value="stats">Statistiques</TabsTrigger><TabsTrigger value="palmares">Palmarès</TabsTrigger></TabsList>
+        <TabsList><TabsTrigger value="race">Course aux trophées</TabsTrigger><TabsTrigger value="rewards">Récompenses</TabsTrigger><TabsTrigger value="stats">Statistiques</TabsTrigger><TabsTrigger value="palmares">Palmarès</TabsTrigger></TabsList>
+        <TabsContent value="rewards">{seasonId ? <RewardsByPeriod seasonId={seasonId} /> : null}</TabsContent>
         <TabsContent value="race" className="space-y-10">
           <PlayerRace scope={scope} raceKey="ballon_or" category="ballon_or" />
           <PlayerRace scope={scope} raceKey="golden_glove" category="golden_glove" />
@@ -209,6 +217,38 @@ export function Palmares() {
           </section>
         )
       })}
+    </div>
+  )
+}
+
+/** Récompenses par journée, par mois ou sur la saison, avec filtre de compétition */
+function RewardsByPeriod({ seasonId }: { seasonId: string }) {
+  const { db, league } = useData()
+  const [kind, setKind] = useState<'round' | 'month' | 'season'>('round')
+  const [comp, setComp] = useState('')
+  const comps = db.Competition.filter((c) => c.season_id === seasonId).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+  const rounds = seasonRounds(league, seasonId, comp || null)
+  const months = seasonMonths(league, seasonId, comp || null)
+  const [round, setRound] = useState<number | null>(null)
+  const [month, setMonth] = useState('')
+  const r = round && rounds.includes(round) ? round : rounds.at(-1)
+  const mo = month && months.includes(month) ? month : months.at(-1)
+  if (!rounds.length) return <SeasonNotStarted what="Les récompenses" />
+  const period: Period = kind === 'round' ? { type: 'round', round: r! } : kind === 'month' ? { type: 'month', month: mo! } : { type: 'season' }
+  const monthName = (m: string) => format(new Date(`${m}-01T12:00:00`), 'MMMM yyyy', { locale: fr })
+  return (
+    <div className="space-y-4">
+      {comps.length > 1 && <CompetitionTabs comps={comps} value={comp} onChange={setComp} />}
+      <div className="flex flex-wrap items-center gap-2">
+        {([['round', 'Par journée'], ['month', 'Par mois'], ['season', 'Saison']] as const).map(([k, l]) => (
+          <button key={k} onClick={() => setKind(k)} aria-pressed={kind === k} className={cn('cursor-pointer rounded-full border px-4 py-1.5 text-sm font-bold transition', kind === k ? 'border-white bg-white text-ink' : 'border-white/15 text-muted-foreground hover:text-white')}>{l}</button>
+        ))}
+        {kind === 'round' && <FilterSelect label="Journée" value={String(r)} onChange={(v) => setRound(Number(v))} allLabel={null} options={rounds.map((x) => ({ value: String(x), label: `Journée ${x}` }))} />}
+        {kind === 'month' && <FilterSelect label="Mois" value={mo ?? ''} onChange={setMonth} allLabel={null} options={months.map((x) => ({ value: x, label: monthName(x) }))} />}
+      </div>
+      <h3 className="font-display text-2xl font-black first-letter:uppercase">{kind === 'round' ? `Journée ${r}` : kind === 'month' ? monthName(mo!) : 'Toute la saison'}</h3>
+      <RewardsList seasonId={seasonId} period={period} competitionId={comp || null} />
+      {kind === 'round' && <Link to={`/equipe-type?journee=${r}${comp ? `&competition=${comp}` : ''}`} className="inline-block text-sm font-bold text-neon underline underline-offset-4">Voir l’équipe type de la journée {r}</Link>}
     </div>
   )
 }

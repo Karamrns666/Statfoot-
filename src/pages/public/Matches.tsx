@@ -11,6 +11,8 @@ import { FilterSelect } from '@/components/league/FilterSelect'
 import { MatchRow } from '@/components/match/MatchRow'
 import { CompetitionTabs } from '@/components/league/CompetitionTabs'
 import { SeasonNotStarted } from '@/components/league/SeasonNotStarted'
+import { AddToCalendar } from '@/components/match/AddToCalendar'
+import { NextMatchBanner } from '@/components/match/NextMatchBanner'
 import { STAGE_LABELS } from '@/lib/schedule'
 import { isKnockout } from '@/lib/standings'
 import { cn } from '@/lib/utils'
@@ -84,6 +86,11 @@ export default function Matches() {
     return [...g.entries()]
   }, [filtered])
 
+  // prochains matchs (tous filtres sauf journée et jour) — pour le compte à rebours et l'export agenda
+  const upcomingFiltered = base.filter((m) => m.status === 'scheduled' && m.date && new Date(m.date).getTime() > Date.now() - 3600000 &&
+    (!team || m.home_team_id === team || m.away_team_id === team) && (!comp || m.competition_id === comp) && (!pitch || m.pitch === pitch) &&
+    (tab !== 'favoris' || fav.has(m.home_team_id) || fav.has(m.away_team_id)))
+  const nextMatch = upcomingFiltered[0]
   const strip = useRef<HTMLDivElement>(null)
   useEffect(() => { strip.current?.querySelector('[aria-current="true"]')?.scrollIntoView({ inline: 'center', block: 'nearest' }) }, [round])
   const teams = db.Team.filter((t) => base.some((m) => m.home_team_id === t.id || m.away_team_id === t.id)).sort((a, b) => a.name.localeCompare(b.name))
@@ -134,6 +141,13 @@ export default function Matches() {
         {pitches.length > 1 && <FilterSelect label="Terrain" value={pitch} onChange={(v) => set('terrain', v)} allLabel="Terrain : tous" options={pitches.map((x) => ({ value: x, label: x }))} className="rounded-full sm:w-40" />}
       </div>
 
+      {nextMatch && <NextMatchBanner match={nextMatch} />}
+      {upcomingFiltered.length > 0 && (
+        <div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+          <AddToCalendar matches={upcomingFiltered} label={`Ajouter les ${upcomingFiltered.length} prochains matchs à mon agenda`} filename="mbl-calendrier.ics" />
+          <span className="text-xs">Fichier .ics compatible Google Agenda, Outlook et iPhone ; suit les filtres choisis.</span>
+        </div>
+      )}
       {tab === 'favoris' && !fav.size && <EmptyState title="Aucune équipe favorite" icon={<Star />}>Touchez l’étoile à côté d’une équipe pour suivre ses matchs ici.</EmptyState>}
       {groups.length === 0 && !(tab === 'favoris' && !fav.size) && <EmptyState title="Aucun match" icon={<CalendarX />}>Aucun match ne correspond à cette sélection.</EmptyState>}
       <div className="space-y-8">

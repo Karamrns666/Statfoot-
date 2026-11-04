@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import { PublicLayout } from '@/components/layout/PublicLayout'
 import { Spinner } from '@/components/league/Bits'
 import { useData } from '@/hooks/useData'
@@ -90,7 +90,8 @@ export default function App() {
           <Route path="joueurs/:id" element={<P.PlayerDetail />} />
           <Route path="trophees" element={<P.Awards />} />
           <Route path="statistiques" element={<P.Stats />} />
-          <Route path="equipe-de-la-journee" element={<P.TeamOfRound />} />
+          <Route path="equipe-type" element={<P.TeamOfRound />} />
+          <Route path="equipe-de-la-journee" element={<Navigate to="/equipe-type" replace />} />
           <Route path="media" element={<P.Media />} />
           <Route path="historique" element={<P.History />} />
           <Route path="reglement" element={<P.Rules />} />

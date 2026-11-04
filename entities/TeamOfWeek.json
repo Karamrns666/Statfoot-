@@ -1,0 +1,54 @@
+{
+  "name": "TeamOfWeek",
+  "type": "object",
+  "properties": {
+    "season_id": {
+      "type": "string",
+      "description": "Saison"
+    },
+    "round": {
+      "type": "number",
+      "description": "Journée"
+    },
+    "competition_id": {
+      "type": "string",
+      "description": "Compétition (vide = toutes)"
+    },
+    "formation": {
+      "type": "string",
+      "description": "Ex. 2-2-1, 3-2-1"
+    },
+    "slots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "position": {
+            "type": "string",
+            "enum": [
+              "GK",
+              "DEF",
+              "MID",
+              "FWD"
+            ]
+          },
+          "player_id": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Joueurs dans l'ordre des postes (gardien d'abord)"
+    },
+    "note": {
+      "type": "string"
+    },
+    "chosen_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "season_id",
+    "round",
+    "slots"
+  ]
+}

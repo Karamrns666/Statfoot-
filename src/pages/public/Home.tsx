@@ -8,7 +8,10 @@ import { Link } from 'react-router-dom'
 import { CalendarDays, Trophy, Users, Goal, Hand } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
 import { useSeason } from '@/hooks/useSeason'
-import { useEffectiveSeason, useSeasonCompetitions, useRace, usePlayerXP } from '@/hooks/useStats'
+import { useEffectiveSeason, useSeasonCompetitions, useRace, usePlayerXP, useTeamOfWeek } from '@/hooks/useStats'
+import { TeamOfWeekPitch } from '@/components/teamweek/TeamOfWeekPitch'
+import { RewardsList } from '@/components/teamweek/RewardsList'
+import { seasonRounds } from '@/lib/rewards'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { MatchCard } from '@/components/match/MatchCard'
@@ -53,6 +56,8 @@ export default function Home() {
   const teamsInSeason = new Set(comps.flatMap((c) => c.team_ids ?? []))
   const showIPG = refSid === SEASON_2025_ID
   const tag = archive ? ` · ${archive.name.replace('Saison ', '')}` : ''
+  const lastPlayedRound = useMemo(() => (refSid ? seasonRounds(league, refSid).at(-1) : undefined), [league, refSid])
+  const tow = useTeamOfWeek(refSid, lastPlayedRound)
 
   const slides = useMemo<BillboardSlide[]>(() => {
     const out: BillboardSlide[] = []
@@ -134,6 +139,20 @@ export default function Home() {
           })}
         </div>
       </section>
+
+      {/* ÉQUIPE TYPE + RÉCOMPENSES DE LA JOURNÉE */}
+      {tow && refSid && (
+        <section>
+          <SectionTitle title={`Équipe type · Journée ${tow.round}${tag}`} subtitle="Les meilleurs joueurs de la dernière journée" accent="#E8B931" action={<Button asChild variant="ghost" size="sm"><Link to={`/equipe-type${archive ? '' : `?journee=${tow.round}`}`}>Voir l’équipe type</Link></Button>} />
+          <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,420px)_1fr]">
+            <TeamOfWeekPitch result={tow} size="md" />
+            <div className="space-y-3">
+              <h3 className="font-display text-xl font-black">Récompenses de la journée {tow.round}</h3>
+              <RewardsList seasonId={refSid} period={{ type: 'round', round: tow.round }} compact />
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* PODIUM XP + GARDIENS */}
       <section className="grid gap-6 lg:grid-cols-5">

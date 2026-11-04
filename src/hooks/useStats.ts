@@ -2,7 +2,8 @@ import { useMemo } from 'react'
 import { useData } from './useData'
 import { useSeason } from './useSeason'
 import { computePlayerXP, computeTeamStats, raceWithEvolution, type LeagueData, type RaceKey, type XPScope } from '@/lib/stats'
-import { allPlayerLogs, cardMaterial, playerBadges, unlockedByRarity, type BadgeState, type BadgeTier } from '@/lib/badges'
+import { allPlayerLogs, cardMaterial, playerBadges, unlockedByRarity, type BadgeState, type BadgeTier, type PlayerMatchLine } from '@/lib/badges'
+import { teamOfWeek } from '@/lib/rewards'
 
 /** Saison "effective" : la saison sélectionnée, ou la saison active si "Toutes saisons". */
 export function useEffectiveSeason() {
@@ -42,7 +43,7 @@ function computeAllBadges(league: LeagueData, seasonId: string | null | undefine
   const key = seasonId ?? 'all'
   const hit = bySeason.get(key)
   if (hit) return hit
-  const logs = allPlayerLogs(league, seasonId)
+  const logs = seasonId ? seasonLogs(league, seasonId) : allPlayerLogs(league, seasonId)
   const out = new Map<string, PlayerBadgeSummary>()
   for (const p of league.players) {
     const log = logs.get(p.id) ?? []
@@ -59,4 +60,22 @@ export function usePlayerBadges(seasonId?: string | null) {
   const eff = useEffectiveSeason()
   const sid = seasonId !== undefined ? seasonId : scopeSeasonId ?? eff?.id ?? null
   return useMemo(() => computeAllBadges(league, sid), [league, sid])
+}
+
+// journaux des joueurs par saison, partagés entre pages (équipe type, badges, récompenses)
+const logCache = new WeakMap<object, Map<string, Map<string, PlayerMatchLine[]>>>()
+export function seasonLogs(league: LeagueData, seasonId: string) {
+  let m = logCache.get(league)
+  if (!m) { m = new Map(); logCache.set(league, m) }
+  if (!m.has(seasonId)) m.set(seasonId, allPlayerLogs(league, seasonId))
+  return m.get(seasonId)!
+}
+/** Équipe type d'une journée (sélection manuelle de l'admin prioritaire) */
+export function useTeamOfWeek(seasonId: string | null | undefined, round: number | null | undefined, competitionId?: string | null) {
+  const { league, db, settings } = useData()
+  return useMemo(() => {
+    if (!seasonId || !round) return null
+    const override = db.TeamOfWeek.find((t) => t.season_id === seasonId && t.round === round && (t.competition_id ?? '') === (competitionId ?? '')) ?? null
+    return teamOfWeek(league, seasonId, round, { competitionId, players: settings.starters_count ?? 6, override, logs: seasonLogs(league, seasonId) })
+  }, [league, db.TeamOfWeek, settings.starters_count, seasonId, round, competitionId])
 }

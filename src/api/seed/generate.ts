@@ -17,7 +17,7 @@ const id = (p: string) => `${p}_${(++c).toString(36)}`
 
 export function generateLeagueData(now = new Date()): DB {
   c = 0
-  const db = Object.fromEntries((['Season', 'Competition', 'Division', 'Group', 'Venue', 'Team', 'Player', 'Match', 'MatchEvent', 'Lineup', 'LiveState', 'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'Settings', 'Page', 'AuditLog', 'AdminUser'] as EntityName[]).map((n) => [n, []])) as unknown as DB
+  const db = Object.fromEntries((['Season', 'Competition', 'Division', 'Group', 'Venue', 'Team', 'Player', 'Match', 'MatchEvent', 'Lineup', 'LiveState', 'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser'] as EntityName[]).map((n) => [n, []])) as unknown as DB
 
   const settings: Settings = {
     id: 'settings', league_name: LEAGUE.name, short_name: LEAGUE.shortName, tagline: LEAGUE.tagline,

@@ -16,9 +16,9 @@ export const PUBLIC_NAV = [
   { to: '/classement', label: 'Classement' },
   { to: '/equipes', label: 'Équipes' },
   { to: '/joueurs', label: 'Joueurs' },
+  { to: '/equipe-type', label: 'Équipe type' },
   { to: '/trophees', label: 'Trophées' },
-  { to: '/statistiques', label: 'Stats' },
-  { to: '/equipe-de-la-journee', label: 'Équipe type', wide: true },
+  { to: '/statistiques', label: 'Stats', wide: true },
   { to: '/media', label: 'Média' },
   { to: '/historique', label: 'Historique', wide: true },
 ] as { to: string; label: string; end?: boolean; wide?: boolean }[]

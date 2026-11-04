@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, CalendarDays, MapPin, Star, Vote, ArrowRightLeft, Share2, ShieldAlert, User } from 'lucide-react'
+import { ArrowLeft, CalendarDays, MapPin, Star, Vote, ArrowRightLeft, Share2, ShieldAlert, User, Crown, Hand, Image as ImageIcon, Play } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
 import { useNow } from '@/hooks/useNow'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -16,9 +16,13 @@ import { TeamStatsBars } from '@/components/match/TeamStatsBars'
 import { fmtDate, fmtDateTime, playerShort, STATUS_LABEL } from '@/lib/format'
 import { STAGE_LABELS } from '@/lib/schedule'
 import { byDate, competitionStandings, headToHead, isPlayed, matchScorers, resultFor, computePlayerXP } from '@/lib/stats'
-import { fmtMinute, fmtScore, possession, timelineByPeriod, PERIOD_LABEL } from '@/lib/matchEngine'
+import { fmtMinute, fmtScore, keeperMatchStats, possession, timelineByPeriod, PERIOD_LABEL } from '@/lib/matchEngine'
 import type { Match, MatchEvent, Player } from '@/types/entities'
 import { cn } from '@/lib/utils'
+import { AddToCalendar } from '@/components/match/AddToCalendar'
+import { useTeamOfWeek } from '@/hooks/useStats'
+import { countdown } from '@/lib/ics'
+import { fmtRating, ratingColor } from '@/components/teamweek/TeamOfWeekPitch'
 
 export default function MatchDetail() {
   const { id } = useParams()
@@ -42,7 +46,10 @@ export default function MatchDetail() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <Button asChild variant="ghost" size="sm"><Link to="/matchs"><ArrowLeft />Matchs</Link></Button>
-        {showScore && <Button variant="outline" size="sm" onClick={() => setShare(true)}><Share2 />Visuels Instagram</Button>}
+        <div className="flex gap-2">
+          {m.status === 'scheduled' && <AddToCalendar matches={[m]} filename={`mbl-${home?.short_name ?? ''}-${away?.short_name ?? ''}.ics`.toLowerCase()} />}
+          {showScore && <Button variant="outline" size="sm" onClick={() => setShare(true)}><Share2 />Visuels Instagram</Button>}
+        </div>
       </div>
       <section className="relative overflow-hidden rounded-3xl border border-white/10 p-5 sm:p-8">
         <div className="pointer-events-none absolute inset-0" style={{ background: `radial-gradient(ellipse 50% 90% at 0% 50%, ${home?.primary_color}33, transparent 70%), radial-gradient(ellipse 50% 90% at 100% 50%, ${away?.primary_color}33, transparent 70%), linear-gradient(180deg,#0D2B66,#04163D)` }} />
@@ -59,6 +66,7 @@ export default function MatchDetail() {
               {showScore
                 ? <div className={cn('num flex items-center gap-2 text-6xl sm:text-8xl', live && 'text-white')}><span>{m.home_score ?? 0}</span><span className="text-4xl text-white/30">-</span><span>{m.away_score ?? 0}</span></div>
                 : <div className="num text-4xl text-neon sm:text-6xl">{fmtDate(m.date, 'HH:mm')}</div>}
+              {m.status === 'scheduled' && <Countdown to={m.date} now={now} />}
               {m.penalties && <div className="mt-1 rounded bg-white/10 px-2 text-xs font-semibold">{fmtScore(m)}</div>}
               {m.home_ht_score != null && showScore && <div className="mt-1 text-xs text-muted-foreground">MT {m.home_ht_score}-{m.away_ht_score}</div>}
               {m.extra_time && <div className="mt-1 text-[11px] text-muted-foreground">après prolongation</div>}
@@ -99,6 +107,9 @@ export default function MatchDetail() {
                 <CardHeader><CardTitle className="flex items-center gap-2"><Star className="size-5 text-award-gold" />Homme du match</CardTitle></CardHeader>
                 <CardContent>{m.motm_player_id ? <MotmCard match={m} playerId={m.motm_player_id} /> : <p className="text-sm text-muted-foreground">{showScore ? 'Désigné à la fin du match.' : 'Désigné après le match.'}</p>}</CardContent>
               </Card>
+              {m.status === 'finished' && <PlayerOfRoundCard match={m} />}
+              {m.status === 'finished' && <KeepersCard match={m} events={events} />}
+              {showScore && <CardsCard match={m} events={events} />}
               {(m.motm_vote_closes_at || live) && m.status !== 'scheduled' && <Card><CardHeader><CardTitle className="flex items-center gap-2"><Vote className="size-5 text-neon" />Vote du public</CardTitle></CardHeader><CardContent><MotmVoteWidget match={m} /></CardContent></Card>}
             </div>
             <Card className="lg:col-span-2">
@@ -116,6 +127,7 @@ export default function MatchDetail() {
         </TabsContent>
         <TabsContent value="preview"><PreMatch match={m} /></TabsContent>
       </Tabs>
+      <MatchGallery match={m} />
       {share && <ShareVisualsDialog open={share} onOpenChange={setShare} match={m} />}
     </div>
   )
@@ -136,7 +148,7 @@ function ScorerList({ list, align }: { list: MatchEvent[]; align: 'left' | 'righ
   const L = useLookup()
   return (
     <ul className={cn('space-y-0.5', align === 'right' ? 'text-right' : 'text-left')}>
-      {list.map((e) => <li key={e.id} className="text-muted-foreground"><span className="text-white">⚽ {playerShort(L.player.get(e.player_id ?? '')) || e.player_name_free}</span> {fmtMinute(e.minute, e.added_minute)}{e.goal_kind === 'penalty' ? ' (pen.)' : e.type === 'own_goal' ? ' (csc)' : ''}</li>)}
+      {list.map((e) => <li key={e.id} className="text-muted-foreground"><span className="text-white">⚽ {e.player_id ? playerShort(L.player.get(e.player_id)) : e.player_name_free ?? (e.type === 'own_goal' ? 'Contre son camp' : '—')}</span> {fmtMinute(e.minute, e.added_minute)}{e.goal_kind === 'penalty' ? ' (pen.)' : e.type === 'own_goal' ? ' (csc)' : ''}{e.type === 'goal' && e.related_player_id ? <span className="text-neon-soft"> · passe {playerShort(L.player.get(e.related_player_id))}</span> : null}</li>)}
     </ul>
   )
 }
@@ -263,5 +275,106 @@ function PreMatch({ match }: { match: Match }) {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+function Countdown({ to, now }: { to?: string; now: number }) {
+  const c = countdown(to, now)
+  if (!c) return null
+  const parts = c.d ? [[c.d, 'j'], [c.h, 'h'], [c.m, 'min']] : [[c.h, 'h'], [c.m, 'min'], [c.s, 's']]
+  return (
+    <div className="mt-2 flex items-baseline gap-2 rounded-xl bg-black/25 px-3 py-1.5" aria-label="Compte à rebours avant le coup d'envoi">
+      <span className="text-[11px] text-muted-foreground">Coup d’envoi dans</span>
+      {parts.map(([v, u]) => <span key={u as string} className="num text-xl">{String(v).padStart(2, '0')}<span className="ml-0.5 text-xs text-muted-foreground">{u}</span></span>)}
+    </div>
+  )
+}
+
+/** Joueur de la journée : meilleur joueur de toute la journée (équipe type) */
+function PlayerOfRoundCard({ match }: { match: Match }) {
+  const L = useLookup()
+  const res = useTeamOfWeek(match.season_id, match.round)
+  const best = res?.player_of_round
+  if (!best) return null
+  const p = L.player.get(best.player_id), t = L.team.get(best.team_id)
+  const fromThisMatch = best.team_id === match.home_team_id || best.team_id === match.away_team_id
+  return (
+    <Card>
+      <CardHeader><CardTitle className="flex items-center gap-2"><Crown className="size-5 fill-award-gold text-award-gold" />Joueur de la journée {match.round}</CardTitle></CardHeader>
+      <CardContent>
+        <Link to={`/joueurs/${best.player_id}`} className="flex items-center gap-3 rounded-xl p-2 hover:bg-white/5">
+          <PlayerAvatar player={p} team={t} size={44} />
+          <div className="min-w-0 flex-1"><div className="truncate font-semibold">{p?.first_name} {p?.last_name}</div><div className="text-xs text-muted-foreground">{t?.name}{fromThisMatch ? ' · dans ce match' : ''}</div></div>
+          <span className="rounded-md px-1.5 font-display text-xl font-black text-ink" style={{ background: ratingColor(best.rating) }}>{fmtRating(best.rating)}</span>
+        </Link>
+        <Link to={`/equipe-type?journee=${match.round}`} className="mt-2 block text-xs font-bold text-neon underline underline-offset-4">Voir l’équipe type de la journée</Link>
+      </CardContent>
+    </Card>
+  )
+}
+
+function KeepersCard({ match, events }: { match: Match; events: MatchEvent[] }) {
+  const { db } = useData()
+  const L = useLookup()
+  const rows = [match.home_team_id, match.away_team_id].flatMap((tid) => keeperMatchStats(match, db.Lineup.find((l) => l.match_id === match.id && l.team_id === tid), events, tid).map((k) => ({ ...k, team_id: tid })))
+  if (!rows.length) return null
+  return (
+    <Card>
+      <CardHeader><CardTitle className="flex items-center gap-2"><Hand className="size-5 text-sky" />Gardiens</CardTitle></CardHeader>
+      <CardContent className="space-y-1">
+        {rows.map((k) => {
+          const p = L.player.get(k.player_id), t = L.team.get(k.team_id)
+          return (
+            <Link key={k.player_id} to={`/joueurs/${k.player_id}`} className="flex items-center gap-3 rounded-xl p-2 hover:bg-white/5">
+              <TeamLogo team={t} size={22} />
+              <span className="min-w-0 flex-1 truncate text-sm font-semibold">{playerShort(p)}</span>
+              <span className="text-center"><span className="num text-lg">{k.saves}</span><span className="block text-[10px] text-muted-foreground">arrêts</span></span>
+              <span className="text-center"><span className="num text-lg">{k.conceded}</span><span className="block text-[10px] text-muted-foreground">encaissés</span></span>
+              {k.clean_sheet && <span className="rounded bg-win/15 px-1.5 text-[11px] font-bold text-win">Clean sheet</span>}
+            </Link>
+          )
+        })}
+      </CardContent>
+    </Card>
+  )
+}
+
+function CardsCard({ match, events }: { match: Match; events: MatchEvent[] }) {
+  const L = useLookup()
+  const cards = events.filter((e) => e.type === 'yellow_card' || e.type === 'second_yellow' || e.type === 'red_card')
+  if (!cards.length) return null
+  return (
+    <Card>
+      <CardHeader><CardTitle>Cartons</CardTitle></CardHeader>
+      <CardContent className="space-y-1 text-sm">
+        {cards.map((e) => (
+          <div key={e.id} className="flex items-center gap-2">
+            <span className={cn('inline-block h-4 w-3 rounded-sm', e.type === 'yellow_card' ? 'bg-yellow-400' : 'bg-red-500')} aria-label={e.type === 'yellow_card' ? 'Carton jaune' : 'Carton rouge'} />
+            <TeamLogo team={L.team.get(e.team_id)} size={16} />
+            <span className="flex-1">{playerShort(L.player.get(e.player_id ?? ''))}</span>
+            <span className="text-xs text-muted-foreground">{fmtMinute(e.minute, e.added_minute)}</span>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  )
+}
+
+function MatchGallery({ match }: { match: Match }) {
+  const { db } = useData()
+  const items = db.Media.filter((x) => x.published !== false && x.match_id === match.id)
+  if (!items.length) return null
+  return (
+    <section>
+      <h2 className="mb-3 flex items-center gap-2 font-display text-2xl font-black"><ImageIcon className="size-5 text-neon" />Galerie du match</h2>
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {items.map((x) => (
+          <a key={x.id} href={x.url} target="_blank" rel="noreferrer" className="group relative aspect-[4/3] overflow-hidden rounded-xl bg-night-950">
+            <img src={x.thumbnail_url ?? x.url} alt={x.title} loading="lazy" className="size-full object-cover transition group-hover:scale-105" />
+            {x.type === 'video' && <Play className="absolute left-1/2 top-1/2 size-10 -translate-x-1/2 -translate-y-1/2 fill-white text-white drop-shadow" />}
+          </a>
+        ))}
+      </div>
+    </section>
   )
 }

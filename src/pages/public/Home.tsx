@@ -41,13 +41,10 @@ export default function Home() {
   }, [db.Match, sid])
 
   const k = useMemo(() => kpis(league, { seasonId: sid }), [league, sid])
-  // Saison sans match joué (début de saison) : les rubriques joueurs reprennent la dernière saison jouée
-  const refSid = useMemo(() => {
-    if (!sid || k.matches > 0) return sid
-    const prev = [...db.Season].filter((x) => x.id !== sid && db.Match.some((m) => m.season_id === x.id && isPlayed(m))).sort((a, b) => b.start_date.localeCompare(a.start_date))[0]
-    return prev?.id ?? sid
-  }, [sid, k.matches, db.Season, db.Match])
-  const archive = refSid !== sid ? L.season.get(refSid ?? '') : undefined
+  // l'accueil affiche UNIQUEMENT la saison sélectionnée (aucun repli sur une autre saison)
+  const refSid = sid
+  const notStarted = k.matches === 0
+  const archive = undefined as { name: string } | undefined
   const refK = useMemo(() => (refSid === sid ? k : kpis(league, { seasonId: refSid })), [league, refSid, sid, k])
   // MÊME fonction que la fiche joueur et la page Trophées (computePlayerXP via useRace)
   const podium = useRace({ seasonId: refSid }, 'xp').slice(0, 3)
@@ -63,7 +60,7 @@ export default function Home() {
     const out: BillboardSlide[] = []
     if (!sid || !refSid) return out
     const team = (id?: string) => (id ? L.team.get(id) : undefined)
-    if (archive) {
+    if (notStarted) {
       const names = comps.map((c) => c.name)
       out.push({ key: 'intro', eyebrow: season?.name ?? 'Nouvelle saison', title: names.length > 1 ? names.join(' & ') : 'Coup d’envoi', value: teamsInSeason.size || undefined, unit: 'ÉQUIPES', sub: `${teamsInSeason.size} entreprises engagées${comps.length ? ` · ${comps.map((c) => `${c.name}${c.default_pitch ? ` sur le ${c.default_pitch}` : ''}`).join(', ')}` : ''}. Calendrier et résultats en ligne dès la première journée.`, href: '/equipes', tone: 'orange' })
     }
@@ -155,7 +152,7 @@ export default function Home() {
       )}
 
       {/* PODIUM XP + GARDIENS */}
-      <section className="grid gap-6 lg:grid-cols-5">
+      {!notStarted && <section className="grid gap-6 lg:grid-cols-5">
         <div className="lg:col-span-3">
           <SectionTitle title={`Les meilleurs joueurs${tag}`} subtitle={showIPG ? 'Indice de Performance Globale — touchez une carte pour la retourner' : 'Classement XP — touchez une carte pour la retourner'} accent="#facc15" action={<Button asChild variant="ghost" size="sm"><Link to={showIPG ? '/joueurs?vue=ipg' : '/joueurs'}>{showIPG ? 'Top 25 IPG' : 'Classement XP'}</Link></Button>} />
           <div className="grid grid-cols-3 items-end gap-2 sm:gap-4">
@@ -194,7 +191,7 @@ export default function Home() {
             </CardContent>
           </Card>
         </div>
-      </section>
+      </section>}
 
       {/* LOGOS */}
       <section>

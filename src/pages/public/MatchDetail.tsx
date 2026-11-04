@@ -109,7 +109,7 @@ export default function MatchDetail() {
               </Card>
               {m.status === 'finished' && <PlayerOfRoundCard match={m} />}
               {m.status === 'finished' && <KeepersCard match={m} events={events} />}
-              {showScore && <CardsCard match={m} events={events} />}
+              {showScore && <CardsCard events={events} />}
               {(m.motm_vote_closes_at || live) && m.status !== 'scheduled' && <Card><CardHeader><CardTitle className="flex items-center gap-2"><Vote className="size-5 text-neon" />Vote du public</CardTitle></CardHeader><CardContent><MotmVoteWidget match={m} /></CardContent></Card>}
             </div>
             <Card className="lg:col-span-2">
@@ -339,7 +339,7 @@ function KeepersCard({ match, events }: { match: Match; events: MatchEvent[] }) 
   )
 }
 
-function CardsCard({ match, events }: { match: Match; events: MatchEvent[] }) {
+function CardsCard({ events }: { events: MatchEvent[] }) {
   const L = useLookup()
   const cards = events.filter((e) => e.type === 'yellow_card' || e.type === 'second_yellow' || e.type === 'red_card')
   if (!cards.length) return null

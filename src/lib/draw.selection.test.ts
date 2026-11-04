@@ -26,7 +26,7 @@ describe('tirage de la phase de sélection', () => {
         const g = games.get(t) ?? 0
         if (n % 2 === 0) expect(g).toBe(r)
         else expect(g === r || g === r - 1).toBe(true)
-        expect(Math.abs((home.get(t) ?? 0) * 2 - g)).toBeLessThanOrEqual(2)
+        expect(Math.abs((home.get(t) ?? 0) * 2 - g)).toBeLessThanOrEqual(1) // domicile − extérieur ∈ {−1, 0, +1}
       }
       expect(fx.length).toBe(n % 2 === 0 ? (n / 2) * r : ((n - 1) / 2) * r)
     })

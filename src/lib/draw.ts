@@ -139,16 +139,49 @@ export function selectionFixtures(teamIds: string[], rounds: number, rng: Rng = 
       if (a !== BYE && b !== BYE) pairs.push({ round: firstRound + idx, a, b })
     }
   })
-  const home = new Map<string, number>(), away = new Map<string, number>()
-  const out: SwissFixture[] = []
-  for (const pr of shuffle(pairs).sort((x, y) => x.round - y.round)) {
-    const da = (home.get(pr.a) ?? 0) - (away.get(pr.a) ?? 0), db = (home.get(pr.b) ?? 0) - (away.get(pr.b) ?? 0)
-    const aHome = da < db || (da === db && rng() < 0.5)
-    const [h, a] = aHome ? [pr.a, pr.b] : [pr.b, pr.a]
-    home.set(h, (home.get(h) ?? 0) + 1); away.set(a, (away.get(a) ?? 0) + 1)
-    out.push({ round: pr.round, home_team_id: h, away_team_id: a })
-  }
+  // orientation domicile/extérieur : au hasard, puis rééquilibrage exact (inversion de chemins)
+  const out: SwissFixture[] = shuffle(pairs).sort((x, y) => x.round - y.round).map((pr) => (rng() < 0.5 ? { round: pr.round, home_team_id: pr.a, away_team_id: pr.b } : { round: pr.round, home_team_id: pr.b, away_team_id: pr.a }))
+  balanceHomeAway(out)
   return out
 }
 /** Nombre maximal de matchs par équipe possible */
 export const maxRoundsFor = (teams: number) => (teams % 2 ? teams : teams - 1)
+
+/**
+ * Rend l'écart domicile − extérieur de chaque équipe égal à −1, 0 ou +1.
+ * Tant qu'une équipe a 2 matchs à domicile de plus qu'à l'extérieur, on cherche un chemin d'affiches
+ * « à domicile » qui mène à une équipe en déficit et on inverse tout le chemin : seuls les deux bouts changent.
+ */
+export function balanceHomeAway(fx: SwissFixture[]) {
+  const diff = new Map<string, number>()
+  const bump = (t: string, d: number) => diff.set(t, (diff.get(t) ?? 0) + d)
+  for (const f of fx) { bump(f.home_team_id, 1); bump(f.away_team_id, -1) }
+  for (let guard = 0; guard < fx.length * 4; guard++) {
+    const start = [...diff.entries()].find(([, d]) => d >= 2)?.[0]
+    if (!start) return fx
+    // BFS en suivant les affiches où l'équipe courante reçoit
+    const prev = new Map<string, number>([[start, -1]])
+    const queue = [start]
+    let end: string | undefined
+    while (queue.length && !end) {
+      const u = queue.shift()!
+      for (let i = 0; i < fx.length; i++) {
+        if (fx[i].home_team_id !== u) continue
+        const v = fx[i].away_team_id
+        if (prev.has(v)) continue
+        prev.set(v, i)
+        if ((diff.get(v) ?? 0) <= 0) { end = v; break }
+        queue.push(v)
+      }
+    }
+    if (!end) return fx
+    for (let v = end; v !== start;) {
+      const i = prev.get(v)!
+      const f = fx[i]
+      fx[i] = { ...f, home_team_id: f.away_team_id, away_team_id: f.home_team_id }
+      v = f.home_team_id
+    }
+    bump(start, -2); bump(end, 2)
+  }
+  return fx
+}

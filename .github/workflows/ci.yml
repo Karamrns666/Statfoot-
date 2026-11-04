@@ -2,6 +2,7 @@ name: CI
 
 # Vérifie chaque push : types, tests unitaires et build de production.
 # Le rapport est rangé dans une référence cachée `refs/ci/<branche>` (ni branche ni tag : Vercel l'ignore).
+# Seule la branche `main` (le site en ligne) fait échouer le workflow ; les branches de travail ne font que produire le rapport.
 on:
   push:
     branches: ['**']
@@ -35,5 +36,5 @@ jobs:
           cd /tmp/out && git init -q && git config user.name ci && git config user.email ci@users.noreply.github.com
           git add -A && git commit -qm "CI ${GITHUB_SHA}"
           git push -qf "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/ci/${GITHUB_REF_NAME}"
-      - if: steps.checks.outputs.failed == '1'
+      - if: steps.checks.outputs.failed == '1' && github.ref_name == 'main'
         run: exit 1

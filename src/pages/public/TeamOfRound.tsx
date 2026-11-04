@@ -61,7 +61,7 @@ export default function TeamOfWeekPage() {
 
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
         <div>
-          <h2 className="mb-3 font-display text-2xl font-black">Journée {round}{roundDate && <span className="ml-2 text-base font-semibold capitalize text-muted-foreground">{fmtDate(roundDate, 'EEEE d MMMM yyyy')}</span>}</h2>
+          <h2 className="mb-3 font-display text-2xl font-black">Journée {round}{roundDate && <span className="ml-2 text-base font-semibold text-muted-foreground first-letter:uppercase inline-block">{fmtDate(roundDate, 'EEEE d MMMM yyyy')}</span>}</h2>
           <TeamOfWeekPitch result={result} size="lg" className="mx-auto max-w-[560px]" />
         </div>
         <div className="space-y-5">

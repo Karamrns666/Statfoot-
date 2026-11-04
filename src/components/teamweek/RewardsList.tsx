@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Footprints, Goal, Hand, Shield, Star } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
+import { seasonLogs } from '@/hooks/useStats'
 import { PlayerAvatar, TeamLogo } from '@/components/league/Identity'
 import { REWARD_LABEL, periodRewards, type Period, type RewardKey } from '@/lib/rewards'
 import { playerName } from '@/lib/format'
@@ -17,7 +18,7 @@ export function RewardsList({ seasonId, period, competitionId, compact }: { seas
   const { league } = useData()
   const L = useLookup()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const list = useMemo(() => periodRewards(league, seasonId, period, competitionId), [league, seasonId, JSON.stringify(period), competitionId])
+  const list = useMemo(() => periodRewards(league, seasonId, period, competitionId, seasonLogs(league, seasonId)), [league, seasonId, JSON.stringify(period), competitionId])
   if (!list.length) return <p className="glass rounded-2xl p-4 text-sm text-muted-foreground">Pas encore de match joué sur cette période.</p>
   return (
     <div className={cn('grid gap-2', !compact && 'sm:grid-cols-2 lg:grid-cols-5')}>
@@ -34,7 +35,7 @@ export function RewardsList({ seasonId, period, competitionId, compact }: { seas
               <div className="truncate font-display text-lg font-black leading-tight">{p ? playerName(p) : t?.name}</div>
               <div className="truncate text-[11px] text-muted-foreground">{p ? `${t?.name ?? ''} · ` : ''}{r.detail}</div>
             </div>
-            <div className={cn('font-display font-black leading-none', compact ? 'text-2xl' : 'mt-2 text-4xl')} style={{ color: st.color }}>{r.value}<span className="ml-1 text-xs font-bold text-muted-foreground">{r.unit}</span></div>
+            <div className={cn('font-display font-black leading-none', compact ? 'text-2xl' : 'mt-2 text-4xl')} style={{ color: st.color }}>{r.unit === '/10' ? r.value.toFixed(1).replace('.', ',') : r.value}<span className="ml-1 text-xs font-bold text-muted-foreground">{r.unit}</span></div>
           </Link>
         )
       })}

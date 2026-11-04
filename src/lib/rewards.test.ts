@@ -40,7 +40,14 @@ describe('équipe type et récompenses', () => {
     const months = seasonMonths(L, sid)
     expect(months.length).toBeGreaterThan(2)
     expect(periodRewards(L, sid, { type: 'month', month: months[0] }).length).toBeGreaterThan(3)
-    expect(periodRewards(L, sid, { type: 'round', round: 1 }).length).toBeGreaterThan(3)
+    const r1 = periodRewards(L, sid, { type: 'round', round: 1 })
+    expect(r1.length).toBeGreaterThan(3)
+    // journée : le meilleur joueur est le joueur de la journée de l'équipe type
+    expect(r1[0].player_id).toBe(teamOfWeek(L, sid, 1, { players: 6 }).player_of_round!.player_id)
+    // la note ne plafonne pas : les meilleurs de chaque journée ne sont pas tous à égalité
+    const tops = seasonRounds(L, sid).map((r) => teamOfWeek(L, sid, r, { players: 6 }).player_of_round!.rating)
+    expect(new Set(tops).size).toBeGreaterThan(5)
+    expect(Math.max(...tops)).toBeLessThan(10)
     expect(periodRewards(L, 'season_2026', { type: 'season' })).toEqual([])
   })
   it('export agenda .ics', () => {

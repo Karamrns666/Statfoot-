@@ -35,11 +35,13 @@ export interface PlayerMatchLine {
  * jaune −0,4 · rouge −1,5 · gardien : arrêt +0,1, but encaissé −0,15, clean sheet +1,0 · bornée entre 3,0 et 10,0.
  */
 export function matchRating(l: Omit<PlayerMatchLine, 'rating'>): number {
-  let r = 6 + 0.8 * l.goals + 0.5 * l.assists + (l.result === 'W' ? 0.4 : l.result === 'L' ? -0.4 : 0) + (l.motm ? 0.5 : 0) - 0.4 * l.yellow - 1.5 * l.red
-  if (l.keeper) r += 0.1 * l.saves - 0.15 * l.conceded + (l.clean_sheet ? 1 : 0)
-  return Math.round(Math.min(10, Math.max(3, r)) * 10) / 10
+  let raw = 0.8 * l.goals + 0.5 * l.assists + (l.result === 'W' ? 0.4 : l.result === 'L' ? -0.4 : 0) + (l.motm ? 0.5 : 0) - 0.4 * l.yellow - 1.5 * l.red
+  if (l.keeper) raw += 0.1 * l.saves - 0.15 * l.conceded + (l.clean_sheet ? 1 : 0)
+  // au-dessus de 6 : courbe qui se rapproche de 10 sans jamais l'atteindre (les gros scores restent départagés)
+  const r = raw >= 0 ? 6 + 4 * (1 - Math.exp(-raw / 3)) : Math.max(3, 6 + raw)
+  return Math.round(Math.min(9.9, r) * 10) / 10
 }
-export const RATING_RULES = 'Note sur 10 calculée à partir des actions du match : base 6,0 ; but +0,8 ; passe décisive +0,5 ; victoire +0,4, défaite −0,4 ; homme du match +0,5 ; carton jaune −0,4, rouge −1,5 ; gardien : arrêt +0,1, but encaissé −0,15, clean sheet +1,0.'
+export const RATING_RULES = 'Note sur 10 calculée à partir des actions du match : but +0,8 ; passe décisive +0,5 ; victoire +0,4, défaite −0,4 ; homme du match +0,5 ; carton jaune −0,4, rouge −1,5 ; gardien : arrêt +0,1, but encaissé −0,15, clean sheet +1,0. Le total part de 6,0 et se rapproche de 10 sans l’atteindre, pour départager les grosses performances.'
 
 export function playerMatchLog(data: XPData, playerId: string, seasonId?: string | null): PlayerMatchLine[] {
   return allPlayerLogs(data, seasonId, playerId).get(playerId) ?? []

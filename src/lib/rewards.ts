@@ -112,14 +112,21 @@ export const REWARD_ORDER: RewardKey[] = ['best_player', 'top_scorer', 'top_assi
 
 export interface Reward { key: RewardKey; player_id?: string; team_id?: string; value: number; unit: string; detail: string }
 
-export function periodRewards(data: XPData, seasonId: string, p: Period, competitionId?: string | null): Reward[] {
+export function periodRewards(data: XPData, seasonId: string, p: Period, competitionId?: string | null, logs?: Map<string, PlayerMatchLine[]>): Reward[] {
   const ms = periodMatches(data, seasonId, p, competitionId)
   if (!ms.length) return []
   const x = [...periodXP(data, seasonId, ms).values()].filter((s) => s.matches > 0)
   const out: Reward[] = []
   const pl = (s: PlayerXP) => `${s.goals} but${s.goals > 1 ? 's' : ''}, ${s.assists} passe${s.assists > 1 ? 's' : ''} · ${s.matches} match${s.matches > 1 ? 's' : ''}`
-  const best = [...x].sort((a, b) => b.xp - a.xp || b.goals - a.goals || b.assists - a.assists)[0]
-  if (best) out.push({ key: 'best_player', player_id: best.player_id, team_id: best.team_id, value: best.xp, unit: 'XP', detail: pl(best) })
+  if (p.type === 'round') {
+    // journée : meilleur joueur = joueur de la journée de l'équipe type (meilleure note du match, puis XP)
+    const best = teamOfWeek(data, seasonId, p.round, { competitionId, logs: logs ?? allPlayerLogs(data, seasonId) }).player_of_round
+    const s = best ? x.find((y) => y.player_id === best.player_id) : undefined
+    if (best && s) out.push({ key: 'best_player', player_id: best.player_id, team_id: best.team_id, value: best.rating, unit: '/10', detail: `${pl(s)} · ${s.xp} XP` })
+  } else {
+    const best = [...x].sort((a, b) => b.xp - a.xp || b.goals - a.goals || b.assists - a.assists)[0]
+    if (best) out.push({ key: 'best_player', player_id: best.player_id, team_id: best.team_id, value: best.xp, unit: 'XP', detail: pl(best) })
+  }
   const sc = [...x].filter((s) => s.goals > 0).sort((a, b) => b.goals - a.goals || b.assists - a.assists || a.matches - b.matches)[0]
   if (sc) out.push({ key: 'top_scorer', player_id: sc.player_id, team_id: sc.team_id, value: sc.goals, unit: sc.goals > 1 ? 'buts' : 'but', detail: pl(sc) })
   const as = [...x].filter((s) => s.assists > 0).sort((a, b) => b.assists - a.assists || b.goals - a.goals || a.matches - b.matches)[0]

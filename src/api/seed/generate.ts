@@ -54,11 +54,8 @@ export function generateLeagueData(now = new Date()): DB {
     db.Award.push({ id: id('aw'), season_id: s25.season.id, scope: 'season', category: a.category, player_id: a.player_id, team_id: a.team_id, value: a.value, snapshot: a.snapshot, not_awarded: a.not_awarded, status: 'published', locked: true } as Award)
   }
 
-  // 2026-2027 : structure (équipes, Gold Cup, Silver Cup)
+  // 2026-2027 : équipes inscrites et phase de sélection (un seul groupe)
   db.Team.push(...s26.teams); db.Competition.push(...s26.competitions)
-  for (const comp of s26.competitions) for (const tid of comp.team_ids ?? []) {
-    const t = db.Team.find((x) => x.id === tid); if (t) t.division_id = comp.phase === 'gold' ? 'div_gold' : 'div_silver'
-  }
 
   // ---- administrateurs (à remplacer par les vrais comptes au lancement) -----------
   const ts = new Date(now.getTime() - 30 * 86400000).toISOString()

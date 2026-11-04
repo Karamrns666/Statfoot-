@@ -22,7 +22,7 @@ export const ADMIN_NAV: { group: string; items: { to: string; label: string; ico
     { to: '/admin/saisons', label: 'Saisons', icon: CalendarRange, area: 'sport' },
     { to: '/admin/competitions', label: 'Compétitions', icon: Trophy, area: 'sport' },
     { to: '/admin/divisions', label: 'Séries & Divisions', icon: Layers, area: 'sport' },
-    { to: '/admin/tirage', label: 'Tirage phase de ligue', icon: Shuffle, area: 'sport' },
+    { to: '/admin/tirage', label: 'Tirage & divisions', icon: Shuffle, area: 'sport' },
     { to: '/admin/groupes', label: 'Groupes & tirage', icon: Grid3x3, area: 'sport' },
   ] },
   { group: 'Effectifs', items: [

@@ -4,7 +4,6 @@ import { ClipboardList, FileText, Plus, Radio, Trash2, Wand2, Network, Eye, EyeO
 import { base44 } from '@/api/base44Client'
 import { useData, useLookup } from '@/hooks/useData'
 import { useAdminScope } from '@/hooks/useAdminScope'
-import { useAuth } from '@/hooks/useAuth'
 import { AdminPage } from '@/components/admin/AdminLayout'
 import { EntityForm, type Field } from '@/components/admin/EntityCrud'
 import { FilterSelect } from '@/components/league/FilterSelect'
@@ -18,16 +17,13 @@ import { STATUS_LABEL, fmtDate } from '@/lib/format'
 import { fmtScore } from '@/lib/matchEngine'
 import { buildBracket, STAGE_LABELS, sourceLabel, addDays } from '@/lib/schedule'
 import { competitionStandings, isKnockout } from '@/lib/stats'
-import { potsFromRanking, swissPotsFixtures } from '@/lib/draw'
 import type { Competition, Match, MatchStatus } from '@/types/entities'
 
 const STATUS_V: Record<MatchStatus, 'outline' | 'live' | 'secondary' | 'warning' | 'destructive'> = { scheduled: 'outline', live: 'live', finished: 'secondary', postponed: 'warning', cancelled: 'destructive' }
-const SLOTS = ['18:00', '18:45', '19:30', '20:15', '21:00']
 
 export default function MatchesAdmin() {
-  const { db, league } = useData()
+  const { db } = useData()
   const L = useLookup()
-  const { user } = useAuth()
   const { seasonId, competitionId } = useAdminScope()
   const [round, setRound] = useState('')
   const [status, setStatus] = useState('')
@@ -65,31 +61,10 @@ export default function MatchesAdmin() {
     toast.success('Match enregistré'); setEdit(null)
   }
 
-  /** Après la J5 : top 10 → Gold Cup, 11–20 → Silver Cup ; affiches J6–J10 tirées en système suisse (chapeaux de 2 selon le classement). */
-  const buildCups = async () => {
-    if (!lp) return
-    const table = competitionStandings(league, lp.id)
-    const season = db.Season.find((s) => s.id === seasonId)
-    const n = season?.gold_size ?? 10
-    const lastDate = db.Match.filter((m) => m.competition_id === lp.id).map((m) => m.date ?? '').sort().at(-1)?.slice(0, 10) ?? new Date().toISOString().slice(0, 10)
-    for (const [phase, name, ids, pitch, color] of [['gold', 'Gold Cup', table.slice(0, n).map((r) => r.team_id), 'Terrain 1', '#facc15'], ['silver', 'Silver Cup', table.slice(n).map((r) => r.team_id), 'Terrain 2', '#cbd5e1']] as const) {
-      const comp = await base44.entities.Competition.create({ season_id: seasonId, name, phase, format: 'swiss', status: 'active', team_ids: [...ids], rounds: [6, 7, 8, 9, 10], default_pitch: pitch, half_duration_min: 15, foul_alert_threshold: 5, color, order: phase === 'gold' ? 2 : 3 })
-      const seed = Math.floor(Math.random() * 1e6)
-      const fx = swissPotsFixtures(potsFromRanking([...ids], 2)).map((f) => ({ ...f, round: f.round + 5 }))
-      await base44.entities.Draw.create({ season_id: seasonId, competition_id: comp.id, type: 'swiss_pots', pots: potsFromRanking([...ids], 2).map((t, i) => ({ pot: i + 1, team_ids: t })), fixtures: fx.map((f) => ({ ...f, revealed: true })), revealed_count: fx.length, status: 'published', performed_by: user?.email, seed })
-      await base44.entities.Match.bulkCreate(fx.map((f) => {
-        const idx = fx.filter((x) => x.round === f.round).indexOf(f)
-        return { season_id: seasonId, competition_id: comp.id, round: f.round, stage: 'cup' as const, date: new Date(`${addDays(lastDate, (f.round - 5) * 7)}T${SLOTS[idx % SLOTS.length]}:00`).toISOString(), pitch, home_team_id: f.home_team_id, away_team_id: f.away_team_id, status: 'scheduled' as const, published: true, half_duration_min: 15 }
-      }))
-    }
-    await base44.entities.Competition.update(lp.id, { status: 'finished' })
-    toast.success('Gold Cup et Silver Cup constituées · 50 affiches J6–J10 générées')
-  }
-
   return (
     <AdminPage title="Matchs" subtitle={`${rows.length} match(s)`}
       actions={<>
-        {lpDone && !hasCups && <Button variant="gold" onClick={buildCups}><Wand2 />Constituer Gold / Silver (J6–J10)</Button>}
+        {lpDone && !hasCups && <Button asChild variant="gold"><Link to="/admin/tirage"><Wand2 />Constituer les divisions</Link></Button>}
         <Button variant="outline" onClick={() => setBracketFor(comps.find((c) => c.id === competitionId) ?? comps.find((c) => c.phase === 'gold') ?? comps[0])}><Network />Automatiser le tableau</Button>
         <Button onClick={() => setEdit({ competition_id: competitionId || comps[0]?.id, status: 'scheduled', stage: 'cup', published: true, half_duration_min: 15, round: rounds.at(-1) ?? 1 })}><Plus />Créer match</Button>
       </>}>

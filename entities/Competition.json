@@ -79,6 +79,28 @@
     },
     "order": {
       "type": "integer"
+    },
+    "split": {
+      "type": "object",
+      "description": "Phase de sélection : places menant aux divisions",
+      "properties": {
+        "gold_to": {
+          "type": "number"
+        },
+        "silver_from": {
+          "type": "number"
+        },
+        "gold_name": {
+          "type": "string"
+        },
+        "silver_name": {
+          "type": "string"
+        }
+      }
+    },
+    "parent_id": {
+      "type": "string",
+      "description": "Compétition d'origine (phase de sélection)"
     }
   },
   "required": [

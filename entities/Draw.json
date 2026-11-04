@@ -12,7 +12,8 @@
       "type": "string",
       "enum": [
         "swiss_pots",
-        "groups"
+        "groups",
+        "selection"
       ]
     },
     "pots": {
@@ -65,6 +66,10 @@
     "one_team_per_pot_per_group": {
       "type": "boolean",
       "default": true
+    },
+    "matches_per_team": {
+      "type": "number",
+      "description": "Phase de sélection : matchs par équipe (3 à 6)"
     }
   },
   "required": [

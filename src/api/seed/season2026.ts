@@ -1,4 +1,5 @@
-// Saison 2026-2027 — structure officielle : 20 entreprises, Gold Cup (Terrain 1) et Silver Cup (Terrain 2), 10 équipes chacune.
+// Saison 2026-2027 — 20 entreprises inscrites, d'abord une phase de sélection (un seul groupe), puis Gold Cup / Silver Cup.
+// La répartition cup ci-dessous ne sert qu'à l'ordre d'affichage initial : les divisions sont décidées après la sélection.
 // Les matchs et les effectifs sont importés depuis le fichier de la ligue (scripts/import_excel_*.py) ou saisis dans l'admin.
 // Les équipes déjà présentes en 2025-2026 réutilisent la même fiche (historique continu).
 import type { Competition, Season, Team } from '@/types/entities'
@@ -44,9 +45,10 @@ export function buildSeason2026() {
     if (t.reuse) return // fiche existante (2025-2026)
     teams.push({ id: s26TeamId(t.short), name: t.name, short_name: t.short, company: t.name, logo_url: teamLogoSvg(t.short, t.c1, t.c2, i), primary_color: t.c1, secondary_color: t.c2, status: 'active' })
   })
+  // Phase de sélection : un seul groupe, un seul classement. Le tirage (Admin → Tirage & divisions) crée les matchs ;
+  // Gold Cup et Silver Cup sont constituées ensuite à partir du classement.
   const competitions: Competition[] = [
-    { id: 'comp_2026_gold', season_id: season.id, name: 'Gold Cup', phase: 'gold', format: 'league', status: 'active', team_ids: ids('gold'), default_pitch: 'Terrain 1', half_duration_min: 15, foul_alert_threshold: 5, color: '#E8B931', order: 1, description: '10 équipes · Terrain 1' },
-    { id: 'comp_2026_silver', season_id: season.id, name: 'Silver Cup', phase: 'silver', format: 'league', status: 'active', team_ids: ids('silver'), default_pitch: 'Terrain 2', half_duration_min: 15, foul_alert_threshold: 5, color: '#C9D3DD', order: 2, description: '10 équipes · Terrain 2' },
+    { id: 'comp_2026_selection', season_id: season.id, name: 'Phase de sélection', phase: 'league_phase', format: 'swiss', status: 'draft', team_ids: [...ids('gold'), ...ids('silver')].sort(), half_duration_min: 15, foul_alert_threshold: 5, color: '#F85A00', order: 1, description: 'Un seul groupe · matchs tirés au sort' },
   ]
   return { season, teams, competitions }
 }

@@ -14,12 +14,11 @@ describe('données de la ligue', () => {
     expect(JSON.stringify(db)).not.toMatch(/démo|exemple\.ma|contact@mbl\.ma/i)
     expect(db.Settings[0].contact_email).toBe('contact@ardentia.ma')
   })
-  it('2026-2027 en cours : Gold Cup et Silver Cup, 10 équipes chacune, 20 équipes distinctes', () => {
+  it('2026-2027 en cours : une seule phase de sélection, 20 équipes, un seul classement', () => {
     expect(s26.is_active).toBe(true)
     const comps = db.Competition.filter((c) => c.season_id === s26.id)
-    expect(comps.map((c) => [c.name, c.team_ids?.length, c.default_pitch])).toEqual([['Gold Cup', 10, 'Terrain 1'], ['Silver Cup', 10, 'Terrain 2']])
-    expect(new Set(comps.flatMap((c) => c.team_ids)).size).toBe(20)
-    for (const tid of comps.flatMap((c) => c.team_ids ?? [])) expect(db.Team.some((t) => t.id === tid)).toBe(true)
+    expect(comps.map((c) => [c.name, c.phase, c.team_ids?.length])).toEqual([['Phase de sélection', 'league_phase', 20]])
+    for (const tid of comps[0].team_ids ?? []) expect(db.Team.some((t) => t.id === tid)).toBe(true)
     expect(generalStandings(L, s26.id)).toHaveLength(20)
   })
   it('2025-2026 en archive : classement identique au fichier Excel', () => {

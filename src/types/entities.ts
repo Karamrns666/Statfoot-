@@ -43,6 +43,10 @@ export interface Competition extends BaseEntity {
   description?: string
   color?: string
   order?: number
+  /** phase de sélection : places qui mènent aux deux divisions (renseigné lors de la constitution) */
+  split?: { gold_to: number; silver_from: number; gold_name?: string; silver_name?: string }
+  /** division issue de la phase de sélection */
+  parent_id?: string
 }
 
 export interface Division extends BaseEntity { name: string; level: number; promotion_count?: number; relegation_count?: number; color?: string }
@@ -265,7 +269,8 @@ export interface DrawFixture { round: number; home_team_id: string; away_team_id
 export interface Draw extends BaseEntity {
   season_id: string
   competition_id?: string
-  type: 'swiss_pots' | 'groups'
+  type: 'swiss_pots' | 'groups' | 'selection'
+  matches_per_team?: number
   pots?: { pot: number; team_ids: string[] }[]
   fixtures?: DrawFixture[]
   groups?: { group_id: string; name?: string; team_ids: string[] }[]

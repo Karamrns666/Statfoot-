@@ -108,3 +108,47 @@ export function potsFromRanking(teamIds: string[], perPot: number): string[][] {
   for (let i = 0; i < teamIds.length; i += perPot) pots.push(teamIds.slice(i, i + perPot))
   return pots
 }
+
+// ---------------------------------------------------------------------------
+//  Phase de sélection : N équipes (pair ou impair), R matchs par équipe
+// ---------------------------------------------------------------------------
+/**
+ * Méthode du cercle (table de Berger) sur un ordre tiré au sort, limitée aux R premières journées :
+ *  - chaque équipe joue au plus une fois par journée et jamais deux fois la même équipe ;
+ *  - nombre pair d'équipes : chacune joue exactement R matchs ;
+ *  - nombre impair : une équipe est exemptée à chaque journée (elle joue R − 1 matchs) ;
+ *  - domicile/extérieur équilibré (au plus 1 d'écart).
+ * Condition : R ≤ N − 1 (N pair) ou R ≤ N (N impair).
+ */
+export function selectionFixtures(teamIds: string[], rounds: number, rng: Rng = Math.random, firstRound = 1): SwissFixture[] {
+  const n = teamIds.length
+  if (n < 2) throw new Error('Il faut au moins 2 équipes')
+  const shuffle = <T,>(a: T[]) => { const x = [...a]; for (let i = x.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [x[i], x[j]] = [x[j], x[i]] } return x }
+  const BYE = '__exempt__'
+  const list = shuffle(teamIds)
+  if (list.length % 2) list.push(BYE)
+  const m = list.length
+  if (rounds > m - 1) throw new Error(`Au maximum ${m - 1} matchs par équipe avec ${n} équipes`)
+  // journées tirées au hasard parmi les m − 1 possibles, pour que l'ordre des affiches ne soit pas prévisible
+  const which = shuffle(Array.from({ length: m - 1 }, (_, i) => i)).slice(0, rounds).sort((a, b) => a - b)
+  const pairs: { round: number; a: string; b: string }[] = []
+  which.forEach((r, idx) => {
+    const rot = [list[0], ...Array.from({ length: m - 1 }, (_, i) => list[1 + ((i + r) % (m - 1))])]
+    for (let i = 0; i < m / 2; i++) {
+      const a = rot[i], b = rot[m - 1 - i]
+      if (a !== BYE && b !== BYE) pairs.push({ round: firstRound + idx, a, b })
+    }
+  })
+  const home = new Map<string, number>(), away = new Map<string, number>()
+  const out: SwissFixture[] = []
+  for (const pr of shuffle(pairs).sort((x, y) => x.round - y.round)) {
+    const da = (home.get(pr.a) ?? 0) - (away.get(pr.a) ?? 0), db = (home.get(pr.b) ?? 0) - (away.get(pr.b) ?? 0)
+    const aHome = da < db || (da === db && rng() < 0.5)
+    const [h, a] = aHome ? [pr.a, pr.b] : [pr.b, pr.a]
+    home.set(h, (home.get(h) ?? 0) + 1); away.set(a, (away.get(a) ?? 0) + 1)
+    out.push({ round: pr.round, home_team_id: h, away_team_id: a })
+  }
+  return out
+}
+/** Nombre maximal de matchs par équipe possible */
+export const maxRoundsFor = (teams: number) => (teams % 2 ? teams : teams - 1)

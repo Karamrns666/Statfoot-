@@ -1,18 +1,32 @@
 import { describe, expect, it } from 'vitest'
-import { generateDemoData } from './generate'
-import { computePlayerXP, competitionStandings, kpis, raceWithEvolution, type LeagueData } from '@/lib/stats'
+import { generateLeagueData } from './generate'
+import { competitionStandings, computePlayerXP, generalStandings, type LeagueData } from '@/lib/stats'
 import { scoreFromEvents } from '@/lib/matchEngine'
 
-describe('seed MBL', () => {
-  const db = generateDemoData(new Date('2026-11-02T19:00:00'))
+describe('données de la ligue', () => {
+  const db = generateLeagueData(new Date('2026-11-04T19:00:00'))
   const L: LeagueData = { seasons: db.Season, competitions: db.Competition, teams: db.Team, players: db.Player, matches: db.Match, events: db.MatchEvent, lineups: db.Lineup, xpRules: db.XPRule, suspensions: db.Suspension, monthlyAwards: db.MonthlyAward, settings: db.Settings[0] }
-  const cur = db.Season.find((s) => s.id === 'season_current')!
-  const real = db.Season.find((s) => s.id === 'season_2025')!
-  it('saison 2025-2026 réelle : 16 équipes, 120 matchs, classement identique au fichier Excel', () => {
-    expect(real.is_active).toBe(true)
-    const comp = db.Competition.find((c) => c.season_id === real.id)!
+  const s25 = db.Season.find((s) => s.id === 'season_2025')!
+  const s26 = db.Season.find((s) => s.id === 'season_2026')!
+
+  it('aucune donnée fictive : 2 saisons, pas de mention « démo », contacts officiels', () => {
+    expect(db.Season.map((s) => s.name).sort()).toEqual(['Saison 2025-2026', 'Saison 2026-2027'])
+    expect(JSON.stringify(db)).not.toMatch(/démo|exemple\.ma|contact@mbl\.ma/i)
+    expect(db.Settings[0].contact_email).toBe('contact@ardentia.ma')
+  })
+  it('2026-2027 en cours : Gold Cup et Silver Cup, 10 équipes chacune, 20 équipes distinctes', () => {
+    expect(s26.is_active).toBe(true)
+    const comps = db.Competition.filter((c) => c.season_id === s26.id)
+    expect(comps.map((c) => [c.name, c.team_ids?.length, c.default_pitch])).toEqual([['Gold Cup', 10, 'Terrain 1'], ['Silver Cup', 10, 'Terrain 2']])
+    expect(new Set(comps.flatMap((c) => c.team_ids)).size).toBe(20)
+    for (const tid of comps.flatMap((c) => c.team_ids ?? [])) expect(db.Team.some((t) => t.id === tid)).toBe(true)
+    expect(generalStandings(L, s26.id)).toHaveLength(20)
+  })
+  it('2025-2026 en archive : classement identique au fichier Excel', () => {
+    expect(s25.is_active).toBe(false)
+    const comp = db.Competition.find((c) => c.season_id === s25.id)!
     expect(comp.team_ids).toHaveLength(16)
-    expect(db.Match.filter((m) => m.season_id === real.id)).toHaveLength(120)
+    expect(db.Match.filter((m) => m.season_id === s25.id)).toHaveLength(120)
     const table = competitionStandings(L, comp.id)
     const name = (id: string) => db.Team.find((t) => t.id === id)!.name
     expect(table.slice(0, 3).map((r) => [name(r.team_id), r.played, r.points])).toEqual([['Mondial Services', 15, 41], ['Distra', 15, 34], ['Dell', 13, 29]])
@@ -20,32 +34,11 @@ describe('seed MBL', () => {
     const goals = db.MatchEvent.filter((e) => e.type === 'goal' && e.player_id && db.Player.find((p) => p.id === e.player_id)?.last_name === 'Orch').length
     expect(goals).toBe(56)
   })
-  it('saison de démo : 20 équipes, 240 joueurs, 5 chapeaux, 50 matchs de phase de ligue', () => {
-    const lp0 = db.Competition.find((c) => c.season_id === cur.id && c.phase === 'league_phase')!
-    expect(lp0.team_ids).toHaveLength(20)
-    expect(db.Player.filter((p) => p.season_ids?.includes(cur.id))).toHaveLength(240)
-    const lp = db.Competition.find((c) => c.season_id === cur.id && c.phase === 'league_phase')!
-    expect(db.Match.filter((m) => m.competition_id === lp.id)).toHaveLength(50)
-    expect(db.Draw.find((d) => d.competition_id === lp.id)!.pots).toHaveLength(5)
-  })
-  it('Gold = top 10, Silver = 10 suivants, J6–J10', () => {
-    const gold = db.Competition.find((c) => c.season_id === cur.id && c.phase === 'gold')!
-    expect(gold.team_ids).toHaveLength(10)
-    expect(db.Match.filter((m) => m.competition_id === gold.id)).toHaveLength(25)
-    expect(competitionStandings(L, gold.id)).toHaveLength(10)
-  })
-  it('scores = somme des buts saisis', () => {
-    for (const m of db.Match.filter((x) => x.status === 'finished' || x.status === 'live')) {
+  it('scores = somme des buts saisis, XP calculé', () => {
+    for (const m of db.Match.filter((x) => x.status === 'finished')) {
       const s = scoreFromEvents(m, db.MatchEvent.filter((e) => e.match_id === m.id))
       expect([s.home, s.away]).toEqual([m.home_score, m.away_score])
     }
-  })
-  it('1 match en direct, XP calculé, passes > 0', () => {
-    expect(db.Match.filter((m) => m.status === 'live')).toHaveLength(1)
-    expect(kpis(L, { seasonId: cur.id }).assists).toBeGreaterThan(50)
-    const x = [...computePlayerXP(L, { seasonId: cur.id }).values()]
-    expect(x.some((p) => p.xp > 300)).toBe(true)
-    expect(raceWithEvolution(L, { seasonId: cur.id }, 'ballon_or').some((r) => r.delta !== 0)).toBe(true)
-    console.log('Taille JSON (Ko) :', Math.round(JSON.stringify(db).length / 1024))
+    expect([...computePlayerXP(L, { seasonId: s25.id }).values()].some((p) => p.xp > 3000)).toBe(true)
   })
 })

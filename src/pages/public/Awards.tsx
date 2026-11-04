@@ -27,7 +27,7 @@ export default function Awards() {
     <div>
       <PageHeader title="Les Trophées" subtitle="Classements mis à jour automatiquement après chaque match" />
       <div className="mb-5 flex flex-wrap gap-2">
-        {hasCups && PHASES.map((p) => <button key={p.value} onClick={() => setPhase(p.value)} className={cn('rounded-full border px-4 py-1.5 font-display text-sm font-bold uppercase tracking-wide cursor-pointer', phase === p.value ? 'border-neon bg-neon/15 text-neon' : 'border-white/10 text-muted-foreground hover:text-white')}>{p.label}</button>)}
+        {hasCups && PHASES.filter((x) => x.value === 'all' || db.Competition.some((c) => c.season_id === seasonId && c.phase === x.value)).map((p) => <button key={p.value} onClick={() => setPhase(p.value)} className={cn('rounded-full border px-4 py-1.5 font-display text-sm font-bold uppercase tracking-wide cursor-pointer', phase === p.value ? 'border-neon bg-neon/15 text-neon' : 'border-white/10 text-muted-foreground hover:text-white')}>{p.label}</button>)}
       </div>
       <Tabs defaultValue="race">
         <TabsList><TabsTrigger value="race">Course aux trophées</TabsTrigger><TabsTrigger value="stats">Statistiques</TabsTrigger><TabsTrigger value="palmares">Palmarès</TabsTrigger></TabsList>

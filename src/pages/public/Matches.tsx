@@ -9,6 +9,7 @@ import { useEffectiveSeason } from '@/hooks/useStats'
 import { PageHeader, EmptyState } from '@/components/league/Bits'
 import { FilterSelect } from '@/components/league/FilterSelect'
 import { MatchRow } from '@/components/match/MatchRow'
+import { CompetitionTabs } from '@/components/league/CompetitionTabs'
 import { STAGE_LABELS } from '@/lib/schedule'
 import { isKnockout } from '@/lib/standings'
 import { cn } from '@/lib/utils'
@@ -53,12 +54,16 @@ export default function Matches() {
   const tab = (sp.get('statut') ?? 'tous') as Tab
   const team = sp.get('equipe') ?? ''
   const day = sp.get('jour') ?? ''
+  const comp = sp.get('competition') ?? ''
+  const pitch = sp.get('terrain') ?? ''
+  const seasonComps = db.Competition.filter((c) => c.season_id === sid).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+  const pitches = [...new Set(base.map((m) => m.pitch).filter(Boolean) as string[])].sort()
 
   const inRound = base.filter((m) => round == null || (m.round ?? 0) === round)
   const liveCount = base.filter((m) => m.status === 'live').length
   const filtered = inRound.filter((m) =>
     (tab === 'tous' || (tab === 'direct' && m.status === 'live') || (tab === 'a-venir' && (m.status === 'scheduled' || m.status === 'postponed')) || (tab === 'termines' && m.status === 'finished') || (tab === 'favoris' && (fav.has(m.home_team_id) || fav.has(m.away_team_id)))) &&
-    (!team || m.home_team_id === team || m.away_team_id === team) && (!day || dayKey(m.date) === day))
+    (!team || m.home_team_id === team || m.away_team_id === team) && (!day || dayKey(m.date) === day) && (!comp || m.competition_id === comp) && (!pitch || m.pitch === pitch))
 
   // bande des jours : semaine de la journée sélectionnée
   const week = useMemo(() => {
@@ -86,6 +91,7 @@ export default function Matches() {
   return (
     <div>
       <PageHeader title="Matchs" subtitle={`${season?.name ?? 'Toutes saisons'} · Calendrier et résultats`} />
+      {seasonComps.length > 1 && <CompetitionTabs comps={seasonComps} value={comp} onChange={(v) => set('competition', v)} className="mb-4" />}
 
       {/* journées */}
       <div ref={strip} className="scrollbar-none -mx-4 mb-3 flex gap-2 overflow-x-auto px-4 pb-1" role="tablist" aria-label="Journées">
@@ -123,6 +129,7 @@ export default function Matches() {
           </button>
         ))}
         <FilterSelect label="Équipe" value={team} onChange={(v) => set('equipe', v)} allLabel="Équipe : toutes" options={teams.map((t) => ({ value: t.id, label: t.name }))} className="rounded-full sm:w-52" />
+        {pitches.length > 1 && <FilterSelect label="Terrain" value={pitch} onChange={(v) => set('terrain', v)} allLabel="Terrain : tous" options={pitches.map((x) => ({ value: x, label: x }))} className="rounded-full sm:w-40" />}
       </div>
 
       {tab === 'favoris' && !fav.size && <EmptyState title="Aucune équipe favorite" icon={<Star />}>Touchez l’étoile à côté d’une équipe pour suivre ses matchs ici.</EmptyState>}

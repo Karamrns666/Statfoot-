@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { MatchCard } from '@/components/match/MatchCard'
 import { StandingsTable } from '@/components/standings/StandingsTable'
-import { SectionTitle, StatTile, CompetitionBadge } from '@/components/league/Bits'
+import { EmptyState, SectionTitle, StatTile, CompetitionBadge } from '@/components/league/Bits'
 import { PlayerAvatar, PlayerLink, TeamLogo } from '@/components/league/Identity'
 import { TrophyBadge } from '@/components/awards/TrophyBadge'
 import { competitionStandings, generalStandings, kpis, isPlayed, race } from '@/lib/stats'
@@ -37,23 +37,36 @@ export default function Home() {
     return { lastRound: { round: lr, matches: lastRound }, live, next }
   }, [db.Match, sid])
 
-  // MÊME fonction que la fiche joueur et la page Trophées (computePlayerXP via useRace)
-  const podium = useRace({ seasonId: sid }, 'xp').slice(0, 3)
-  const xpAll = usePlayerXP({ seasonId: sid })
-  const keepers = useMemo(() => race(league, [...xpAll.values()], 'golden_glove', sid).slice(0, 5).map((r) => r.item), [league, xpAll, sid])
   const k = useMemo(() => kpis(league, { seasonId: sid }), [league, sid])
+  // Saison sans match joué (début de saison) : les rubriques joueurs reprennent la dernière saison jouée
+  const refSid = useMemo(() => {
+    if (!sid || k.matches > 0) return sid
+    const prev = [...db.Season].filter((x) => x.id !== sid && db.Match.some((m) => m.season_id === x.id && isPlayed(m))).sort((a, b) => b.start_date.localeCompare(a.start_date))[0]
+    return prev?.id ?? sid
+  }, [sid, k.matches, db.Season, db.Match])
+  const archive = refSid !== sid ? L.season.get(refSid ?? '') : undefined
+  const refK = useMemo(() => (refSid === sid ? k : kpis(league, { seasonId: refSid })), [league, refSid, sid, k])
+  // MÊME fonction que la fiche joueur et la page Trophées (computePlayerXP via useRace)
+  const podium = useRace({ seasonId: refSid }, 'xp').slice(0, 3)
+  const xpAll = usePlayerXP({ seasonId: refSid })
+  const keepers = useMemo(() => race(league, [...xpAll.values()], 'golden_glove', refSid).slice(0, 5).map((r) => r.item), [league, xpAll, refSid])
   const teamsInSeason = new Set(comps.flatMap((c) => c.team_ids ?? []))
-  const showIPG = sid === SEASON_2025_ID
+  const showIPG = refSid === SEASON_2025_ID
+  const tag = archive ? ` · ${archive.name}` : ''
 
   const slides = useMemo<BillboardSlide[]>(() => {
     const out: BillboardSlide[] = []
-    if (!sid) return out
+    if (!sid || !refSid) return out
     const team = (id?: string) => (id ? L.team.get(id) : undefined)
+    if (archive) {
+      const names = comps.map((c) => c.name)
+      out.push({ key: 'intro', eyebrow: season?.name ?? 'Nouvelle saison', title: names.length > 1 ? names.join(' & ') : 'Coup d’envoi', value: teamsInSeason.size || undefined, unit: 'ÉQUIPES', sub: `${teamsInSeason.size} entreprises engagées${comps.length ? ` · ${comps.map((c) => `${c.name}${c.default_pitch ? ` sur le ${c.default_pitch}` : ''}`).join(', ')}` : ''}. Calendrier et résultats en ligne dès la première journée.`, href: '/equipes', tone: 'orange' })
+    }
     for (const m of live.slice(0, 2)) {
       const h = team(m.home_team_id), a = team(m.away_team_id)
       out.push({ key: `live-${m.id}`, eyebrow: 'En direct', tone: 'red', title: `${h?.short_name ?? '?'} ${m.home_score ?? 0} – ${m.away_score ?? 0} ${a?.short_name ?? '?'}`, sub: `${h?.name} contre ${a?.name}${m.pitch ? `, ${m.pitch}` : ''}`, href: `/matchs/${m.id}` })
     }
-    const lead = generalStandings(league, sid)[0]
+    const lead = generalStandings(league, refSid)[0]
     if (lead && lead.played > 0) {
       const t = team(lead.team_id)
       out.push({ key: 'leader', eyebrow: season?.status === 'closed' ? `Champion · ${season.name}` : 'Leader du classement', title: t?.name ?? '', value: lead.points, unit: 'PTS', image: t?.logo_url, sub: `${lead.won} victoires, ${lead.drawn} nuls, ${lead.lost} défaites · différence ${lead.gd > 0 ? '+' : ''}${lead.gd}`, href: `/equipes/${lead.team_id}`, tone: 'orange' })
@@ -64,16 +77,16 @@ export default function Home() {
       const p = L.player.get(r.item.player_id), t = team(r.item.team_id)
       out.push({ key, eyebrow, title: playerShort(p), value, unit, image: t?.logo_url, sub: t?.name, href: p ? `/joueurs/${p.id}` : undefined, tone })
     }
-    const sc = race(league, list, 'top_scorer', sid)[0]; pushPlayer('scorer', 'Meilleur buteur', sc, sc?.item.goals ?? 0, 'BUTS', 'orange')
-    const as = race(league, list, 'top_assist', sid)[0]; pushPlayer('assist', 'Meilleur passeur', as, as?.item.assists ?? 0, 'PASSES', 'sky')
-    const gk = race(league, list, 'golden_glove', sid)[0]; pushPlayer('keeper', 'Gant d’or · meilleur gardien', gk, gk?.item.saves ?? 0, 'ARRÊTS', 'white')
+    const sc = race(league, list, 'top_scorer', refSid)[0]; pushPlayer('scorer', `Meilleur buteur${tag}`, sc, sc?.item.goals ?? 0, 'BUTS', 'orange')
+    const as = race(league, list, 'top_assist', refSid)[0]; pushPlayer('assist', `Meilleur passeur${tag}`, as, as?.item.assists ?? 0, 'PASSES', 'sky')
+    const gk = race(league, list, 'golden_glove', refSid)[0]; pushPlayer('keeper', `Gant d’or${tag}`, gk, gk?.item.saves ?? 0, 'ARRÊTS', 'white')
     if (showIPG && IPG_RANKING[0]) {
       const e = IPG_RANKING[0]
       out.push({ key: 'ipg', eyebrow: 'N°1 de l’indice de performance', title: e.name, value: e.ipg.toFixed(0), unit: 'IPG', sub: `${e.team} · ${e.goals} buts, ${e.assists} passes décisives`, href: '/joueurs?vue=ipg', tone: 'sky' })
     }
-    if (k.matches) out.push({ key: 'kpi', eyebrow: 'La saison en chiffres', title: `${k.matches} matchs`, value: k.goals, unit: 'BUTS', sub: `${k.goals_avg} buts par match · ${k.assists} passes décisives · ${k.yellow} cartons jaunes`, tone: 'white' })
+    if (refK.matches) out.push({ key: 'kpi', eyebrow: `${archive ? archive.name : 'La saison'} en chiffres`, title: `${refK.matches} matchs`, value: refK.goals, unit: 'BUTS', sub: `${refK.goals_avg} buts par match · ${refK.assists} passes décisives · ${refK.yellow} cartons jaunes`, tone: 'white' })
     return out
-  }, [sid, live, league, xpAll, L, season, showIPG, k])
+  }, [sid, refSid, archive, comps, teamsInSeason.size, tag, live, league, xpAll, L, season, showIPG, refK])
 
   return (
     <div className="space-y-12">
@@ -94,10 +107,10 @@ export default function Home() {
 
       {/* DERNIÈRE JOURNÉE */}
       <section>
-        <SectionTitle title={lastRound.round ? `Journée ${lastRound.round}` : 'Dernière journée'} subtitle="Derniers résultats" action={<Button asChild variant="ghost" size="sm"><Link to="/matchs">Tous les matchs →</Link></Button>} />
+        <SectionTitle title={lastRound.round ? `Journée ${lastRound.round}` : 'Derniers résultats'} subtitle={lastRound.round ? 'Derniers résultats' : season?.name} action={<Button asChild variant="ghost" size="sm"><Link to="/matchs">Tous les matchs →</Link></Button>} />
         {lastRound.matches.length ? (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{lastRound.matches.map((m) => <MatchCard key={m.id} match={m} />)}</div>
-        ) : <p className="text-muted-foreground">Aucun match joué pour l'instant.</p>}
+        ) : <EmptyState title="La saison n’a pas encore commencé">Les résultats s’afficheront ici après la première journée. En attendant, retrouvez la saison 2025-2026 dans <Link to="/historique" className="text-neon underline">l’historique</Link>.</EmptyState>}
         {next.length > 0 && (
           <div className="mt-6">
             <h3 className="title-caps mb-3 text-lg text-muted-foreground">À venir</h3>
@@ -125,7 +138,7 @@ export default function Home() {
       {/* PODIUM XP + GARDIENS */}
       <section className="grid gap-6 lg:grid-cols-5">
         <div className="lg:col-span-3">
-          <SectionTitle title="Les meilleurs joueurs" subtitle={showIPG ? 'Indice de Performance Globale — touchez une carte pour la retourner' : 'Classement XP — touchez une carte pour la retourner'} accent="#facc15" action={<Button asChild variant="ghost" size="sm"><Link to={showIPG ? '/joueurs?vue=ipg' : '/joueurs'}>{showIPG ? 'Top 25 IPG' : 'Classement XP'}</Link></Button>} />
+          <SectionTitle title={`Les meilleurs joueurs${tag}`} subtitle={showIPG ? 'Indice de Performance Globale — touchez une carte pour la retourner' : 'Classement XP — touchez une carte pour la retourner'} accent="#facc15" action={<Button asChild variant="ghost" size="sm"><Link to={showIPG ? '/joueurs?vue=ipg' : '/joueurs'}>{showIPG ? 'Top 25 IPG' : 'Classement XP'}</Link></Button>} />
           <div className="grid grid-cols-3 items-end gap-2 sm:gap-4">
             {showIPG
               ? [1, 0, 2].map((i) => IPG_RANKING[i] && <IPGCard key={i} e={IPG_RANKING[i]} className={i === 0 ? '' : 'origin-bottom scale-[.93]'} />)
@@ -136,7 +149,7 @@ export default function Home() {
           </div>
         </div>
         <div className="lg:col-span-2">
-          <SectionTitle title="Top gardiens" accent="#3b82f6" action={<TrophyBadge category="golden_glove" size={36} />} />
+          <SectionTitle title={`Top gardiens${archive ? ` · ${archive.name.replace('Saison ', '')}` : ''}`} accent="#3b82f6" action={<TrophyBadge category="golden_glove" size={36} />} />
           <Card>
             <CardContent className="divide-y divide-white/5 p-2 sm:p-3">
               {keepers.map((g, i) => {

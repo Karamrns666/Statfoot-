@@ -25,7 +25,7 @@ export default function Stats() {
   return (
     <div className="space-y-8">
       <PageHeader title="Statistiques" subtitle="Leaders et chiffres clés">
-        {hasCups && (['all', 'league_phase', 'gold', 'silver'] as const).map((p) => <button key={p} onClick={() => setPhase(p)} className={cn('rounded-full border px-3 py-1 text-xs font-bold uppercase cursor-pointer', phase === p ? 'border-neon bg-neon/15 text-neon' : 'border-white/10 text-muted-foreground')}>{{ all: 'Saison', league_phase: 'Phase de ligue', gold: 'Gold', silver: 'Silver' }[p]}</button>)}
+        {hasCups && (['all', 'league_phase', 'gold', 'silver'] as const).filter((x) => x === 'all' || league.competitions.some((c) => (!scopeSeasonId || c.season_id === scopeSeasonId) && c.phase === x)).map((p) => <button key={p} onClick={() => setPhase(p)} className={cn('rounded-full border px-3 py-1 text-xs font-bold uppercase cursor-pointer', phase === p ? 'border-neon bg-neon/15 text-neon' : 'border-white/10 text-muted-foreground')}>{{ all: 'Toutes', league_phase: 'Phase de ligue', gold: 'Gold Cup', silver: 'Silver Cup' }[p]}</button>)}
       </PageHeader>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <StatTile label="Matchs" value={k.matches} icon={<CalendarDays />} color="#e6edf8" />

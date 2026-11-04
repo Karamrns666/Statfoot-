@@ -30,7 +30,7 @@ Au premier lancement, un jeu de démo fictif est généré : 2 saisons, 20 équi
 phase de ligue suisse J1–J5, Gold/Silver Cup J6–J10 (J1–J7 jouées, J8 aujourd'hui avec **un match en direct**).
 Réinitialisation : Admin → Paramètres → « Réinitialiser ».
 
-### Comptes de démonstration (mot de passe `mbl2026`)
+### Comptes admin provisoires (mot de passe `mbl2026`, à changer avant le lancement)
 | Email | Rôle |
 |---|---|
 | superadmin@mbl.ma | Super Admin (tout, dérogations, administrateurs) |

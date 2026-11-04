@@ -2,7 +2,7 @@ import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Link2, RotateCcw, Save, Send } from 'lucide-react'
 import { base44 } from '@/api/base44Client'
-import { resetDemoData } from '@/api/seed'
+import { resetLeagueData } from '@/api/seed'
 import { useData, useLookup } from '@/hooks/useData'
 import { useAuth } from '@/hooks/useAuth'
 import { useAdminScope } from '@/hooks/useAdminScope'
@@ -95,20 +95,22 @@ export function SettingsPage() {
   const fields: Field[] = [
     { key: 'league_name', label: 'Nom de la ligue' }, { key: 'short_name', label: 'Nom court' }, { key: 'tagline', label: 'Accroche', full: true },
     { key: 'organizer', label: 'Organisateur' }, { key: 'logo_url', label: 'Logo', type: 'image', full: true },
-    { key: 'contact_email', label: 'Email', type: 'email' }, { key: 'contact_phone', label: 'Téléphone' }, { key: 'address', label: 'Adresse', full: true },
-    { key: 'social_instagram', label: 'Instagram' }, { key: 'social_facebook', label: 'Facebook' }, { key: 'social_linkedin', label: 'LinkedIn' }, { key: 'social_youtube', label: 'YouTube' },
+    { key: 'contact_email', label: 'Email de contact', type: 'email' }, { key: 'contact_phone', label: 'Téléphone / WhatsApp' }, { key: 'address', label: 'Adresse', full: true },
+    { key: 'website', label: 'Site de l’organisateur' },
+    { key: 'social_instagram', label: 'Instagram MBL' }, { key: 'social_organizer_instagram', label: 'Instagram Ardentia' }, { key: 'social_linkedin', label: 'LinkedIn Ardentia' },
+    { key: 'social_facebook', label: 'Facebook (facultatif)' }, { key: 'social_youtube', label: 'YouTube (facultatif)' },
     { key: 'points_win', label: 'Points victoire', type: 'number' }, { key: 'points_draw', label: 'Points nul', type: 'number' }, { key: 'points_loss', label: 'Points défaite', type: 'number' },
     { key: 'starters_count', label: 'Titulaires par équipe', type: 'number' }, { key: 'motm_vote_minutes_after', label: 'Fermeture du vote HdM (min après la fin)', type: 'number' }, { key: 'young_max_age', label: 'Âge max « meilleur jeune »', type: 'number' },
   ]
   const save = async () => {
-    const socials = { instagram: v.social_instagram, facebook: v.social_facebook, linkedin: v.social_linkedin, youtube: v.social_youtube } as Settings['socials']
+    const socials = { instagram: v.social_instagram, organizer_instagram: v.social_organizer_instagram, facebook: v.social_facebook, linkedin: v.social_linkedin, youtube: v.social_youtube } as Settings['socials']
     const clean = Object.fromEntries(Object.entries(v).filter(([k]) => !k.startsWith('social_') && !['id', 'created_date', 'updated_date'].includes(k)))
     await base44.entities.Settings.update(settings.id, { ...clean, socials, tiebreakers: tb })
     toast.success('Paramètres enregistrés — classements recalculés')
   }
   const move = (i: number, d: number) => { const x = [...tb]; const j = i + d; if (j < 0 || j >= x.length) return; [x[i], x[j]] = [x[j], x[i]]; setTb(x) }
   return (
-    <AdminPage title="Paramètres" subtitle="Ligue, contacts, réseaux sociaux, points de classement" actions={<Button onClick={save}><Save />Enregistrer</Button>}>
+    <AdminPage title="Paramètres" subtitle="Infos officielles (par défaut : src/config/league.ts), réseaux, points de classement. Un champ vide reprend la valeur officielle." actions={<Button onClick={save}><Save />Enregistrer</Button>}>
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2"><CardContent className="pt-5"><EntityForm fields={fields} value={v} onChange={setV} /></CardContent></Card>
         <div className="space-y-4">
@@ -116,9 +118,9 @@ export function SettingsPage() {
             {tb.map((t, i) => <div key={t} className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2 text-sm"><span className="num w-5 text-neon">{i + 1}</span><span className="flex-1">{TB_LABEL[t]}</span><button className="px-1 cursor-pointer" onClick={() => move(i, -1)}>▲</button><button className="px-1 cursor-pointer" onClick={() => move(i, 1)}>▼</button></div>)}
             {(Object.keys(TB_LABEL) as Tiebreaker[]).filter((t) => !tb.includes(t)).map((t) => <button key={t} className="block text-xs text-muted-foreground hover:text-neon cursor-pointer" onClick={() => setTb([...tb, t])}>+ {TB_LABEL[t]}</button>)}
           </CardContent></Card>
-          <Card><CardHeader><CardTitle>Données de démonstration</CardTitle></CardHeader><CardContent>
-            <p className="mb-3 text-xs text-muted-foreground">Réinitialise toutes les données locales (localStorage) avec le jeu de démo.</p>
-            <Button variant="destructive" onClick={() => { if (confirm('Réinitialiser toutes les données ?')) { resetDemoData(); location.reload() } }}><RotateCcw />Réinitialiser</Button>
+          <Card><CardHeader><CardTitle>Données locales</CardTitle></CardHeader><CardContent>
+            <p className="mb-3 text-xs text-muted-foreground">Recharge les données officielles (archive 2025-2026, équipes 2026-2027) et efface les modifications faites dans ce navigateur.</p>
+            <Button variant="destructive" onClick={() => { if (confirm('Effacer les modifications locales et recharger les données officielles ?')) { resetLeagueData(); location.reload() } }}><RotateCcw />Recharger les données officielles</Button>
           </CardContent></Card>
         </div>
       </div>

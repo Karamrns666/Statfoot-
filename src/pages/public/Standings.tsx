@@ -23,7 +23,7 @@ export default function Standings() {
   const general = useMemo(() => (season ? generalStandings(league, season.id) : []), [league, season])
   if (!comps.length) return <EmptyState title="Aucune compétition pour cette saison" />
   const pc = pointsConfig(settings)
-  const tabs = [...comps.map((c) => ({ id: c.id, label: c.name, rows: competitionStandings(league, c.id), comp: c })), { id: 'general', label: 'Général', rows: general, comp: undefined }]
+  const tabs = [...comps.map((c) => ({ id: c.id, label: c.name, rows: competitionStandings(league, c.id), comp: c })), ...(comps.length > 1 ? [{ id: 'general', label: 'Général', rows: general, comp: undefined }] : [])]
   const current = tabs.find((t) => t.id === tab) ?? tabs[0]
   return (
     <div>

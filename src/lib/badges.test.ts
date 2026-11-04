@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { generateDemoData } from '@/api/seed/generate'
+import { generateLeagueData } from '@/api/seed/generate'
 import type { LeagueData } from './stats'
 import { BADGES, challengeResult, decisiveStreak, playerBadges, playerMatchLog } from './badges'
 
 describe('badges et défis', () => {
-  const db = generateDemoData(new Date('2026-11-02T19:00:00'))
+  const db = generateLeagueData(new Date('2026-11-04T19:00:00'))
   const L: LeagueData = { seasons: db.Season, competitions: db.Competition, teams: db.Team, players: db.Player, matches: db.Match, events: db.MatchEvent, lineups: db.Lineup, xpRules: db.XPRule, suspensions: db.Suspension, monthlyAwards: db.MonthlyAward, settings: db.Settings[0] }
   const orch = db.Player.find((p) => p.last_name === 'Orch')!
   const log = playerMatchLog(L, orch.id, 'season_2025')

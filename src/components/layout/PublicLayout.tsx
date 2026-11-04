@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Menu, X, Lock, Tv, Camera, ThumbsUp, Briefcase, PlayCircle, Mail, Phone, MapPin } from 'lucide-react'
-import { Logo, OrganizedBy, MBL_LOGO } from './Logo'
+import { Menu, X, Lock, Tv, Mail, Phone, MapPin, Globe } from 'lucide-react'
+import { IconInstagram, IconLinkedin, IconWhatsapp } from './SocialIcons'
+import { useLeague } from '@/hooks/useLeague'
+import { mapsHref, telHref, whatsappHref } from '@/config/league'
+import { Logo, MBL_LOGO } from './Logo'
 import { SeasonSelector } from './SeasonSelector'
 import { ScoreTicker } from '@/components/match/ScoreTicker'
-import { useData } from '@/hooks/useData'
 import { cn } from '@/lib/utils'
 import { useEffect } from 'react'
 
@@ -64,38 +66,46 @@ export function PublicLayout() {
 }
 
 function Footer() {
-  const { settings } = useData()
-  const so = settings.socials ?? {}
+  const L = useLeague()
+  const o = L.organizer
   const socials = [
-    { href: so.instagram, icon: Camera, label: 'Instagram' }, { href: so.facebook, icon: ThumbsUp, label: 'Facebook' },
-    { href: so.linkedin, icon: Briefcase, label: 'LinkedIn' }, { href: so.youtube, icon: PlayCircle, label: 'YouTube' },
-  ].filter((s) => s.href)
+    { href: L.instagram, icon: IconInstagram, label: 'Instagram de la Morocco Business League', short: 'MBL' },
+    { href: o.instagram, icon: IconInstagram, label: `Instagram de ${o.name}`, short: o.name },
+    { href: o.linkedin, icon: IconLinkedin, label: `LinkedIn de ${o.name}`, short: o.name },
+  ]
   return (
     <footer className="mt-12 border-t border-white/5 bg-night-950/60 no-print">
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:grid-cols-3">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-10 md:grid-cols-[1.3fr_1fr_1fr]">
         <div className="flex items-start gap-4">
-          <img src={settings.logo_url || MBL_LOGO} alt={settings.league_name ?? 'MBL'} className="h-24 w-auto" />
+          <img src={L.logo || MBL_LOGO} alt={L.name} className="h-24 w-auto" />
           <div>
-            <div className="font-display text-2xl font-black uppercase leading-none">{settings.league_name}</div>
-            <p className="mt-2 max-w-xs text-sm text-muted-foreground">{settings.tagline}</p>
-            <OrganizedBy className="mt-4" />
+            <div className="font-display text-2xl font-black uppercase leading-none">{L.name}</div>
+            <p className="mt-2 max-w-xs text-sm text-muted-foreground">{L.tagline}</p>
+            <a href={o.website} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2.5 text-sm text-muted-foreground hover:text-white">Organisé par <img src={o.logo} alt={o.name} className="h-7 w-auto" /></a>
           </div>
         </div>
-        <div className="space-y-2 text-sm">
+        <address className="space-y-2.5 text-sm not-italic">
           <div className="title-caps text-base">Contact</div>
-          {settings.contact_email && <a href={`mailto:${settings.contact_email}`} className="flex items-center gap-2 text-muted-foreground hover:text-neon"><Mail className="size-4" />{settings.contact_email}</a>}
-          {settings.contact_phone && <div className="flex items-center gap-2 text-muted-foreground"><Phone className="size-4" />{settings.contact_phone}</div>}
-          {settings.address && <div className="flex items-center gap-2 text-muted-foreground"><MapPin className="size-4" />{settings.address}</div>}
-        </div>
+          <a href={`mailto:${o.email}`} className="flex items-center gap-2 text-muted-foreground hover:text-neon"><Mail className="size-4 shrink-0" />{o.email}</a>
+          <a href={telHref(o.phone)} className="flex items-center gap-2 text-muted-foreground hover:text-neon"><Phone className="size-4 shrink-0" />{o.phone}</a>
+          <a href={mapsHref(o.address)} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-muted-foreground hover:text-neon"><MapPin className="mt-0.5 size-4 shrink-0" />{o.address}</a>
+          <a href={o.website} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-muted-foreground hover:text-neon"><Globe className="size-4 shrink-0" />{o.website.replace(/^https?:\/\//, '')}</a>
+          <div className="flex flex-wrap gap-2 pt-2">
+            <a href={whatsappHref(o.phone)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-2 text-sm font-bold text-[#06210f] hover:brightness-110"><IconWhatsapp className="size-4" />WhatsApp</a>
+            <a href={telHref(o.phone)} className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-bold hover:bg-white/10"><Phone className="size-4" />Appeler</a>
+          </div>
+        </address>
         <div className="space-y-3">
           <div className="title-caps text-base">Suivez-nous</div>
-          <div className="flex gap-2">
-            {socials.map((s) => <a key={s.label} href={s.href} target="_blank" rel="noreferrer" aria-label={s.label} className="glass rounded-xl p-2.5 hover:text-neon"><s.icon className="size-5" /></a>)}
-          </div>
-          <div className="flex gap-4 text-sm"><Link to="/reglement" className="text-muted-foreground hover:text-neon">Règlement</Link><Link to="/admin" className="text-muted-foreground hover:text-neon">Espace admin</Link></div>
+          <ul className="space-y-2">
+            {socials.map((x) => (
+              <li key={x.label}><a href={x.href} target="_blank" rel="noreferrer" aria-label={x.label} className="flex items-center gap-2.5 text-sm text-muted-foreground hover:text-neon"><span className="glass rounded-lg p-2"><x.icon className="size-4" /></span>{x.icon === IconLinkedin ? 'LinkedIn' : 'Instagram'} · {x.short}</a></li>
+            ))}
+          </ul>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 pt-2 text-sm"><Link to="/reglement" className="text-muted-foreground hover:text-neon">Règlement</Link><Link to="/historique" className="text-muted-foreground hover:text-neon">Historique</Link><Link to="/admin" className="text-muted-foreground hover:text-neon">Espace admin</Link></div>
         </div>
       </div>
-      <div className="border-t border-white/5 py-4 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} {settings.league_name ?? 'Morocco Business League'} — saison 2025-2026 : données officielles de la ligue ; saison 2026-2027 : démonstration</div>
+      <div className="border-t border-white/5 py-4 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} {L.name} · organisée par {o.name}</div>
     </footer>
   )
 }

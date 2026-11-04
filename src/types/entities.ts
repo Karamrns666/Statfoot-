@@ -304,7 +304,9 @@ export interface Settings extends BaseEntity {
   contact_email?: string
   contact_phone?: string
   address?: string
-  socials?: { instagram?: string; facebook?: string; linkedin?: string; youtube?: string; tiktok?: string }
+  website?: string
+  /** instagram = compte MBL ; organizer_instagram / linkedin = Ardentia */
+  socials?: { instagram?: string; organizer_instagram?: string; facebook?: string; linkedin?: string; youtube?: string; tiktok?: string }
   points_win?: number
   points_draw?: number
   points_loss?: number

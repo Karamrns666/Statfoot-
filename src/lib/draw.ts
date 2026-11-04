@@ -149,39 +149,37 @@ export const maxRoundsFor = (teams: number) => (teams % 2 ? teams : teams - 1)
 
 /**
  * Rend l'écart domicile − extérieur de chaque équipe égal à −1, 0 ou +1.
- * Tant qu'une équipe a 2 matchs à domicile de plus qu'à l'extérieur, on cherche un chemin d'affiches
- * « à domicile » qui mène à une équipe en déficit et on inverse tout le chemin : seuls les deux bouts changent.
+ * Principe : tant qu'il existe un chemin d'affiches u → … → v (chaque équipe reçoit la suivante) avec
+ * écart(u) − écart(v) ≥ 3, on inverse tout le chemin : seuls les deux bouts changent (u −2, v +2) et
+ * la somme des carrés des écarts diminue strictement, donc l'algorithme s'arrête. Une orientation
+ * équilibrée existant toujours (orientation eulérienne), l'arrêt se fait avec tous les écarts dans {−1, 0, 1}.
  */
 export function balanceHomeAway(fx: SwissFixture[]) {
   const diff = new Map<string, number>()
-  const bump = (t: string, d: number) => diff.set(t, (diff.get(t) ?? 0) + d)
-  for (const f of fx) { bump(f.home_team_id, 1); bump(f.away_team_id, -1) }
-  for (let guard = 0; guard < fx.length * 4; guard++) {
-    const start = [...diff.entries()].find(([, d]) => d >= 2)?.[0]
-    if (!start) return fx
-    // BFS en suivant les affiches où l'équipe courante reçoit
-    const prev = new Map<string, number>([[start, -1]])
-    const queue = [start]
-    let end: string | undefined
-    while (queue.length && !end) {
-      const u = queue.shift()!
-      for (let i = 0; i < fx.length; i++) {
-        if (fx[i].home_team_id !== u) continue
-        const v = fx[i].away_team_id
-        if (prev.has(v)) continue
-        prev.set(v, i)
-        if ((diff.get(v) ?? 0) <= 0) { end = v; break }
-        queue.push(v)
+  const d = (t: string) => diff.get(t) ?? 0
+  for (const f of fx) { diff.set(f.home_team_id, d(f.home_team_id) + 1); diff.set(f.away_team_id, d(f.away_team_id) - 1) }
+  const out = new Map<string, number[]>() // équipe → indices des affiches où elle reçoit
+  const rebuild = () => { out.clear(); fx.forEach((f, i) => { if (!out.has(f.home_team_id)) out.set(f.home_team_id, []); out.get(f.home_team_id)!.push(i) }) }
+  rebuild()
+  for (let guard = 0; guard < fx.length * fx.length + 10; guard++) {
+    let done = true
+    for (const u of [...diff.keys()].sort((a, b) => d(b) - d(a))) {
+      if (d(u) < 2 && ![...diff.values()].some((x) => x <= -2)) break
+      // BFS depuis u le long des affiches « u reçoit »
+      const prev = new Map<string, number>([[u, -1]])
+      const queue = [u]
+      let best: string | undefined
+      while (queue.length) {
+        const x = queue.shift()!
+        if (x !== u && (best === undefined || d(x) < d(best))) best = x
+        for (const i of out.get(x) ?? []) { const y = fx[i].away_team_id; if (!prev.has(y)) { prev.set(y, i); queue.push(y) } }
       }
+      if (best === undefined || d(u) - d(best) < 3) continue
+      for (let v = best; v !== u;) { const i = prev.get(v)!; const f = fx[i]; fx[i] = { ...f, home_team_id: f.away_team_id, away_team_id: f.home_team_id }; v = f.home_team_id }
+      diff.set(u, d(u) - 2); diff.set(best, d(best) + 2)
+      rebuild(); done = false; break
     }
-    if (!end) return fx
-    for (let v = end; v !== start;) {
-      const i = prev.get(v)!
-      const f = fx[i]
-      fx[i] = { ...f, home_team_id: f.away_team_id, away_team_id: f.home_team_id }
-      v = f.home_team_id
-    }
-    bump(start, -2); bump(end, 2)
+    if (done) return fx
   }
   return fx
 }

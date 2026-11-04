@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate, NavLink, Outlet, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, CalendarRange, Trophy, Layers, Shield, Users, Grid3x3, Shuffle, CalendarDays, Radio, Zap, BarChart3, Award, Image, Upload,
-  ScrollText, UserCog, Settings, BookOpen, LogOut, Menu, X, ExternalLink, QrCode,
-} from 'lucide-react'
+  ScrollText, UserCog, Settings, BookOpen, LogOut, Menu, X, ExternalLink, QrCode,, Star } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useData } from '@/hooks/useData'
 import { AdminScopeProvider, useAdminScope } from '@/hooks/useAdminScope'
@@ -34,6 +33,7 @@ export const ADMIN_NAV: { group: string; items: { to: string; label: string; ico
   { group: 'XP & trophées', items: [
     { to: '/admin/xp', label: 'Règles XP', icon: Zap, area: 'xp' },
     { to: '/admin/trophees', label: 'Awards', icon: Award, area: 'awards' },
+    { to: '/admin/equipe-type', label: 'Équipe type', icon: Star, area: 'sport' },
     { to: '/admin/statistiques', label: 'Statistiques', icon: BarChart3, area: 'sport' },
   ] },
   { group: 'Contenu', items: [

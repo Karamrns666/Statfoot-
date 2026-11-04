@@ -40,6 +40,7 @@ const A = {
   McProgram: lazy(() => import('@/pages/admin/MatchCenterProgram')),
   McLive: lazy(() => import('@/pages/admin/MatchCenter')),
   XP: lazy(() => import('@/pages/admin/XPRules')),
+  TeamOfWeek: lazy(() => import('@/pages/admin/TeamOfWeekAdmin')),
   Stats: named(misc, 'StatsAdmin'), Awards: named(misc, 'AwardsAdmin'), Import: named(misc, 'ImportCsv'), Broadcast: named(misc, 'Broadcast'),
   Media: named(content, 'MediaAdmin'), Rules: named(content, 'RulesEditor'), Settings: named(content, 'SettingsPage'), Admins: named(content, 'AdminsPage'), Audit: named(content, 'AuditPage'),
 }
@@ -69,6 +70,7 @@ export default function App() {
           <Route path="match-center" element={guard('match_center', <A.McProgram />)} />
           <Route path="match-center/:id" element={guard('match_center', <A.McLive />)} />
           <Route path="xp" element={guard('xp', <A.XP />)} />
+          <Route path="equipe-type" element={guard('sport', <A.TeamOfWeek />)} />
           <Route path="statistiques" element={guard('sport', <A.Stats />)} />
           <Route path="trophees" element={guard('awards', <A.Awards />)} />
           <Route path="import" element={guard('import', <A.Import />)} />

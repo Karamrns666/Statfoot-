@@ -8,7 +8,9 @@ import { cn } from '@/lib/utils'
 
 export interface Zone { from: number; to: number; color: string; label: string }
 
-export function StandingsTable({ rows, compact = false, zones = [], highlightTeamId }: { rows: StandingRow[]; compact?: boolean; zones?: Zone[]; highlightTeamId?: string }) {
+export function StandingsTable({ rows, compact = false, zones: zonesIn = [], highlightTeamId }: { rows: StandingRow[]; compact?: boolean; zones?: Zone[]; highlightTeamId?: string }) {
+  // pas de zones (champion, qualifiés…) tant qu'aucun match n'est joué
+  const zones = rows.some((r) => r.played > 0) ? zonesIn : []
   const L = useLookup()
   const zoneOf = (rank: number) => zones.find((z) => rank >= z.from && rank <= z.to)
   return (

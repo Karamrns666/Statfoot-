@@ -13,7 +13,7 @@ const SLOTS = ['18:00', '18:45', '19:30', '20:15']
 export const s25TeamId = (i: number | string) => `t25_${(typeof i === 'string' ? i : S25_TEAMS[i][1]).toLowerCase()}`
 /** Raison sociale affichée sous le nom d'équipe */
 const COMPANY: Record<string, string> = {
-  CAC: 'Centrale Automobile Chérifienne', CTR: 'Construction & Travaux Routiers', ALM: 'Stock Box Self-Storage (Almav Group)', MPT: 'Mega Post-Tension',
+  CAC: 'Centrale Automobile Chérifienne', CTR: 'Construction & Travaux Routiers', ALM: 'Stock Box Self-Storage (Almav Group)', MPT: 'Mega Post-Tension SA',
   DEL: 'Dell Technologies', CVG: 'Casavigilance Sécurité Incendie', MDS: 'Groupe Mondial Service', DSW: 'Disway', COP: 'Cooper Pharma', CHL: 'Chaabi LLD',
 }
 export const s25PlayerId = (i: number) => `p25_${i}`

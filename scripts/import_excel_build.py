@@ -9,7 +9,7 @@ TEAMS={ # clé: (nom, court, couleur1, couleur2)
  'ALMAV GROUP':('Almav Group','ALM','#E30613','#2A0406'),'COOPER PHARMA':('Cooper Pharma','COP','#00A99D','#0A2A4F'),
  'CHAABI LLD':('Chaabi LLD','CHL','#F26722','#2A1205'),'VIVALIS':('Vivalis','VIV','#1A8DB5','#05202A'),
  'DISWAY':('Disway','DSW','#E8312F','#141414'),'CTR':('CTR','CTR','#3BB54A','#121A55'),
- 'MEGA PT':('Mega PT','MPT','#1E90FF','#0A1E33'),'ATELIER VERT CASA':('Atelier Vert Casa','AVC','#4A7729','#0E1A08'),
+ 'MEGA PT':('Mega Post Tension','MPT','#1E90FF','#0A1E33'),'ATELIER VERT CASA':('Atelier Vert Casa','AVC','#4A7729','#0E1A08'),
 }
 tkeys=list(TEAMS)
 def cap(s):

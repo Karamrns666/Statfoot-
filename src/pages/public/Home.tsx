@@ -52,7 +52,7 @@ export default function Home() {
   const keepers = useMemo(() => race(league, [...xpAll.values()], 'golden_glove', refSid).slice(0, 5).map((r) => r.item), [league, xpAll, refSid])
   const teamsInSeason = new Set(comps.flatMap((c) => c.team_ids ?? []))
   const showIPG = refSid === SEASON_2025_ID
-  const tag = archive ? ` · ${archive.name}` : ''
+  const tag = archive ? ` · ${archive.name.replace('Saison ', '')}` : ''
 
   const slides = useMemo<BillboardSlide[]>(() => {
     const out: BillboardSlide[] = []

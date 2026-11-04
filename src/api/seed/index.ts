@@ -2,7 +2,7 @@ import { store } from '../localStore'
 import { generateLeagueData } from './generate'
 import type { EntityName } from '@/types/entities'
 
-const SEED_VERSION = '7-officiel-2026'
+const SEED_VERSION = '8-officiel-2026'
 
 /** Charge les données de la ligue au premier lancement (ou si la version des données change). */
 export function ensureSeeded() {

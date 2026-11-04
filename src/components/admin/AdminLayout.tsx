@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate, NavLink, Outlet, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, CalendarRange, Trophy, Layers, Shield, Users, Grid3x3, Shuffle, CalendarDays, Radio, Zap, BarChart3, Award, Image, Upload,
-  ScrollText, UserCog, Settings, BookOpen, LogOut, Menu, X, ExternalLink, QrCode,, Star } from 'lucide-react'
+  ScrollText, UserCog, Settings, BookOpen, LogOut, Menu, X, ExternalLink, QrCode, Star } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useData } from '@/hooks/useData'
 import { AdminScopeProvider, useAdminScope } from '@/hooks/useAdminScope'

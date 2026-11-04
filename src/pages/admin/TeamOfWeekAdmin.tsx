@@ -55,7 +55,7 @@ export default function TeamOfWeekAdmin() {
   const setSlot = (i: number, player_id: string) => setSlots((s) => { const n = positions.map((position, j) => ({ position, player_id: s[j]?.player_id ?? '' })); n[i] = { position: positions[i], player_id }; return n })
   const xy = formationXY(f)
   const preview = current ? {
-    ...current, formation: f, manual: true,
+    ...current, formation: f, manual: !!saved,
     slots: positions.map((position, i) => {
       const id = slots[i]?.player_id ?? ''
       const auto = current.slots.find((x) => x.player_id === id)

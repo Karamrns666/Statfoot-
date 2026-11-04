@@ -31,7 +31,7 @@ export function TeamOfWeekShare({ open, onOpenChange, result, title }: { open: b
     } finally { setBusy(false) }
   }
   // le terrain est dessiné à 390 px de large puis agrandi : textes et proportions identiques au site
-  const pitchW = fmt === 'post' ? 390 : 420, zoom = fmt === 'post' ? 1.75 : 2.2
+  const pitchW = fmt === 'post' ? 390 : 420, zoom = fmt === 'post' ? 1.62 : 2.2
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-xl">

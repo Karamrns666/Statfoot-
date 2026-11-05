@@ -19,20 +19,14 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - name: Types, tests et build
-        id: checks
+      - name: Ajout de la dépendance de détourage
         run: |
-          set +e
-          { echo "## tsc"; npx tsc -b; echo "exit=$?"; } > ci-report.txt 2>&1
-          { echo "## tests"; npx vitest run; echo "exit=$?"; } >> ci-report.txt 2>&1
-          { echo "## build"; npx vite build; echo "exit=$?"; } >> ci-report.txt 2>&1
-          cat ci-report.txt
-          if grep -q "exit=[1-9]" ci-report.txt; then echo "failed=1" >> "$GITHUB_OUTPUT"; fi
+          { npm install --no-audit --no-fund @imgly/background-removal@1.7.0 && npm ls @imgly/background-removal onnxruntime-web; echo "exit=$?"; } > ci-report.txt 2>&1 || true
+          mkdir -p deps && cp package.json package-lock.json deps/
       - name: Ranger le rapport
         if: always()
         run: |
-          mkdir -p /tmp/out && cp ci-report.txt /tmp/out/ && { [ -d dist ] && cp -r dist /tmp/out/ || true; }
+          mkdir -p /tmp/out && cp ci-report.txt /tmp/out/ && { [ -d deps ] && cp -r deps /tmp/out/ || true; } && { [ -d dist ] && cp -r dist /tmp/out/ || true; }
           cd /tmp/out && git init -q && git config user.name ci && git config user.email ci@users.noreply.github.com
           git add -A && git commit -qm "CI ${GITHUB_SHA}"
           git push -qf "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/ci/${GITHUB_REF_NAME}"

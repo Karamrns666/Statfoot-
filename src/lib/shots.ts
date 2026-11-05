@@ -48,7 +48,7 @@ export function teamMatchShots(m: Pick<Match, 'id' | 'home_team_id' | 'away_team
   }
   if (!mine.some(isManualShot)) return null
   const live = teamLiveShots(events, teamId, m)
-  return { ...live, goals, matches: 1 }
+  return { shots: live.shots, on_target: live.on_target, goals, matches: 1 }
 }
 
 /** Tirs d'une équipe depuis les actions (sans condition de saisie) — utilisé en direct par le Match Center. */

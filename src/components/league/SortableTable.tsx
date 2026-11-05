@@ -56,9 +56,9 @@ export function useSort<T>(rows: T[], columns: SortColumn<T>[], initial?: { key:
   return { rows: sorted, state, toggle }
 }
 
-export function SortHead({ col, state, onSort }: { col: Pick<SortColumn<unknown>, 'key' | 'label' | 'title' | 'headClassName' | 'sort'>; state: SortState | null; onSort: (key: string) => void }) {
+export function SortHead({ col, state, onSort }: { col: { key: string; label: ReactNode; title?: string; headClassName?: string; sortable: boolean }; state: SortState | null; onSort: (key: string) => void }) {
   const active = state?.key === col.key
-  if (!col.sort) return <TableHead className={col.headClassName} title={col.title}>{col.label}</TableHead>
+  if (!col.sortable) return <TableHead className={col.headClassName} title={col.title}>{col.label}</TableHead>
   const right = /text-(center|right)/.exec(col.headClassName ?? '')?.[1]
   return (
     <TableHead className={cn(col.headClassName, 'p-0')} aria-sort={active ? (state!.dir === 'asc' ? 'ascending' : 'descending') : 'none'}>
@@ -80,7 +80,7 @@ export function SortableTable<T>({ rows, columns, rowKey, initial, rowClassName,
   const s = useSort(rows, columns, initial)
   return (
     <Table className={className}>
-      <TableHeader><TableRow className="hover:bg-transparent">{columns.map((c) => <SortHead key={c.key} col={c} state={s.state} onSort={s.toggle} />)}</TableRow></TableHeader>
+      <TableHeader><TableRow className="hover:bg-transparent">{columns.map((c) => <SortHead key={c.key} col={{ ...c, sortable: !!c.sort }} state={s.state} onSort={s.toggle} />)}</TableRow></TableHeader>
       <TableBody>
         {s.rows.length === 0 && empty ? <TableRow><TableCell colSpan={columns.length} className="py-6 text-center text-muted-foreground">{empty}</TableCell></TableRow> : null}
         {s.rows.map((r, i) => (

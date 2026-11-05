@@ -1,0 +1,31 @@
+total 2768
+drwxr-xr-x  2 runner runner   4096 Nov  5 16:25 .
+drwxr-xr-x 12 runner runner   4096 Nov  5 16:25 ..
+-rw-r--r--  1 runner runner   6822 Nov  5 16:24 real.mjs
+-rw-r--r--  1 runner runner    688 Nov  5 16:24 serve.mjs
+-rw-r--r--  1 runner runner 352385 Nov  5 16:25 unsplash1.jpg
+-rw-r--r--  1 runner runner 398605 Nov  5 16:25 unsplash2.jpg
+-rw-r--r--  1 runner runner    852 Nov  5 16:24 wiki-sources.json
+-rw-r--r--  1 runner runner 890807 Nov  5 16:24 wiki1.jpg
+-rw-r--r--  1 runner runner 336520 Nov  5 16:24 wiki2.jpg
+-rw-r--r--  1 runner runner 471454 Nov  5 16:24 wiki3.jpg
+-rw-r--r--  1 runner runner 342987 Nov  5 16:24 wiki4.jpg
+JOUEUR Orch : échec : Détourage impossible (joueur trop petit ou masqué sur la photo — utilisez une photo où il est seul au premier plan, de la tête aux genoux au moins). Relancez-le, importez un PNG détouré, ou utilisez la photo originale. 21 s
+  champs {"photo_url":"/_files/photo-mw3rbu1gqhchsz.webp","status":"failed","mode":"cutout"}
+JOUEUR Naouar : échec : Détourage impossible (joueur trop petit ou masqué sur la photo — utilisez une photo où il est seul au premier plan, de la tête aux genoux au moins). Relancez-le, importez un PNG détouré, ou utilisez la photo originale. 19 s
+  champs {"photo_url":"/_files/photo-mw3rdbs8rteufr.webp","status":"failed","mode":"cutout"}
+JOUEUR Afakhar : ok 19 s
+  champs {"photo_url":"/_files/photo-mw3regptidpvf4.webp","photo_cutout_url":"/_files/cutout-mw3reun730hca6.webp","status":"ok","mode":"cutout"}
+  détouré {"type":"image/webp","taille":"952×800","poids":"47 Ko","transparent":"84 %","bords_semi":11634,"bords_blancs":311,"coin_haut_gauche_alpha":0}
+JOUEUR Ighli : ok 48 s
+  champs {"photo_url":"/_files/photo-mw3rfybbyhkm6i.webp","photo_cutout_url":"/_files/cutout-mw3rgmrk4hjscr.webp","status":"ok","mode":"cutout"}
+  détouré {"type":"image/webp","taille":"589×800","poids":"42 Ko","transparent":"55 %","bords_semi":10407,"bords_blancs":1181,"coin_haut_gauche_alpha":0}
+JOUEUR Lamghari : ok 19 s
+  champs {"photo_url":"/_files/photo-mw3rgqwe78hv3a.webp","photo_cutout_url":"/_files/cutout-mw3rh4i9isksl4.webp","status":"ok","mode":"cutout"}
+  détouré {"type":"image/webp","taille":"433×800","poids":"32 Ko","transparent":"41 %","bords_semi":12622,"bords_blancs":0,"coin_haut_gauche_alpha":0}
+JOUEUR Oudkhmouche : échec : Détourage impossible (joueur trop petit ou masqué sur la photo — utilisez une photo où il est seul au premier plan, de la tête aux genoux au moins). Relancez-le, importez un PNG détouré, ou utilisez la photo originale. 18 s
+  champs {"photo_url":"/_files/photo-mw3rh8c3skx9rh.webp","status":"failed","mode":"cutout"}
+LOT DÉTOURER TOUTES LES PHOTOS EXISTANTES Chaque photo est détourée dans ce navigateur, une à la fois. Gardez cette fenêtre ouverte pendant le traitement. Terminé 100 % 0 réussie 5 échecs Ayoub Orch — joueur trop petit ou masqué sur la photo — utilisez une photo où il est seul au premier plan, de la têt 202 s
+ÉQUIPE TYPE photo ronde originale 2 · détourée 0
+LOGS []
+exit=0

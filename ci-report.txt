@@ -1,0 +1,12 @@
+FORMULAIRE ok 21 s
+JOUEUR /_files/photo-mw3jlywcie07qb.webp /_files/cutout-mw3jmesik9jk26.png ok
+PNG DÉTOURÉ {"w":479,"h":1000,"transparent":"27 %"}
+FILE AUTO ok /_files/cutout-mw3jmth5ehwvjx.png 16 s
+CARTE 1 image(s) détourée(s), photo avec fond : 0
+LOGS [
+ "env.wasm.numThreads is set to 4, but this will not work unless you enable crossOriginIsolated mode. See https://web.dev/cross-origin-isolation-guide/ for more info.",
+ "WebAssembly multi-threading is not supported in the current environment. Falling back to single-threading.",
+ "env.wasm.numThreads is set to 4, but this will not work unless you enable crossOriginIsolated mode. See https://web.dev/cross-origin-isolation-guide/ for more info.",
+ "WebAssembly multi-threading is not supported in the current environment. Falling back to single-threading."
+]
+exit=0

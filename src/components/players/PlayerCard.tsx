@@ -77,14 +77,14 @@ function CardPhoto({ cutout, photo, initials, color }: { cutout?: string; photo?
   const [failed, setFailed] = useState(false)
   const fade = 'linear-gradient(to bottom, #000 72%, transparent 100%)'
   if (cutout && !failed) {
-    return <img src={cutout} alt="" onError={() => setFailed(true)} className="absolute bottom-0 right-[-2%] h-[92%] w-[78%] object-contain object-bottom drop-shadow-[0_10px_18px_rgba(0,0,0,.55)]" style={{ maskImage: fade, WebkitMaskImage: fade }} />
+    return <img src={cutout} alt="" onError={() => setFailed(true)} className="absolute bottom-0 right-[-5%] h-[88%] w-[68%] object-contain object-bottom drop-shadow-[0_10px_18px_rgba(0,0,0,.55)]" style={{ maskImage: fade, WebkitMaskImage: fade }} />
   }
   if (photo) {
     const m = 'radial-gradient(75% 80% at 55% 40%, #000 55%, transparent 100%)'
-    return <img src={photo} alt="" className="absolute bottom-0 right-0 h-[88%] w-[74%] object-cover object-top" style={{ maskImage: m, WebkitMaskImage: m }} />
+    return <img src={photo} alt="" className="absolute bottom-0 right-0 h-[84%] w-[66%] object-cover object-top" style={{ maskImage: m, WebkitMaskImage: m }} />
   }
   return (
-    <div className="absolute bottom-0 right-[4%] flex h-[84%] w-[66%] items-end justify-center" aria-hidden>
+    <div className="absolute bottom-0 right-[2%] flex h-[80%] w-[60%] items-end justify-center" aria-hidden>
       <svg viewBox="0 0 100 110" className="h-full w-full" style={{ color }}>
         <defs><linearGradient id="sil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="currentColor" stopOpacity=".75" /><stop offset="1" stopColor="currentColor" stopOpacity="0" /></linearGradient></defs>
         <circle cx="50" cy="34" r="19" fill="url(#sil)" /><path d="M10 110c2-30 18-46 40-46s38 16 40 46z" fill="url(#sil)" />
@@ -126,7 +126,7 @@ export function PlayerCard(p: PlayerCardProps) {
               <CardPhoto cutout={p.cutoutUrl} photo={p.photoUrl} initials={(p.firstName.replace('.', '')[0] ?? '') + (p.lastName[0] ?? '')} color={color} />
               {/* colonne gauche : note, rôle, club, IPG */}
               <div className="absolute left-[7%] top-[13%] z-10 flex flex-col items-center leading-none">
-                <div className="font-display text-[3.6em] font-black leading-[.85] text-white" style={{ textShadow: `0 2px 0 rgb(0 0 0 / .35), 0 0 18px ${tier.glow}` }}>{p.rating}</div>
+                <div className={cn('font-display font-black leading-[.85] text-white', String(p.rating).length > 3 ? 'text-[2.7em]' : 'text-[3.6em]')} style={{ textShadow: `0 2px 0 rgb(0 0 0 / .35), 0 0 18px ${tier.glow}` }}>{p.rating}</div>
                 <div className="mt-[.25em] text-[.85em] font-extrabold tracking-wider" style={{ color: tier.text }}>{p.ratingLabel}</div>
                 {(p.position === 'GK' || p.captain) && <div className="mt-[.35em] font-display text-[1.35em] font-extrabold leading-none text-white/90" title={[p.position === 'GK' && 'Gardien', p.captain && 'Capitaine'].filter(Boolean).join(' · ')}>{[p.position === 'GK' && 'GB', p.captain && 'C'].filter(Boolean).join(' · ')}</div>}
                 <div className="my-[.45em] h-px w-[2.2em] bg-white/25" />

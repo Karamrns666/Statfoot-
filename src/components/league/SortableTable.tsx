@@ -66,7 +66,7 @@ export function SortHead({ col, state, onSort }: { col: { key: string; label: Re
         className={cn('inline-flex h-9 w-full cursor-pointer items-center gap-1 px-2 uppercase tracking-wider transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-neon',
           right === 'center' && 'justify-center', right === 'right' && 'justify-end', active && 'text-neon')}>
         <span>{col.label}</span>
-        <span aria-hidden className={cn('w-2.5 text-[11px] leading-none', !active && 'opacity-0')}>{active && state!.dir === 'asc' ? '↑' : '↓'}</span>
+        {active && <span aria-hidden className="text-[11px] leading-none">{state!.dir === 'asc' ? '↑' : '↓'}</span>}
       </button>
     </TableHead>
   )

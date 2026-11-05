@@ -128,7 +128,7 @@ export default function QuickEntry() {
       </div>
       <div className="grid gap-4 xl:grid-cols-2">
         {[m.home_team_id, m.away_team_id].map((tid) => (
-          <Card key={tid}><CardHeader><CardTitle className="flex items-center gap-2"><TeamLogo team={L.team.get(tid)} size={24} />{L.team.get(tid)?.name}</CardTitle></CardHeader>
+          <Card key={tid} className="min-w-0"><CardHeader><CardTitle className="flex items-center gap-2"><TeamLogo team={L.team.get(tid)} size={24} />{L.team.get(tid)?.name}</CardTitle></CardHeader>
             <CardContent className="px-1 sm:px-3">
               <Table>
                 <TableHeader><TableRow><TableHead>Joueur</TableHead><TableHead className="text-center">A joué</TableHead>{COLS.map((c) => <TableHead key={c.k} className="text-center">{c.l}</TableHead>)}</TableRow></TableHeader>

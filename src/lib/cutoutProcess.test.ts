@@ -19,6 +19,18 @@ describe('post-traitement du détourage', () => {
     expect(s.keep(30, 350)).toBe(false)
     expect(s.keep(360, 350)).toBe(false)
   })
+  it('filet ou grillage devant / derrière le joueur : les fils fins sont supprimés, le joueur reste', () => {
+    const w = 600, h = 600
+    const rects: [number, number, number, number][] = []
+    for (let x = 0; x < w; x += 40) rects.push([x, 0, x + 2, h - 1]) // fils verticaux
+    for (let y = 0; y < h; y += 40) rects.push([0, y, w - 1, y + 2]) // fils horizontaux
+    rects.push([250, 150, 350, 599]) // joueur
+    const a = img(w, h, rects)
+    const s = mainSubject((i) => a[i], w, h)!
+    expect(s.keep(300, 400)).toBe(true) // le joueur
+    expect(s.keep(41, 500)).toBe(false) // fil loin du joueur
+    expect(s.keep(560, 81)).toBe(false)
+  })
   it('cadre en buste un joueur en pied, centré sur la tête', () => {
     const w = 400, h = 900
     // tête (x 170–230) + corps décalé à droite, en pied

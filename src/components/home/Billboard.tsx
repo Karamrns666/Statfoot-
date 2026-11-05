@@ -195,7 +195,7 @@ export function Billboard({ slides: content, leagueName, seasonLabel, logoUrl }:
         </div>
 
         {/* rail haut */}
-        <div className="relative z-10 flex items-center gap-3 border-b border-white/10 bg-night-950/40 px-4 py-2.5 backdrop-blur-sm sm:px-6">
+        <div className="relative z-10 flex items-center gap-3 border-b border-white/10 bg-night-950/60 px-4 py-2.5 sm:px-6">
           <img src={logo} alt="" className="h-9 w-auto sm:h-10" />
           <div className="min-w-0 leading-tight">
             <div className="truncate font-display text-lg font-black uppercase text-white sm:text-2xl">{leagueName}</div>
@@ -216,7 +216,7 @@ export function Billboard({ slides: content, leagueName, seasonLabel, logoUrl }:
         </div>
 
         {/* rail bas : navigation, progression, pause */}
-        <div className="relative z-10 flex flex-wrap items-center gap-3 border-t border-white/10 bg-night-950/40 px-4 py-3 backdrop-blur-sm sm:px-6">
+        <div className="relative z-10 flex flex-wrap items-center gap-3 border-t border-white/10 bg-night-950/60 px-4 py-3 sm:px-6">
           <div className="flex items-center gap-1.5">
             <button onClick={() => go(idx - 1)} className="cursor-pointer rounded-md p-1 text-white/60 hover:text-white" aria-label="Panneau précédent"><ChevronLeft className="size-4" /></button>
             <div className="flex items-center gap-1.5" role="tablist" aria-label="Panneaux">

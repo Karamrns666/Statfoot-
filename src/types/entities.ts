@@ -248,7 +248,7 @@ export interface MonthlyAward extends BaseEntity {
 
 export type AwardCategory =
   | 'ballon_or' | 'golden_glove' | 'top_scorer' | 'top_assist' | 'best_team' | 'player_of_tournament'
-  | 'best_young' | 'best_defense' | 'best_attack'
+  | 'best_defense' | 'best_attack'
 export interface Award extends BaseEntity {
   season_id: string
   scope?: 'season' | 'league_phase' | 'gold' | 'silver'
@@ -326,7 +326,6 @@ export interface Settings extends BaseEntity {
   points_loss?: number
   tiebreakers?: Tiebreaker[]
   motm_vote_minutes_after?: number
-  young_max_age?: number
 }
 
 export interface Page extends BaseEntity { slug: string; title: string; content?: string; published?: boolean }

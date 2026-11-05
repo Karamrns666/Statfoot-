@@ -1,6 +1,6 @@
 // Migrations NON destructives des données déjà enregistrées dans le navigateur.
 // Elles adaptent les anciennes données aux règles en vigueur sans effacer ce que l'admin a saisi.
-import type { Award, Lineup, Page, Position, MatchEvent, MatchTeamStats, Player, TeamOfWeek } from '@/types/entities'
+import type { Award, Lineup, Page, Position, MatchEvent, MatchTeamStats, Player, Settings, Team, TeamOfWeek } from '@/types/entities'
 import { toRole } from '@/lib/format'
 import { store } from '../localStore'
 
@@ -17,6 +17,8 @@ export interface Rules6Data {
   TeamOfWeek?: TeamOfWeek[]
   Lineup?: Lineup[]
   Page?: Page[]
+  Team?: Team[]
+  Settings?: Settings[]
 }
 
 /**
@@ -55,14 +57,58 @@ export function applyRules6v6(db: Rules6Data): Rules6Data {
   return out
 }
 
-const MIGRATION_FLAG = 'migrated-6v6'
+/**
+ * Lot 1 — nettoyage :
+ * - trophée « Meilleur jeune » retiré (et son réglage d'âge) ;
+ * - un seul capitaine par équipe, fiche joueur et fiche équipe alignées.
+ */
+export function applyLot1(db: Rules6Data): Rules6Data {
+  const out: Rules6Data = {}
+  if (db.Award?.some((a) => (a.category as string) === 'best_young'))
+    out.Award = db.Award.filter((a) => (a.category as string) !== 'best_young')
+  if (db.Settings?.some((x) => 'young_max_age' in x))
+    out.Settings = db.Settings.map((x) => omit(x, 'young_max_age'))
+  if (db.Player && db.Team) {
+    const captain = new Map<string, string | null>()
+    for (const t of db.Team) {
+      const squad = db.Player.filter((p) => p.team_id === t.id)
+      const c = squad.find((p) => p.id === t.captain_player_id) ?? squad.find((p) => p.is_captain)
+      captain.set(t.id, c?.id ?? null)
+    }
+    if (db.Player.some((p) => !!p.is_captain !== (captain.get(p.team_id) === p.id)))
+      out.Player = db.Player.map((p) => (!!p.is_captain === (captain.get(p.team_id) === p.id) ? p : { ...p, is_captain: captain.get(p.team_id) === p.id }))
+    if (db.Team.some((t) => (t.captain_player_id ?? null) !== captain.get(t.id)))
+      out.Team = db.Team.map((t) => { const c = captain.get(t.id); return (t.captain_player_id ?? null) === c ? t : c ? { ...t, captain_player_id: c } : omit(t, 'captain_player_id') })
+  }
+  const rules = db.Page?.find((p) => p.slug === 'reglement')
+  if (rules && /,? ?Meilleur jeune/.test(rules.content ?? ''))
+    out.Page = db.Page!.map((p) => (p === rules ? { ...p, content: (p.content ?? '').replace(/,? ?Meilleur jeune/, '') } : p))
+  return out
+}
 
-/** Applique la migration une seule fois sur les données du navigateur. */
+/** Étapes de migration, dans l'ordre. Le numéro atteint est mémorisé dans le navigateur. */
+const STEPS = [applyRules6v6, applyLot1]
+const VERSION_FLAG = 'data-version'
+
+/** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */
+export function migrate(db: Rules6Data, from = 0): Rules6Data {
+  let cur = { ...db }
+  const changed: Rules6Data = {}
+  for (const step of STEPS.slice(from)) {
+    const out = step(cur)
+    Object.assign(changed, out); cur = { ...cur, ...out }
+  }
+  return changed
+}
+
+/** Applique les migrations manquantes sur les données du navigateur. */
 export function migrateStoredData() {
-  if (store.getFlag(MIGRATION_FLAG)) return
-  const names = ['Player', 'MatchEvent', 'MatchTeamStats', 'Award', 'TeamOfWeek', 'Lineup', 'Page'] as const
+  const legacy = store.getFlag('migrated-6v6') ? 1 : 0
+  const from = Number(store.getFlag(VERSION_FLAG) ?? legacy) || legacy
+  if (from >= STEPS.length) return
+  const names = ['Player', 'MatchEvent', 'MatchTeamStats', 'Award', 'TeamOfWeek', 'Lineup', 'Page', 'Team', 'Settings'] as const
   const db = Object.fromEntries(names.map((n) => [n, store.all(n)])) as Rules6Data
-  const changed = applyRules6v6(db)
+  const changed = migrate(db, from)
   store.batch(() => { for (const [name, rows] of Object.entries(changed)) store.replace(name as (typeof names)[number], rows as never) })
-  store.setFlag(MIGRATION_FLAG, '1')
+  store.setFlag(VERSION_FLAG, String(STEPS.length))
 }

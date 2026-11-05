@@ -1,4 +1,4 @@
-import { Crown, Footprints, Hand, Send, Shield, Sparkles, Star, Swords, Trophy } from 'lucide-react'
+import { Crown, Footprints, Hand, Send, Shield, Star, Swords, Trophy } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import type { AwardCategory } from '@/types/entities'
 import { AWARD_LABELS } from '@/lib/stats'
@@ -11,7 +11,6 @@ export const AWARD_STYLE: Record<AwardCategory, { color: string; icon: LucideIco
   golden_glove: { color: '#3b82f6', icon: Hand, label: AWARD_LABELS.golden_glove, criteria: 'Gardiens classés à l’XP (clean sheets, arrêts, buts encaissés)' },
   best_team: { color: '#22c55e', icon: Shield, label: AWARD_LABELS.best_team, criteria: 'Champion, sinon leader du classement' },
   player_of_tournament: { color: '#e879f9', icon: Crown, label: AWARD_LABELS.player_of_tournament, criteria: 'Meilleure note moyenne /10, tous les joueurs' },
-  best_young: { color: '#F85A00', icon: Sparkles, label: AWARD_LABELS.best_young, criteria: 'Moins de 23 ans au début de saison' },
   best_defense: { color: '#60a5fa', icon: Shield, label: AWARD_LABELS.best_defense, criteria: 'Moins de buts encaissés par match' },
   best_attack: { color: '#fb7185', icon: Swords, label: AWARD_LABELS.best_attack, criteria: 'Plus de buts marqués' },
 }

@@ -20,6 +20,7 @@ export function resetLeagueData() {
     for (const [name, rows] of Object.entries(db)) store.replace(name as EntityName, rows)
   })
   store.setFlag('seeded', SEED_VERSION)
+  migrateStoredData()
   if (session) store.setFlag('session', session)
 }
 

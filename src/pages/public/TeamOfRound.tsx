@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Crown, Share2 } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
-import { useEffectiveSeason, seasonLogs, useTeamOfWeek } from '@/hooks/useStats'
+import { useEffectiveSeason, useTeamOfWeek } from '@/hooks/useStats'
 import { PageHeader } from '@/components/league/Bits'
 import { CompetitionTabs } from '@/components/league/CompetitionTabs'
 import { SeasonNotStarted } from '@/components/league/SeasonNotStarted'
@@ -11,9 +11,8 @@ import { Button } from '@/components/ui/button'
 import { TeamOfWeekPitch, fmtRating, ratingColor } from '@/components/teamweek/TeamOfWeekPitch'
 import { TeamOfWeekShare } from '@/components/teamweek/TeamOfWeekShare'
 import { RewardsList } from '@/components/teamweek/RewardsList'
-import { seasonRounds, teamOfWeek } from '@/lib/rewards'
+import { seasonRounds } from '@/lib/rewards'
 import { fmtDate, playerName } from '@/lib/format'
-import { cn } from '@/lib/utils'
 
 export default function TeamOfWeekPage() {
   const { db, league } = useData()
@@ -21,25 +20,14 @@ export default function TeamOfWeekPage() {
   const season = useEffectiveSeason()
   const sid = season?.id
   const [sp, setSp] = useSearchParams()
-  const set = (k: string, v: string) => { const n = new URLSearchParams(sp); if (v) n.set(k, v); else n.delete(k); setSp(n, { replace: true }) }
   const comp = sp.get('competition') ?? ''
   const comps = db.Competition.filter((c) => c.season_id === sid).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
   const rounds = useMemo(() => (sid ? seasonRounds(league, sid, comp || null) : []), [league, sid, comp])
-  const round = sp.get('journee') ? Number(sp.get('journee')) : rounds.at(-1)
+  // uniquement l'équipe type de la dernière journée jouée (pas d'historique)
+  const round = rounds.at(-1)
   const result = useTeamOfWeek(sid, round, comp || null)
   const [share, setShare] = useState(false)
   const roundDate = db.Match.find((m) => m.season_id === sid && m.round === round)?.date
-
-  // historique : joueur de la journée pour chaque journée
-  const history = useMemo(() => {
-    if (!sid) return []
-    const logs = seasonLogs(league, sid)
-    return rounds.map((r) => {
-      const ov = db.TeamOfWeek.find((t) => t.season_id === sid && t.round === r && (t.competition_id ?? '') === comp)
-      const res = teamOfWeek(league, sid, r, { competitionId: comp || null, override: ov, logs })
-      return { round: r, best: res.player_of_round, top: [...res.slots].sort((a, b) => b.rating - a.rating).slice(0, 4) }
-    }).reverse()
-  }, [league, sid, rounds, comp, db.TeamOfWeek])
 
   if (!sid || !rounds.length || !result) {
     return <div><PageHeader title="Équipe type" subtitle={season?.name} /><SeasonNotStarted what="Les équipes types" /></div>
@@ -52,13 +40,7 @@ export default function TeamOfWeekPage() {
         <Button variant="outline" onClick={() => setShare(true)}><Share2 />Partager en image</Button>
       </PageHeader>
 
-      {comps.length > 1 && <CompetitionTabs comps={comps} value={comp} onChange={(v) => { const n = new URLSearchParams(sp); if (v) n.set('competition', v); else n.delete('competition'); n.delete('journee'); setSp(n, { replace: true }) }} />}
-      <div className="scrollbar-none -mx-4 flex gap-2 overflow-x-auto px-4 pb-1" role="tablist" aria-label="Journées">
-        {rounds.map((r) => (
-          <button key={r} role="tab" aria-selected={r === round} onClick={() => set('journee', String(r))} className={cn('shrink-0 cursor-pointer rounded-xl border px-4 py-2 font-display text-lg font-black transition', r === round ? 'border-neon bg-neon text-white' : 'border-white/10 bg-white/[.03] text-muted-foreground hover:text-white')}>J{r}</button>
-        ))}
-      </div>
-
+      {comps.length > 1 && <CompetitionTabs comps={comps} value={comp} onChange={(v) => { const n = new URLSearchParams(sp); if (v) n.set('competition', v); else n.delete('competition'); setSp(n, { replace: true }) }} />}
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
         <div>
           <h2 className="mb-3 font-display text-2xl font-black">Journée {round}{roundDate && <span className="ml-2 text-base font-semibold text-muted-foreground first-letter:uppercase inline-block">{fmtDate(roundDate, 'EEEE d MMMM yyyy')}</span>}</h2>
@@ -105,24 +87,6 @@ export default function TeamOfWeekPage() {
         </div>
       </div>
 
-      <section>
-        <h2 className="mb-3 font-display text-2xl font-black">Historique</h2>
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {history.map((h) => {
-            const p = h.best ? L.player.get(h.best.player_id) : undefined
-            return (
-              <button key={h.round} onClick={() => { set('journee', String(h.round)); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className={cn('glass flex cursor-pointer items-center gap-3 rounded-2xl p-3 text-left transition hover:border-neon/40', h.round === round && 'border-neon/60')}>
-                <span className="w-10 font-display text-2xl font-black text-neon">J{h.round}</span>
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm font-semibold"><Crown className="mr-1 inline size-3.5 fill-award-gold text-award-gold" />{playerName(p)}</div>
-                  <div className="mt-1 flex -space-x-2">{h.top.map((s) => <PlayerAvatar key={s.player_id} player={L.player.get(s.player_id)} team={L.team.get(s.team_id)} size={24} />)}</div>
-                </div>
-                {h.best && <span className="rounded-md px-1.5 font-display text-lg font-black text-ink" style={{ background: ratingColor(h.best.rating) }}>{fmtRating(h.best.rating)}</span>}
-              </button>
-            )
-          })}
-        </div>
-      </section>
       {share && <TeamOfWeekShare open={share} onOpenChange={setShare} result={result} title={title} />}
     </div>
   )

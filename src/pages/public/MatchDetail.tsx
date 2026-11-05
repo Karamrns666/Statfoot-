@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, CalendarDays, MapPin, Star, Vote, ArrowRightLeft, Share2, ShieldAlert, User, Crown, Hand, Image as ImageIcon, Play } from 'lucide-react'
+import { ArrowLeft, CalendarDays, MapPin, Star, Vote, ArrowRightLeft, Share2, ShieldAlert, User, Hand, Image as ImageIcon, Play } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
 import { useNow } from '@/hooks/useNow'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CompetitionBadge, EmptyState, FormPills } from '@/components/league/Bits'
 import { PlayerAvatar, PlayerLink, TeamLogo } from '@/components/league/Identity'
-import { PitchLineup } from '@/components/match/PitchLineup'
+import { LineupList } from '@/components/match/LineupList'
 import { MotmVoteWidget } from '@/components/match/MotmVoteWidget'
 import { ShareVisualsDialog } from '@/components/share/ShareVisualsDialog'
 import { LiveBadge } from '@/components/match/LiveBadge'
@@ -20,9 +20,7 @@ import { fmtMinute, fmtScore, keeperMatchStats, possession, timelineByPeriod, PE
 import type { Match, MatchEvent, Player } from '@/types/entities'
 import { cn } from '@/lib/utils'
 import { AddToCalendar } from '@/components/match/AddToCalendar'
-import { useTeamOfWeek } from '@/hooks/useStats'
 import { countdown } from '@/lib/ics'
-import { fmtRating, ratingColor } from '@/components/teamweek/TeamOfWeekPitch'
 
 export default function MatchDetail() {
   const { id } = useParams()
@@ -107,7 +105,6 @@ export default function MatchDetail() {
                 <CardHeader><CardTitle className="flex items-center gap-2"><Star className="size-5 text-award-gold" />Homme du match</CardTitle></CardHeader>
                 <CardContent>{m.motm_player_id ? <MotmCard match={m} playerId={m.motm_player_id} /> : <p className="text-sm text-muted-foreground">{showScore ? 'Désigné à la fin du match.' : 'Désigné après le match.'}</p>}</CardContent>
               </Card>
-              {m.status === 'finished' && <PlayerOfRoundCard match={m} />}
               {m.status === 'finished' && <KeepersCard match={m} events={events} />}
               {showScore && <CardsCard events={events} />}
               {(m.motm_vote_closes_at || live) && m.status !== 'scheduled' && <Card><CardHeader><CardTitle className="flex items-center gap-2"><Vote className="size-5 text-neon" />Vote du public</CardTitle></CardHeader><CardContent><MotmVoteWidget match={m} /></CardContent></Card>}
@@ -120,9 +117,9 @@ export default function MatchDetail() {
         </TabsContent>
         <TabsContent value="stats"><StatsTab match={m} events={events} now={now} /></TabsContent>
         <TabsContent value="lineups">
-          <div className="grid gap-6 md:grid-cols-2">
-            <PitchLineup lineup={lineups.home} team={home} events={events} />
-            <PitchLineup lineup={lineups.away} team={away} events={events} />
+          <div className="grid gap-4 md:grid-cols-2">
+            <LineupList lineup={lineups.home} team={home} events={events} />
+            <LineupList lineup={lineups.away} team={away} events={events} />
           </div>
         </TabsContent>
         <TabsContent value="preview"><PreMatch match={m} /></TabsContent>
@@ -287,29 +284,6 @@ function Countdown({ to, now }: { to?: string; now: number }) {
       <span className="text-[11px] text-muted-foreground">Coup d’envoi dans</span>
       {parts.map(([v, u]) => <span key={u as string} className="num text-xl">{String(v).padStart(2, '0')}<span className="ml-0.5 text-xs text-muted-foreground">{u}</span></span>)}
     </div>
-  )
-}
-
-/** Joueur de la journée : meilleur joueur de toute la journée (équipe type) */
-function PlayerOfRoundCard({ match }: { match: Match }) {
-  const L = useLookup()
-  const res = useTeamOfWeek(match.season_id, match.round)
-  const best = res?.player_of_round
-  if (!best) return null
-  const p = L.player.get(best.player_id), t = L.team.get(best.team_id)
-  const fromThisMatch = best.team_id === match.home_team_id || best.team_id === match.away_team_id
-  return (
-    <Card>
-      <CardHeader><CardTitle className="flex items-center gap-2"><Crown className="size-5 fill-award-gold text-award-gold" />Joueur de la journée {match.round}</CardTitle></CardHeader>
-      <CardContent>
-        <Link to={`/joueurs/${best.player_id}`} className="flex items-center gap-3 rounded-xl p-2 hover:bg-white/5">
-          <PlayerAvatar player={p} team={t} size={44} />
-          <div className="min-w-0 flex-1"><div className="truncate font-semibold">{p?.first_name} {p?.last_name}</div><div className="text-xs text-muted-foreground">{t?.name}{fromThisMatch ? ' · dans ce match' : ''}</div></div>
-          <span className="rounded-md px-1.5 font-display text-xl font-black text-ink" style={{ background: ratingColor(best.rating) }}>{fmtRating(best.rating)}</span>
-        </Link>
-        <Link to={`/equipe-type?journee=${match.round}`} className="mt-2 block text-xs font-bold text-neon underline underline-offset-4">Voir l’équipe type de la journée</Link>
-      </CardContent>
-    </Card>
   )
 }
 

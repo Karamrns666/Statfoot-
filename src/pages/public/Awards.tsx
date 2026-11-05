@@ -248,7 +248,6 @@ function RewardsByPeriod({ seasonId }: { seasonId: string }) {
       </div>
       <h3 className="font-display text-2xl font-black first-letter:uppercase">{kind === 'round' ? `Journée ${r}` : kind === 'month' ? monthName(mo!) : 'Toute la saison'}</h3>
       <RewardsList seasonId={seasonId} period={period} competitionId={comp || null} />
-      {kind === 'round' && <Link to={`/equipe-type?journee=${r}${comp ? `&competition=${comp}` : ''}`} className="inline-block text-sm font-bold text-neon underline underline-offset-4">Voir l’équipe type de la journée {r}</Link>}
     </div>
   )
 }

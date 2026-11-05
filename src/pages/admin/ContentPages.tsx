@@ -100,7 +100,7 @@ export function SettingsPage() {
     { key: 'social_instagram', label: 'Instagram MBL' }, { key: 'social_organizer_instagram', label: 'Instagram Ardentia' }, { key: 'social_linkedin', label: 'LinkedIn Ardentia' },
     { key: 'social_facebook', label: 'Facebook (facultatif)' }, { key: 'social_youtube', label: 'YouTube (facultatif)' },
     { key: 'points_win', label: 'Points victoire', type: 'number' }, { key: 'points_draw', label: 'Points nul', type: 'number' }, { key: 'points_loss', label: 'Points défaite', type: 'number' },
-    { key: 'motm_vote_minutes_after', label: 'Fermeture du vote HdM (min après la fin)', type: 'number' }, { key: 'young_max_age', label: 'Âge max « meilleur jeune »', type: 'number' },
+    { key: 'motm_vote_minutes_after', label: 'Fermeture du vote HdM (min après la fin)', type: 'number' },
   ]
   const save = async () => {
     const socials = { instagram: v.social_instagram, organizer_instagram: v.social_organizer_instagram, facebook: v.social_facebook, linkedin: v.social_linkedin, youtube: v.social_youtube } as Settings['socials']

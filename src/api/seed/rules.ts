@@ -24,5 +24,5 @@ export const RULES_MARKDOWN = `# Règlement de la StatFoot League
 - 3 cartons jaunes cumulés : 1 match de suspension.
 
 ## 6. Trophées de fin de saison
-Ballon d'or, Soulier d'or, Meilleur passeur, Gant d'or, Meilleure équipe, Meilleur jeune, Meilleure défense, Équipe la plus offensive.
+Ballon d'or, Soulier d'or, Meilleur passeur, Gant d'or, Meilleure équipe, Meilleure défense, Équipe la plus offensive.
 `

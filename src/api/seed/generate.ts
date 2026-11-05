@@ -24,7 +24,7 @@ export function generateLeagueData(now = new Date()): DB {
     organizer: LEAGUE.organizer.name, logo_url: LEAGUE.logo, contact_email: LEAGUE.organizer.email, contact_phone: LEAGUE.organizer.phone, address: LEAGUE.organizer.address,
     website: LEAGUE.organizer.website, socials: { instagram: LEAGUE.instagram, organizer_instagram: LEAGUE.organizer.instagram, linkedin: LEAGUE.organizer.linkedin },
     points_win: 3, points_draw: 1, points_loss: 0, tiebreakers: ['points', 'goal_diff', 'goals_for', 'head_to_head', 'fair_play'],
-    motm_vote_minutes_after: 15, young_max_age: 23,
+    motm_vote_minutes_after: 15,
   }
   db.Settings.push(settings)
   db.Page.push({ id: 'page_rules', slug: 'reglement', title: 'Règlement de la ligue', content: RULES_MARKDOWN, published: true } as Page)

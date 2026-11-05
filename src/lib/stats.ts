@@ -125,7 +125,7 @@ export function kpis(data: LeagueData, scope: XPScope = {}) {
 export const AWARD_LABELS: Record<AwardCategory, string> = {
   ballon_or: "Ballon d'or", golden_glove: "Gant d'or", top_scorer: "Soulier d'or", top_assist: 'Meilleur passeur', best_team: 'Meilleure équipe',
   player_of_tournament: 'Joueur du tournoi',
-  best_young: 'Meilleur jeune', best_defense: 'Meilleure défense', best_attack: 'Équipe la plus offensive',
+  best_defense: 'Meilleure défense', best_attack: 'Équipe la plus offensive',
 }
 export interface AwardResult { category: AwardCategory; player_id?: string; team_id?: string; value?: number; not_awarded: boolean; snapshot?: Record<string, unknown> }
 
@@ -140,8 +140,6 @@ export function ageAt(birth?: string, at?: string): number | null {
 export function computeAwards(data: LeagueData, scope: XPScope): AwardResult[] {
   const list = [...computePlayerXP(data, scope).values()]
   const cfg = xpConfig(data.xpRules, scope.seasonId)
-  const season = data.seasons.find((s) => s.id === scope.seasonId)
-  const youngMax = data.settings.young_max_age ?? 23
   const eligible = list.filter((s) => s.matches >= cfg.min_matches_awards).sort((a, b) => b.xp - a.xp || b.goals - a.goals || b.assists - a.assists || a.matches - b.matches)
   const res: AwardResult[] = []
   const snap = (s: PlayerXP) => ({ matches: s.matches, goals: s.goals, assists: s.assists, xp: s.xp, clean_sheets: s.clean_sheets, saves: s.saves, conceded: s.conceded })
@@ -152,7 +150,6 @@ export function computeAwards(data: LeagueData, scope: XPScope): AwardResult[] {
   push('top_scorer', race(data, list, 'top_scorer', scope.seasonId)[0]?.item, (s) => s.goals)
   push('top_assist', race(data, list, 'top_assist', scope.seasonId)[0]?.item, (s) => s.assists)
   push('player_of_tournament', eligible[0], (s) => s.xp)
-  push('best_young', eligible.find((s) => { const p = data.players.find((x) => x.id === s.player_id); const a = ageAt(p?.birth_date, season?.start_date); return a !== null && a < youngMax }), (s) => s.xp)
   const bt = bestTeam(data, scope)
   res.push(bt ? { category: 'best_team', team_id: bt.team_id, value: bt.row?.points, not_awarded: false, snapshot: { reason: bt.reason } } : { category: 'best_team', not_awarded: true })
   const ts = [...computeTeamStats(data, scope).values()]

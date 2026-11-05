@@ -54,10 +54,6 @@
     "motm_vote_minutes_after": {
       "type": "integer",
       "default": 15
-    },
-    "young_max_age": {
-      "type": "integer",
-      "default": 23
     }
   }
 }

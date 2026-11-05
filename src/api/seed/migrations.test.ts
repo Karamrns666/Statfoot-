@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { applyRules6v6 } from './migrations'
+import { applyLot1, applyRules6v6, migrate } from './migrations'
+import { captainUpdates } from '@/lib/captain'
 import { generateLeagueData } from './generate'
-import type { Player } from '@/types/entities'
+import type { Player, Team } from '@/types/entities'
 
 describe('règles 6 contre 6', () => {
   it('données de la ligue : rôles GK / FIELD uniquement, aucun hors-jeu, aucun trophée par poste', () => {
     const db = generateLeagueData(new Date('2026-11-04T19:00:00'))
     expect(new Set(db.Player.map((p) => p.position))).toEqual(new Set(['GK', 'FIELD']))
-    expect(JSON.stringify({ ...db, Page: [] })).not.toMatch(/offside|hors-jeu|best_defender|best_midfielder|best_forward/i)
+    expect(JSON.stringify({ ...db, Page: [] })).not.toMatch(/offside|hors-jeu|best_defender|best_midfielder|best_forward|best_young|young_max_age/i)
     expect(db.Page.find((p) => p.slug === 'reglement')!.content).toMatch(/Pas de hors-jeu/)
   })
   it('migration des données déjà enregistrées', () => {
@@ -28,5 +29,28 @@ describe('règles 6 contre 6', () => {
     expect(applyRules6v6({ Player: out.Player })).toEqual({})
     const page = applyRules6v6({ Page: [{ id: 'r', slug: 'reglement', title: 'R', content: '# R\n\n## 1. Format\n- Football à 6.\n' }] }).Page![0]
     expect(page.content).toBe('# R\n\n## 1. Format\n- **Pas de postes** : les seuls rôles sont **Gardien** et **Capitaine**.\n- **Pas de hors-jeu.**\n- Football à 6.\n')
+  })
+  it('lot 1 : « Meilleur jeune » retiré, un seul capitaine par équipe', () => {
+    const P = (id: string, team_id: string, is_captain = false) => ({ id, first_name: id, last_name: id, team_id, position: 'FIELD', is_captain }) as Player
+    const out = applyLot1({
+      Award: [{ id: 'a', season_id: 's', category: 'best_young' as never }, { id: 'b', season_id: 's', category: 'ballon_or' }],
+      Settings: [{ id: 'x', young_max_age: 23 } as never],
+      Player: [P('a1', 'A', true), P('a2', 'A', true), P('b1', 'B'), P('b2', 'B')],
+      Team: [{ id: 'A', name: 'A', short_name: 'A' }, { id: 'B', name: 'B', short_name: 'B', captain_player_id: 'b2' }],
+      Page: [{ id: 'r', slug: 'reglement', title: 'R', content: 'Ballon d’or, Meilleur jeune, Meilleure défense.' }],
+    })
+    expect(out.Award!.map((a) => a.id)).toEqual(['b'])
+    expect(out.Settings![0]).toEqual({ id: 'x' })
+    expect(out.Player!.filter((p) => p.is_captain).map((p) => p.id)).toEqual(['a1', 'b2'])
+    expect(out.Team!.map((t) => t.captain_player_id)).toEqual(['a1', 'b2'])
+    expect(out.Page![0].content).toBe('Ballon d’or, Meilleure défense.')
+    expect(migrate({ Award: out.Award, Settings: out.Settings, Player: out.Player, Team: out.Team }, 1)).toEqual({})
+  })
+  it('capitaine : désigner un joueur retire le brassard aux autres de son équipe', () => {
+    const P = (id: string, team_id: string, is_captain = false) => ({ id, first_name: id, last_name: id, team_id, position: 'FIELD', is_captain }) as Player
+    const teams: Team[] = [{ id: 'A', name: 'A', short_name: 'A', captain_player_id: 'a1' }, { id: 'B', name: 'B', short_name: 'B' }]
+    const players = [P('a1', 'A', true), P('a2', 'A'), P('b1', 'B', true)]
+    expect(captainUpdates(players, teams, 'a2', 'A', true)).toEqual({ players: [{ id: 'a1', is_captain: false }, { id: 'a2', is_captain: true }], teams: [{ id: 'A', captain_player_id: 'a2' }] })
+    expect(captainUpdates(players, teams, 'a1', 'A', false)).toEqual({ players: [{ id: 'a1', is_captain: false }], teams: [{ id: 'A', captain_player_id: null }] })
   })
 })

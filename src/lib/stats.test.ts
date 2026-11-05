@@ -161,10 +161,8 @@ describe('trophées', () => {
     expect(bestDefense(ts)[0].team_id).toBe('A')
     expect(bestAttack(ts)[0].team_id).toBe('B')
   })
-  it('meilleur jeune = âge réel ; sinon Non attribué', () => {
-    expect(computeAwards(data, { seasonId: 's1' }).find((a) => a.category === 'best_young')!.player_id).toBe('C_MID')
-    const d = makeLeague({ settings: { young_max_age: 18 } })
-    expect(computeAwards(d, { seasonId: 's1' }).find((a) => a.category === 'best_young')!.not_awarded).toBe(true)
+  it('pas de trophée « Meilleur jeune »', () => {
+    expect(computeAwards(data, { seasonId: 's1' }).map((a) => a.category as string)).not.toContain('best_young')
   })
   it('KPIs : passes comptées', () => {
     expect(kpis(data, { seasonId: 's1' })).toMatchObject({ goals: 15, assists: 9, matches: 6 })

@@ -128,7 +128,6 @@ export function Teams() {
     { key: 'primary_color', label: 'Couleur principale', type: 'color' }, { key: 'secondary_color', label: 'Couleur secondaire', type: 'color' },
     { key: 'division_id', label: 'Série', type: 'select', options: db.Division.map((d) => ({ value: d.id, label: d.name })) },
     { key: 'group_id', label: 'Groupe', type: 'select', options: db.Group.map((g) => ({ value: g.id, label: g.name })) },
-    { key: 'captain_player_id', label: 'Capitaine', type: 'select', options: db.Player.map((p) => ({ value: p.id, label: `${p.first_name} ${p.last_name}` })) },
     { key: 'contact_name', label: 'Contact' }, { key: 'contact_email', label: 'Email contact', type: 'email' }, { key: 'contact_phone', label: 'Téléphone' },
   ]
   return (
@@ -144,6 +143,7 @@ export function Teams() {
           { label: 'Entreprise', render: (t) => <span className="flex items-center gap-2">{t.company_logo_url && <img src={t.company_logo_url} className="size-5 rounded" alt="" />}{t.company}</span>, className: 'hidden md:table-cell' },
           { label: 'Couleurs', render: (t) => <span className="flex gap-1"><span className="size-4 rounded" style={{ background: t.primary_color }} /><span className="size-4 rounded ring-1 ring-white/20" style={{ background: t.secondary_color }} /></span>, className: 'hidden sm:table-cell' },
           { label: 'Série', render: (t) => db.Division.find((d) => d.id === t.division_id)?.name ?? '—' },
+          { label: 'Capitaine', render: (t) => { const c = db.Player.find((p) => p.team_id === t.id && p.is_captain); return c ? `${c.first_name} ${c.last_name}` : <span className="text-muted-foreground">—</span> }, className: 'hidden lg:table-cell' },
           { label: 'Effectif', render: (t) => db.Player.filter((p) => p.team_id === t.id && p.season_ids?.includes(seasonId)).length, className: 'text-center' },
           { label: 'Statut', render: (t) => <Badge variant={t.status === 'active' ? 'success' : 'outline'}>{t.status === 'active' ? 'Active' : t.status === 'pending' ? 'En attente' : 'Inactive'}</Badge> },
         ]} />

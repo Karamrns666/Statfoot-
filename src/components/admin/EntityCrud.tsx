@@ -31,7 +31,7 @@ export function EntityForm({ fields, value, onChange }: { fields: Field[]; value
             {f.type === 'textarea' ? <Textarea id={id} value={(v as string) ?? ''} onChange={(e) => set(f.key, e.target.value)} rows={4} />
               : f.type === 'select' ? <FilterSelect className="sm:w-full" value={(v as string) ?? ''} onChange={(x) => set(f.key, x || undefined)} allLabel="—" options={f.options ?? []} />
                 : f.type === 'multiselect' ? <MultiSelect options={f.options ?? []} value={(v as string[]) ?? []} onChange={(x) => set(f.key, x)} />
-                  : f.type === 'boolean' ? <div className="pt-1"><Switch id={id} checked={!!v} onCheckedChange={(c) => set(f.key, c)} /></div>
+                  : f.type === 'boolean' ? <div className="flex items-center gap-2 pt-1"><Switch id={id} checked={!!v} onCheckedChange={(c) => set(f.key, c)} /><span className="text-sm text-muted-foreground">{v ? 'Oui' : 'Non'}</span></div>
                     : f.type === 'color' ? <div className="flex gap-2"><input type="color" value={(v as string) ?? '#F85A00'} onChange={(e) => set(f.key, e.target.value)} className="h-10 w-14 cursor-pointer rounded-lg border border-input bg-transparent" /><Input id={id} value={(v as string) ?? ''} onChange={(e) => set(f.key, e.target.value)} /></div>
                       : f.type === 'image' ? <ImageInput value={v as string} onChange={(x) => set(f.key, x)} />
                         : <Input id={id} type={f.type === 'number' ? 'number' : f.type === 'date' ? 'date' : f.type === 'datetime' ? 'datetime-local' : f.type === 'email' ? 'email' : 'text'} placeholder={f.placeholder}
@@ -66,11 +66,15 @@ export function ImageInput({ value, onChange }: { value?: string; onChange: (v: 
   )
 }
 
-export function EntityCrud<N extends EntityName>({ entity, title, fields, columns, filter, defaults, toolbar, rowActions, sort, searchText, emptyLabel, canDelete = true, transform }: {
+export function EntityCrud<N extends EntityName>({ entity, title, fields, columns, filter, defaults, toolbar, rowActions, sort, searchText, emptyLabel, canDelete = true, transform, prepare, afterSave }: {
   entity: N; title: string; fields: Field[]; columns: Column<EntityMap[N]>[]
   filter?: (r: EntityMap[N]) => boolean; defaults?: () => Record<string, unknown>; toolbar?: ReactNode; rowActions?: (r: EntityMap[N]) => ReactNode
   sort?: (a: EntityMap[N], b: EntityMap[N]) => number; searchText?: (r: EntityMap[N]) => string; emptyLabel?: string; canDelete?: boolean
   transform?: (v: Record<string, unknown>) => Record<string, unknown>
+  /** valeurs du formulaire à l'ouverture (champs calculés, ex. « gardien oui/non ») */
+  prepare?: (v: Record<string, unknown>) => Record<string, unknown>
+  /** après enregistrement (ex. un seul capitaine par équipe) */
+  afterSave?: (saved: Record<string, unknown>) => Promise<void> | void
 }) {
   const { db } = useData()
   const [q, setQ] = useState('')
@@ -89,7 +93,9 @@ export function EntityCrud<N extends EntityName>({ entity, title, fields, column
     const data = transform ? transform(edit) : edit
     const { id, created_date: _c, updated_date: _u, ...rest } = data as Record<string, unknown>
     void _c; void _u
-    if (id) await api.update(id as string, rest); else await api.create(rest)
+    const saved = id ? { ...rest, id } : ((await api.create(rest)) as Record<string, unknown>)
+    if (id) await api.update(id as string, rest)
+    await afterSave?.(saved)
     toast.success(id ? 'Modifications enregistrées' : 'Élément créé'); setEdit(null)
   }
   return (
@@ -97,7 +103,7 @@ export function EntityCrud<N extends EntityName>({ entity, title, fields, column
       <div className="flex flex-wrap items-center gap-2">
         {searchText && <div className="relative w-full sm:w-64"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher…" className="h-9 pl-9" /></div>}
         {toolbar}
-        <Button className="ml-auto" onClick={() => setEdit({ ...(defaults?.() ?? {}) })}><Plus />Ajouter</Button>
+        <Button className="ml-auto" onClick={() => { const v = { ...(defaults?.() ?? {}) }; setEdit(prepare ? prepare(v) : v) }}><Plus />Ajouter</Button>
       </div>
       <div className="glass rounded-2xl p-1 sm:p-2">
         <Table>
@@ -109,7 +115,7 @@ export function EntityCrud<N extends EntityName>({ entity, title, fields, column
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">
                     {rowActions?.(r)}
-                    <Button size="icon" variant="ghost" className="size-8" onClick={() => setEdit({ ...(r as unknown as Record<string, unknown>) })} title="Modifier"><Pencil /></Button>
+                    <Button size="icon" variant="ghost" className="size-8" onClick={() => { const v = { ...(r as unknown as Record<string, unknown>) }; setEdit(prepare ? prepare(v) : v) }} title="Modifier"><Pencil /></Button>
                     {canDelete && (confirm === r.id
                       ? <Button size="sm" variant="destructive" className="h-8" onClick={async () => { await api.delete(r.id); setConfirm(null); toast.success('Supprimé') }}>Confirmer</Button>
                       : <Button size="icon" variant="ghost" className="size-8 text-red-400" onClick={() => setConfirm(r.id)} title="Supprimer"><Trash2 /></Button>)}

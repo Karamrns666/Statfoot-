@@ -14,7 +14,7 @@ describe('règles 6 contre 6', () => {
     const legacy = (position: string) => ({ id: position, first_name: 'a', last_name: 'b', team_id: 't', position }) as unknown as Player
     const out = applyRules6v6({
       Player: ['GK', 'DEF', 'MID', 'FWD', 'FIELD'].map(legacy),
-      MatchEvent: [{ id: 'e1', match_id: 'm', type: 'offside' as never }, { id: 'e2', match_id: 'm', type: 'goal' }],
+      MatchEvent: [{ id: 'e1', match_id: 'm', team_id: 't', type: 'offside' as never }, { id: 'e2', match_id: 'm', team_id: 't', type: 'goal' }],
       MatchTeamStats: [{ id: 's', match_id: 'm', team_id: 't', offsides: 3, fouls: 2 } as never],
       Award: [{ id: 'a1', season_id: 's', category: 'best_defender' as never }, { id: 'a2', season_id: 's', category: 'ballon_or' }],
       TeamOfWeek: [{ id: 'w', season_id: 's', round: 1, formation: '2-2-1', slots: ['GK', 'DEF', 'DEF', 'MID', 'MID', 'FWD'].map((p, i) => ({ position: p as never, player_id: `p${i}` })) } as never],

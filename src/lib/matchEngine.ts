@@ -279,9 +279,14 @@ export function minutesPlayed(lineup: Pick<Lineup, 'starter_ids'> | undefined, e
 }
 
 /** Joueurs ayant participé (titulaires + entrés en jeu). */
+/** Joueurs ayant joué : titulaires, entrants (remplacement) et tout remplaçant ayant une action dans le match (but, passe, arrêt…). */
 export function participants(lineup: Pick<Lineup, 'starter_ids'> | undefined, events: MatchEvent[], teamId: string): Set<string> {
   const s = new Set(lineup?.starter_ids ?? [])
-  for (const e of events) if (e.team_id === teamId && e.type === 'substitution' && e.player_id) s.add(e.player_id)
+  for (const e of events) {
+    if (e.team_id !== teamId || !e.player_id) continue
+    s.add(e.player_id)
+    if (e.type === 'goal' && e.related_player_id) s.add(e.related_player_id)
+  }
   return s
 }
 

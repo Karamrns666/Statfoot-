@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
-  buildAction, closureChecklist, correctEvent, footballMinute, fmtMinute, idsToRemove, keeperMatchStats, minutesPlayed, newLiveState,
+  buildAction, closureChecklist, correctEvent, footballMinute, fmtMinute, idsToRemove, keeperMatchStats, minutesPlayed, newLiveState, participants,
   pause, possession, possessionAfter, resume, scoreFromEvents, setPossession, shootout, startPeriod, teamStats, eligibility, fmtScore,
 } from './matchEngine'
 import type { LiveState, Match, MatchEvent } from '@/types/entities'
@@ -128,5 +128,17 @@ describe('clôture', () => {
     const items = closureChecklist({ ...M, home_score: 2, away_score: 0 }, evs, [], { knockout: false })
     expect(items.find((i) => i.key === 'score')!.ok).toBe(false)
     expect(closureChecklist({ ...M, home_score: 1, away_score: 0 }, evs, [], { knockout: false }).find((i) => i.key === 'score')!.ok).toBe(true)
+  })
+  it('6 titulaires au maximum : gardien + joueurs les plus impliqués, les autres remplaçants mais comptés comme ayant joué', async () => {
+    const { capStarters } = await import('./lineup')
+    const ev = (id: string, type: MatchEvent['type'], player_id: string, related_player_id?: string) => ({ id, match_id: 'm', team_id: 'H', type, player_id, related_player_id }) as MatchEvent
+    const evs = [ev('1', 'goal', 'p7', 'p8'), ev('2', 'goal', 'p7'), ev('3', 'yellow_card', 'p6'), ev('4', 'goal', 'p5'), ev('5', 'save', 'gk'), ev('6', 'goal', 'p4'), ev('7', 'goal', 'p3')]
+    const lu = capStarters({ match_id: 'm', starter_ids: ['gk', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8'], substitute_ids: [], goalkeeper_id: 'gk' }, evs)
+    expect(lu.starter_ids).toEqual(['gk', 'p3', 'p4', 'p5', 'p6', 'p7'])
+    expect(lu.substitute_ids).toEqual(['p1', 'p2', 'p8'])
+    const played = participants(lu, evs, 'H')
+    expect(played.has('p8')).toBe(true) // passeur décisif depuis le banc
+    expect(played.has('p1')).toBe(false)
+    expect(capStarters(lu, evs)).toBe(lu)
   })
 })

@@ -1,10 +1,10 @@
 // Composition d'une équipe pour un match (6 contre 6) : deux listes simples, sans terrain.
 //  · Titulaires : 6 joueurs, le gardien d'abord, gardien et capitaine signalés.
-//  · Remplaçants : les autres présents, avec une flèche s'ils sont entrés en jeu.
+//  · Remplaçants : les autres présents, avec une flèche s'ils sont entrés en jeu (remplacement ou action dans le match).
 import { Link } from 'react-router-dom'
 import { ArrowUpRight } from 'lucide-react'
 import type { Lineup, MatchEvent, Player, Team } from '@/types/entities'
-import { playerBadges } from '@/lib/matchEngine'
+import { participants, playerBadges } from '@/lib/matchEngine'
 import { playerName } from '@/lib/format'
 import { useLookup } from '@/hooks/useData'
 import { PlayerAvatar, RoleBadge, TeamLogo } from '@/components/league/Identity'
@@ -44,7 +44,7 @@ export function LineupList({ lineup, team, events = [] }: { lineup?: Lineup; tea
   const num = (p: Player) => lineup.numbers?.[p.id] ?? p.number ?? 99
   const starters = get(lineup.starter_ids).sort((a, b) => Number(b.id === lineup.goalkeeper_id) - Number(a.id === lineup.goalkeeper_id) || num(a) - num(b))
   const subs = get(lineup.substitute_ids).sort((a, b) => num(a) - num(b))
-  const entered = new Set(events.filter((e) => e.type === 'substitution').map((e) => e.player_id))
+  const entered = participants(undefined, events, lineup.team_id)
   return (
     <div className="glass rounded-2xl p-4">
       {header}

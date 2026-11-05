@@ -4,6 +4,7 @@
 // 6 contre 6, pas de postes : le rôle de gardien est déduit des arrêts et modifiable dans l'admin.
 import type { Competition, Lineup, Match, MatchEvent, Player, Season, Team } from '@/types/entities'
 import { addDays } from '@/lib/schedule'
+import { capStarters } from '@/lib/lineup'
 import { S25_MATCHES, S25_PLAYERS, S25_TEAMS } from './season2025.data'
 
 export const SEASON_2025_ID = 'season_2025'
@@ -86,10 +87,11 @@ export function buildSeason2025(): Season2025 {
       // composition : joueurs ayant une action sur le match (le fichier ne liste pas les présents)
       const gk = [...savesBy.entries()].sort((x, y) => y[1] - x[1])[0]?.[0]
       const involved = [...new Set(mine.filter((e) => e[2] >= 0).map((e) => e[2]))]
-      lineups.push({
+      // 6 contre 6 : 6 titulaires au plus (gardien + joueurs les plus impliqués), les autres remplaçants entrés en jeu
+      lineups.push(capStarters({
         id: `lu25_${n}_${side}`, match_id: m.id, team_id: teamId, present_ids: involved.map(s25PlayerId), starter_ids: involved.map(s25PlayerId),
         substitute_ids: [], goalkeeper_id: gk != null ? s25PlayerId(gk) : undefined, validated: true, validated_by: 'Import Excel',
-      })
+      }, events))
     }
   }
   return { season, competition, teams, players, matches, events, lineups }

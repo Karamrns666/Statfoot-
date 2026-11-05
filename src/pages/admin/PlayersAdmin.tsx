@@ -35,11 +35,11 @@ export default function PlayersAdmin() {
     { key: 'first_name', label: 'Prénom', required: true }, { key: 'last_name', label: 'Nom', required: true },
     { key: 'number', label: 'Numéro', type: 'number' },
     { key: 'team_id', label: 'Équipe', type: 'select', required: true, options: db.Team.map((t) => ({ value: t.id, label: t.name })) },
-    { key: 'birth_date', label: 'Date de naissance', type: 'date' }, { key: 'photo_url', label: 'Photo', type: 'image', full: true },
-    { key: 'status', label: 'Statut', type: 'select', options: [{ value: 'active', label: 'Actif' }, { value: 'injured', label: 'Blessé' }, { value: 'inactive', label: 'Inactif' }] },
     // 6 contre 6 : pas de postes, seulement deux rôles
     { key: 'is_goalkeeper', label: 'Gardien', type: 'boolean' },
     { key: 'is_captain', label: 'Capitaine', type: 'boolean', help: 'Un seul capitaine par équipe : l’ancien capitaine perd le brassard.' },
+    { key: 'birth_date', label: 'Date de naissance', type: 'date' }, { key: 'photo_url', label: 'Photo', type: 'image', full: true },
+    { key: 'status', label: 'Statut', type: 'select', options: [{ value: 'active', label: 'Actif' }, { value: 'injured', label: 'Blessé' }, { value: 'inactive', label: 'Inactif' }] },
     { key: 'email', label: 'Email du compte joueur (accès à sa carte)', type: 'email', full: true },
     { key: 'season_ids', label: 'Saisons jouées', type: 'multiselect', options: db.Season.map((s) => ({ value: s.id, label: s.name })) },
   ]

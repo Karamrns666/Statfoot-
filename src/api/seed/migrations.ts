@@ -2,6 +2,7 @@
 // Elles adaptent les anciennes données aux règles en vigueur sans effacer ce que l'admin a saisi.
 import type { Award, Lineup, Page, Position, MatchEvent, MatchTeamStats, Player, Settings, Team, TeamOfWeek } from '@/types/entities'
 import { toRole } from '@/lib/format'
+import { capStarters } from '@/lib/lineup'
 import { store } from '../localStore'
 
 /** copie sans la clé donnée */
@@ -60,7 +61,8 @@ export function applyRules6v6(db: Rules6Data): Rules6Data {
 /**
  * Lot 1 — nettoyage :
  * - trophée « Meilleur jeune » retiré (et son réglage d'âge) ;
- * - un seul capitaine par équipe, fiche joueur et fiche équipe alignées.
+ * - un seul capitaine par équipe, fiche joueur et fiche équipe alignées ;
+ * - 6 titulaires au maximum par composition (les autres deviennent remplaçants).
  */
 export function applyLot1(db: Rules6Data): Rules6Data {
   const out: Rules6Data = {}
@@ -79,6 +81,11 @@ export function applyLot1(db: Rules6Data): Rules6Data {
       out.Player = db.Player.map((p) => (!!p.is_captain === (captain.get(p.team_id) === p.id) ? p : { ...p, is_captain: captain.get(p.team_id) === p.id }))
     if (db.Team.some((t) => (t.captain_player_id ?? null) !== captain.get(t.id)))
       out.Team = db.Team.map((t) => { const c = captain.get(t.id); return (t.captain_player_id ?? null) === c ? t : c ? { ...t, captain_player_id: c } : omit(t, 'captain_player_id') })
+  }
+  if (db.Lineup && db.MatchEvent) {
+    const evs = db.MatchEvent
+    const next = db.Lineup.map((l) => capStarters(l, evs))
+    if (next.some((l, i) => l !== db.Lineup![i])) out.Lineup = next
   }
   const rules = db.Page?.find((p) => p.slug === 'reglement')
   if (rules && /,? ?Meilleur jeune/.test(rules.content ?? ''))

@@ -1,14 +1,14 @@
-import { useMemo } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import { Billboard, type BillboardSlide } from '@/components/home/Billboard'
 import { IPGCard, XPCard } from '@/components/players/Cards'
 import { IPG_RANKING } from '@/lib/ipg'
 import { SEASON_2025_ID } from '@/api/seed/season2025'
-import { playerShort } from '@/lib/format'
+import { initials, playerShort } from '@/lib/format'
 import { Link } from 'react-router-dom'
 import { CalendarDays, Trophy, Users, Goal, Hand } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
 import { useSeason } from '@/hooks/useSeason'
-import { useEffectiveSeason, useSeasonCompetitions, useRace, usePlayerXP, useTeamOfWeek } from '@/hooks/useStats'
+import { useEffectiveSeason, useSeasonCompetitions, useRace, usePlayerXP, useTeamOfWeek, useTeamStats } from '@/hooks/useStats'
 import { TeamOfWeekPitch } from '@/components/teamweek/TeamOfWeekPitch'
 import { RewardsList } from '@/components/teamweek/RewardsList'
 import { seasonRounds } from '@/lib/rewards'
@@ -19,7 +19,7 @@ import { StandingsTable } from '@/components/standings/StandingsTable'
 import { EmptyState, SectionTitle, StatTile, CompetitionBadge } from '@/components/league/Bits'
 import { PlayerAvatar, PlayerLink, TeamLogo } from '@/components/league/Identity'
 import { TrophyBadge } from '@/components/awards/TrophyBadge'
-import { competitionStandings, generalStandings, kpis, isPlayed, race } from '@/lib/stats'
+import { bestAttack, bestDefense, competitionStandings, generalStandings, kpis, isPlayed, race } from '@/lib/stats'
 import { competitionZones } from '@/lib/zones'
 
 export default function Home() {
@@ -50,45 +50,69 @@ export default function Home() {
   const podium = useRace({ seasonId: refSid }, 'xp').slice(0, 3)
   const xpAll = usePlayerXP({ seasonId: refSid })
   const keepers = useMemo(() => race(league, [...xpAll.values()], 'golden_glove', refSid).slice(0, 5).map((r) => r.item), [league, xpAll, refSid])
-  const teamsInSeason = new Set(comps.flatMap((c) => c.team_ids ?? []))
+  const teamsInSeason = useMemo(() => new Set(comps.flatMap((c) => c.team_ids ?? [])), [comps])
   const showIPG = refSid === SEASON_2025_ID
   const tag = archive ? ` · ${archive.name.replace('Saison ', '')}` : ''
+  const teamStatsAll = useTeamStats({ seasonId: refSid })
   const lastPlayedRound = useMemo(() => (refSid ? seasonRounds(league, refSid).at(-1) : undefined), [league, refSid])
   const tow = useTeamOfWeek(refSid, lastPlayedRound)
 
+  // billboard : joueurs et équipes mis en avant, en alternance
   const slides = useMemo<BillboardSlide[]>(() => {
     const out: BillboardSlide[] = []
     if (!sid || !refSid) return out
     const team = (id?: string) => (id ? L.team.get(id) : undefined)
     if (notStarted) {
       const names = comps.map((c) => c.name)
-      out.push({ key: 'intro', eyebrow: season?.name ?? 'Nouvelle saison', title: names.length > 1 ? names.join(' & ') : 'Coup d’envoi', value: teamsInSeason.size || undefined, unit: 'ÉQUIPES', sub: `${teamsInSeason.size} entreprises engagées${comps.length ? ` · ${comps.map((c) => `${c.name}${c.default_pitch ? ` sur le ${c.default_pitch}` : ''}`).join(', ')}` : ''}. Calendrier et résultats en ligne dès la première journée.`, href: '/equipes', tone: 'orange' })
+      out.push({ key: 'intro', kind: 'info', eyebrow: season?.name ?? 'Nouvelle saison', title: names.length > 1 ? names.join(' & ') : 'Coup d’envoi', value: teamsInSeason.size || undefined, unit: 'ÉQUIPES', sub: `${teamsInSeason.size} entreprises engagées. Calendrier et résultats en ligne dès la première journée.`, href: '/equipes', tone: 'orange' })
     }
     for (const m of live.slice(0, 2)) {
       const h = team(m.home_team_id), a = team(m.away_team_id)
-      out.push({ key: `live-${m.id}`, eyebrow: 'En direct', tone: 'red', title: `${h?.short_name ?? '?'} ${m.home_score ?? 0} – ${m.away_score ?? 0} ${a?.short_name ?? '?'}`, sub: `${h?.name} contre ${a?.name}${m.pitch ? `, ${m.pitch}` : ''}`, href: `/matchs/${m.id}` })
+      out.push({ key: `live-${m.id}`, kind: 'match', eyebrow: `En direct${m.pitch ? ` · ${m.pitch}` : ''}`, tone: 'red', title: `${h?.short_name ?? '?'} ${m.home_score ?? 0} – ${m.away_score ?? 0} ${a?.short_name ?? '?'}`, sub: `${h?.name} contre ${a?.name}`, images: [h?.logo_url, a?.logo_url], href: `/matchs/${m.id}` })
     }
-    const lead = generalStandings(league, refSid)[0]
-    if (lead && lead.played > 0) {
-      const t = team(lead.team_id)
-      out.push({ key: 'leader', eyebrow: season?.status === 'closed' ? `Champion · ${season.name}` : 'Leader du classement', title: t?.name ?? '', value: lead.points, unit: 'PTS', image: t?.logo_url, sub: `${lead.won} victoires, ${lead.drawn} nuls, ${lead.lost} défaites · différence ${lead.gd > 0 ? '+' : ''}${lead.gd}`, href: `/equipes/${lead.team_id}`, tone: 'orange' })
-    }
+    // --- joueurs
+    const players: BillboardSlide[] = []
     const list = [...xpAll.values()]
     const pushPlayer = (key: string, eyebrow: string, r: ReturnType<typeof race>[number] | undefined, value: number, unit: string, tone: BillboardSlide['tone']) => {
       if (!r || !value) return
       const p = L.player.get(r.item.player_id), t = team(r.item.team_id)
-      out.push({ key, eyebrow, title: playerShort(p), value, unit, image: t?.logo_url, sub: t?.name, href: p ? `/joueurs/${p.id}` : undefined, tone })
+      players.push({ key, kind: 'player', eyebrow, title: playerShort(p), value, unit, image: t?.logo_url, color: t?.primary_color, photo: p?.photo_url, initials: initials(p), sub: t?.name, href: p ? `/joueurs/${p.id}` : undefined, tone })
     }
+    const xp1 = race(league, list, 'xp', refSid)[0]; pushPlayer('xp', `N°1 du classement XP${tag}`, xp1, xp1?.item.xp ?? 0, 'XP', 'orange')
     const sc = race(league, list, 'top_scorer', refSid)[0]; pushPlayer('scorer', `Meilleur buteur${tag}`, sc, sc?.item.goals ?? 0, 'BUTS', 'orange')
     const as = race(league, list, 'top_assist', refSid)[0]; pushPlayer('assist', `Meilleur passeur${tag}`, as, as?.item.assists ?? 0, 'PASSES', 'sky')
     const gk = race(league, list, 'golden_glove', refSid)[0]; pushPlayer('keeper', `Gant d’or${tag}`, gk, gk?.item.saves ?? 0, 'ARRÊTS', 'white')
+    if (tow?.player_of_round) {
+      const b = tow.player_of_round, p = L.player.get(b.player_id), t = team(b.team_id)
+      players.push({ key: 'potr', kind: 'player', eyebrow: `Joueur de la journée ${tow.round}`, title: playerShort(p), value: b.rating.toFixed(1).replace('.', ','), unit: '/10', image: t?.logo_url, color: t?.primary_color, photo: p?.photo_url, initials: initials(p), sub: t?.name, href: '/equipe-type', tone: 'sky' })
+    }
     if (showIPG && IPG_RANKING[0]) {
       const e = IPG_RANKING[0]
-      out.push({ key: 'ipg', eyebrow: 'N°1 de l’indice de performance', title: e.name, value: e.ipg.toFixed(0), unit: 'IPG', sub: `${e.team} · ${e.goals} buts, ${e.assists} passes décisives`, href: '/joueurs?vue=ipg', tone: 'sky' })
+      players.push({ key: 'ipg', kind: 'player', eyebrow: 'N°1 de l’indice de performance', title: e.name, value: e.ipg.toFixed(0), unit: 'IPG', initials: e.name.split(' ').map((w) => w[0]).join('').slice(0, 2), sub: `${e.team} · ${e.goals} buts, ${e.assists} passes décisives`, href: '/joueurs?vue=ipg', tone: 'sky' })
     }
-    if (refK.matches) out.push({ key: 'kpi', eyebrow: `${archive ? archive.name : 'La saison'} en chiffres`, title: `${refK.matches} matchs`, value: refK.goals, unit: 'BUTS', sub: `${refK.goals_avg} buts par match · ${refK.assists} passes décisives · ${refK.yellow} cartons jaunes`, tone: 'white' })
+    // --- équipes
+    const teams: BillboardSlide[] = []
+    const pushTeam = (key: string, eyebrow: string, id: string | undefined, value: ReactNode, unit: string, sub: string, tone: BillboardSlide['tone']) => {
+      const t = team(id); if (!t) return
+      teams.push({ key, kind: 'team', eyebrow, title: t.name, value, unit, image: t.logo_url, color: t.primary_color, sub, href: `/equipes/${t.id}`, tone })
+    }
+    const lead = generalStandings(league, refSid)[0]
+    if (lead && lead.played > 0) pushTeam('leader', season?.status === 'closed' ? `Champion · ${season.name}` : 'Leader du classement', lead.team_id, lead.points, 'PTS', `${lead.won} victoires, ${lead.drawn} nuls, ${lead.lost} défaites · différence ${lead.gd > 0 ? '+' : ''}${lead.gd}`, 'orange')
+    const tstats = [...teamStatsAll.values()].filter((t) => t.played > 0)
+    const att = bestAttack(tstats)[0]; if (att && att.team_id !== lead?.team_id) pushTeam('attack', 'Attaque la plus prolifique', att.team_id, att.gf, 'BUTS', `${att.gf_avg} buts par match en ${att.played} matchs`, 'orange')
+    const def = bestDefense(tstats)[0]; if (def) pushTeam('defense', 'Meilleure défense', def.team_id, def.ga_avg.toLocaleString('fr-FR'), 'BC / MATCH', `${def.ga} buts encaissés en ${def.played} matchs`, 'sky')
+    if (notStarted) {
+      const engaged = [...teamsInSeason].map((id) => team(id)).filter((t): t is NonNullable<typeof t> => !!t).sort((a, b) => a.name.localeCompare(b.name)).slice(0, 6)
+      for (const t of engaged) pushTeam(`team-${t.id}`, `Engagée en ${season?.name.replace('Saison ', '') ?? ''}`, t.id, undefined, '', t.company && t.company !== t.name ? t.company : 'Entreprise engagée dans la ligue', 'white')
+    }
+    // alternance joueur / équipe
+    for (let i = 0; i < Math.max(players.length, teams.length); i++) {
+      if (players[i]) out.push(players[i])
+      if (teams[i]) out.push(teams[i])
+    }
+    if (refK.matches) out.push({ key: 'kpi', kind: 'info', eyebrow: `${archive ? archive.name : 'La saison'} en chiffres`, title: `${refK.matches} matchs`, value: refK.goals, unit: 'BUTS', sub: `${refK.goals_avg} buts par match · ${refK.assists} passes décisives · ${refK.yellow} cartons jaunes`, tone: 'white' })
     return out
-  }, [sid, refSid, archive, comps, teamsInSeason.size, tag, live, league, xpAll, L, season, showIPG, refK])
+  }, [sid, refSid, archive, comps, teamsInSeason, tag, live, league, xpAll, teamStatsAll, tow, L, season, showIPG, refK, notStarted])
 
   return (
     <div className="space-y-12">

@@ -1,50 +1,127 @@
-// Mode TV / écran géant : /live/:terrain (ou /tv pour tous les terrains). Rotation automatique entre les matchs.
-// Même page = cible du QR code par terrain pour les spectateurs (responsive).
-import { useEffect, useMemo, useState } from 'react'
+// Mode TV / écran géant : /tv (tous les terrains) ou /live/:terrain (un terrain — cible du QR code).
+//  · Plusieurs matchs en même temps → onglets pour passer de l'un à l'autre + rotation automatique (20 s, désactivable).
+//  · Match en direct : score, chrono, buteurs avec minute, cartons, stats live (tirs, tirs cadrés, arrêts, possession).
+//  · Mise à jour automatique sans recharger : la page lit les mêmes données que le Match Center
+//    (chaque action saisie est diffusée aux autres onglets/écrans ouverts dans le navigateur).
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Maximize, X } from 'lucide-react'
+import { Maximize, Pause, Play, RotateCw, X } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
 import { useNow } from '@/hooks/useNow'
 import { TeamLogo } from '@/components/league/Identity'
 import { QrCode, pitchSlug } from '@/components/league/QrCode'
-import { durationsFor, fmtMinute, liveLabel, possession } from '@/lib/matchEngine'
+import { durationsFor, fmtMinute, liveLabel, possession, teamStats } from '@/lib/matchEngine'
 import { matchScorers } from '@/lib/stats'
-import { fmtTime } from '@/lib/format'
+import { fmtTime, playerShort } from '@/lib/format'
 import { Logo } from '@/components/layout/Logo'
-import type { Match } from '@/types/entities'
+import type { Match, MatchEvent, Team } from '@/types/entities'
+import { cn } from '@/lib/utils'
+
+const ROTATE_MS = 20000
+const PREF = 'statfoot:tv:rotation'
+const readPref = () => { try { return localStorage.getItem(PREF) !== 'off' } catch { return true } }
+const writePref = (on: boolean) => { try { localStorage.setItem(PREF, on ? 'on' : 'off') } catch { /* navigation privée */ } }
 
 export default function TvMode() {
   const { terrain } = useParams()
   const { db, settings } = useData()
   const now = useNow(1000)
-  const today = new Date().toISOString().slice(0, 10)
+  const today = new Date(now).toISOString().slice(0, 10)
   const matches = useMemo(() => {
     const sel = db.Match.filter((m) => !terrain || terrain === 'tous' || pitchSlug(m.pitch) === terrain)
-    const live = sel.filter((m) => m.status === 'live')
+    const byPitch = (a: Match, b: Match) => (a.pitch ?? '').localeCompare(b.pitch ?? '', 'fr', { numeric: true }) || (a.date ?? '').localeCompare(b.date ?? '')
+    const live = sel.filter((m) => m.status === 'live').sort(byPitch)
     if (live.length) return live
     return sel.filter((m) => (m.date ?? '').slice(0, 10) === today).sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''))
   }, [db.Match, terrain, today])
-  const [idx, setIdx] = useState(0)
-  useEffect(() => { const t = setInterval(() => setIdx((i) => i + 1), 12000); return () => clearInterval(t) }, [])
-  const m = matches.length ? matches[idx % matches.length] : undefined
+
+  const [selected, setSelected] = useState<string | null>(null)
+  const [rotate, setRotate] = useState(readPref)
+  const [cycle, setCycle] = useState(0) // relance la barre de progression
+  const multi = matches.length > 1
+  const current = matches.find((m) => m.id === selected) ?? matches[0]
+  const pick = useCallback((id: string) => { setSelected(id); setCycle((c) => c + 1) }, [])
+  const step = useCallback((d: number) => {
+    if (!matches.length) return
+    const i = Math.max(0, matches.findIndex((m) => m.id === current?.id))
+    pick(matches[(i + d + matches.length) % matches.length].id)
+  }, [matches, current?.id, pick])
+  useEffect(() => {
+    if (!multi || !rotate) return
+    const t = setTimeout(() => step(1), ROTATE_MS)
+    return () => clearTimeout(t)
+  }, [multi, rotate, step, cycle, current?.id])
+  const toggleRotate = () => setRotate((r) => { writePref(!r); setCycle((c) => c + 1); return !r })
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') step(1)
+      else if (e.key === 'ArrowLeft') step(-1)
+      else if (e.key.toLowerCase() === 'r') setRotate((r) => { writePref(!r); return !r })
+    }
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
+  }, [step])
+
   const pitchName = terrain && terrain !== 'tous' ? db.Match.find((x) => pitchSlug(x.pitch) === terrain)?.pitch ?? terrain : 'Tous les terrains'
   const url = `${location.origin}/live/${terrain ?? 'tous'}`
   return (
-    <div className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-night-950 p-4 sm:p-8" style={{ background: 'radial-gradient(ellipse 50% 50% at 10% 0%, rgba(160,210,255,.18), transparent 70%), radial-gradient(ellipse 50% 50% at 90% 0%, rgba(160,210,255,.15), transparent 70%), #04163D' }}>
-      <div className="flex items-center justify-between">
+    <div className="tv fixed inset-0 z-50 flex flex-col overflow-hidden text-white" style={{ background: 'radial-gradient(ellipse 50% 45% at 8% 0%, rgba(160,210,255,.16), transparent 70%), radial-gradient(ellipse 50% 45% at 92% 0%, rgba(160,210,255,.13), transparent 70%), #020B22' }}>
+      {/* barre du haut */}
+      <header className="flex items-center gap-4 px-[2vw] pt-[1.6vh]">
         <Logo subtitle={settings.league_name} />
-        <div className="title-caps text-xl text-neon sm:text-3xl">{pitchName}</div>
-        <div className="flex items-center gap-2">
-          <button className="hidden rounded-lg p-2 hover:bg-white/10 sm:block cursor-pointer" onClick={() => document.documentElement.requestFullscreen?.()} title="Plein écran"><Maximize /></button>
+        <div className="title-caps ml-auto text-[clamp(1.1rem,2.2vw,2.6rem)] text-neon">{pitchName}</div>
+        <div className="num text-[clamp(1.1rem,2.2vw,2.6rem)] text-white/80" aria-label="Heure">{fmtTime(new Date(now).toISOString())}</div>
+        <div className="flex items-center gap-1">
+          <button className="hidden cursor-pointer rounded-lg p-2 hover:bg-white/10 sm:block" onClick={() => document.documentElement.requestFullscreen?.()} title="Plein écran"><Maximize /></button>
           <Link to="/" className="rounded-lg p-2 hover:bg-white/10" title="Quitter"><X /></Link>
         </div>
-      </div>
-      {m ? <Board m={m} now={now} /> : <div className="flex flex-1 items-center justify-center text-center"><div><div className="title-caps text-4xl">Aucun match en cours</div><p className="text-muted-foreground">Les matchs du jour s'afficheront ici automatiquement.</p></div></div>}
-      <div className="flex items-end justify-between gap-4">
-        <div className="flex gap-2 overflow-x-auto">{matches.map((x, i) => <MiniScore key={x.id} m={x} active={x.id === m?.id} onClick={() => setIdx(i)} />)}</div>
-        <div className="hidden shrink-0 items-center gap-3 rounded-2xl bg-white p-2 sm:flex"><QrCode value={url} size={96} /><div className="pr-2 text-xs font-bold uppercase text-night-950">Suivez<br />en direct</div></div>
-      </div>
+      </header>
+
+      {/* onglets : un par match en cours */}
+      {multi && (
+        <nav className="mt-[1.4vh] flex flex-wrap items-stretch gap-2 px-[2vw]" aria-label="Matchs en cours">
+          <div className="flex flex-1 flex-wrap gap-2" role="tablist">
+            {matches.map((m) => <MatchTab key={m.id} m={m} active={m.id === current?.id} onClick={() => pick(m.id)} />)}
+          </div>
+          <button onClick={toggleRotate} aria-pressed={rotate} className={cn('relative flex cursor-pointer items-center gap-2 overflow-hidden rounded-xl border px-4 font-display text-[clamp(.9rem,1.2vw,1.4rem)] font-bold uppercase', rotate ? 'border-neon/60 bg-neon/15 text-white' : 'border-white/15 bg-white/5 text-white/70')}>
+            {rotate ? <Pause className="size-5" /> : <Play className="size-5" />}<RotateCw className="size-5" />
+            <span>Rotation {rotate ? '20 s' : 'désactivée'}</span>
+            {rotate && <span key={`${cycle}-${current?.id}`} className="tv-progress absolute inset-x-0 bottom-0 h-1 origin-left bg-neon" style={{ animationDuration: `${ROTATE_MS}ms` }} />}
+          </button>
+        </nav>
+      )}
+
+      {current ? <Board key={current.id} m={current} now={now} /> : (
+        <div className="flex flex-1 items-center justify-center text-center">
+          <div><div className="title-caps text-[clamp(2rem,5vw,5rem)]">Aucun match en cours</div><p className="text-[clamp(1rem,1.6vw,1.8rem)] text-white/70">Les matchs du jour s’afficheront ici automatiquement.</p></div>
+        </div>
+      )}
+
+      <footer className="flex items-end justify-between gap-4 px-[2vw] pb-[1.6vh]">
+        <p className="hidden text-[clamp(.8rem,1vw,1.1rem)] text-white/50 lg:block">{multi ? '← → changer de match · R rotation' : ''}</p>
+        <div className="ml-auto hidden shrink-0 items-center gap-3 rounded-2xl bg-white p-2 sm:flex"><QrCode value={url} size={96} /><div className="pr-2 text-xs font-bold uppercase text-night-950">Suivez<br />en direct</div></div>
+      </footer>
     </div>
+  )
+}
+
+function MatchTab({ m, active, onClick }: { m: Match; active: boolean; onClick: () => void }) {
+  const L = useLookup()
+  const h = L.team.get(m.home_team_id), a = L.team.get(m.away_team_id)
+  return (
+    <button role="tab" aria-selected={active} onClick={onClick}
+      className={cn('flex min-w-0 cursor-pointer items-center gap-3 rounded-xl border px-4 py-2 text-left transition', active ? 'border-neon bg-neon/20 shadow-[0_0_30px_-8px_rgb(248_90_0/.8)]' : 'border-white/10 bg-white/5 hover:bg-white/10')}>
+      <div className="leading-tight">
+        <div className="flex items-center gap-2 font-display text-[clamp(.8rem,1vw,1.2rem)] font-bold uppercase tracking-wider text-white/70">
+          {m.status === 'live' && <span className="size-2.5 rounded-full bg-red-500 animate-pulse-live" />}{m.pitch ?? 'Terrain'}
+        </div>
+        <div className="flex items-center gap-2 font-display text-[clamp(1.1rem,1.6vw,2rem)] font-black">
+          <TeamLogo team={h} size={28} />{h?.short_name}
+          <span className="num rounded-md bg-black/40 px-2">{m.status === 'scheduled' ? fmtTime(m.date) : `${m.home_score ?? 0}-${m.away_score ?? 0}`}</span>
+          {a?.short_name}<TeamLogo team={a} size={28} />
+        </div>
+      </div>
+    </button>
   )
 }
 
@@ -53,40 +130,120 @@ function Board({ m, now }: { m: Match; now: number }) {
   const L = useLookup()
   const h = L.team.get(m.home_team_id), a = L.team.get(m.away_team_id), comp = L.competition.get(m.competition_id)
   const ls = L.live.get(m.id)
-  const sc = matchScorers(m, db.MatchEvent)
+  const events = useMemo(() => db.MatchEvent.filter((e) => e.match_id === m.id), [db.MatchEvent, m.id])
+  const sc = matchScorers(m, events)
+  const st = teamStats(m, events, ls, now)
   const pos = possession(ls, now)
-  const label = m.status === 'live' ? liveLabel(ls, durationsFor(m, comp), now) : m.status === 'finished' ? 'Terminé' : fmtTime(m.date)
+  const live = m.status === 'live'
+  const label = live ? liveLabel(ls, durationsFor(m, comp), now) : m.status === 'finished' ? 'Terminé' : `Coup d’envoi ${fmtTime(m.date)}`
+  const cards = (tid: string) => events.filter((e) => e.team_id === tid && (e.type === 'yellow_card' || e.type === 'second_yellow' || e.type === 'red_card'))
+  const goal = useGoalFlash(m)
   return (
-    <div className="flex flex-1 flex-col items-center justify-center">
-      <div className="mb-4 text-center font-display text-lg font-bold uppercase tracking-widest text-muted-foreground sm:text-2xl">{comp?.name} · Journée {m.round}</div>
-      <div className="grid w-full max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-4">
-        <div className="flex flex-col items-center gap-3 text-center"><TeamLogo team={h} size={180} className="size-24 sm:size-44" /><div className="title-caps text-2xl sm:text-5xl">{h?.name}</div></div>
+    <main className="relative flex flex-1 flex-col items-center justify-center px-[2vw]">
+      <div className="mb-[1.5vh] text-center font-display text-[clamp(1rem,1.8vw,2.2rem)] font-bold uppercase tracking-[.2em] text-white/70">{comp?.name}{m.round ? ` · Journée ${m.round}` : ''}{m.pitch ? ` · ${m.pitch}` : ''}</div>
+      <div className="grid w-full max-w-[92vw] grid-cols-[1fr_auto_1fr] items-center gap-[2vw]">
+        <TeamSide team={h} />
         <div className="flex flex-col items-center">
-          <div className="num text-[22vw] leading-none sm:text-[12vw]">{m.home_score ?? 0}<span className="text-white/30">-</span>{m.away_score ?? 0}</div>
-          <div className={`mt-2 rounded-full px-5 py-1 font-display text-xl font-black uppercase sm:text-3xl ${m.status === 'live' ? 'bg-red-500 text-white' : 'bg-white/10'}`}>{label}</div>
+          <div className="num flex items-center leading-none text-[clamp(5rem,15vw,18rem)]" aria-live="polite" aria-label={`Score ${m.home_score ?? 0} à ${m.away_score ?? 0}`}>
+            <span>{m.home_score ?? 0}</span><span className="mx-[1vw] text-white/25">-</span><span>{m.away_score ?? 0}</span>
+          </div>
+          <div className={cn('mt-[1vh] rounded-full px-[1.6vw] py-[.5vh] font-display text-[clamp(1.4rem,3vw,3.6rem)] font-black uppercase', live ? 'bg-red-600 text-white' : 'bg-white/10')}>
+            {live && <span className="mr-3 inline-block size-[.5em] rounded-full bg-white align-middle animate-pulse-live" />}{label}
+          </div>
         </div>
-        <div className="flex flex-col items-center gap-3 text-center"><TeamLogo team={a} size={180} className="size-24 sm:size-44" /><div className="title-caps text-2xl sm:text-5xl">{a?.name}</div></div>
+        <TeamSide team={a} />
       </div>
-      <div className="mt-6 grid w-full max-w-5xl grid-cols-2 gap-10 text-base sm:text-2xl">
-        <div className="text-right">{sc.home.map((e) => <div key={e.id}>⚽ {L.player.get(e.player_id ?? '')?.last_name} {fmtMinute(e.minute, e.added_minute)}</div>)}</div>
-        <div>{sc.away.map((e) => <div key={e.id}>⚽ {L.player.get(e.player_id ?? '')?.last_name} {fmtMinute(e.minute, e.added_minute)}</div>)}</div>
+
+      {/* buteurs et cartons */}
+      <div className="mt-[2.5vh] grid w-full max-w-[86vw] grid-cols-2 gap-[4vw] text-[clamp(1rem,1.7vw,2.1rem)] font-semibold">
+        <Timeline goals={sc.home} cards={cards(m.home_team_id)} align="right" />
+        <Timeline goals={sc.away} cards={cards(m.away_team_id)} align="left" />
       </div>
-      {ls && m.status === 'live' && (
-        <div className="mt-6 w-full max-w-3xl">
-          <div className="flex justify-between font-display text-xl font-bold"><span>{pos.home_pct}%</span><span className="text-sm uppercase text-muted-foreground">Possession</span><span>{pos.away_pct}%</span></div>
-          <div className="mt-1 flex h-3 overflow-hidden rounded-full bg-white/10"><div style={{ width: `${pos.home_pct}%`, background: h?.primary_color }} /><div style={{ width: `${pos.away_pct}%`, background: a?.primary_color }} /></div>
+
+      {/* stats live */}
+      {(live || m.status === 'finished') && (
+        <div className="mt-[3vh] grid w-full max-w-[70vw] gap-[1.4vh]">
+          <StatBar label="Tirs" h={st.home.shots} a={st.away.shots} hc={h?.primary_color} ac={a?.primary_color} />
+          <StatBar label="Tirs cadrés" h={st.home.shots_on_target} a={st.away.shots_on_target} hc={h?.primary_color} ac={a?.primary_color} />
+          <StatBar label="Arrêts" h={st.home.saves} a={st.away.saves} hc={h?.primary_color} ac={a?.primary_color} />
+          {ls && <StatBar label="Possession" h={pos.home_pct} a={pos.away_pct} hc={h?.primary_color} ac={a?.primary_color} unit="%" />}
         </div>
       )}
+      {goal && <GoalFlash team={L.team.get(goal)} />}
+    </main>
+  )
+}
+
+function TeamSide({ team }: { team?: Team }) {
+  return (
+    <div className="flex min-w-0 flex-col items-center gap-[1.2vh] text-center">
+      <TeamLogo team={team} size={220} className="size-[clamp(6rem,13vw,15rem)]" />
+      <div className="title-caps max-w-full truncate text-[clamp(1.6rem,3.6vw,4.6rem)] leading-none">{team?.name}</div>
     </div>
   )
 }
 
-function MiniScore({ m, active, onClick }: { m: Match; active: boolean; onClick: () => void }) {
+function Timeline({ goals, cards, align }: { goals: MatchEvent[]; cards: MatchEvent[]; align: 'left' | 'right' }) {
   const L = useLookup()
+  const name = (e: MatchEvent) => (e.player_id ? playerShort(L.player.get(e.player_id)) : e.player_name_free ?? '')
+  const items = [
+    ...goals.map((e) => ({ e, icon: '⚽', text: `${name(e)}${e.type === 'own_goal' ? ' (csc)' : e.goal_kind === 'penalty' ? ' (pén.)' : ''}` })),
+    ...cards.map((e) => ({ e, icon: e.type === 'yellow_card' ? '🟨' : '🟥', text: name(e) })),
+  ].sort((x, y) => ['1H', '2H', 'ET1', 'ET2'].indexOf(x.e.period ?? '1H') - ['1H', '2H', 'ET1', 'ET2'].indexOf(y.e.period ?? '1H') || (x.e.minute ?? 0) - (y.e.minute ?? 0))
   return (
-    <button onClick={onClick} className={`flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm cursor-pointer ${active ? 'bg-neon/20 ring-1 ring-neon' : 'bg-white/5'}`}>
-      {m.status === 'live' && <span className="size-2 rounded-full bg-red-500 animate-pulse-live" />}
-      <span className="font-display font-bold">{L.team.get(m.home_team_id)?.short_name}</span><span className="num">{m.status === 'scheduled' ? fmtTime(m.date) : `${m.home_score}-${m.away_score}`}</span><span className="font-display font-bold">{L.team.get(m.away_team_id)?.short_name}</span>
-    </button>
+    <ul className={cn('space-y-[.6vh]', align === 'right' ? 'text-right' : 'text-left')}>
+      {items.map(({ e, icon, text }) => (
+        <li key={e.id} className={cn('flex items-baseline gap-3', align === 'right' && 'flex-row-reverse')}>
+          <span aria-hidden>{icon}</span><span className="truncate">{text}</span><span className="num text-neon">{fmtMinute(e.minute, e.added_minute)}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function StatBar({ label, h, a, hc = '#F85A00', ac = '#6CB4CC', unit = '' }: { label: string; h: number; a: number; hc?: string; ac?: string; unit?: string }) {
+  const total = h + a
+  const hp = total ? (h / total) * 100 : 50
+  return (
+    <div>
+      <div className="flex items-baseline justify-between font-display font-black">
+        <span className="num text-[clamp(1.4rem,2.6vw,3.2rem)]">{h}{unit}</span>
+        <span className="text-[clamp(.9rem,1.3vw,1.6rem)] uppercase tracking-[.18em] text-white/70">{label}</span>
+        <span className="num text-[clamp(1.4rem,2.6vw,3.2rem)]">{a}{unit}</span>
+      </div>
+      <div className="mt-1 flex h-[clamp(8px,1.1vh,16px)] gap-1 overflow-hidden rounded-full">
+        <div className="tv-bar rounded-full" style={{ width: `${hp}%`, background: hc }} />
+        <div className="tv-bar rounded-full" style={{ width: `${100 - hp}%`, background: ac }} />
+      </div>
+    </div>
+  )
+}
+
+/** Affiche « BUT ! » quelques secondes quand le score d'une équipe augmente. */
+function useGoalFlash(m: Match) {
+  const last = useRef<{ id: string; h: number; a: number } | null>(null)
+  const [team, setTeam] = useState<string | null>(null)
+  useEffect(() => {
+    const h = m.home_score ?? 0, a = m.away_score ?? 0
+    const p = last.current
+    last.current = { id: m.id, h, a }
+    if (!p || p.id !== m.id || m.status !== 'live') return
+    const scorer = h > p.h ? m.home_team_id : a > p.a ? m.away_team_id : null
+    if (!scorer) return
+    setTeam(scorer)
+    const t = setTimeout(() => setTeam(null), 5000)
+    return () => clearTimeout(t)
+  }, [m.id, m.home_score, m.away_score, m.status, m.home_team_id, m.away_team_id])
+  return team
+}
+
+function GoalFlash({ team }: { team?: Team }) {
+  return (
+    <div className="tv-goal pointer-events-none absolute inset-0 flex items-center justify-center" role="status">
+      <div className="flex items-center gap-[2vw] rounded-[3vw] px-[4vw] py-[2vh] shadow-2xl" style={{ background: `linear-gradient(135deg, ${team?.primary_color ?? '#F85A00'}, #04163D)` }}>
+        <TeamLogo team={team} size={160} className="size-[clamp(5rem,10vw,12rem)]" />
+        <div className="title-caps text-[clamp(4rem,12vw,14rem)] leading-none">But !</div>
+      </div>
+    </div>
   )
 }

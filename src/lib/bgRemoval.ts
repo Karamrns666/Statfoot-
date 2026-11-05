@@ -70,6 +70,8 @@ export async function finishCutout(png: Blob, height = CUTOUT_HEIGHT): Promise<B
   // 1. joueur au premier plan uniquement
   const subject = mainSubject(alpha, W, H)
   if (!subject) throw new Error('Aucun joueur détecté sur la photo')
+  // photo inadaptée (plan large, joueur minuscule ou masqué par un filet) : on prévient plutôt que d'afficher un mauvais détourage
+  if (subject.areaFraction < 0.02 || !subject.upright) throw new Error('joueur trop petit ou masqué sur la photo — utilisez une photo où il est seul au premier plan, de la tête aux genoux au moins')
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (!subject.keep(x, y)) px[(y * W + x) * 4 + 3] = 0
   ctx.putImageData(data, 0, 0)
   // 2. cadrage buste / mi-corps

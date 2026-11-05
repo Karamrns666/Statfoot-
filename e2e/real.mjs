@@ -57,7 +57,7 @@ await p.getByRole('dialog').screenshot({ path: `${out}/lot-fin.png` })
 await p.keyboard.press('Escape')
 // cartes publiques desktop + mobile, équipe type ronde
 await p.goto(B + '/joueurs', { waitUntil: 'networkidle' }); await p.waitForTimeout(1500)
-await p.locator('main .grid').first().screenshot({ path: `${out}/cartes-desktop.png` })
+await p.screenshot({ path: `${out}/cartes-desktop.png` })
 await p.goto(B + '/equipe-type', { waitUntil: 'networkidle' }); await p.waitForTimeout(1000)
 const orch = await p.evaluate(() => JSON.parse(localStorage.getItem('statfoot:v1:Player')).find((x) => x.last_name === 'Orch'))
 console.log('ÉQUIPE TYPE photo ronde originale', await p.locator(`main img[src="${orch.photo_url}"]`).count(), '· détourée', await p.locator(`main img[src="${orch.photo_cutout_url}"]`).count())

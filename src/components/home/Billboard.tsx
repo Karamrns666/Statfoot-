@@ -59,7 +59,7 @@ function Ball({ className }: { className?: string }) {
       </defs>
       <circle cx="50" cy="50" r="47" fill="url(#bb-ball-shade)" stroke="#0b1a3a" strokeWidth="2" />
       <polygon points="50,33 66,45 60,64 40,64 34,45" fill="#0b1a3a" />
-      {[[50, 10, 0], [88, 38, 72], [74, 84, 144], [26, 84, 216], [12, 38, 288]].map(([x, y, r]) => (
+      {[0, 72, 144, 216, 288].map((r) => (
         <g key={r} transform={`rotate(${r} 50 50)`}><polygon points="44,5 56,5 60,15 50,21 40,15" fill="#0b1a3a" /><line x1="50" y1="21" x2="50" y2="33" stroke="#0b1a3a" strokeWidth="2" /></g>
       ))}
       <circle cx="50" cy="50" r="47" fill="none" stroke="#fff" strokeOpacity=".5" strokeWidth="1" />

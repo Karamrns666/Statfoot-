@@ -2,14 +2,16 @@
 //  StatFoot — FAÇADE UNIQUE des calculs (site public, admin, Match Center, mode TV).
 //  Classements : ./standings  ·  XP & trophées : ./xp  ·  Match en direct : ./matchEngine
 // ============================================================================
-import type { AwardCategory, Competition, Division, Group, Match, MatchEvent, Position } from '@/types/entities'
+import type { AwardCategory, Competition, Division, Group, Match, MatchEvent, MatchTeamStats, Position } from '@/types/entities'
+import { addShots, emptyShots, teamMatchShots, type ShotTotals } from './shots'
 import { byDate, competitionStandings, isKnockout, isPlayed, winnerOf, type StandingRow } from './standings'
 import { computePlayerXP, matchInScope, race, xpConfig, type PlayerXP, type XPData, type XPScope } from './xp'
 
 export * from './standings'
 export * from './xp'
+export * from './shots'
 
-export interface LeagueData extends XPData { divisions?: Division[]; groups?: Group[] }
+export interface LeagueData extends XPData { divisions?: Division[]; groups?: Group[]; /** stats d'équipe saisies sur la feuille de match */ teamStats?: MatchTeamStats[] }
 
 // ---------------------------------------------------------------------------
 //  Classement général de la saison (Gold devant Silver), et classement par périmètre
@@ -66,6 +68,8 @@ export function bestTeam(data: LeagueData, scope: XPScope): { team_id: string; r
 export interface TeamStats {
   team_id: string; played: number; won: number; drawn: number; lost: number; gf: number; ga: number; gd: number; points: number
   clean_sheets: number; yellow: number; red: number; gf_avg: number; ga_avg: number
+  /** tirs (matchs où les tirs ont été saisis) */
+  shot: ShotTotals
   timeline: { label: string; gf: number; ga: number; points: number }[]
 }
 export function computeTeamStats(data: LeagueData, scope: XPScope = {}): Map<string, TeamStats> {
@@ -73,10 +77,12 @@ export function computeTeamStats(data: LeagueData, scope: XPScope = {}): Map<str
   const ms = data.matches.filter((m) => isPlayed(m) && matchInScope(m, comps, scope)).sort(byDate)
   const out = new Map<string, TeamStats>()
   const get = (id: string) => {
-    if (!out.has(id)) out.set(id, { team_id: id, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, gd: 0, points: 0, clean_sheets: 0, yellow: 0, red: 0, gf_avg: 0, ga_avg: 0, timeline: [] })
+    if (!out.has(id)) out.set(id, { team_id: id, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, gd: 0, points: 0, clean_sheets: 0, yellow: 0, red: 0, gf_avg: 0, ga_avg: 0, shot: emptyShots(), timeline: [] })
     return out.get(id)!
   }
   const pw = data.settings.points_win ?? 3, pd = data.settings.points_draw ?? 1, pl = data.settings.points_loss ?? 0
+  const evByMatch = new Map<string, MatchEvent[]>()
+  for (const e of data.events) { if (!evByMatch.has(e.match_id)) evByMatch.set(e.match_id, []); evByMatch.get(e.match_id)!.push(e) }
   for (const m of ms) {
     for (const home of [true, false]) {
       const t = get(home ? m.home_team_id : m.away_team_id)
@@ -85,6 +91,9 @@ export function computeTeamStats(data: LeagueData, scope: XPScope = {}): Map<str
       if (gf > ga) { t.won++; t.points += pw } else if (gf < ga) { t.lost++; t.points += pl } else { t.drawn++; t.points += pd }
       if (ga === 0) t.clean_sheets++
       t.timeline.push({ label: `J${m.round}`, gf, ga, points: t.points })
+      const sheet = data.teamStats?.find((x) => x.match_id === m.id && x.team_id === t.team_id && (x.period ?? 'full') === 'full')
+      const sh = teamMatchShots(m, evByMatch.get(m.id) ?? [], t.team_id, sheet)
+      if (sh) t.shot = addShots(t.shot, sh)
     }
   }
   const ids = new Set(ms.map((m) => m.id))

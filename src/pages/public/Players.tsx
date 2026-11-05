@@ -11,7 +11,9 @@ import { IPGCard, MaterialLegend, XPCard } from '@/components/players/Cards'
 import { Input } from '@/components/ui/input'
 import { SeasonNotStarted } from '@/components/league/SeasonNotStarted'
 import { Button } from '@/components/ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { SortableTable } from '@/components/league/SortableTable'
+import { shotColumns } from '@/components/league/shotColumns'
+import { XPExplainer } from '@/components/players/XPExplainer'
 import { isRookie, type PhaseFilter } from '@/lib/stats'
 import { playerName } from '@/lib/format'
 import { IPG_RANKING } from '@/lib/ipg'
@@ -74,6 +76,7 @@ export default function Players() {
 
       {view === 'ipg' ? <IPGView /> : (
         <>
+          <XPExplainer seasonId={scopeSeasonId} className="mb-4" />
           <div className="glass mb-5 flex flex-wrap gap-2 rounded-2xl p-3">
             <div className="relative w-full sm:w-60"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher un joueur" className="h-9 pl-9" aria-label="Rechercher un joueur" /></div>
             {hasCups && <FilterSelect label="Phase" value={phase === 'all' ? '' : phase} onChange={(v) => setPhase((v || 'all') as PhaseFilter)} allLabel="Toute la saison" options={[{ value: 'league_phase', label: 'Phase de ligue' }, { value: 'gold', label: 'Gold Cup' }, { value: 'silver', label: 'Silver Cup' }].filter((o) => db.Competition.some((c) => (!scopeSeasonId || c.season_id === scopeSeasonId) && c.phase === o.value))} />}
@@ -96,30 +99,20 @@ export default function Players() {
             </>
           ) : (
             <div className="glass rounded-2xl p-1 sm:p-3">
-              <Table>
-                <TableHeader><TableRow><TableHead className="text-center">Rang</TableHead><TableHead>Joueur</TableHead><TableHead className="hidden sm:table-cell">Équipe</TableHead><TableHead className="text-center">MJ</TableHead><TableHead className="text-center">Buts</TableHead><TableHead className="text-center">Passes</TableHead><TableHead className="text-center">XP</TableHead></TableRow></TableHeader>
-                <TableBody>
-                  {rows.slice(0, 200).map((r) => {
-                    const p = L.player.get(r.item.player_id)!, t = L.team.get(p.team_id)
-                    return (
-                      <TableRow key={p.id}>
-                        <TableCell className="text-center"><div className="num text-lg">{r.rank}</div><RankDelta delta={r.delta} /></TableCell>
-                        <TableCell>
-                          <Link to={`/joueurs/${p.id}`} className="flex items-center gap-3 hover:text-neon">
-                            <PlayerAvatar player={p} team={t} size={36} />
-                            <div className="min-w-0"><div className="flex items-center gap-2 font-semibold">{playerName(p)}</div><div className="flex items-center gap-1.5"><RoleBadge position={p.position} captain={p.is_captain || L.team.get(p.team_id)?.captain_player_id === p.id} />{isRookie(p) && <RookieBadge />}</div></div>
-                          </Link>
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell"><span className="flex items-center gap-2 text-sm"><TeamLogo team={t} size={20} />{t?.name}</span></TableCell>
-                        <TableCell className="num text-center text-base">{r.item.matches}</TableCell>
-                        <TableCell className="num text-center text-base">{r.item.goals}</TableCell>
-                        <TableCell className="num text-center text-base">{r.item.assists}</TableCell>
-                        <TableCell className="num text-center text-xl text-neon">{r.item.xp}</TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
+              <SortableTable rows={rows.slice(0, 200)} rowKey={(r) => r.item.player_id} initial={{ key: 'rank', dir: 'asc' }} columns={[
+                { key: 'rank', label: 'Rang', headClassName: 'text-center', className: 'text-center', first: 'asc', sort: (r) => r.rank, render: (r) => <><div className="num text-lg">{r.rank}</div><RankDelta delta={r.delta} /></> },
+                { key: 'name', label: 'Joueur', sort: (r) => playerName(L.player.get(r.item.player_id)), render: (r) => { const p = L.player.get(r.item.player_id)!; return (
+                  <Link to={`/joueurs/${p.id}`} className="flex items-center gap-3 hover:text-neon">
+                    <PlayerAvatar player={p} team={L.team.get(p.team_id)} size={36} />
+                    <div className="min-w-0"><div className="flex items-center gap-2 font-semibold">{playerName(p)}</div><div className="flex items-center gap-1.5"><RoleBadge position={p.position} captain={p.is_captain || L.team.get(p.team_id)?.captain_player_id === p.id} />{isRookie(p) && <RookieBadge />}</div></div>
+                  </Link>) } },
+                { key: 'team', label: 'Équipe', headClassName: 'hidden sm:table-cell', className: 'hidden sm:table-cell', sort: (r) => L.team.get(r.item.team_id)?.name, render: (r) => { const t = L.team.get(r.item.team_id); return <span className="flex items-center gap-2 text-sm"><TeamLogo team={t} size={20} />{t?.name}</span> } },
+                { key: 'mj', label: 'MJ', title: 'Matchs joués', headClassName: 'text-center', className: 'num text-center text-base', sort: (r) => r.item.matches, render: (r) => r.item.matches },
+                { key: 'goals', label: 'Buts', headClassName: 'text-center', className: 'num text-center text-base', sort: (r) => r.item.goals, render: (r) => r.item.goals },
+                { key: 'assists', label: 'Passes', headClassName: 'text-center', className: 'num text-center text-base', sort: (r) => r.item.assists, render: (r) => r.item.assists },
+                ...shotColumns<(typeof rows)[number]>((r) => r.item.shot, 'hidden md:table-cell'),
+                { key: 'xp', label: 'XP', headClassName: 'text-center', className: 'num text-center text-xl text-neon', sort: (r) => r.item.xp, render: (r) => r.item.xp },
+              ]} />
               {rows.length > 200 && <p className="p-3 text-center text-xs text-muted-foreground">200 premiers affichés — affinez avec les filtres.</p>}
             </div>
           )}

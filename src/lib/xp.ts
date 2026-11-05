@@ -7,6 +7,7 @@ import type {
 } from '@/types/entities'
 import { competitionStandings, isKnockout, isPlayed } from './standings'
 import { keeperMatchStats, participants } from './matchEngine'
+import { addShots, emptyShots, playerMatchShots, type ShotTotals } from './shots'
 
 // ---------------------------------------------------------------------------
 //  Barème
@@ -227,6 +228,37 @@ export function matchXPLines(data: XPData, match: Match, cfg: XPConfig, opts: { 
   return out.filter((l) => l.points !== 0 || l.key === 'clean_sheet_gk')
 }
 
+// ---------------------------------------------------------------------------
+//  Exemples chiffrés — calculés par le MÊME moteur (matchXPLines) avec le barème en vigueur
+// ---------------------------------------------------------------------------
+export interface XPExample { title: string; context: string; lines: XPLine[]; total: number }
+
+/** Deux matchs fictifs passés dans le vrai calcul : un joueur de champ et un gardien. */
+export function xpExamples(cfg: XPConfig): XPExample[] {
+  const comp = { id: 'ex_c', season_id: 'ex', name: 'Exemple', phase: 'league_phase' } as Competition
+  const run = (id: string, score: [number, number], oppRank: number, evs: Omit<MatchEvent, 'id' | 'match_id'>[], lineup: Omit<Lineup, 'id' | 'match_id'>) => {
+    const match = { id, season_id: 'ex', competition_id: comp.id, round: 5, stage: 'league_phase', status: 'finished', home_team_id: 'A', away_team_id: 'B', home_score: score[0], away_score: score[1], validated: true, opponent_rank_snapshot: { home_rank: 1, away_rank: oppRank } } as unknown as Match
+    const data: XPData = { seasons: [], competitions: [comp], teams: [], players: [], matches: [match], events: evs.map((e, i) => ({ ...e, id: `${id}_${i}`, match_id: id }) as MatchEvent), lineups: [{ ...lineup, id: `${id}_lu`, match_id: id } as Lineup], xpRules: [], suspensions: [], monthlyAwards: [], settings: {} }
+    return matchXPLines(data, match, cfg)
+  }
+  const sum = (ls: XPLine[]) => ls.reduce((a, l) => a + l.points, 0)
+  const field = run('ex1', [3, 1], 2, [
+    { team_id: 'A', type: 'goal', player_id: 'P', related_player_id: 'Q' },
+    { team_id: 'A', type: 'goal', player_id: 'P' },
+    { team_id: 'A', type: 'goal', player_id: 'Q', related_player_id: 'P' },
+    { team_id: 'A', type: 'yellow_card', player_id: 'P' },
+    { team_id: 'B', type: 'goal', player_id: 'X' },
+  ], { team_id: 'A', starter_ids: ['K', 'P', 'Q'], goalkeeper_id: 'K' }).filter((l) => l.player_id === 'P')
+  const keeper = run('ex2', [2, 0], 8, [
+    { team_id: 'A', type: 'goal', player_id: 'P' }, { team_id: 'A', type: 'goal', player_id: 'Q' },
+    ...Array.from({ length: 6 }, () => ({ team_id: 'A', type: 'save' as const, player_id: 'K' })),
+  ], { team_id: 'A', starter_ids: ['K', 'P', 'Q'], goalkeeper_id: 'K' }).filter((l) => l.player_id === 'K')
+  return [
+    { title: 'Un joueur de champ', context: 'Victoire 3-1 contre l’équipe classée 2e : 2 buts, 1 passe décisive, 1 carton jaune.', lines: field, total: sum(field) },
+    { title: 'Un gardien', context: 'Victoire 2-0 contre l’équipe classée 8e : 6 arrêts, aucun but encaissé.', lines: keeper, total: sum(keeper) },
+  ]
+}
+
 /** Lignes hors match : suspensions et récompenses mensuelles. */
 export function seasonXPLines(data: XPData, seasonId: string | null | undefined, cfg: XPConfig, comps: Map<string, Competition>, scope: XPScope): XPLine[] {
   const out: XPLine[] = []
@@ -274,6 +306,8 @@ export interface PlayerXP {
   xp: number; matches: number; minutes: number; wins: number; draws: number; losses: number
   goals: number; assists: number; own_goals: number; yellow: number; red: number
   gk_matches: number; clean_sheets: number; saves: number; penalties_saved: number; shootout_saved: number; conceded: number
+  /** tirs (matchs où les tirs ont été saisis par joueur) */
+  shot: ShotTotals
   lines: XPLine[]
   byMatch: { match_id: string; xp: number }[]
 }
@@ -287,7 +321,7 @@ export function computePlayerXP(data: XPData, scope: XPScope = {}): Map<string, 
   const get = (pid: string) => {
     if (!out.has(pid)) {
       const p = pmap.get(pid); if (!p) return null
-      out.set(pid, { player_id: pid, team_id: p.team_id, position: p.position, xp: 0, matches: 0, minutes: 0, wins: 0, draws: 0, losses: 0, goals: 0, assists: 0, own_goals: 0, yellow: 0, red: 0, gk_matches: 0, clean_sheets: 0, saves: 0, penalties_saved: 0, shootout_saved: 0, conceded: 0, lines: [], byMatch: [] })
+      out.set(pid, { player_id: pid, team_id: p.team_id, position: p.position, xp: 0, matches: 0, minutes: 0, wins: 0, draws: 0, losses: 0, goals: 0, assists: 0, own_goals: 0, yellow: 0, red: 0, gk_matches: 0, clean_sheets: 0, saves: 0, penalties_saved: 0, shootout_saved: 0, conceded: 0, shot: emptyShots(), lines: [], byMatch: [] })
     }
     return out.get(pid)!
   }
@@ -305,6 +339,12 @@ export function computePlayerXP(data: XPData, scope: XPScope = {}): Map<string, 
       let ps = participants(lu, evs, teamId)
       if (ps.size === 0) ps = new Set(evs.filter((e) => e.team_id === teamId).flatMap((e) => [e.player_id, e.type === 'goal' ? e.related_player_id : undefined]).filter(Boolean) as string[])
       const gf = teamId === m.home_team_id ? m.home_score! : m.away_score!, ga = teamId === m.home_team_id ? m.away_score! : m.home_score!
+      const shotMap = playerMatchShots(evs, teamId)
+      if (shotMap) for (const pid of new Set([...ps, ...shotMap.keys()])) {
+        const s = get(pid); if (!s) continue
+        const x = shotMap.get(pid)
+        s.shot = addShots(s.shot, { shots: x?.shots ?? 0, on_target: x?.on_target ?? 0, goals: x?.goals ?? 0, matches: 1 })
+      }
       for (const pid of ps) {
         const s = get(pid); if (!s) continue
         s.matches++
@@ -356,18 +396,43 @@ function rankList<T>(list: T[], cmp: Cmp<T>, tieKey: (x: T) => string): Ranked<T
 export type RaceKey = 'xp' | 'ballon_or' | 'golden_glove' | 'top_scorer' | 'top_assist'
 export const RACE_LABEL: Record<RaceKey, string> = { xp: 'Classement XP', ballon_or: "Ballon d'or", golden_glove: "Gant d'or", top_scorer: "Soulier d'or", top_assist: 'Meilleur passeur' }
 
+/** Critères de classement, dans l'ordre : source unique du tri ET du texte explicatif affiché sur le site. */
+export interface RankCriterion { label: string; value: (s: PlayerXP) => number; dir: 'asc' | 'desc' }
+const C = {
+  xp: { label: 'XP', value: (s: PlayerXP) => s.xp, dir: 'desc' },
+  goals: { label: 'buts', value: (s: PlayerXP) => s.goals, dir: 'desc' },
+  assists: { label: 'passes décisives', value: (s: PlayerXP) => s.assists, dir: 'desc' },
+  fewerMatches: { label: 'moins de matchs joués', value: (s: PlayerXP) => s.matches, dir: 'asc' },
+  cleanSheets: { label: 'clean sheets', value: (s: PlayerXP) => s.clean_sheets, dir: 'desc' },
+  fewerConceded: { label: 'moins de buts encaissés', value: (s: PlayerXP) => s.conceded, dir: 'asc' },
+  saves: { label: 'arrêts', value: (s: PlayerXP) => s.saves, dir: 'desc' },
+} satisfies Record<string, RankCriterion>
+export const RACE_CRITERIA: Record<RaceKey, RankCriterion[]> = {
+  xp: [C.xp, C.goals, C.assists, C.fewerMatches],
+  ballon_or: [C.xp, C.goals, C.assists, C.fewerMatches],
+  golden_glove: [C.xp, C.cleanSheets, C.fewerConceded, C.saves],
+  top_scorer: [C.goals, C.assists, C.fewerMatches],
+  top_assist: [C.assists, C.goals, C.fewerMatches],
+}
+/** Qui entre dans chaque classement (min = matchs minimum du barème). */
+export const RACE_ELIGIBLE: Record<RaceKey, { label: string; test: (s: PlayerXP, min: number) => boolean }> = {
+  xp: { label: 'tous les joueurs ayant joué au moins un match', test: (s) => s.matches > 0 || s.xp !== 0 },
+  ballon_or: { label: 'joueurs de champ ayant joué le nombre minimum de matchs', test: (s, min) => s.position !== 'GK' && s.matches >= min },
+  golden_glove: { label: 'gardiens ayant gardé les buts le nombre minimum de matchs', test: (s, min) => s.position === 'GK' && s.gk_matches >= min },
+  top_scorer: { label: 'joueurs ayant marqué au moins un but', test: (s) => s.goals > 0 },
+  top_assist: { label: 'joueurs ayant au moins une passe décisive', test: (s) => s.assists > 0 },
+}
+
 export function race(data: Pick<XPData, 'players' | 'xpRules'>, list: PlayerXP[], key: RaceKey, seasonId?: string | null): Ranked<PlayerXP>[] {
   const cfg = xpConfig(data.xpRules, seasonId)
   const name = new Map(data.players.map((p) => [p.id, `${p.last_name} ${p.first_name}`]))
-  const byName = (a: PlayerXP, b: PlayerXP) => (name.get(a.player_id) ?? '').localeCompare(name.get(b.player_id) ?? '')
-  const min = cfg.min_matches_awards
-  switch (key) {
-    case 'xp': return rankList(list.filter((s) => s.matches > 0 || s.xp !== 0), (a, b) => b.xp - a.xp || b.goals - a.goals || b.assists - a.assists || a.matches - b.matches || byName(a, b), (s) => `${s.xp}|${s.goals}|${s.assists}|${s.matches}`)
-    case 'ballon_or': return rankList(list.filter((s) => s.position !== 'GK' && s.matches >= min), (a, b) => b.xp - a.xp || b.goals - a.goals || b.assists - a.assists || a.matches - b.matches || byName(a, b), (s) => `${s.xp}|${s.goals}|${s.assists}|${s.matches}`)
-    case 'golden_glove': return rankList(list.filter((s) => s.position === 'GK' && s.gk_matches >= min), (a, b) => b.xp - a.xp || b.clean_sheets - a.clean_sheets || a.conceded - b.conceded || b.saves - a.saves || byName(a, b), (s) => `${s.xp}|${s.clean_sheets}|${s.conceded}|${s.saves}`)
-    case 'top_scorer': return rankList(list.filter((s) => s.goals > 0), (a, b) => b.goals - a.goals || b.assists - a.assists || a.matches - b.matches || byName(a, b), (s) => `${s.goals}|${s.assists}|${s.matches}`)
-    case 'top_assist': return rankList(list.filter((s) => s.assists > 0), (a, b) => b.assists - a.assists || b.goals - a.goals || a.matches - b.matches || byName(a, b), (s) => `${s.assists}|${s.goals}|${s.matches}`)
+  const crit = RACE_CRITERIA[key]
+  const cmp = (a: PlayerXP, b: PlayerXP) => {
+    for (const c of crit) { const d = c.dir === 'desc' ? c.value(b) - c.value(a) : c.value(a) - c.value(b); if (d) return d }
+    return (name.get(a.player_id) ?? '').localeCompare(name.get(b.player_id) ?? '') // départage final : ordre alphabétique (même rang)
   }
+  const min = cfg.min_matches_awards
+  return rankList(list.filter((s) => RACE_ELIGIBLE[key].test(s, min)), cmp, (s) => crit.map((c) => c.value(s)).join('|'))
 }
 
 /** Dernière journée jouée du périmètre */

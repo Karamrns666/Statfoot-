@@ -14,6 +14,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { SortableTable } from '@/components/league/SortableTable'
+import { shotColumns } from '@/components/league/shotColumns'
+import { fmtAccuracy, fmtShots, fmtShotsPerGoal } from '@/lib/shots'
 import { FilterSelect } from '@/components/league/FilterSelect'
 import { TeamLogo } from '@/components/league/Identity'
 import { StatTile } from '@/components/league/Bits'
@@ -21,7 +24,7 @@ import { QrCode, pitchSlug } from '@/components/league/QrCode'
 import { AWARD_STYLE, TrophyBadge } from '@/components/awards/TrophyBadge'
 import { VisualFrame } from '@/components/share/VisualFrame'
 import { toast } from '@/components/ui/toast'
-import { AWARD_LABELS, computeAwards, computePlayerXP, computeTeamStats, isPlayed, kpis, type PhaseFilter } from '@/lib/stats'
+import { AWARD_LABELS, computeAwards, computePlayerXP, computeTeamStats, isPlayed, kpis, type PhaseFilter, type PlayerXP, type TeamStats } from '@/lib/stats'
 import { fmtScore } from '@/lib/matchEngine'
 import { fmtDate, playerName, roleLabels, toRole } from '@/lib/format'
 import { teamLogoSvg as teamLogoSvgFn } from '@/lib/logos'
@@ -73,18 +76,39 @@ export function StatsAdmin() {
         <TabsList><TabsTrigger value="matches">Matchs</TabsTrigger><TabsTrigger value="players">Joueurs</TabsTrigger><TabsTrigger value="teams">Équipes</TabsTrigger></TabsList>
         <TabsContent value="matches">
           <Button variant="outline" size="sm" className="mb-2" onClick={() => downloadCsv('matchs.csv', mx.map((m) => ({ date: m.date, journee: m.round, domicile: L.team.get(m.home_team_id)?.name, exterieur: L.team.get(m.away_team_id)?.name, score: fmtScore(m), terrain: m.pitch })))}><Download />Export CSV</Button>
-          <div className="glass rounded-2xl p-2"><Table><TableHeader><TableRow><TableHead>Date</TableHead><TableHead>J</TableHead><TableHead>Rencontre</TableHead><TableHead>Score</TableHead></TableRow></TableHeader>
-            <TableBody>{mx.slice(0, 120).map((m) => <TableRow key={m.id}><TableCell className="text-xs">{fmtDate(m.date, 'd MMM')}</TableCell><TableCell>{m.round}</TableCell><TableCell>{L.team.get(m.home_team_id)?.name} – {L.team.get(m.away_team_id)?.name}</TableCell><TableCell className="num">{fmtScore(m)}</TableCell></TableRow>)}</TableBody></Table></div>
+          <div className="glass rounded-2xl p-2"><SortableTable rows={mx.slice(0, 120)} rowKey={(m) => m.id} initial={{ key: 'date', dir: 'desc' }} columns={[
+            { key: 'date', label: 'Date', className: 'text-xs', sort: (m) => m.date ?? '', render: (m) => fmtDate(m.date, 'd MMM') },
+            { key: 'round', label: 'J', title: 'Journée', sort: (m) => m.round, render: (m) => m.round },
+            { key: 'match', label: 'Rencontre', sort: (m) => L.team.get(m.home_team_id)?.name, render: (m) => `${L.team.get(m.home_team_id)?.name} – ${L.team.get(m.away_team_id)?.name}` },
+            { key: 'goals', label: 'Score', title: 'Trié par nombre de buts', className: 'num', sort: (m) => (m.home_score ?? 0) + (m.away_score ?? 0), render: (m) => fmtScore(m) },
+          ]} /></div>
         </TabsContent>
         <TabsContent value="players">
-          <Button variant="outline" size="sm" className="mb-2" onClick={() => downloadCsv('joueurs.csv', px.map((s) => ({ joueur: playerName(L.player.get(s.player_id)), equipe: L.team.get(s.team_id)?.name, gardien: s.position === 'GK' ? 'oui' : 'non', mj: s.matches, buts: s.goals, passes: s.assists, jaunes: s.yellow, rouges: s.red, arrets: s.saves, clean_sheets: s.clean_sheets, xp: s.xp })))}><Download />Export CSV</Button>
-          <div className="glass rounded-2xl p-2"><Table><TableHeader><TableRow><TableHead>Joueur</TableHead><TableHead>Équipe</TableHead><TableHead className="text-center">MJ</TableHead><TableHead className="text-center">Buts</TableHead><TableHead className="text-center">Passes</TableHead><TableHead className="text-center">CJ/CR</TableHead><TableHead className="text-center">Arrêts</TableHead><TableHead className="text-center">XP</TableHead></TableRow></TableHeader>
-            <TableBody>{px.slice(0, 150).map((s) => <TableRow key={s.player_id}><TableCell>{playerName(L.player.get(s.player_id))}</TableCell><TableCell className="text-xs">{L.team.get(s.team_id)?.short_name}</TableCell><TableCell className="num text-center">{s.matches}</TableCell><TableCell className="num text-center">{s.goals}</TableCell><TableCell className="num text-center">{s.assists}</TableCell><TableCell className="num text-center">{s.yellow}/{s.red}</TableCell><TableCell className="num text-center">{s.saves}</TableCell><TableCell className="num text-center text-neon">{s.xp}</TableCell></TableRow>)}</TableBody></Table></div>
+          <Button variant="outline" size="sm" className="mb-2" onClick={() => downloadCsv('joueurs.csv', px.map((s) => ({ joueur: playerName(L.player.get(s.player_id)), equipe: L.team.get(s.team_id)?.name, gardien: s.position === 'GK' ? 'oui' : 'non', mj: s.matches, buts: s.goals, passes: s.assists, jaunes: s.yellow, rouges: s.red, arrets: s.saves, clean_sheets: s.clean_sheets, tirs: fmtShots(s.shot, 'shots'), tirs_cadres: fmtShots(s.shot, 'on_target'), precision: fmtAccuracy(s.shot), tirs_par_but: fmtShotsPerGoal(s.shot), xp: s.xp })))}><Download />Export CSV</Button>
+          <div className="glass rounded-2xl p-2"><SortableTable rows={px.slice(0, 150)} rowKey={(x) => x.player_id} initial={{ key: 'xp', dir: 'desc' }} columns={[
+            { key: 'name', label: 'Joueur', sort: (x) => playerName(L.player.get(x.player_id)), render: (x) => playerName(L.player.get(x.player_id)) },
+            { key: 'team', label: 'Équipe', className: 'text-xs', sort: (x) => L.team.get(x.team_id)?.short_name, render: (x) => L.team.get(x.team_id)?.short_name },
+            { key: 'mj', label: 'MJ', headClassName: 'text-center', className: 'num text-center', sort: (x) => x.matches, render: (x) => x.matches },
+            { key: 'goals', label: 'Buts', headClassName: 'text-center', className: 'num text-center', sort: (x) => x.goals, render: (x) => x.goals },
+            { key: 'assists', label: 'Passes', headClassName: 'text-center', className: 'num text-center', sort: (x) => x.assists, render: (x) => x.assists },
+            ...shotColumns<PlayerXP>((x) => x.shot),
+            { key: 'cards', label: 'CJ/CR', headClassName: 'text-center', className: 'num text-center', first: 'desc', sort: (x) => x.yellow + x.red * 3, render: (x) => `${x.yellow}/${x.red}` },
+            { key: 'saves', label: 'Arrêts', headClassName: 'text-center', className: 'num text-center', sort: (x) => x.saves, render: (x) => x.saves },
+            { key: 'xp', label: 'XP', headClassName: 'text-center', className: 'num text-center text-neon', sort: (x) => x.xp, render: (x) => x.xp },
+          ]} /></div>
         </TabsContent>
         <TabsContent value="teams">
-          <Button variant="outline" size="sm" className="mb-2" onClick={() => downloadCsv('equipes.csv', tx.map((t) => ({ equipe: L.team.get(t.team_id)?.name, mj: t.played, v: t.won, n: t.drawn, d: t.lost, bp: t.gf, bc: t.ga, diff: t.gd, pts: t.points })))}><Download />Export CSV</Button>
-          <div className="glass rounded-2xl p-2"><Table><TableHeader><TableRow><TableHead>Équipe</TableHead><TableHead className="text-center">MJ</TableHead><TableHead className="text-center">V-N-D</TableHead><TableHead className="text-center">BP</TableHead><TableHead className="text-center">BC</TableHead><TableHead className="text-center">CS</TableHead><TableHead className="text-center">Cartons</TableHead><TableHead className="text-center">Pts</TableHead></TableRow></TableHeader>
-            <TableBody>{tx.map((t) => <TableRow key={t.team_id}><TableCell><span className="flex items-center gap-2"><TeamLogo team={L.team.get(t.team_id)} size={18} />{L.team.get(t.team_id)?.name}</span></TableCell><TableCell className="num text-center">{t.played}</TableCell><TableCell className="num text-center">{t.won}-{t.drawn}-{t.lost}</TableCell><TableCell className="num text-center">{t.gf}</TableCell><TableCell className="num text-center">{t.ga}</TableCell><TableCell className="num text-center">{t.clean_sheets}</TableCell><TableCell className="num text-center">{t.yellow}/{t.red}</TableCell><TableCell className="num text-center text-neon">{t.points}</TableCell></TableRow>)}</TableBody></Table></div>
+          <Button variant="outline" size="sm" className="mb-2" onClick={() => downloadCsv('equipes.csv', tx.map((t) => ({ equipe: L.team.get(t.team_id)?.name, mj: t.played, v: t.won, n: t.drawn, d: t.lost, bp: t.gf, bc: t.ga, diff: t.gd, pts: t.points, tirs: fmtShots(t.shot, 'shots'), tirs_cadres: fmtShots(t.shot, 'on_target'), precision: fmtAccuracy(t.shot), tirs_par_but: fmtShotsPerGoal(t.shot) })))}><Download />Export CSV</Button>
+          <div className="glass rounded-2xl p-2"><SortableTable rows={tx} rowKey={(t) => t.team_id} initial={{ key: 'points', dir: 'desc' }} columns={[
+            { key: 'team', label: 'Équipe', sort: (t) => L.team.get(t.team_id)?.name, render: (t) => <span className="flex items-center gap-2"><TeamLogo team={L.team.get(t.team_id)} size={18} />{L.team.get(t.team_id)?.name}</span> },
+            { key: 'mj', label: 'MJ', headClassName: 'text-center', className: 'num text-center', sort: (t) => t.played, render: (t) => t.played },
+            { key: 'vnd', label: 'V-N-D', title: 'Trié par victoires', headClassName: 'text-center', className: 'num text-center', sort: (t) => t.won, render: (t) => `${t.won}-${t.drawn}-${t.lost}` },
+            { key: 'gf', label: 'BP', headClassName: 'text-center', className: 'num text-center', sort: (t) => t.gf, render: (t) => t.gf },
+            { key: 'ga', label: 'BC', headClassName: 'text-center', className: 'num text-center', first: 'asc', sort: (t) => t.ga, render: (t) => t.ga },
+            ...shotColumns<TeamStats>((t) => t.shot),
+            { key: 'cards', label: 'Cartons', headClassName: 'text-center', className: 'num text-center', sort: (t) => t.yellow + t.red * 3, render: (t) => `${t.yellow}/${t.red}` },
+            { key: 'points', label: 'Pts', headClassName: 'text-center', className: 'num text-center text-neon', sort: (t) => t.points, render: (t) => t.points },
+          ]} /></div>
         </TabsContent>
       </Tabs>
     </AdminPage>

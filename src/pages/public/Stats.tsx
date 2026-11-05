@@ -3,13 +3,16 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import { Goal, Handshake, Hand, Square, CalendarDays, ShieldCheck } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
 import { useSeason } from '@/hooks/useSeason'
-import { useTeamStats } from '@/hooks/useStats'
+import { usePlayerXP, useTeamStats } from '@/hooks/useStats'
 import { PageHeader, StatTile } from '@/components/league/Bits'
 import { AXIS, ChartBox, GRID, SERIES, TOOLTIP } from '@/components/charts/theme'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Link } from 'react-router-dom'
+import { SortableTable, type SortColumn } from '@/components/league/SortableTable'
+import { shotColumns } from '@/components/league/shotColumns'
+import { playerName } from '@/lib/format'
 import { TeamLogo } from '@/components/league/Identity'
-import { bestAttack, bestDefense, kpis, type PhaseFilter } from '@/lib/stats'
+import { bestAttack, bestDefense, kpis, type PhaseFilter, type PlayerXP, type TeamStats } from '@/lib/stats'
 import { cn } from '@/lib/utils'
 import { SeasonNotStarted } from '@/components/league/SeasonNotStarted'
 
@@ -22,6 +25,9 @@ export default function Stats() {
   const scope = { seasonId: scopeSeasonId, phase }
   const k = useMemo(() => kpis(league, scope), [league, scopeSeasonId, phase]) // eslint-disable-line react-hooks/exhaustive-deps
   const ts = [...useTeamStats(scope).values()].filter((t) => t.played > 0)
+  const xp = usePlayerXP(scope)
+  const players = useMemo(() => [...xp.values()].filter((p) => p.matches > 0).sort((a, b) => b.goals - a.goals || b.assists - a.assists || b.xp - a.xp), [xp])
+  const teamCol: SortColumn<TeamStats> = { key: 'team', label: 'Équipe', sort: (t) => L.team.get(t.team_id)?.name, render: (t) => <Link to={`/equipes/${t.team_id}`} className="flex items-center gap-2 hover:text-neon"><TeamLogo team={L.team.get(t.team_id)} size={20} /><span className="font-semibold">{L.team.get(t.team_id)?.name}</span></Link> }
   const goalsByTeam = [...ts].sort((a, b) => b.gf - a.gf).map((t) => ({ name: L.team.get(t.team_id)?.short_name, gf: t.gf }))
   return (
     <div className="space-y-8">
@@ -44,13 +50,38 @@ export default function Stats() {
         </BarChart></ResponsiveContainer>
       </ChartBox>
       <div className="grid gap-4 lg:grid-cols-2">
-        {[{ title: 'Meilleures défenses', list: bestDefense(ts), val: (t: typeof ts[0]) => `${t.ga} BC · ${t.ga_avg}/m` }, { title: 'Attaques les plus prolifiques', list: bestAttack(ts), val: (t: typeof ts[0]) => `${t.gf} BP · ${t.gf_avg}/m` }].map((b) => (
+        {[{ title: 'Meilleures défenses', list: bestDefense(ts), key: 'ga_avg', label: 'BC / m', title2: 'Buts encaissés par match', v: (t: TeamStats) => t.ga_avg, first: 'asc' as const },
+          { title: 'Attaques les plus prolifiques', list: bestAttack(ts), key: 'gf', label: 'BP', title2: 'Buts marqués', v: (t: TeamStats) => t.gf, first: 'desc' as const }].map((b) => (
           <Card key={b.title}><CardHeader><CardTitle>{b.title}</CardTitle></CardHeader><CardContent>
-            <Table><TableHeader><TableRow><TableHead>#</TableHead><TableHead>Équipe</TableHead><TableHead className="text-center">MJ</TableHead><TableHead className="text-right">Valeur</TableHead></TableRow></TableHeader>
-              <TableBody>{b.list.slice(0, 6).map((t, i) => <TableRow key={t.team_id}><TableCell className="num">{i + 1}</TableCell><TableCell><span className="flex items-center gap-2"><TeamLogo team={L.team.get(t.team_id)} size={20} />{L.team.get(t.team_id)?.name}</span></TableCell><TableCell className="num text-center">{t.played}</TableCell><TableCell className="num text-right">{b.val(t)}</TableCell></TableRow>)}</TableBody></Table>
+            <SortableTable rows={b.list.slice(0, 6).map((t, i) => ({ ...t, pos: i + 1 }))} rowKey={(t) => t.team_id} initial={{ key: 'pos', dir: 'asc' }} columns={[
+              { key: 'pos', label: '#', first: 'asc', className: 'num', sort: (t) => t.pos, render: (t) => t.pos },
+              teamCol,
+              { key: 'played', label: 'MJ', title: 'Matchs joués', headClassName: 'text-center', className: 'num text-center', sort: (t) => t.played, render: (t) => t.played },
+              { key: b.key, label: b.label, title: b.title2, first: b.first, headClassName: 'text-right', className: 'num text-right', sort: b.v, render: (t) => (b.key === 'gf' ? `${t.gf} · ${t.gf_avg}/m` : `${t.ga_avg} · ${t.ga} BC`) },
+            ]} />
           </CardContent></Card>
         ))}
       </div>
+      <Card><CardHeader><CardTitle>Équipes</CardTitle></CardHeader><CardContent className="px-1 sm:px-4">
+        <SortableTable rows={[...ts].sort((a, b) => b.points - a.points || b.gf - b.ga - (a.gf - a.ga))} rowKey={(t) => t.team_id} initial={{ key: 'points', dir: 'desc' }} columns={[
+          teamCol,
+          { key: 'played', label: 'MJ', title: 'Matchs joués', headClassName: 'text-center', className: 'num text-center', sort: (t) => t.played, render: (t) => t.played },
+          { key: 'points', label: 'Pts', title: 'Points', headClassName: 'text-center', className: 'num text-center text-white', sort: (t) => t.points, render: (t) => t.points },
+          { key: 'gf', label: 'BP', title: 'Buts marqués', headClassName: 'text-center', className: 'num text-center', sort: (t) => t.gf, render: (t) => t.gf },
+          { key: 'ga', label: 'BC', title: 'Buts encaissés', first: 'asc', headClassName: 'text-center', className: 'num text-center', sort: (t) => t.ga, render: (t) => t.ga },
+          ...shotColumns<TeamStats>((t) => t.shot),
+        ]} />
+      </CardContent></Card>
+      <Card><CardHeader><CardTitle>Joueurs</CardTitle></CardHeader><CardContent className="max-h-[70vh] overflow-y-auto px-1 sm:px-4">
+        <SortableTable rows={players} rowKey={(p) => p.player_id} initial={{ key: 'goals', dir: 'desc' }} columns={[
+          { key: 'name', label: 'Joueur', sort: (p) => playerName(L.player.get(p.player_id)), render: (p) => <Link to={`/joueurs/${p.player_id}`} className="flex items-center gap-2 hover:text-neon"><TeamLogo team={L.team.get(p.team_id)} size={20} /><span className="font-semibold">{playerName(L.player.get(p.player_id))}</span></Link> },
+          { key: 'played', label: 'MJ', title: 'Matchs joués', headClassName: 'text-center', className: 'num text-center', sort: (p) => p.matches, render: (p) => p.matches },
+          { key: 'goals', label: 'Buts', headClassName: 'text-center', className: 'num text-center', sort: (p) => p.goals, render: (p) => p.goals },
+          { key: 'assists', label: 'Passes', title: 'Passes décisives', headClassName: 'text-center', className: 'num text-center', sort: (p) => p.assists, render: (p) => p.assists },
+          ...shotColumns<PlayerXP>((p) => p.shot),
+          { key: 'xp', label: 'XP', headClassName: 'text-center', className: 'num text-center text-neon', sort: (p) => p.xp, render: (p) => p.xp },
+        ]} />
+      </CardContent></Card>
       </>}
     </div>
   )

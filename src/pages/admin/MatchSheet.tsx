@@ -1,7 +1,7 @@
 // Feuille de match officielle : se remplit depuis le Match Center, signatures arbitre + responsable, impression / PDF.
 import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { ArrowLeft, Printer, Wand2, PenLine, Radio, Save } from 'lucide-react'
+import { ArrowLeft, ListChecks, Printer, Wand2, PenLine, Radio, Save } from 'lucide-react'
 import { base44 } from '@/api/base44Client'
 import { useData, useLookup } from '@/hooks/useData'
 import { useAuth } from '@/hooks/useAuth'
@@ -73,6 +73,7 @@ export default function MatchSheet() {
         <Button asChild variant="ghost"><Link to="/admin/matchs"><ArrowLeft />Matchs</Link></Button>
         <Button asChild variant="outline"><Link to={`/admin/match-center/${m.id}`}><Radio />Match Center</Link></Button>
         <Button variant="outline" onClick={fill} disabled={signed}><Wand2 />Remplir depuis le Match Center</Button>
+        <Button asChild variant="outline"><Link to={`/admin/matchs/${m.id}/saisie`}><ListChecks />Tirs et stats par joueur</Link></Button>
         <Button onClick={() => window.print()}><Printer />Imprimer / PDF</Button>
       </div>
       {m.sheet?.filled_at && <div className="no-print mb-4 rounded-xl bg-neon/10 px-4 py-2 text-sm">Remplie automatiquement le {fmtDateTime(m.sheet.filled_at)} par {m.sheet.filled_by} · {m.sheet.actions_count} actions · Score {fmtScore(m)}</div>}

@@ -7,6 +7,7 @@
 import type {
   EventType, LivePeriod, LiveState, Lineup, Match, MatchEvent, Period, PossessionSlice, Player, Suspension,
 } from '@/types/entities'
+import { teamLiveShots } from './shots'
 
 export type Side = 'home' | 'away'
 export const DEFAULT_HALF_MIN = 15
@@ -237,8 +238,9 @@ export function teamStats(m: Pick<Match, 'home_team_id' | 'away_team_id'>, event
     const tid = side === 'home' ? m.home_team_id : m.away_team_id
     const mine = evs.filter((e) => e.team_id === tid)
     const c = (...t: EventType[]) => mine.filter((e) => t.includes(e.type)).length
-    const on = c('shot_on_target')
-    const off = c('shot_off_target', 'penalty_missed')
+    // tirs : même règle que les statistiques de saison (un but et un arrêt adverse sont des tirs cadrés)
+    const sh = teamLiveShots(evs, tid, m)
+    const on = sh.on_target, off = sh.shots_off_target
     return {
       possession: side === 'home' ? pos.home_pct : pos.away_pct,
       goals: c('goal') + evs.filter((e) => e.type === 'own_goal' && e.team_id !== tid).length,

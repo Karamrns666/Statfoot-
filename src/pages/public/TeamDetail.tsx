@@ -8,10 +8,13 @@ import { CompetitionBadge, EmptyState, FormPills, SectionTitle, StatTile } from 
 import { PlayerAvatar, RoleBadge, TeamLogo } from '@/components/league/Identity'
 import { MatchCard } from '@/components/match/MatchCard'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { SortableTable } from '@/components/league/SortableTable'
+import { shotColumns } from '@/components/league/shotColumns'
+import type { Player } from '@/types/entities'
 import { AXIS, ChartBox, GRID, Legend, SERIES, TOOLTIP } from '@/components/charts/theme'
 import { competitionStandings, teamForm } from '@/lib/stats'
 import { playerName } from '@/lib/format'
+import { fmtAccuracy, fmtShots, fmtShotsPerGoal } from '@/lib/shots'
 
 // 6 contre 6 : gardiens d'abord, puis les joueurs de champ par numéro
 const POS_ORDER: Record<string, number> = { GK: 0, FIELD: 1 }
@@ -54,30 +57,27 @@ export default function TeamDetail() {
         <TabsList><TabsTrigger value="squad">Effectif</TabsTrigger><TabsTrigger value="results">Résultats</TabsTrigger><TabsTrigger value="stats">Statistiques</TabsTrigger></TabsList>
         <TabsContent value="squad">
           <div className="glass rounded-2xl p-2 sm:p-4">
-            <Table>
-              <TableHeader><TableRow><TableHead>#</TableHead><TableHead>Joueur</TableHead><TableHead>Rôle</TableHead><TableHead className="text-center">MJ</TableHead><TableHead className="text-center">Buts</TableHead><TableHead className="text-center">Passes</TableHead><TableHead className="text-center">XP</TableHead></TableRow></TableHeader>
-              <TableBody>
-                {squad.map((p) => {
-                  const s = xp.get(p.id)
-                  return (
-                    <TableRow key={p.id}>
-                      <TableCell className="num text-muted-foreground">{p.number}</TableCell>
-                      <TableCell><Link to={`/joueurs/${p.id}`} className="flex items-center gap-2 hover:text-neon"><PlayerAvatar player={p} team={team} size={30} /><span className="font-semibold">{playerName(p)}</span></Link></TableCell>
-                      <TableCell><RoleBadge long position={p.position} captain={p.is_captain || team?.captain_player_id === p.id} /></TableCell>
-                      <TableCell className="num text-center">{s?.matches ?? 0}</TableCell>
-                      <TableCell className="num text-center">{s?.goals ?? 0}</TableCell>
-                      <TableCell className="num text-center">{s?.assists ?? 0}</TableCell>
-                      <TableCell className="num text-center text-neon">{s?.xp ?? 0}</TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
+            <SortableTable rows={squad} rowKey={(p) => p.id} initial={{ key: 'role', dir: 'asc' }} columns={[
+              { key: 'number', label: '#', first: 'asc', className: 'num text-muted-foreground', sort: (p) => p.number, render: (p) => p.number },
+              { key: 'name', label: 'Joueur', sort: (p) => playerName(p), render: (p) => <Link to={`/joueurs/${p.id}`} className="flex items-center gap-2 hover:text-neon"><PlayerAvatar player={p} team={team} size={30} /><span className="font-semibold">{playerName(p)}</span></Link> },
+              { key: 'role', label: 'Rôle', first: 'asc', sort: (p) => (p.position === 'GK' ? 0 : p.is_captain || team?.captain_player_id === p.id ? 1 : 2), render: (p) => <RoleBadge long position={p.position} captain={p.is_captain || team?.captain_player_id === p.id} /> },
+              { key: 'mj', label: 'MJ', title: 'Matchs joués', headClassName: 'text-center', className: 'num text-center', sort: (p) => xp.get(p.id)?.matches ?? 0, render: (p) => xp.get(p.id)?.matches ?? 0 },
+              { key: 'goals', label: 'Buts', headClassName: 'text-center', className: 'num text-center', sort: (p) => xp.get(p.id)?.goals ?? 0, render: (p) => xp.get(p.id)?.goals ?? 0 },
+              { key: 'assists', label: 'Passes', headClassName: 'text-center', className: 'num text-center', sort: (p) => xp.get(p.id)?.assists ?? 0, render: (p) => xp.get(p.id)?.assists ?? 0 },
+              ...shotColumns<Player>((p) => xp.get(p.id)?.shot, 'hidden md:table-cell'),
+              { key: 'xp', label: 'XP', headClassName: 'text-center', className: 'num text-center text-neon', sort: (p) => xp.get(p.id)?.xp ?? 0, render: (p) => xp.get(p.id)?.xp ?? 0 },
+            ]} />
           </div>
         </TabsContent>
         <TabsContent value="results"><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{matches.map((m) => <MatchCard key={m.id} match={m} />)}</div></TabsContent>
         <TabsContent value="stats">
-          {timeline.length ? (
+          {timeline.length ? (<>
+            <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+              <StatTile label="Tirs" value={fmtShots(ts?.shot, 'shots')} sub={ts?.shot.matches ? `${ts.shot.matches} match(s) saisis` : 'non saisis'} />
+              <StatTile label="Tirs cadrés" value={fmtShots(ts?.shot, 'on_target')} color="#2a8fc4" />
+              <StatTile label="Précision" value={fmtAccuracy(ts?.shot)} color="#22c55e" sub="cadrés / tirs" />
+              <StatTile label="Tirs par but" value={fmtShotsPerGoal(ts?.shot)} color="#E04E00" />
+            </div>
             <div className="grid gap-4 lg:grid-cols-2">
               <ChartBox title="Points cumulés">
                 <ResponsiveContainer><LineChart data={timeline} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
@@ -95,7 +95,7 @@ export default function TeamDetail() {
                 </BarChart></ResponsiveContainer>
               </ChartBox>
             </div>
-          ) : <EmptyState title="Pas encore de match joué" />}
+          </>) : <EmptyState title="Pas encore de match joué" />}
         </TabsContent>
       </Tabs>
       <SectionTitle title="" className="hidden" />

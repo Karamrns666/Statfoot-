@@ -34,7 +34,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const league: LeagueData = {
       seasons: db.Season, competitions: db.Competition, divisions: db.Division, groups: db.Group, teams: db.Team,
       players: db.Player, matches: db.Match, events: db.MatchEvent, lineups: db.Lineup, xpRules: db.XPRule,
-      suspensions: db.Suspension, monthlyAwards: db.MonthlyAward, settings,
+      suspensions: db.Suspension, monthlyAwards: db.MonthlyAward, settings, teamStats: db.MatchTeamStats,
     }
     return { db, league, settings, ready }
   }, [db, ready])

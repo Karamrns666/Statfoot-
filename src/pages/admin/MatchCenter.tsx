@@ -44,6 +44,7 @@ const vibrate = () => { try { navigator.vibrate?.(25) } catch { /* */ } }
 type Flow =
   | { kind: 'goal'; team: string; step: 'type' | 'scorer' | 'assist'; goal_kind?: GoalKind | 'own_goal'; scorer?: string; free?: string }
   | { kind: 'card'; team: string; type: 'yellow_card' | 'red_card' }
+  | { kind: 'shot'; team: string; type: 'shot_on_target' | 'shot_off_target' }
   | { kind: 'player_menu'; team: string; player: string }
   | { kind: 'sub'; team: string; out?: string }
   | { kind: 'gk'; team: string }
@@ -242,7 +243,7 @@ export default function MatchCenter() {
               {[m.home_team_id, m.away_team_id].map((tid) => (
                 <ActionPad key={tid} teamId={tid} events={events} disabled={!canWrite || !(isPlaying(period) || period === 'HT' || period === 'ET_BREAK')}
                   onGoal={() => setFlow({ kind: 'goal', team: tid, step: 'type' })}
-                  onAction={(type) => (type === 'yellow_card' || type === 'red_card' ? setFlow({ kind: 'card', team: tid, type }) : act(tid, type))}
+                  onAction={(type) => (type === 'yellow_card' || type === 'red_card' ? setFlow({ kind: 'card', team: tid, type }) : type === 'shot_on_target' || type === 'shot_off_target' ? setFlow({ kind: 'shot', team: tid, type }) : act(tid, type))}
                   onMore={() => setFlow({ kind: 'more', team: tid })} />
               ))}
             </div>
@@ -484,6 +485,11 @@ function FlowDialog({ flow, setFlow, match, events, act, ls }: { flow: Flow; set
       title = `${flow.type === 'yellow_card' ? 'Carton jaune' : 'Carton rouge'} — ${teamName(flow.team)}`
       body = <div className="space-y-3"><PlayerGrid match={match} teamId={flow.team} events={events} onPick={async (p) => { setFlow(null); await act(flow.team, flow.type, { player_id: p }) }} />
         <Button variant="outline" className="w-full" onClick={async () => { setFlow(null); await act(flow.team, flow.type) }}>Joueur inconnu</Button></div>
+      break
+    case 'shot':
+      title = `${flow.type === 'shot_on_target' ? 'Tir cadré' : 'Tir non cadré'} — ${teamName(flow.team)}`
+      body = <div className="space-y-3"><p className="text-sm text-muted-foreground">Tireur (sert aux statistiques de tirs du joueur)</p><PlayerGrid match={match} teamId={flow.team} events={events} includeBench={false} onPick={async (p) => { setFlow(null); await act(flow.team, flow.type, { player_id: p }) }} />
+        <Button variant="outline" className="w-full" onClick={async () => { setFlow(null); await act(flow.team, flow.type) }}>Sans joueur (tir de l’équipe)</Button></div>
       break
     case 'player_for':
       title = `${EVENT_LABEL[flow.type]} — ${teamName(flow.team)}`

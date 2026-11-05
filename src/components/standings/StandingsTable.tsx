@@ -3,7 +3,7 @@ import type { StandingRow } from '@/lib/stats'
 import { useLookup } from '@/hooks/useData'
 import { TeamLogo } from '@/components/league/Identity'
 import { FormPills } from '@/components/league/Bits'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { SortableTable, type SortColumn } from '@/components/league/SortableTable'
 import { cn } from '@/lib/utils'
 
 export interface Zone { from: number; to: number; color: string; label: string }
@@ -13,52 +13,27 @@ export function StandingsTable({ rows, compact = false, zones: zonesIn = [], hig
   const zones = rows.some((r) => r.played > 0) ? zonesIn : []
   const L = useLookup()
   const zoneOf = (rank: number) => zones.find((z) => rank >= z.from && rank <= z.to)
+  const formPoints = (r: StandingRow) => r.form.reduce((a, x) => a + (x === 'W' ? 3 : x === 'D' ? 1 : 0), 0)
+  const full = !compact
+  const n = 'num text-center text-base'
+  const columns: SortColumn<StandingRow>[] = [
+    { key: 'rank', label: 'Pos', headClassName: 'w-12 text-center', className: 'relative text-center', first: 'asc', sort: (r) => r.rank, render: (r) => { const z = zoneOf(r.rank); return <>{z && <span className="absolute inset-y-1 left-0 w-1 rounded-full" style={{ background: z.color }} title={z.label} />}<span className="num text-lg">{r.rank}</span></> } },
+    { key: 'team', label: 'Équipe', className: 'max-w-[46vw] sm:max-w-none', sort: (r) => L.team.get(r.team_id)?.name, render: (r) => { const t = L.team.get(r.team_id); return <Link to={`/equipes/${r.team_id}`} className="flex items-center gap-2 hover:text-neon"><TeamLogo team={t} size={26} /><span className="truncate font-semibold">{t?.name}</span></Link> } },
+    { key: 'played', label: 'MJ', title: 'Matchs joués', headClassName: 'text-center', className: cn(n, 'text-muted-foreground'), sort: (r) => r.played, render: (r) => r.played },
+    ...(full ? [
+      { key: 'won', label: 'V', title: 'Victoires', headClassName: 'text-center', className: n, sort: (r) => r.won, render: (r) => r.won },
+      { key: 'drawn', label: 'N', title: 'Nuls', headClassName: 'text-center', className: n, sort: (r) => r.drawn, render: (r) => r.drawn },
+      { key: 'lost', label: 'D', title: 'Défaites', headClassName: 'text-center', className: n, sort: (r) => r.lost, render: (r) => r.lost },
+      { key: 'gf', label: 'BP', title: 'Buts pour', headClassName: 'text-center hidden sm:table-cell', className: cn(n, 'hidden sm:table-cell'), sort: (r) => r.gf, render: (r) => r.gf },
+      { key: 'ga', label: 'BC', title: 'Buts contre', headClassName: 'text-center hidden sm:table-cell', className: cn(n, 'hidden sm:table-cell'), sort: (r) => r.ga, render: (r) => r.ga },
+    ] as SortColumn<StandingRow>[] : []),
+    { key: 'gd', label: 'Diff', title: 'Différence de buts', headClassName: 'text-center', sort: (r) => r.gd, className: 'num text-center text-base', render: (r) => <span className={r.gd > 0 ? 'text-win' : r.gd < 0 ? 'text-loss' : 'text-muted-foreground'}>{r.gd > 0 ? `+${r.gd}` : r.gd}</span> },
+    { key: 'points', label: 'Pts', title: 'Points', headClassName: 'text-center', className: 'num text-center text-xl text-white', sort: (r) => r.points, render: (r) => r.points },
+    { key: 'form', label: 'Forme', title: '5 derniers matchs (victoire 3, nul 1)', headClassName: cn(compact && 'hidden sm:table-cell'), className: cn(compact && 'hidden sm:table-cell'), sort: (r) => formPoints(r), render: (r) => <FormPills form={r.form} /> },
+  ]
   return (
     <div>
-      <Table>
-        <TableHeader>
-          <TableRow className="hover:bg-transparent">
-            <TableHead className="w-10 text-center">Pos</TableHead>
-            <TableHead>Équipe</TableHead>
-            <TableHead className="text-center">MJ</TableHead>
-            {!compact && <><TableHead className="text-center">V</TableHead><TableHead className="text-center">N</TableHead><TableHead className="text-center">D</TableHead><TableHead className="text-center hidden sm:table-cell">BP</TableHead><TableHead className="text-center hidden sm:table-cell">BC</TableHead></>}
-            <TableHead className="text-center">Diff</TableHead>
-            <TableHead className="text-center">Pts</TableHead>
-            <TableHead className={cn(compact ? 'hidden sm:table-cell' : '')}>Forme</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {rows.map((r) => {
-            const t = L.team.get(r.team_id)
-            const z = zoneOf(r.rank)
-            return (
-              <TableRow key={r.team_id} className={cn(highlightTeamId === r.team_id && 'bg-neon/10')}>
-                <TableCell className="relative text-center">
-                  {z && <span className="absolute inset-y-1 left-0 w-1 rounded-full" style={{ background: z.color }} title={z.label} />}
-                  <span className="num text-lg">{r.rank}</span>
-                </TableCell>
-                <TableCell className="max-w-[46vw] sm:max-w-none">
-                  <Link to={`/equipes/${r.team_id}`} className="flex items-center gap-2 hover:text-neon">
-                    <TeamLogo team={t} size={26} />
-                    <span className="truncate font-semibold">{t?.name}</span>
-                  </Link>
-                </TableCell>
-                <TableCell className="num text-center text-base text-muted-foreground">{r.played}</TableCell>
-                {!compact && <>
-                  <TableCell className="num text-center text-base">{r.won}</TableCell>
-                  <TableCell className="num text-center text-base">{r.drawn}</TableCell>
-                  <TableCell className="num text-center text-base">{r.lost}</TableCell>
-                  <TableCell className="num text-center text-base hidden sm:table-cell">{r.gf}</TableCell>
-                  <TableCell className="num text-center text-base hidden sm:table-cell">{r.ga}</TableCell>
-                </>}
-                <TableCell className={cn('num text-center text-base', r.gd > 0 ? 'text-win' : r.gd < 0 ? 'text-loss' : 'text-muted-foreground')}>{r.gd > 0 ? `+${r.gd}` : r.gd}</TableCell>
-                <TableCell className="num text-center text-xl text-white">{r.points}</TableCell>
-                <TableCell className={cn(compact ? 'hidden sm:table-cell' : '')}><FormPills form={r.form} /></TableCell>
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
+      <SortableTable rows={rows} columns={columns} rowKey={(r) => r.team_id} initial={{ key: 'rank', dir: 'asc' }} rowClassName={(r) => highlightTeamId === r.team_id && 'bg-neon/10'} />
       {zones.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-4 px-2 text-xs text-muted-foreground">
           {zones.map((z) => <span key={z.label} className="inline-flex items-center gap-1.5"><span className="size-2.5 rounded-full" style={{ background: z.color }} />{z.label}</span>)}

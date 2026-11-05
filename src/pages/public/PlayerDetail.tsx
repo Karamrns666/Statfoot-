@@ -11,7 +11,9 @@ import { EmptyState, RankDelta, RookieBadge, SectionTitle } from '@/components/l
 import { PlayerAvatar, RoleBadge, TeamLogo } from '@/components/league/Identity'
 import { MaterialLegend, XPCard } from '@/components/players/Cards'
 import { BadgeMedal, BadgeTile } from '@/components/players/BadgeMedal'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { SortableTable } from '@/components/league/SortableTable'
+import { shotColumns } from '@/components/league/shotColumns'
+import { fmtAccuracy, fmtShots, fmtShotsPerGoal } from '@/lib/shots'
 import { AXIS, ChartBox, GRID, Legend, SERIES, TOOLTIP } from '@/components/charts/theme'
 import { AWARD_LABELS, computePlayerXP, isRookie, ageAt, type XPLine } from '@/lib/stats'
 import { BADGES, RATING_RULES, TIER_LABEL, TIER_STYLE, cardMaterial, challengeResult, challengeTargets, decisiveStreak, nextBadges, playerBadges, playerMatchLog, type BadgeGroup } from '@/lib/badges'
@@ -124,6 +126,13 @@ export default function PlayerDetail() {
         <Tile label="Meilleure note" value={best ? best.toFixed(1).replace('.', ',') : '—'} sub="sur 10" />
       </div>
 
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <Tile label="Tirs" value={fmtShots(s?.shot, 'shots')} sub={s?.shot.matches ? `sur ${s.shot.matches} match(s) saisis` : 'tirs non saisis'} />
+        <Tile label="Tirs cadrés" value={fmtShots(s?.shot, 'on_target')} sub="buts compris" />
+        <Tile label="Précision" value={fmtAccuracy(s?.shot)} sub="tirs cadrés / tirs" />
+        <Tile label="Tirs par but" value={fmtShotsPerGoal(s?.shot)} sub="tirs nécessaires pour marquer" />
+      </div>
+
       {/* DÉFIS + RIVALITÉ + TITRES */}
       <div className="grid gap-4 lg:grid-cols-3">
         <section className="glass rounded-2xl p-5">
@@ -225,43 +234,36 @@ export default function PlayerDetail() {
       {/* DÉTAIL DE L'XP */}
       <section className="glass rounded-2xl p-2 sm:p-4">
         <h2 className="px-2 pt-2 font-display text-2xl font-black">Détail de l’XP</h2>
-        <Table>
-          <TableHeader><TableRow>
-            <TableHead>Date</TableHead><TableHead>Adversaire</TableHead><TableHead className="text-center" title="Buts">B</TableHead><TableHead className="text-center" title="Passes décisives">PD</TableHead>
-            <TableHead className="text-center" title="Multiplicateur selon le rang de l'adversaire">Import.</TableHead><TableHead className="text-center">Résultat</TableHead><TableHead className="text-center">Sanctions</TableHead>
-            {keeper && <TableHead className="text-center">Gardien</TableHead>}<TableHead className="text-center">Note</TableHead><TableHead className="text-right">XP</TableHead>
-          </TableRow></TableHeader>
-          <TableBody>
-            {xpRows.map((r) => (
-              <TableRow key={r.m.id}>
-                <TableCell className="whitespace-nowrap text-xs text-muted-foreground"><Link to={`/matchs/${r.m.id}`} className="hover:text-neon">{fmtDate(r.m.date, 'dd/MM')} · J{r.m.round}</Link></TableCell>
-                <TableCell><span className="flex items-center gap-2 text-sm"><TeamLogo team={r.opp} size={18} /><span className="truncate">{r.opp?.name}</span>{r.oppRank ? <span className="text-xs text-muted-foreground">({ordinal(r.oppRank)})</span> : null}</span></TableCell>
-                <TableCell className="num text-center">{r.goals}</TableCell><TableCell className="num text-center">{r.assists}</TableCell>
-                <TableCell className="text-center text-xs">{r.mult ? `×${String(r.mult).replace('.', ',')}` : '—'}</TableCell>
-                <TableCell className={cn('num text-center', r.result > 0 ? 'text-win' : r.result < 0 ? 'text-loss' : 'text-muted-foreground')}>{r.result ? pts(r.result) : '0'}</TableCell>
-                <TableCell className={cn('num text-center', r.sanctions < 0 ? 'text-loss' : 'text-muted-foreground')}>{r.sanctions ? pts(r.sanctions) : '0'}</TableCell>
-                {keeper && <TableCell className="num text-center">{r.keeper ? pts(r.keeper) : '0'}</TableCell>}
-                <TableCell className="num text-center">{r.rating != null ? r.rating.toFixed(1).replace('.', ',') : '—'}</TableCell>
-                <TableCell className={cn('num text-right text-lg', r.total >= 0 ? 'text-neon' : 'text-sky')}>{pts(r.total)}</TableCell>
-              </TableRow>
-            ))}
-            {offMatch.map((l, i) => (
-              <TableRow key={`off-${i}`}>
-                <TableCell colSpan={keeper ? 9 : 8} className="text-sm text-muted-foreground">{l.label}{l.detail ? ` · ${l.detail}` : ''}</TableCell>
-                <TableCell className="num text-right text-lg text-neon">{pts(l.points)}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <SortableTable rows={xpRows} rowKey={(r) => r.m.id} initial={{ key: 'date', dir: 'asc' }} columns={[
+          { key: 'date', label: 'Date', first: 'asc', className: 'whitespace-nowrap text-xs text-muted-foreground', sort: (r) => r.m.date ?? '', render: (r) => <Link to={`/matchs/${r.m.id}`} className="hover:text-neon">{fmtDate(r.m.date, 'dd/MM')} · J{r.m.round}</Link> },
+          { key: 'opp', label: 'Adversaire', sort: (r) => r.opp?.name, render: (r) => <span className="flex items-center gap-2 text-sm"><TeamLogo team={r.opp} size={18} /><span className="truncate">{r.opp?.name}</span>{r.oppRank ? <span className="text-xs text-muted-foreground">({ordinal(r.oppRank)})</span> : null}</span> },
+          { key: 'goals', label: 'B', title: 'Buts', headClassName: 'text-center', className: 'num text-center', sort: (r) => r.goals, render: (r) => r.goals },
+          { key: 'assists', label: 'PD', title: 'Passes décisives', headClassName: 'text-center', className: 'num text-center', sort: (r) => r.assists, render: (r) => r.assists },
+          { key: 'mult', label: 'Import.', title: "Multiplicateur selon le rang de l'adversaire", headClassName: 'text-center', className: 'text-center text-xs', sort: (r) => r.mult || null, render: (r) => (r.mult ? `×${String(r.mult).replace('.', ',')}` : '—') },
+          { key: 'result', label: 'Résultat', headClassName: 'text-center', sort: (r) => r.result, className: 'num text-center', render: (r) => <span className={r.result > 0 ? 'text-win' : r.result < 0 ? 'text-loss' : 'text-muted-foreground'}>{r.result ? pts(r.result) : '0'}</span> },
+          { key: 'sanctions', label: 'Sanctions', headClassName: 'text-center', first: 'asc', sort: (r) => r.sanctions, className: 'num text-center', render: (r) => <span className={r.sanctions < 0 ? 'text-loss' : 'text-muted-foreground'}>{r.sanctions ? pts(r.sanctions) : '0'}</span> },
+          ...(keeper ? [{ key: 'keeper', label: 'Gardien', headClassName: 'text-center', className: 'num text-center', sort: (r: (typeof xpRows)[number]) => r.keeper, render: (r: (typeof xpRows)[number]) => (r.keeper ? pts(r.keeper) : '0') }] : []),
+          { key: 'rating', label: 'Note', headClassName: 'text-center', className: 'num text-center', sort: (r) => r.rating, render: (r) => (r.rating != null ? r.rating.toFixed(1).replace('.', ',') : '—') },
+          { key: 'total', label: 'XP', headClassName: 'text-right', sort: (r) => r.total, className: 'num text-right text-lg', render: (r) => <span className={r.total >= 0 ? 'text-neon' : 'text-sky'}>{pts(r.total)}</span> },
+        ]} />
+        {offMatch.length > 0 && (
+          <ul className="mt-2 divide-y divide-white/5 border-t border-white/10 px-2">
+            {offMatch.map((l, i) => <li key={i} className="flex items-center justify-between py-2 text-sm text-muted-foreground"><span>{l.label}{l.detail ? ` · ${l.detail}` : ''}</span><span className="num text-lg text-neon">{pts(l.points)}</span></li>)}
+          </ul>
+        )}
         {!xpRows.length && !offMatch.length && <p className="p-3 text-sm text-muted-foreground">Pas encore d’XP cette saison.</p>}
       </section>
 
       <section className="glass rounded-2xl p-2 sm:p-4">
         <h2 className="px-2 pt-2 font-display text-2xl font-black">Historique par saison</h2>
-        <Table>
-          <TableHeader><TableRow><TableHead>Saison</TableHead><TableHead className="text-center">MJ</TableHead><TableHead className="text-center">Buts</TableHead><TableHead className="text-center">Passes</TableHead><TableHead className="text-center">XP</TableHead></TableRow></TableHeader>
-          <TableBody>{history.map(({ season: se, x }) => <TableRow key={se.id}><TableCell>{se.name}</TableCell><TableCell className="num text-center">{x?.matches ?? 0}</TableCell><TableCell className="num text-center">{x?.goals ?? 0}</TableCell><TableCell className="num text-center">{x?.assists ?? 0}</TableCell><TableCell className="num text-center text-neon">{x?.xp ?? 0}</TableCell></TableRow>)}</TableBody>
-        </Table>
+        <SortableTable rows={history} rowKey={(h) => h.season.id} initial={{ key: 'season', dir: 'desc' }} columns={[
+          { key: 'season', label: 'Saison', sort: (h) => h.season.start_date, render: (h) => h.season.name },
+          { key: 'mj', label: 'MJ', title: 'Matchs joués', headClassName: 'text-center', className: 'num text-center', sort: (h) => h.x?.matches ?? 0, render: (h) => h.x?.matches ?? 0 },
+          { key: 'goals', label: 'Buts', headClassName: 'text-center', className: 'num text-center', sort: (h) => h.x?.goals ?? 0, render: (h) => h.x?.goals ?? 0 },
+          { key: 'assists', label: 'Passes', headClassName: 'text-center', className: 'num text-center', sort: (h) => h.x?.assists ?? 0, render: (h) => h.x?.assists ?? 0 },
+          ...shotColumns<(typeof history)[number]>((h) => h.x?.shot, 'hidden sm:table-cell'),
+          { key: 'xp', label: 'XP', headClassName: 'text-center', className: 'num text-center text-neon', sort: (h) => h.x?.xp ?? 0, render: (h) => h.x?.xp ?? 0 },
+        ]} />
       </section>
       <p className="text-xs text-muted-foreground">{playerName(p)} · XP calculé selon le barème de la saison, recalculé depuis les événements de match.</p>
     </div>

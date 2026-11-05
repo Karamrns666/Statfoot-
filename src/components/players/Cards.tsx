@@ -4,7 +4,8 @@ import { useLookup } from '@/hooks/useData'
 import { usePlayerBadges } from '@/hooks/useStats'
 import { SEASON_2025_ID } from '@/api/seed/season2025'
 import { isRookie, type PlayerXP, type Ranked } from '@/lib/stats'
-import { splitName, type IPGEntry } from '@/lib/ipg'
+import { IPG_RANKING, splitName, type IPGEntry } from '@/lib/ipg'
+import { useSeason } from '@/hooks/useSeason'
 import type { Player, Team } from '@/types/entities'
 import { TIER_LABEL, TIER_ORDER, TIER_STYLE } from '@/lib/badges'
 import { cn } from '@/lib/utils'
@@ -14,11 +15,14 @@ export function XPCard({ r, player: p, team: t, className }: { r: Ranked<PlayerX
   const s = r.item
   const gk = p.position === 'GK'
   const bs = usePlayerBadges().get(p.id)
+  const { scopeSeasonId } = useSeason()
+  // l'IPG n'existe que pour la saison 2025-2026 (fichier de la ligue)
+  const ipg = scopeSeasonId === SEASON_2025_ID ? IPG_RANKING.find((e) => e.player_id === p.id)?.ipg : undefined
   return (
     <PlayerCard
       className={className}
       material={bs?.material} medals={bs?.unlocked} badgeTotal={bs?.total}
-      firstName={p.first_name} lastName={p.last_name} position={p.position} captain={p.is_captain || t?.captain_player_id === p.id} team={t} photoUrl={p.photo_url}
+      firstName={p.first_name} lastName={p.last_name} position={p.position} captain={p.is_captain || t?.captain_player_id === p.id} team={t} photoUrl={p.photo_url} cutoutUrl={p.photo_cutout_url} ipg={ipg}
       rating={s.xp} ratingLabel="XP" rank={r.rank} delta={r.delta}
       badge={isRookie(p) ? <RookieBadge /> : undefined}
       front={gk
@@ -47,7 +51,7 @@ export function IPGCard({ e, className }: { e: IPGEntry; className?: string }) {
       className={className}
       material={bs?.material} medals={bs?.unlocked} badgeTotal={bs?.total}
       firstName={player?.first_name ?? n.first} lastName={player?.last_name ?? n.last} position={player?.position}
-      team={team} teamName={e.team.toLowerCase().replace(/(^|\s)\S/g, (x) => x.toUpperCase())} photoUrl={player?.photo_url}
+      team={team} teamName={e.team.toLowerCase().replace(/(^|\s)\S/g, (x) => x.toUpperCase())} photoUrl={player?.photo_url} cutoutUrl={player?.photo_cutout_url}
       rating={e.ipg.toFixed(1)} ratingLabel="IPG" rank={e.rank}
       front={[{ label: 'BUT', value: e.goals }, { label: 'PAS', value: e.assists, hint: 'Passes décisives' }, { label: 'CONT', value: `${Math.round(e.contribution)}%`, hint: 'Part des buts de l’équipe' }, { label: 'VIC', value: `${Math.round(e.win_pct)}%`, hint: 'Victoires de l’équipe' }]}
       backTitle="Indice de performance"

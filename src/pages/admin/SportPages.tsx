@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Lock, CheckCircle2, AlertTriangle } from 'lucide-react'
+import { Lock, CheckCircle2, AlertTriangle, Images } from 'lucide-react'
+import { TeamMediaManager } from '@/components/admin/TeamMediaManager'
 import { base44 } from '@/api/base44Client'
 import { useData, useLookup } from '@/hooks/useData'
 import { useAdminScope } from '@/hooks/useAdminScope'
@@ -120,6 +121,8 @@ export function Teams() {
   const { db } = useData()
   const { seasonId, competitionId } = useAdminScope()
   const [div, setDiv] = useState('')
+  const [mediaFor, setMediaFor] = useState<string | null>(null)
+  const mediaTeam = mediaFor ? db.Team.find((t) => t.id === mediaFor) : undefined
   const comp = db.Competition.find((c) => c.id === competitionId)
   const fields: Field[] = [
     { key: 'name', label: 'Nom', required: true }, { key: 'short_name', label: 'Nom court (3 lettres)', required: true },
@@ -138,6 +141,7 @@ export function Teams() {
         transform={(v) => ({ ...v, short_name: String(v.short_name ?? '').toUpperCase().slice(0, 3) })}
         toolbar={<FilterSelect value={div} onChange={setDiv} allLabel="Toutes séries" options={db.Division.map((d) => ({ value: d.id, label: d.name }))} />}
         defaults={() => ({ status: 'active', primary_color: '#F85A00', secondary_color: '#04163D' })}
+        rowActions={(t) => <Button size="sm" variant="outline" className="h-8" onClick={() => setMediaFor(t.id)}><Images />Photos & poster{t.media?.length ? ` (${t.media.length})` : ''}</Button>}
         columns={[
           { label: 'Équipe', render: (t) => <span className="flex items-center gap-2"><TeamLogo team={t} size={28} /><span><span className="font-semibold">{t.name}</span><span className="ml-2 text-xs text-muted-foreground">{t.short_name}</span></span></span> },
           { label: 'Entreprise', render: (t) => <span className="flex items-center gap-2">{t.company_logo_url && <img src={t.company_logo_url} className="size-5 rounded" alt="" />}{t.company}</span>, className: 'hidden md:table-cell' },
@@ -147,6 +151,7 @@ export function Teams() {
           { label: 'Effectif', render: (t) => db.Player.filter((p) => p.team_id === t.id && p.season_ids?.includes(seasonId)).length, className: 'text-center' },
           { label: 'Statut', render: (t) => <Badge variant={t.status === 'active' ? 'success' : 'outline'}>{t.status === 'active' ? 'Active' : t.status === 'pending' ? 'En attente' : 'Inactive'}</Badge> },
         ]} />
+      {mediaTeam && <TeamMediaManager team={mediaTeam} open onOpenChange={(o) => !o && setMediaFor(null)} />}
     </AdminPage>
   )
 }

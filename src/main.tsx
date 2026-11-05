@@ -7,6 +7,10 @@ import { DataProvider } from '@/hooks/useData'
 import { SeasonProvider } from '@/hooks/useSeason'
 import { AuthProvider } from '@/hooks/useAuth'
 import { Toaster } from '@/components/ui/toast'
+import { registerFileWorker } from '@/api/fileStore'
+
+// sert les images importées (photos, posters) depuis IndexedDB
+void registerFileWorker()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

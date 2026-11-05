@@ -49,6 +49,58 @@
         "pending",
         "inactive"
       ]
+    },
+    "media": {
+      "type": "array",
+      "description": "Photos collectives et posters de l'équipe",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "team_photo",
+              "poster"
+            ]
+          },
+          "focus_x": {
+            "type": "number"
+          },
+          "focus_y": {
+            "type": "number"
+          },
+          "focus_x_mobile": {
+            "type": "number"
+          },
+          "focus_y_mobile": {
+            "type": "number"
+          },
+          "width": {
+            "type": "integer"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "kind"
+        ]
+      }
+    },
+    "cover_media_id": {
+      "type": "string",
+      "description": "Image affichée en en-tête de la page équipe"
     }
   },
   "required": [

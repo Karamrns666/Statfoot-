@@ -65,11 +65,18 @@ export interface Team extends BaseEntity {
   division_id?: string
   group_id?: string
   captain_player_id?: string
+  /** photos collectives et posters (en-tête de la page équipe) */
+  media?: TeamMedia[]
+  /** image affichée en en-tête */
+  cover_media_id?: string
   contact_name?: string
   contact_email?: string
   contact_phone?: string
   status?: 'active' | 'pending' | 'inactive'
 }
+
+/** Image d'équipe ; focus = point de recadrage en % (0–100), séparé pour ordinateur et mobile */
+export interface TeamMedia { id: string; url: string; kind: 'team_photo' | 'poster'; focus_x?: number; focus_y?: number; focus_x_mobile?: number; focus_y_mobile?: number; width?: number; height?: number; created_at?: string }
 
 export type DocType = 'id_card' | 'medical' | 'license'
 export type DocStatus = 'valid' | 'missing' | 'refused' | 'pending'
@@ -78,7 +85,11 @@ export interface PlayerDoc { status: DocStatus; file_url?: string; reason?: stri
 export interface Player extends BaseEntity {
   first_name: string
   last_name: string
+  /** photo originale (gardée en secours, utilisée en rond : avatars, équipe type) */
   photo_url?: string
+  /** photo détourée (PNG transparent) pour la carte joueur */
+  photo_cutout_url?: string
+  photo_cutout_status?: 'ok' | 'failed'
   position: Position
   number?: number
   team_id: string

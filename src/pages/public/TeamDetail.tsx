@@ -5,7 +5,8 @@ import { useData, useLookup } from '@/hooks/useData'
 import { useSeason } from '@/hooks/useSeason'
 import { usePlayerXP, useTeamStats, useSeasonCompetitions } from '@/hooks/useStats'
 import { CompetitionBadge, EmptyState, FormPills, SectionTitle, StatTile } from '@/components/league/Bits'
-import { PlayerAvatar, RoleBadge, TeamLogo } from '@/components/league/Identity'
+import { PlayerAvatar, RoleBadge } from '@/components/league/Identity'
+import { TeamBanner } from '@/components/league/TeamBanner'
 import { MatchCard } from '@/components/match/MatchCard'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SortableTable } from '@/components/league/SortableTable'
@@ -36,18 +37,12 @@ export default function TeamDetail() {
   const timeline = ts?.timeline ?? []
   return (
     <div className="space-y-8">
-      <section className="relative overflow-hidden rounded-3xl border border-white/10 p-6 sm:p-8" style={{ background: `radial-gradient(ellipse 60% 100% at 0% 0%, ${team.primary_color}40, transparent 70%), linear-gradient(180deg,#0D2B66,#04163D)` }}>
-        <div className="flex flex-col items-center gap-5 sm:flex-row">
-          <TeamLogo team={team} size={120} />
-          <div className="text-center sm:text-left">
-            <h1 className="title-caps text-4xl sm:text-6xl">{team.name}</h1>
-            <div className="mt-1 flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground sm:justify-start">
-              {team.company_logo_url && <img src={team.company_logo_url} alt={team.company ?? ''} className={team.company_logo_url.startsWith('/logos/') ? 'h-10 w-auto rounded-lg bg-white' : 'size-6 rounded'} />}<span>{team.company}</span><CompetitionBadge competition={cup} />{row && <span>{row.rank}e · {row.points} pts</span>}
-            </div>
-            <div className="mt-3 flex justify-center sm:justify-start"><FormPills form={teamForm(matches, team.id)} size="md" /></div>
-          </div>
+      <TeamBanner team={team}>
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-white/85">
+          {team.company_logo_url && <img src={team.company_logo_url} alt={team.company ?? ''} className={team.company_logo_url.startsWith('/logos/') ? 'h-9 w-auto rounded-lg bg-white' : 'size-6 rounded'} />}<span>{team.company}</span><CompetitionBadge competition={cup} />{row && <span className="font-semibold">{row.rank}e · {row.points} pts</span>}
         </div>
-      </section>
+        <div className="mt-3"><FormPills form={teamForm(matches, team.id)} size="md" /></div>
+      </TeamBanner>
       <div className="grid grid-cols-3 gap-2 sm:gap-3">
         <StatTile label="Matchs joués" value={ts?.played ?? 0} sub={`${ts?.won ?? 0}V · ${ts?.drawn ?? 0}N · ${ts?.lost ?? 0}D`} />
         <StatTile label="Buts marqués" value={ts?.gf ?? 0} color="#E04E00" sub={`${ts?.gf_avg ?? 0} / match`} />

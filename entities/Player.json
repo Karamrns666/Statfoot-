@@ -58,6 +58,17 @@
     "documents": {
       "type": "object",
       "description": "{ id_card|medical|license: { status: valid|missing|refused|pending, file_url, reason, validated_by } }"
+    },
+    "photo_cutout_url": {
+      "type": "string",
+      "description": "Photo détourée (PNG transparent) pour la carte joueur"
+    },
+    "photo_cutout_status": {
+      "type": "string",
+      "enum": [
+        "ok",
+        "failed"
+      ]
     }
   },
   "required": [

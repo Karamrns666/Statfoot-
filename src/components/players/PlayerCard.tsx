@@ -1,5 +1,6 @@
-// Carte joueur à collectionner : la couleur du recto suit la matière du meilleur badge (bronze → black),
-// bleu MBL tant qu'aucun badge n'est débloqué. Verso blanc, retournement 3D au clic (ou Entrée / Espace).
+// Carte joueur à collectionner façon « Ultimate Team » : photo détourée en grand posée sur la carte,
+// note (XP ou IPG), rôle, logo du club, nom et stats principales. La couleur suit la matière du meilleur
+// badge (bronze → black), bleu MBL sans badge. Verso blanc, retournement 3D au clic (ou Entrée / Espace).
 import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { RotateCw } from 'lucide-react'
@@ -21,7 +22,12 @@ export interface PlayerCardProps {
   team?: Team | null
   /** nom d'équipe affiché quand l'équipe n'existe pas dans la base (ex. classement IPG) */
   teamName?: string
+  /** photo originale (repli si pas de version détourée) */
   photoUrl?: string
+  /** photo détourée (PNG transparent) : affichée en grand, posée sur la carte */
+  cutoutUrl?: string
+  /** indice de performance (IPG), affiché en pastille s'il existe */
+  ipg?: number
   rating: ReactNode
   ratingLabel: string
   rank?: number
@@ -66,6 +72,28 @@ function MiniMedal({ b }: { b: BadgeState }) {
   )
 }
 
+/** Photo de la carte : version détourée en grand ; sinon photo originale fondue dans la carte ; sinon silhouette. */
+function CardPhoto({ cutout, photo, initials, color }: { cutout?: string; photo?: string; initials: string; color: string }) {
+  const [failed, setFailed] = useState(false)
+  const fade = 'linear-gradient(to bottom, #000 72%, transparent 100%)'
+  if (cutout && !failed) {
+    return <img src={cutout} alt="" onError={() => setFailed(true)} className="absolute bottom-0 right-[-2%] h-[92%] w-[78%] object-contain object-bottom drop-shadow-[0_10px_18px_rgba(0,0,0,.55)]" style={{ maskImage: fade, WebkitMaskImage: fade }} />
+  }
+  if (photo) {
+    const m = 'radial-gradient(75% 80% at 55% 40%, #000 55%, transparent 100%)'
+    return <img src={photo} alt="" className="absolute bottom-0 right-0 h-[88%] w-[74%] object-cover object-top" style={{ maskImage: m, WebkitMaskImage: m }} />
+  }
+  return (
+    <div className="absolute bottom-0 right-[4%] flex h-[84%] w-[66%] items-end justify-center" aria-hidden>
+      <svg viewBox="0 0 100 110" className="h-full w-full" style={{ color }}>
+        <defs><linearGradient id="sil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="currentColor" stopOpacity=".75" /><stop offset="1" stopColor="currentColor" stopOpacity="0" /></linearGradient></defs>
+        <circle cx="50" cy="34" r="19" fill="url(#sil)" /><path d="M10 110c2-30 18-46 40-46s38 16 40 46z" fill="url(#sil)" />
+      </svg>
+      <span className="absolute top-[22%] font-display text-[2.4em] font-black text-white/85">{initials}</span>
+    </div>
+  )
+}
+
 export function PlayerCard(p: PlayerCardProps) {
   const [flipped, setFlipped] = useState(false)
   const tier = themeFor(p.material)
@@ -91,34 +119,31 @@ export function PlayerCard(p: PlayerCardProps) {
           <div className="pcard-shape relative flex h-full flex-col overflow-hidden rounded-b-[14px]" style={{ background: tier.bg }}>
             <div className="pcard-sheen pointer-events-none absolute inset-0" />
             {p.material && <div className="absolute inset-x-0 top-[2.6%] text-center text-[.7em] font-extrabold tracking-[.2em]" style={{ color: tier.text }}>{TIER_LABEL[p.material].toUpperCase()}</div>}
-            <div className="relative flex items-start justify-between px-[8%] pt-[13%]">
-              <div className="leading-none">
-                <div className="font-display text-[4.1em] font-black leading-[.85] text-white" style={{ textShadow: `0 0 18px ${tier.glow}` }}>{p.rating}</div>
-                <div className="mt-[.3em] text-[.85em] font-bold tracking-wide" style={{ color: tier.text }}>{p.ratingLabel}</div>
-                {(p.position === 'GK' || p.captain) && <div className="mt-[.4em] font-display text-[1.55em] font-extrabold leading-none text-white/90" title={[p.position === 'GK' && 'Gardien', p.captain && 'Capitaine'].filter(Boolean).join(' · ')}>{[p.position === 'GK' && 'GB', p.captain && 'C'].filter(Boolean).join(' · ')}</div>}
+            {/* zone photo : le joueur détouré est posé sur le fond de la carte */}
+            <div className="relative h-[60%] shrink-0">
+              <div className="pointer-events-none absolute inset-0" style={{ background: `radial-gradient(60% 55% at 62% 58%, ${color}55, transparent 70%)` }} />
+              <div className="pointer-events-none absolute right-[-6%] top-[14%] font-display text-[9em] font-black leading-none opacity-[.07]" aria-hidden>{(p.lastName[0] ?? '').toUpperCase()}</div>
+              <CardPhoto cutout={p.cutoutUrl} photo={p.photoUrl} initials={(p.firstName.replace('.', '')[0] ?? '') + (p.lastName[0] ?? '')} color={color} />
+              {/* colonne gauche : note, rôle, club, IPG */}
+              <div className="absolute left-[7%] top-[13%] z-10 flex flex-col items-center leading-none">
+                <div className="font-display text-[3.6em] font-black leading-[.85] text-white" style={{ textShadow: `0 2px 0 rgb(0 0 0 / .35), 0 0 18px ${tier.glow}` }}>{p.rating}</div>
+                <div className="mt-[.25em] text-[.85em] font-extrabold tracking-wider" style={{ color: tier.text }}>{p.ratingLabel}</div>
+                {(p.position === 'GK' || p.captain) && <div className="mt-[.35em] font-display text-[1.35em] font-extrabold leading-none text-white/90" title={[p.position === 'GK' && 'Gardien', p.captain && 'Capitaine'].filter(Boolean).join(' · ')}>{[p.position === 'GK' && 'GB', p.captain && 'C'].filter(Boolean).join(' · ')}</div>}
+                <div className="my-[.45em] h-px w-[2.2em] bg-white/25" />
+                {logo && <img src={logo} alt="" className={cn('size-[2.6em] object-contain', isBrandLogo(logo) ? 'rounded-[22%] bg-white shadow-[0_3px_10px_rgba(0,0,0,.45)]' : 'drop-shadow-[0_3px_6px_rgba(0,0,0,.5)]')} />}
+                {p.ipg != null && <div className="mt-[.45em] rounded-md px-[.4em] py-[.15em] text-center font-display text-[.95em] font-black leading-none" style={{ background: tier.chip, color: tier.chipText }} title="Indice de performance globale">{Math.round(p.ipg)}<span className="block text-[.6em] font-extrabold tracking-wider">IPG</span></div>}
               </div>
-              {logo && <img src={logo} alt="" className={cn('size-[4em] object-contain', isBrandLogo(logo) ? 'rounded-[22%] bg-white shadow-[0_4px_12px_rgba(0,0,0,.45)]' : 'drop-shadow-[0_4px_8px_rgba(0,0,0,.5)]')} />}
+              {p.rank != null && <div className="absolute right-[6%] top-[10%] z-10 rounded-full px-[.6em] py-[.1em] font-display text-[1.05em] font-black shadow-lg" style={{ background: tier.chip, color: tier.chipText }}>N°{p.rank}</div>}
             </div>
-            {/* portrait */}
-            <div className="relative mx-auto -mt-[4%] flex aspect-square w-[46%] items-center justify-center">
-              <div className="absolute inset-0 rounded-full" style={{ background: `conic-gradient(from 210deg, ${color}, ${tier.edge}, ${color})`, padding: 3 }}>
-                <div className="size-full overflow-hidden rounded-full bg-[#082358]">
-                  {p.photoUrl
-                    ? <img src={p.photoUrl} alt="" className="size-full object-cover" />
-                    : <div className="flex size-full items-center justify-center font-display text-[3em] font-black text-white/90" style={{ background: `radial-gradient(circle at 30% 25%, ${color}66, transparent 65%)` }}>{(p.firstName.replace('.', '')[0] ?? '') + (p.lastName[0] ?? '')}</div>}
-                </div>
-              </div>
-              {p.rank != null && <div className="absolute -bottom-[.7em] left-1/2 -translate-x-1/2 rounded-full px-[.7em] py-[.1em] font-display text-[1.2em] font-black shadow-lg" style={{ background: tier.chip, color: tier.chipText }}>N°{p.rank}</div>}
-            </div>
-            <div className="relative mt-[1.3em] px-[6%] text-center">
-              <div className="truncate text-[.95em] font-semibold text-sky-soft">{p.firstName}</div>
-              <div className="truncate font-display text-[2.1em] font-black uppercase leading-[.95] text-white">{p.lastName}</div>
-              <div className="mt-[.2em] flex items-center justify-center gap-1.5 text-[.95em] text-white/70"><span className="truncate">{teamLabel}</span>{p.delta !== undefined && <RankDelta delta={p.delta} />}</div>
+            <div className="relative z-10 -mt-[1.6em] px-[6%] text-center">
+              <div className="truncate text-[.9em] font-semibold text-sky-soft">{p.firstName}</div>
+              <div className="truncate font-display text-[2.15em] font-black uppercase leading-[.92] text-white" style={{ textShadow: '0 2px 8px rgb(0 0 0 / .6)' }}>{p.lastName}</div>
+              <div className="mt-[.15em] flex items-center justify-center gap-1.5 text-[.9em] text-white/70"><span className="truncate">{teamLabel}</span>{p.delta !== undefined && <RankDelta delta={p.delta} />}</div>
               {medals.length > 0
-                ? <div className="mt-[.45em] flex items-center justify-center gap-[.2em]" aria-label={`${medals.length} badges débloqués`}>{medals.slice(0, 5).map((b) => <MiniMedal key={b.def.id} b={b} />)}{medals.length > 5 && <span className="ml-[.2em] text-[.85em] font-bold text-white/70">+{medals.length - 5}</span>}</div>
+                ? <div className="mt-[.35em] flex items-center justify-center gap-[.2em]" aria-label={`${medals.length} badges débloqués`}>{medals.slice(0, 5).map((b) => <MiniMedal key={b.def.id} b={b} />)}{medals.length > 5 && <span className="ml-[.2em] text-[.85em] font-bold text-white/70">+{medals.length - 5}</span>}</div>
                 : p.badge && <div className="mt-[.3em] flex justify-center">{p.badge}</div>}
             </div>
-            <div className="relative mt-auto grid grid-cols-4 border-t border-white/10 bg-black/20">
+            <div className="relative mt-auto grid grid-cols-4 divide-x divide-white/10 border-t border-white/10 bg-black/25">
               {p.front.slice(0, 4).map((s) => (
                 <div key={s.label} className="py-[.6em] text-center" title={s.hint}>
                   <div className="font-display text-[1.85em] font-extrabold leading-none text-white">{s.value}</div>
@@ -126,7 +151,7 @@ export function PlayerCard(p: PlayerCardProps) {
                 </div>
               ))}
             </div>
-            <RotateCw className="absolute bottom-[19%] right-[5%] size-[1.2em] text-white/30 transition group-hover:text-white/70" aria-hidden />
+            <RotateCw className="absolute bottom-[17%] right-[5%] size-[1.1em] text-white/30 transition group-hover:text-white/70" aria-hidden />
           </div>
         </div>
         {/* ---------- VERSO ---------- */}

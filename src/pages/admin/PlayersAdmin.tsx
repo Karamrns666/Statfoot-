@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { toast } from '@/components/ui/toast'
 import { playerName } from '@/lib/format'
 import { syncCaptain } from '@/lib/captain'
+import { PlayerPhotoField, cutoutFromUrl } from '@/components/admin/PlayerPhotoField'
 import type { DocStatus, DocType, Player } from '@/types/entities'
 
 const DOCS: { key: DocType; label: string }[] = [{ key: 'id_card', label: 'CIN' }, { key: 'medical', label: 'Certificat médical' }, { key: 'license', label: 'Licence / autorisation entreprise' }]
@@ -38,7 +39,7 @@ export default function PlayersAdmin() {
     // 6 contre 6 : pas de postes, seulement deux rôles
     { key: 'is_goalkeeper', label: 'Gardien', type: 'boolean' },
     { key: 'is_captain', label: 'Capitaine', type: 'boolean', help: 'Un seul capitaine par équipe : l’ancien capitaine perd le brassard.' },
-    { key: 'birth_date', label: 'Date de naissance', type: 'date' }, { key: 'photo_url', label: 'Photo', type: 'image', full: true },
+    { key: 'birth_date', label: 'Date de naissance', type: 'date' }, { key: 'photo_url', label: 'Photo du joueur', type: 'custom', full: true, render: (v, patch) => <PlayerPhotoField value={v} patch={patch} /> },
     { key: 'status', label: 'Statut', type: 'select', options: [{ value: 'active', label: 'Actif' }, { value: 'injured', label: 'Blessé' }, { value: 'inactive', label: 'Inactif' }] },
     { key: 'email', label: 'Email du compte joueur (accès à sa carte)', type: 'email', full: true },
     { key: 'season_ids', label: 'Saisons jouées', type: 'multiselect', options: db.Season.map((s) => ({ value: s.id, label: s.name })) },
@@ -51,13 +52,23 @@ export default function PlayersAdmin() {
     if (!files) return
     let ok = 0
     const unmatched: string[] = []
+    const done: { id: string; url: string }[] = []
     for (const f of Array.from(files)) {
       const base = norm(f.name.replace(/\.[^.]+$/, ''))
       const p = db.Player.find((x) => norm(`${x.first_name}${x.last_name}`) === base || norm(`${x.last_name}${x.first_name}`) === base || (team && x.team_id === team && String(x.number) === base))
       if (!p) { unmatched.push(f.name); continue }
-      await base44.entities.Player.update(p.id, { photo_url: (await base44.integrations.Core.UploadFile({ file: f })).file_url }); ok++
+      const url = (await base44.integrations.Core.UploadFile({ file: f, maxSize: 1600, hint: 'photo' })).file_url
+      await base44.entities.Player.update(p.id, { photo_url: url, photo_cutout_url: undefined, photo_cutout_status: undefined }); ok++
+      done.push({ id: p.id, url })
     }
-    toast.success(`${ok} photo(s) importée(s)${unmatched.length ? ` · non reconnues : ${unmatched.join(', ')}` : ''}`)
+    toast.success(`${ok} photo(s) importée(s)${unmatched.length ? ` · non reconnues : ${unmatched.join(', ')}` : ''}${done.length ? ' — détourage en cours…' : ''}`)
+    // détourage automatique, une photo après l'autre (l'originale reste utilisée en cas d'échec)
+    let cut = 0
+    for (const d of done) {
+      try { await base44.entities.Player.update(d.id, { photo_cutout_url: await cutoutFromUrl(d.url), photo_cutout_status: 'ok' }); cut++ }
+      catch { await base44.entities.Player.update(d.id, { photo_cutout_status: 'failed' }) }
+    }
+    if (done.length) toast[cut === done.length ? 'success' : 'info'](`Détourage : ${cut} / ${done.length} photo(s)${cut < done.length ? ' — les autres gardent la photo originale' : ''}`)
   }
   const toolbar = (
     <>

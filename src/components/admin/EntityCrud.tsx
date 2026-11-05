@@ -14,12 +14,17 @@ import { FilterSelect } from '@/components/league/FilterSelect'
 import { toast } from '@/components/ui/toast'
 import { cn } from '@/lib/utils'
 
-export type FieldType = 'text' | 'number' | 'date' | 'datetime' | 'textarea' | 'select' | 'multiselect' | 'color' | 'image' | 'boolean' | 'email'
-export interface Field { key: string; label: string; type?: FieldType; options?: { value: string; label: string }[]; required?: boolean; help?: string; full?: boolean; placeholder?: string }
+export type FieldType = 'text' | 'number' | 'date' | 'datetime' | 'textarea' | 'select' | 'multiselect' | 'color' | 'image' | 'boolean' | 'email' | 'custom'
+export interface Field {
+  key: string; label: string; type?: FieldType; options?: { value: string; label: string }[]; required?: boolean; help?: string; full?: boolean; placeholder?: string
+  /** type 'custom' : rendu libre, reçoit toutes les valeurs du formulaire et peut en modifier plusieurs */
+  render?: (value: Record<string, unknown>, patch: (p: Record<string, unknown>) => void) => ReactNode
+}
 export interface Column<T> { label: string; render: (row: T) => ReactNode; className?: string }
 
 export function EntityForm({ fields, value, onChange }: { fields: Field[]; value: Record<string, unknown>; onChange: (v: Record<string, unknown>) => void }) {
   const set = (k: string, v: unknown) => onChange({ ...value, [k]: v })
+  const patch = (p: Record<string, unknown>) => onChange({ ...value, ...p })
   return (
     <div className="grid gap-3 sm:grid-cols-2">
       {fields.map((f) => {
@@ -28,7 +33,7 @@ export function EntityForm({ fields, value, onChange }: { fields: Field[]; value
         return (
           <div key={f.key} className={cn('space-y-1.5', (f.full || f.type === 'textarea' || f.type === 'multiselect') && 'sm:col-span-2')}>
             <Label htmlFor={id}>{f.label}{f.required && ' *'}</Label>
-            {f.type === 'textarea' ? <Textarea id={id} value={(v as string) ?? ''} onChange={(e) => set(f.key, e.target.value)} rows={4} />
+            {f.type === 'custom' && f.render ? f.render(value, patch) : f.type === 'textarea' ? <Textarea id={id} value={(v as string) ?? ''} onChange={(e) => set(f.key, e.target.value)} rows={4} />
               : f.type === 'select' ? <FilterSelect className="sm:w-full" value={(v as string) ?? ''} onChange={(x) => set(f.key, x || undefined)} allLabel="—" options={f.options ?? []} />
                 : f.type === 'multiselect' ? <MultiSelect options={f.options ?? []} value={(v as string[]) ?? []} onChange={(x) => set(f.key, x)} />
                   : f.type === 'boolean' ? <div className="flex items-center gap-2 pt-1"><Switch id={id} checked={!!v} onCheckedChange={(c) => set(f.key, c)} /><span className="text-sm text-muted-foreground">{v ? 'Oui' : 'Non'}</span></div>

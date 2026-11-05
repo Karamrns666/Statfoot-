@@ -1,4 +1,4 @@
-import { Crown, Flame, Footprints, Hand, Send, Shield, ShieldCheck, Sparkles, Star, Swords, Compass, Trophy } from 'lucide-react'
+import { Crown, Footprints, Hand, Send, Shield, Sparkles, Star, Swords, Trophy } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import type { AwardCategory } from '@/types/entities'
 import { AWARD_LABELS } from '@/lib/stats'
@@ -10,10 +10,7 @@ export const AWARD_STYLE: Record<AwardCategory, { color: string; icon: LucideIco
   top_assist: { color: '#f97316', icon: Send, label: AWARD_LABELS.top_assist, criteria: 'Passes, puis buts, puis moins de matchs joués' },
   golden_glove: { color: '#3b82f6', icon: Hand, label: AWARD_LABELS.golden_glove, criteria: 'Gardiens classés à l’XP (clean sheets, arrêts, buts encaissés)' },
   best_team: { color: '#22c55e', icon: Shield, label: AWARD_LABELS.best_team, criteria: 'Champion, sinon leader du classement' },
-  player_of_tournament: { color: '#e879f9', icon: Crown, label: AWARD_LABELS.player_of_tournament, criteria: 'Meilleure note moyenne /10, tous postes' },
-  best_defender: { color: '#22c55e', icon: ShieldCheck, label: AWARD_LABELS.best_defender, criteria: 'Défenseurs, note moyenne, min. de matchs' },
-  best_midfielder: { color: '#f97316', icon: Compass, label: AWARD_LABELS.best_midfielder, criteria: 'Milieux, note moyenne, min. de matchs' },
-  best_forward: { color: '#ef4444', icon: Flame, label: AWARD_LABELS.best_forward, criteria: 'Attaquants, note moyenne, min. de matchs' },
+  player_of_tournament: { color: '#e879f9', icon: Crown, label: AWARD_LABELS.player_of_tournament, criteria: 'Meilleure note moyenne /10, tous les joueurs' },
   best_young: { color: '#F85A00', icon: Sparkles, label: AWARD_LABELS.best_young, criteria: 'Moins de 23 ans au début de saison' },
   best_defense: { color: '#60a5fa', icon: Shield, label: AWARD_LABELS.best_defense, criteria: 'Moins de buts encaissés par match' },
   best_attack: { color: '#fb7185', icon: Swords, label: AWARD_LABELS.best_attack, criteria: 'Plus de buts marqués' },
@@ -21,6 +18,7 @@ export const AWARD_STYLE: Record<AwardCategory, { color: string; icon: LucideIco
 
 export function TrophyBadge({ category, size = 56, className, rank }: { category: AwardCategory; size?: number; className?: string; rank?: number }) {
   const s = AWARD_STYLE[category]
+  if (!s) return null
   const Icon = s.icon
   return (
     <div className={cn('relative shrink-0 rounded-full', className)} style={{ width: size, height: size }}>

@@ -2,14 +2,15 @@
 //  J1  A 2-0 B   |  C 1-1 D        Classement avant J2 : A1 C2 D3 B4
 //  J2  A 1-1 C   |  B 3-1 D        Classement avant J3 : A1 B2 C3 D4
 //  J3  A 0-1 D   |  B 2-2 C
-import type { Lineup, Match, MatchEvent, Player, Position, Team } from '@/types/entities'
+import type { Lineup, Match, MatchEvent, Player, Team } from '@/types/entities'
 import type { LeagueData } from '../stats'
 
 const T = ['A', 'B', 'C', 'D'] as const
-const POS: Position[] = ['GK', 'DEF', 'MID', 'FWD']
+// suffixes d'identifiants hérités ; le rôle n'est que GK (gardien) ou FIELD (joueur de champ)
+const POS = ['GK', 'DEF', 'MID', 'FWD'] as const
 export const teams: Team[] = T.map((t) => ({ id: t, name: `Équipe ${t}`, short_name: `EQ${t}` }))
 export const players: Player[] = T.flatMap((t) => POS.map((pos) => ({
-  id: `${t}_${pos}`, first_name: pos, last_name: `${t}-${pos}`, position: pos, team_id: t,
+  id: `${t}_${pos}`, first_name: pos, last_name: `${t}-${pos}`, position: pos === 'GK' ? 'GK' : 'FIELD', team_id: t,
   birth_date: t === 'C' && pos === 'MID' ? '2006-03-01' : '1990-01-01', season_ids: t === 'A' && pos === 'FWD' ? ['s1'] : ['s0', 's1'],
 })))
 

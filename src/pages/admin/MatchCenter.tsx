@@ -36,8 +36,8 @@ const PAD: { type: EventType; label: string; short: string }[] = [
   { type: 'shot_on_target', label: 'Tir cadré', short: 'Cadré' }, { type: 'shot_off_target', label: 'Tir non cadré', short: 'Non cadré' },
   { type: 'save', label: 'Arrêt gardien', short: 'Arrêt' }, { type: 'corner', label: 'Corner', short: 'Corner' },
   { type: 'throw_in', label: 'Touche', short: 'Touche' }, { type: 'free_kick', label: 'Coup franc', short: 'Coup franc' },
-  { type: 'foul', label: 'Faute', short: 'Faute' }, { type: 'offside', label: 'Hors-jeu', short: 'Hors-jeu' },
   { type: 'yellow_card', label: 'Carton jaune', short: '🟨 Jaune' }, { type: 'red_card', label: 'Carton rouge', short: '🟥 Rouge' },
+  { type: 'foul', label: 'Faute', short: 'Faute' },
 ]
 const vibrate = () => { try { navigator.vibrate?.(25) } catch { /* */ } }
 
@@ -56,7 +56,7 @@ type Flow =
 
 export default function MatchCenter() {
   const { id } = useParams()
-  const { db, league, settings } = useData()
+  const { db, league } = useData()
   const L = useLookup()
   const { user } = useAuth()
   const now = useNow(500)
@@ -268,7 +268,7 @@ export default function MatchCenter() {
       )}
 
       <Dialog open={lineupsOpen} onOpenChange={setLineupsOpen}>
-        <DialogContent className="max-w-4xl"><DialogHeader><DialogTitle>Feuille de composition</DialogTitle><DialogDescription>Présents, titulaires (max {settings.starters_count ?? 6}), gardien (G), capitaine (C), numéros. Joueurs suspendus / documents non validés bloqués.</DialogDescription></DialogHeader>
+        <DialogContent className="max-w-4xl"><DialogHeader><DialogTitle>Feuille de composition</DialogTitle><DialogDescription>Présents, 6 titulaires (1 gardien + 5 joueurs de champ), gardien (G), capitaine (C), numéros. Joueurs suspendus / documents non validés bloqués.</DialogDescription></DialogHeader>
           <div className="grid gap-3 md:grid-cols-2"><LineupEditor match={m} teamId={m.home_team_id} readOnly={!canWrite && !can(user, 'sport')} /><LineupEditor match={m} teamId={m.away_team_id} readOnly={!canWrite && !can(user, 'sport')} /></div>
         </DialogContent>
       </Dialog>
@@ -315,7 +315,7 @@ function ActionPad({ teamId, events, disabled, onGoal, onAction, onMore }: { tea
       <button disabled={disabled} onClick={() => { vibrate(); onGoal() }} className="mb-2 flex h-16 w-full items-center justify-center rounded-xl bg-neon font-display text-3xl font-black uppercase tracking-wider text-white shadow-[0_0_24px_-6px_rgb(242_107_29/.9)] active:scale-[.98] disabled:opacity-40 cursor-pointer">⚽ But</button>
       <div className="grid grid-cols-2 gap-1.5">
         {PAD.map((p) => (
-          <button key={p.type} disabled={disabled} onClick={() => { vibrate(); onAction(p.type) }} className={cn('relative flex min-h-14 items-center justify-between rounded-xl bg-white/5 px-3 text-left text-sm font-semibold active:bg-white/15 disabled:opacity-40 cursor-pointer', p.type === 'yellow_card' && 'bg-yellow-400/10', p.type === 'red_card' && 'bg-red-500/10')}>
+          <button key={p.type} disabled={disabled} onClick={() => { vibrate(); onAction(p.type) }} className={cn('relative flex min-h-14 items-center justify-between last:odd:col-span-2 rounded-xl bg-white/5 px-3 text-left text-sm font-semibold active:bg-white/15 disabled:opacity-40 cursor-pointer', p.type === 'yellow_card' && 'bg-yellow-400/10', p.type === 'red_card' && 'bg-red-500/10')}>
             <span>{p.short}</span><span className="num rounded-md bg-black/30 px-1.5 text-base">{count(p.type)}</span>
           </button>
         ))}
@@ -348,7 +348,7 @@ function LineupPanel({ match, teamId, events, onPlayer, onEdit }: { match: Match
   }
   return (
     <div className="glass rounded-2xl p-2">
-      <div className="mb-1 flex items-center justify-between px-1"><span className="text-xs font-bold uppercase text-muted-foreground">{L.team.get(teamId)?.short_name} · {lu?.formation ?? 'compo'}</span><button className="text-xs text-neon cursor-pointer" onClick={onEdit}><Pencil className="inline size-3" /> compo</button></div>
+      <div className="mb-1 flex items-center justify-between px-1"><span className="text-xs font-bold uppercase text-muted-foreground">{L.team.get(teamId)?.short_name} · 6 contre 6</span><button className="text-xs text-neon cursor-pointer" onClick={onEdit}><Pencil className="inline size-3" /> compo</button></div>
       {lu ? <>{(lu.starter_ids ?? []).map((p) => row(p, false))}<div className="my-1 border-t border-white/5" />{(lu.substitute_ids ?? []).map((p) => row(p, true))}</> : <p className="p-2 text-xs text-muted-foreground">Composition non saisie</p>}
     </div>
   )

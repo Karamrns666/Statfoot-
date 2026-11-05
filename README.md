@@ -16,8 +16,9 @@ npm run build
 
 ### Données
 - **Saison 2025-2026 : données réelles** importées du tracker Excel de la ligue (16 équipes, 120 matchs, buts, passes, arrêts, cartons)
-  et classement **Top 25 IPG** (`src/api/seed/season2025.data.ts`, `src/lib/ipg.ts`). Le fichier Excel ne contenant ni dates ni postes,
-  les dates sont estimées (une journée par semaine à partir du 4 octobre 2025) et les postes déduits des stats (modifiables dans l'admin).
+  et classement **Top 25 IPG** (`src/api/seed/season2025.data.ts`, `src/lib/ipg.ts`). Le fichier Excel ne contenant pas de dates,
+  elles sont estimées (une journée par semaine à partir du 4 octobre 2025). Le rôle de gardien est déduit des arrêts (modifiable dans l'admin).
+- **Règles de jeu** (`src/config/rules.ts`) : 6 contre 6 (5 joueurs de champ + 1 gardien), pas de postes (seuls rôles : Gardien et Capitaine), pas de hors-jeu.
   Pour réimporter une nouvelle version des fichiers :
   ```bash
   python3 scripts/import_excel_parse.py MBL_tracker.xlsx /tmp/mbl.json

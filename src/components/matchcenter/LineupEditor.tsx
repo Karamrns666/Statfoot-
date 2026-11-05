@@ -1,4 +1,4 @@
-// Feuille de compo d'avant-match : présents, 6 titulaires + remplaçants, gardien, capitaine, numéros.
+// Feuille de compo d'avant-match (6 contre 6) : présents, 6 titulaires (1 gardien + 5 joueurs de champ) + remplaçants, gardien, capitaine, numéros.
 // Blocage automatique : joueurs suspendus et documents non validés (dérogation Super Admin tracée au journal).
 import { useMemo, useState } from 'react'
 import { CheckCircle2, ShieldAlert, Unlock } from 'lucide-react'
@@ -8,13 +8,14 @@ import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { TeamLogo, PositionBadge } from '@/components/league/Identity'
+import { TeamLogo, RoleBadge } from '@/components/league/Identity'
 import { toast } from '@/components/ui/toast'
 import { eligibility, suspensionRemaining } from '@/lib/matchEngine'
 import { can } from '@/lib/permissions'
 import { isPlayed } from '@/lib/stats'
 import type { Lineup, Match, Player } from '@/types/entities'
 import { cn } from '@/lib/utils'
+import { PLAYERS_ON_PITCH } from '@/config/rules'
 
 export function useEligibility(match: Match) {
   const { db } = useData()
@@ -34,9 +35,9 @@ export function useEligibility(match: Match) {
 }
 
 export function LineupEditor({ match, teamId, onValidated, readOnly }: { match: Match; teamId: string; onValidated?: () => void; readOnly?: boolean }) {
-  const { db, settings } = useData()
+  const { db } = useData()
   const { user } = useAuth()
-  const max = settings.starters_count ?? 6
+  const max = PLAYERS_ON_PITCH
   const team = db.Team.find((t) => t.id === teamId)
   const existing = db.Lineup.find((l) => l.match_id === match.id && l.team_id === teamId)
   const squad = db.Player.filter((p) => p.team_id === teamId && p.season_ids?.includes(match.season_id) && p.status !== 'inactive').sort((a, b) => (a.number ?? 99) - (b.number ?? 99))
@@ -68,7 +69,8 @@ export function LineupEditor({ match, teamId, onValidated, readOnly }: { match: 
   const validate = async () => {
     const st = lu.starter_ids ?? []
     if (st.length === 0) { toast.error('Sélectionnez les titulaires'); return }
-    if (!lu.goalkeeper_id) { toast.error('Désignez le gardien'); return }
+    if (st.length > max) { toast.error(`${max} titulaires maximum (1 gardien + ${max - 1} joueurs de champ)`); return }
+    if (!lu.goalkeeper_id || !st.includes(lu.goalkeeper_id)) { toast.error('Désignez le gardien parmi les titulaires'); return }
     const subs = (lu.present_ids ?? []).filter((x) => !st.includes(x))
     const data = { ...lu, match_id: match.id, team_id: teamId, substitute_ids: subs, validated: true, validated_by: user?.full_name ?? user?.email, validated_at: new Date().toISOString() }
     if (existing) await base44.entities.Lineup.update(existing.id, data); else await base44.entities.Lineup.create(data as Lineup)
@@ -88,7 +90,7 @@ export function LineupEditor({ match, teamId, onValidated, readOnly }: { match: 
               <input type="checkbox" aria-label="Présent" checked={present.has(p.id)} onChange={() => toggle(p.id, 'present')} className="size-4 accent-[#F85A00]" disabled={readOnly} />
               <Input type="number" aria-label="Numéro" className="h-7 w-12 px-1 text-center" value={lu.numbers?.[p.id] ?? p.number ?? ''} disabled={readOnly} onChange={(e) => setLu({ ...lu, numbers: { ...(lu.numbers ?? {}), [p.id]: +e.target.value } })} />
               <button className="flex-1 truncate text-left cursor-pointer" onClick={() => toggle(p.id, 'starter')}>{p.first_name} {p.last_name}</button>
-              <PositionBadge position={p.position} />
+              <RoleBadge position={p.position} />
               {isBlocked && <span title={el?.reasons.map((r) => r.label).join(' · ')} className="text-red-400"><ShieldAlert className="size-4" /></span>}
               {isBlocked && can(user, 'derogation') && !readOnly && <button title="Dérogation Super Admin" onClick={() => waive(p)} className="text-amber-300"><Unlock className="size-4" /></button>}
               {waived(p.id) && <Badge variant="warning">Dérogation</Badge>}

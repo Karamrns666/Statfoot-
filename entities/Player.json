@@ -15,10 +15,9 @@
       "type": "string",
       "enum": [
         "GK",
-        "DEF",
-        "MID",
-        "FWD"
-      ]
+        "FIELD"
+      ],
+      "description": "Rôle : GK = gardien, FIELD = joueur de champ (6 contre 6, pas de postes)"
     },
     "number": {
       "type": "integer"

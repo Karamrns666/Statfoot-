@@ -94,7 +94,7 @@ describe('joueurs & gardien', () => {
     expect(cs[0].clean_sheet).toBe(true)
   })
   it('joueur suspendu ou documents non validés → bloqué', () => {
-    const p = { id: 'p', first_name: 'a', last_name: 'b', position: 'DEF' as const, team_id: 'H', documents: { id_card: { status: 'valid' as const }, medical: { status: 'valid' as const }, license: { status: 'valid' as const } } }
+    const p = { id: 'p', first_name: 'a', last_name: 'b', position: 'FIELD' as const, team_id: 'H', documents: { id_card: { status: 'valid' as const }, medical: { status: 'valid' as const }, license: { status: 'valid' as const } } }
     expect(eligibility(p, { suspendedMatchesLeft: 0 }).blocked).toBe(false)
     expect(eligibility(p, { suspendedMatchesLeft: 1 }).reasons[0].reason).toBe('suspended')
     expect(eligibility({ ...p, documents: {} }, { suspendedMatchesLeft: 0 }).reasons[0].reason).toBe('documents')

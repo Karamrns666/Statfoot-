@@ -6,7 +6,7 @@ import { useEffectiveSeason, seasonLogs, useTeamOfWeek } from '@/hooks/useStats'
 import { PageHeader } from '@/components/league/Bits'
 import { CompetitionTabs } from '@/components/league/CompetitionTabs'
 import { SeasonNotStarted } from '@/components/league/SeasonNotStarted'
-import { PlayerAvatar, PositionBadge, TeamLogo } from '@/components/league/Identity'
+import { PlayerAvatar, RoleBadge, TeamLogo } from '@/components/league/Identity'
 import { Button } from '@/components/ui/button'
 import { TeamOfWeekPitch, fmtRating, ratingColor } from '@/components/teamweek/TeamOfWeekPitch'
 import { TeamOfWeekShare } from '@/components/teamweek/TeamOfWeekShare'
@@ -16,7 +16,7 @@ import { fmtDate, playerName } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
 export default function TeamOfWeekPage() {
-  const { db, league, settings } = useData()
+  const { db, league } = useData()
   const L = useLookup()
   const season = useEffectiveSeason()
   const sid = season?.id
@@ -36,10 +36,10 @@ export default function TeamOfWeekPage() {
     const logs = seasonLogs(league, sid)
     return rounds.map((r) => {
       const ov = db.TeamOfWeek.find((t) => t.season_id === sid && t.round === r && (t.competition_id ?? '') === comp)
-      const res = teamOfWeek(league, sid, r, { competitionId: comp || null, players: settings.starters_count ?? 6, override: ov, logs })
+      const res = teamOfWeek(league, sid, r, { competitionId: comp || null, override: ov, logs })
       return { round: r, best: res.player_of_round, top: [...res.slots].sort((a, b) => b.rating - a.rating).slice(0, 4) }
     }).reverse()
-  }, [league, sid, rounds, comp, db.TeamOfWeek, settings.starters_count])
+  }, [league, sid, rounds, comp, db.TeamOfWeek])
 
   if (!sid || !rounds.length || !result) {
     return <div><PageHeader title="Équipe type" subtitle={season?.name} /><SeasonNotStarted what="Les équipes types" /></div>
@@ -86,7 +86,7 @@ export default function TeamOfWeekPage() {
                 return (
                   <li key={s.player_id}>
                     <Link to={`/joueurs/${s.player_id}`} className="flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-white/5">
-                      <PositionBadge position={s.position} />
+                      <RoleBadge position={s.position} />
                       <span className="min-w-0 flex-1 truncate font-semibold">{playerName(p)}</span>
                       <span className="hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex"><TeamLogo team={t} size={16} />{t?.short_name}</span>
                       <span className="w-20 text-right text-xs text-muted-foreground">{s.position === 'GK' ? `${s.saves} arr.${s.clean_sheet ? ' · CS' : ''}` : `${s.goals} B · ${s.assists} PD`}</span>

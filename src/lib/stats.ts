@@ -124,7 +124,7 @@ export function kpis(data: LeagueData, scope: XPScope = {}) {
 // ---------------------------------------------------------------------------
 export const AWARD_LABELS: Record<AwardCategory, string> = {
   ballon_or: "Ballon d'or", golden_glove: "Gant d'or", top_scorer: "Soulier d'or", top_assist: 'Meilleur passeur', best_team: 'Meilleure équipe',
-  player_of_tournament: 'Joueur du tournoi', best_defender: 'Meilleur défenseur', best_midfielder: 'Meilleur milieu', best_forward: 'Meilleur attaquant',
+  player_of_tournament: 'Joueur du tournoi',
   best_young: 'Meilleur jeune', best_defense: 'Meilleure défense', best_attack: 'Équipe la plus offensive',
 }
 export interface AwardResult { category: AwardCategory; player_id?: string; team_id?: string; value?: number; not_awarded: boolean; snapshot?: Record<string, unknown> }
@@ -152,10 +152,6 @@ export function computeAwards(data: LeagueData, scope: XPScope): AwardResult[] {
   push('top_scorer', race(data, list, 'top_scorer', scope.seasonId)[0]?.item, (s) => s.goals)
   push('top_assist', race(data, list, 'top_assist', scope.seasonId)[0]?.item, (s) => s.assists)
   push('player_of_tournament', eligible[0], (s) => s.xp)
-  const byPos = (p: Position) => eligible.find((s) => s.position === p)
-  push('best_defender', byPos('DEF'), (s) => s.xp)
-  push('best_midfielder', byPos('MID'), (s) => s.xp)
-  push('best_forward', byPos('FWD'), (s) => s.xp)
   push('best_young', eligible.find((s) => { const p = data.players.find((x) => x.id === s.player_id); const a = ageAt(p?.birth_date, season?.start_date); return a !== null && a < youngMax }), (s) => s.xp)
   const bt = bestTeam(data, scope)
   res.push(bt ? { category: 'best_team', team_id: bt.team_id, value: bt.row?.points, not_awarded: false, snapshot: { reason: bt.reason } } : { category: 'best_team', not_awarded: true })
@@ -167,9 +163,9 @@ export function computeAwards(data: LeagueData, scope: XPScope): AwardResult[] {
 }
 
 // ---------------------------------------------------------------------------
-//  Équipe type de la journée : meilleurs XP de la journée par poste (1 GB, 2 DEF, 2 MIL, 1 ATT)
+//  Équipe type de la journée (6 contre 6) : le meilleur gardien + les 5 meilleurs joueurs de champ à l'XP
 // ---------------------------------------------------------------------------
-export const TEAM_OF_ROUND_FORMATION: Position[] = ['GK', 'DEF', 'DEF', 'MID', 'MID', 'FWD']
+export const TEAM_OF_ROUND_FORMATION: Position[] = ['GK', 'FIELD', 'FIELD', 'FIELD', 'FIELD', 'FIELD']
 export function teamOfRound(data: LeagueData, seasonId: string, round: number) {
   const ms = data.matches.filter((m) => m.season_id === seasonId && m.round === round && isPlayed(m))
   const ids = new Set(ms.map((m) => m.id))

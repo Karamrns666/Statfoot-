@@ -18,7 +18,7 @@ import { isKnockout } from '@/lib/stats'
 import { EVENT_LABEL, fmtDateTime, playerName, STATUS_LABEL } from '@/lib/format'
 import type { MatchStatus, MatchTeamStats } from '@/types/entities'
 
-const STAT_FIELDS: { k: keyof MatchTeamStats; l: string }[] = [{ k: 'possession', l: 'Possession %' }, { k: 'shots', l: 'Tirs' }, { k: 'shots_on_target', l: 'Tirs cadrés' }, { k: 'corners', l: 'Corners' }, { k: 'fouls', l: 'Fautes' }, { k: 'offsides', l: 'Hors-jeu' }, { k: 'passes', l: 'Passes' }, { k: 'passes_completed', l: 'Passes réussies' }, { k: 'yellow_cards', l: 'Cartons jaunes' }, { k: 'red_cards', l: 'Cartons rouges' }, { k: 'saves', l: 'Arrêts' }]
+const STAT_FIELDS: { k: keyof MatchTeamStats; l: string }[] = [{ k: 'possession', l: 'Possession %' }, { k: 'shots', l: 'Tirs' }, { k: 'shots_on_target', l: 'Tirs cadrés' }, { k: 'corners', l: 'Corners' }, { k: 'fouls', l: 'Fautes' }, { k: 'passes', l: 'Passes' }, { k: 'passes_completed', l: 'Passes réussies' }, { k: 'yellow_cards', l: 'Cartons jaunes' }, { k: 'red_cards', l: 'Cartons rouges' }, { k: 'saves', l: 'Arrêts' }]
 
 export default function MatchSheet() {
   const { id } = useParams()
@@ -43,7 +43,7 @@ export default function MatchSheet() {
       const st = teamStats(m, events, ls, Date.now(), period === 'full' ? undefined : period)
       for (const [side, tid] of [['home', m.home_team_id], ['away', m.away_team_id]] as const) {
         const s = st[side]
-        const row = { match_id: m.id, team_id: tid, period, possession: s.possession, shots: s.shots, shots_on_target: s.shots_on_target, corners: s.corners, fouls: s.fouls, offsides: s.offsides, yellow_cards: s.yellow, red_cards: s.red, saves: s.saves, source: 'match_center' as const }
+        const row = { match_id: m.id, team_id: tid, period, possession: s.possession, shots: s.shots, shots_on_target: s.shots_on_target, corners: s.corners, fouls: s.fouls, yellow_cards: s.yellow, red_cards: s.red, saves: s.saves, source: 'match_center' as const }
         const cur = db.MatchTeamStats.find((x) => x.match_id === m.id && x.team_id === tid && (x.period ?? 'full') === period)
         if (cur) await base44.entities.MatchTeamStats.update(cur.id, row); else await base44.entities.MatchTeamStats.create(row)
       }

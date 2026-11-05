@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { Player, Position, Team } from '@/types/entities'
 import { cn } from '@/lib/utils'
-import { initials, POSITION_COLOR, POSITION_LABEL, playerName } from '@/lib/format'
+import { initials, playerName } from '@/lib/format'
 import { isBrandLogo, teamLogoSvg } from '@/lib/logos'
 
 export function TeamLogo({ team, size = 32, className }: { team?: Team | null; size?: number; className?: string }) {
@@ -27,9 +27,23 @@ export function PlayerAvatar({ player, team, size = 40, className }: { player?: 
   )
 }
 
-export function PositionBadge({ position, className }: { position: Position; className?: string }) {
-  const c = POSITION_COLOR[position]
-  return <span className={cn('inline-flex h-5 min-w-9 items-center justify-center rounded px-1.5 font-display text-[11px] font-extrabold tracking-wider', className)} style={{ color: c, background: `${c}22`, boxShadow: `inset 0 0 0 1px ${c}55` }}>{POSITION_LABEL[position]}</span>
+/**
+ * Rôles d'un joueur (6 contre 6, pas de postes) : seuls « Gardien » et « Capitaine » existent.
+ * Un joueur de champ non capitaine n'affiche rien.
+ */
+export function RoleBadge({ position, captain, long = false, className }: { position?: Position; captain?: boolean; long?: boolean; className?: string }) {
+  const roles = [
+    position === 'GK' && { key: 'gk', short: 'GB', label: 'Gardien', color: '#3b82f6' },
+    captain && { key: 'c', short: 'C', label: 'Capitaine', color: '#facc15' },
+  ].filter(Boolean) as { key: string; short: string; label: string; color: string }[]
+  if (!roles.length) return null
+  return (
+    <span className={cn('inline-flex items-center gap-1', className)}>
+      {roles.map((r) => (
+        <span key={r.key} title={r.label} className="inline-flex h-5 min-w-6 items-center justify-center rounded px-1.5 font-display text-[11px] font-extrabold tracking-wider" style={{ color: r.color, background: `${r.color}22`, boxShadow: `inset 0 0 0 1px ${r.color}55` }}>{long ? r.label : r.short}</span>
+      ))}
+    </span>
+  )
 }
 
 export function PlayerLink({ player, className, short }: { player?: Player | null; className?: string; short?: boolean }) {

@@ -1,7 +1,9 @@
 export const RULES_MARKDOWN = `# Règlement de la StatFoot League
 
 ## 1. Format
-- Football à **6** (5 joueurs de champ + 1 gardien), matchs de **2 × 20 minutes**.
+- Football à **6 contre 6** (5 joueurs de champ + 1 gardien), matchs de **2 × 20 minutes**.
+- **Pas de postes** : les seuls rôles sont **Gardien** et **Capitaine**.
+- **Pas de hors-jeu.**
 - Changements illimités et volants.
 - Deux divisions : **Gold Cup (Série A)** et **Silver Cup (Série B)**, championnat aller/retour.
 - Gold Cup : les 4 premiers disputent les demi-finales puis la finale.

@@ -6,13 +6,13 @@ import { useAdminScope } from '@/hooks/useAdminScope'
 import { AdminPage } from '@/components/admin/AdminLayout'
 import { EntityCrud, type Field } from '@/components/admin/EntityCrud'
 import { FilterSelect } from '@/components/league/FilterSelect'
-import { PlayerAvatar, PositionBadge, TeamLogo } from '@/components/league/Identity'
+import { PlayerAvatar, RoleBadge, TeamLogo } from '@/components/league/Identity'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { toast } from '@/components/ui/toast'
-import { playerName, POSITION_LONG } from '@/lib/format'
+import { playerName } from '@/lib/format'
 import type { DocStatus, DocType, Player } from '@/types/entities'
 
 const DOCS: { key: DocType; label: string }[] = [{ key: 'id_card', label: 'CIN' }, { key: 'medical', label: 'Certificat médical' }, { key: 'license', label: 'Licence / autorisation entreprise' }]
@@ -32,7 +32,7 @@ export default function PlayersAdmin() {
     && (!docFilter || (docFilter === 'ok' ? DOCS.every((d) => p.documents?.[d.key]?.status === 'valid') : DOCS.some((d) => p.documents?.[d.key]?.status !== 'valid'))), [team, comp, seasonId, docFilter])
   const fields: Field[] = [
     { key: 'first_name', label: 'Prénom', required: true }, { key: 'last_name', label: 'Nom', required: true },
-    { key: 'number', label: 'Numéro', type: 'number' }, { key: 'position', label: 'Poste', type: 'select', required: true, options: (['GK', 'DEF', 'MID', 'FWD'] as const).map((p) => ({ value: p, label: POSITION_LONG[p] })) },
+    { key: 'number', label: 'Numéro', type: 'number' }, { key: 'position', label: 'Rôle', type: 'select', required: true, options: [{ value: 'FIELD', label: 'Joueur de champ' }, { value: 'GK', label: 'Gardien' }] },
     { key: 'team_id', label: 'Équipe', type: 'select', required: true, options: db.Team.map((t) => ({ value: t.id, label: t.name })) },
     { key: 'birth_date', label: 'Date de naissance', type: 'date' }, { key: 'photo_url', label: 'Photo', type: 'image', full: true },
     { key: 'status', label: 'Statut', type: 'select', options: [{ value: 'active', label: 'Actif' }, { value: 'injured', label: 'Blessé' }, { value: 'inactive', label: 'Inactif' }] },
@@ -68,12 +68,12 @@ export default function PlayersAdmin() {
       {view === 'list' ? (
         <EntityCrud entity="Player" title="Joueur" fields={fields} filter={filter} toolbar={toolbar} searchText={(p) => `${p.first_name} ${p.last_name} ${L.team.get(p.team_id)?.name}`}
           sort={(a, b) => (L.team.get(a.team_id)?.name ?? '').localeCompare(L.team.get(b.team_id)?.name ?? '') || (a.number ?? 0) - (b.number ?? 0)}
-          defaults={() => ({ status: 'active', position: 'MID', team_id: team || undefined, season_ids: [seasonId] })}
+          defaults={() => ({ status: 'active', position: 'FIELD', team_id: team || undefined, season_ids: [seasonId] })}
           rowActions={(p) => <Button size="sm" variant="ghost" className="h-8" onClick={() => setDocs(p)}><FileCheck2 />Documents</Button>}
           columns={[
             { label: '#', render: (p) => <span className="num">{p.number}</span> },
             { label: 'Joueur', render: (p) => <span className="flex items-center gap-2"><PlayerAvatar player={p} team={L.team.get(p.team_id)} size={28} /><span className="font-semibold">{playerName(p)}</span>{p.is_captain && <Badge variant="gold">C</Badge>}</span> },
-            { label: 'Poste', render: (p) => <PositionBadge position={p.position} /> },
+            { label: 'Rôle', render: (p) => <RoleBadge position={p.position} captain={p.is_captain} /> },
             { label: 'Équipe', render: (p) => <span className="flex items-center gap-1.5"><TeamLogo team={L.team.get(p.team_id)} size={18} />{L.team.get(p.team_id)?.short_name}</span>, className: 'hidden md:table-cell' },
             { label: 'Documents', render: docBadge },
             { label: 'Compte', render: (p) => p.email ? <span className="text-xs text-muted-foreground">{p.email}</span> : '—', className: 'hidden lg:table-cell' },

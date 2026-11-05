@@ -8,14 +8,14 @@ import { useData, useLookup } from '@/hooks/useData'
 import { useSeason } from '@/hooks/useSeason'
 import { useEffectiveSeason, useRace } from '@/hooks/useStats'
 import { EmptyState, RankDelta, RookieBadge, SectionTitle } from '@/components/league/Bits'
-import { PlayerAvatar, PositionBadge, TeamLogo } from '@/components/league/Identity'
+import { PlayerAvatar, RoleBadge, TeamLogo } from '@/components/league/Identity'
 import { MaterialLegend, XPCard } from '@/components/players/Cards'
 import { BadgeMedal, BadgeTile } from '@/components/players/BadgeMedal'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { AXIS, ChartBox, GRID, Legend, SERIES, TOOLTIP } from '@/components/charts/theme'
 import { AWARD_LABELS, computePlayerXP, isRookie, ageAt, type XPLine } from '@/lib/stats'
 import { BADGES, RATING_RULES, TIER_LABEL, TIER_STYLE, cardMaterial, challengeResult, challengeTargets, decisiveStreak, nextBadges, playerBadges, playerMatchLog, type BadgeGroup } from '@/lib/badges'
-import { fmtDate, POSITION_LONG, ordinal, playerName, playerShort } from '@/lib/format'
+import { fmtDate, ordinal, playerName, playerShort } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
 const GROUPS: BadgeGroup[] = ['Buts', 'Passes', 'Polyvalence', 'Régularité', 'Exploits', 'Défis', 'Gardien']
@@ -95,14 +95,13 @@ export default function PlayerDetail() {
           {me ? <XPCard r={me} player={p} team={t} className="w-56 shrink-0" /> : <PlayerAvatar player={p} team={t} size={132} />}
           <div className="min-w-0 flex-1 text-center sm:text-left">
             <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-              <PositionBadge position={p.position} />{isRookie(p) && <RookieBadge />}
+              <RoleBadge long position={p.position} captain={p.is_captain || t?.captain_player_id === p.id} />{isRookie(p) && <RookieBadge />}
               {material && <span className="rounded-full px-2.5 py-0.5 text-[11px] font-extrabold" style={{ background: `linear-gradient(135deg, ${TIER_STYLE[material].light}, ${TIER_STYLE[material].edge})`, color: material === 'black' ? '#fff' : '#0A0F33' }}>Carte {TIER_LABEL[material]}</span>}
-              {p.is_captain && <span className="rounded bg-award-gold/20 px-2 py-0.5 text-[11px] font-bold text-award-gold">Capitaine</span>}
             </div>
             <h1 className="title-caps mt-2 text-4xl sm:text-6xl">{p.first_name} <span className="text-neon">{p.last_name}</span></h1>
             <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-sm text-muted-foreground sm:justify-start">
               <Link to={`/equipes/${t?.id}`} className="flex items-center gap-2 hover:text-neon"><TeamLogo team={t} size={22} />{t?.name}</Link>
-              <span>{POSITION_LONG[p.position]}</span>{p.number != null && <span>n°{p.number}</span>}{p.birth_date && <span>{ageAt(p.birth_date)} ans</span>}
+              {p.number != null && <span>n°{p.number}</span>}{p.birth_date && <span>{ageAt(p.birth_date)} ans</span>}
             </div>
             {titles.length > 0 && <div className="mt-3 flex flex-wrap justify-center gap-2 sm:justify-start">{titles.slice(0, 3).map((x) => <span key={x.key} className="rounded-full bg-award-gold/15 px-3 py-1 text-xs font-bold text-award-gold">★ {x.label}</span>)}</div>}
             <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">

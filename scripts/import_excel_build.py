@@ -49,11 +49,8 @@ for m in sorted(d['matches'],key=lambda x:x['n']):
 print('journées',max(x[1] for x in out))
 def pos(i):
     c=tot[i]; g,a,s=c['g'],c['a'],c['s']
-    if s>=10 and s>=3*(g+a): return 'GK'
-    if g==0 and a==0: return 'DEF'
-    if a>g: return 'MID'
-    if g>=3 and g>=1.5*a: return 'FWD'
-    return 'MID'
+    # 6 contre 6 : pas de postes, seul le gardien est identifié
+    return 'GK' if s>=10 and s>=3*(g+a) else 'FIELD'
 P=[[tkeys.index(p['team']),p['first'],p['last'],pos(i)] for i,p in enumerate(players)]
 print(collections.Counter(x[3] for x in P), len(P))
 # IPG
@@ -71,7 +68,7 @@ ts='// Données réelles — Saison 2025-2026 (MBL_26_Game_stats_tracker_27_03_2
 ts+='export type S25Event = [side: 0 | 1, type: \'g\' | \'a\' | \'s\' | \'y\' | \'r\' | \'og\', player: number, count: number]\n'
 ts+='export type S25Match = [n: number, round: number, home: number, away: number, hs: number | null, as: number | null, events: S25Event[]]\n'
 ts+='export const S25_TEAMS: [name: string, short: string, c1: string, c2: string][] = '+json.dumps([list(TEAMS[k]) for k in tkeys],ensure_ascii=False)+'\n'
-ts+='export const S25_PLAYERS: [team: number, first: string, last: string, position: \'GK\' | \'DEF\' | \'MID\' | \'FWD\'][] = '+json.dumps(P,ensure_ascii=False)+'\n'
+ts+='export const S25_PLAYERS: [team: number, first: string, last: string, role: \'GK\' | \'FIELD\'][] = '+json.dumps(P,ensure_ascii=False)+'\n'
 ts+='export const S25_MATCHES: S25Match[] = '+json.dumps(out,ensure_ascii=False)+'\n'
 ts+='export interface IPGRow { name: string; team: string; goals: number; assists: number; contribution: number; win_pct: number; card_penalty: number; clutch_goals: number; clutch_assists: number; clutch_score: number; adversity: number; raw: number; ipg: number; player: number }\n'
 ts+='export const IPG_TOP25: IPGRow[] = '+json.dumps(ipg,ensure_ascii=False,indent=0).replace('\n','')+'\n'

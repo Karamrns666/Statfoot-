@@ -8,7 +8,8 @@ export interface BaseEntity {
   created_by?: string
 }
 
-export type Position = 'GK' | 'DEF' | 'MID' | 'FWD'
+/** 6 contre 6 : pas de postes. GK = gardien, FIELD = joueur de champ. Les seuls rôles affichés sont Gardien et Capitaine. */
+export type Position = 'GK' | 'FIELD'
 export type MatchStatus = 'scheduled' | 'live' | 'finished' | 'postponed' | 'cancelled'
 export type MatchStage = 'league_phase' | 'cup' | 'group' | 'round_of_16' | 'quarter' | 'semi' | 'third_place' | 'final'
 export type Period = '1H' | '2H' | 'ET1' | 'ET2' | 'PENS'
@@ -142,7 +143,7 @@ export interface Match extends BaseEntity {
 
 export type EventType =
   | 'goal' | 'own_goal' | 'penalty_missed' | 'goal_disallowed' | 'shot_on_target' | 'shot_off_target'
-  | 'save' | 'penalty_saved' | 'corner' | 'throw_in' | 'free_kick' | 'foul' | 'offside'
+  | 'save' | 'penalty_saved' | 'corner' | 'throw_in' | 'free_kick' | 'foul'
   | 'yellow_card' | 'second_yellow' | 'red_card' | 'substitution' | 'gk_change'
   | 'shootout_scored' | 'shootout_saved' | 'shootout_missed'
 export type GoalKind = 'normal' | 'header' | 'penalty' | 'direct_free_kick'
@@ -177,7 +178,6 @@ export interface Lineup extends BaseEntity {
   substitute_ids?: string[]
   goalkeeper_id?: string
   captain_id?: string
-  formation?: string
   numbers?: Record<string, number>
   validated?: boolean
   validated_by?: string
@@ -210,7 +210,6 @@ export interface MatchTeamStats extends BaseEntity {
   shots_on_target?: number
   corners?: number
   fouls?: number
-  offsides?: number
   passes?: number
   passes_completed?: number
   yellow_cards?: number
@@ -249,7 +248,7 @@ export interface MonthlyAward extends BaseEntity {
 
 export type AwardCategory =
   | 'ballon_or' | 'golden_glove' | 'top_scorer' | 'top_assist' | 'best_team' | 'player_of_tournament'
-  | 'best_defender' | 'best_midfielder' | 'best_forward' | 'best_young' | 'best_defense' | 'best_attack'
+  | 'best_young' | 'best_defense' | 'best_attack'
 export interface Award extends BaseEntity {
   season_id: string
   scope?: 'season' | 'league_phase' | 'gold' | 'silver'
@@ -302,7 +301,6 @@ export interface TeamOfWeek extends BaseEntity {
   season_id: string
   round: number
   competition_id?: string | null
-  formation?: string
   slots: { position: Position; player_id: string }[]
   note?: string
   chosen_by?: string
@@ -327,7 +325,6 @@ export interface Settings extends BaseEntity {
   points_draw?: number
   points_loss?: number
   tiebreakers?: Tiebreaker[]
-  starters_count?: number
   motm_vote_minutes_after?: number
   young_max_age?: number
 }

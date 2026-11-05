@@ -31,9 +31,6 @@
     "fouls": {
       "type": "integer"
     },
-    "offsides": {
-      "type": "integer"
-    },
     "passes": {
       "type": "integer"
     },

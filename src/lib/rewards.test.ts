@@ -8,13 +8,12 @@ describe('équipe type et récompenses', () => {
   const db = generateLeagueData(new Date('2026-11-04T19:00:00'))
   const L: LeagueData = { seasons: db.Season, competitions: db.Competition, teams: db.Team, players: db.Player, matches: db.Match, events: db.MatchEvent, lineups: db.Lineup, xpRules: db.XPRule, suspensions: db.Suspension, monthlyAwards: db.MonthlyAward, settings: db.Settings[0] }
   const sid = 'season_2025'
-  it('formations : un emplacement par joueur, gardien en bas', () => {
-    for (const [n, f] of Object.entries(FORMATIONS)) {
-      const xy = formationXY(f)
-      expect(xy).toHaveLength(Number(n))
-      expect(xy[0].position).toBe('GK')
-      expect(xy[0].y).toBeGreaterThan(xy.at(-1)!.y)
-    }
+  it('6 contre 6 : 1 gardien en bas + 5 joueurs de champ, aucun autre poste', () => {
+    expect(Object.keys(FORMATIONS)).toEqual(['6'])
+    const xy = formationXY(FORMATIONS[6])
+    expect(xy).toHaveLength(6)
+    expect(xy.map((p) => p.position)).toEqual(['GK', 'FIELD', 'FIELD', 'FIELD', 'FIELD', 'FIELD'])
+    expect(xy[0].y).toBeGreaterThan(xy.at(-1)!.y)
   })
   it('équipe type : 6 joueurs distincts ayant joué la journée, 1 gardien, joueur de la journée = meilleure note', () => {
     expect(seasonRounds(L, sid)).toHaveLength(15)
@@ -22,6 +21,7 @@ describe('équipe type et récompenses', () => {
     expect(r.slots).toHaveLength(6)
     expect(new Set(r.slots.map((s) => s.player_id)).size).toBe(6)
     expect(r.slots.filter((s) => s.position === 'GK')).toHaveLength(1)
+    expect(r.slots.filter((s) => s.position === 'FIELD')).toHaveLength(5)
     const roundTeams = new Set(db.Match.filter((m) => m.season_id === sid && m.round === 4).flatMap((m) => [m.home_team_id, m.away_team_id]))
     for (const s of r.slots) expect(roundTeams.has(s.team_id)).toBe(true)
     expect(r.player_of_round!.rating).toBe(Math.max(...r.slots.map((s) => s.rating)))

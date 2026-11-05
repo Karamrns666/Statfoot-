@@ -4,7 +4,6 @@ import { useLookup } from '@/hooks/useData'
 import { usePlayerBadges } from '@/hooks/useStats'
 import { SEASON_2025_ID } from '@/api/seed/season2025'
 import { isRookie, type PlayerXP, type Ranked } from '@/lib/stats'
-import { POSITION_LONG } from '@/lib/format'
 import { splitName, type IPGEntry } from '@/lib/ipg'
 import type { Player, Team } from '@/types/entities'
 import { TIER_LABEL, TIER_ORDER, TIER_STYLE } from '@/lib/badges'
@@ -19,13 +18,13 @@ export function XPCard({ r, player: p, team: t, className }: { r: Ranked<PlayerX
     <PlayerCard
       className={className}
       material={bs?.material} medals={bs?.unlocked} badgeTotal={bs?.total}
-      firstName={p.first_name} lastName={p.last_name} position={p.position} team={t} photoUrl={p.photo_url}
+      firstName={p.first_name} lastName={p.last_name} position={p.position} captain={p.is_captain || t?.captain_player_id === p.id} team={t} photoUrl={p.photo_url}
       rating={s.xp} ratingLabel="XP" rank={r.rank} delta={r.delta}
       badge={isRookie(p) ? <RookieBadge /> : undefined}
       front={gk
         ? [{ label: 'MJ', value: s.matches }, { label: 'ARR', value: s.saves, hint: 'Arrêts' }, { label: 'CS', value: s.clean_sheets, hint: 'Clean sheets' }, { label: 'BE', value: s.conceded, hint: 'Buts encaissés' }]
         : [{ label: 'MJ', value: s.matches }, { label: 'BUT', value: s.goals }, { label: 'PAS', value: s.assists, hint: 'Passes décisives' }, { label: 'CJ', value: s.yellow, hint: 'Cartons jaunes' }]}
-      backTitle={POSITION_LONG[p.position]}
+      backTitle={gk ? 'Gardien' : 'Statistiques'}
       back={[
         { label: 'V / N / D', value: `${s.wins} / ${s.draws} / ${s.losses}`, hint: 'Victoires / nuls / défaites' },
         { label: 'Buts', value: s.goals },

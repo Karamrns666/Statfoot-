@@ -8,18 +8,14 @@ import { isPlayed } from './standings'
 import { computePlayerXP, type PlayerXP, type XPData } from './xp'
 
 // ---------------------------------------------------------------------------
-//  Formations selon le nombre de joueurs sur le terrain
+//  Disposition 6 contre 6 : 1 gardien + 5 joueurs de champ (pas de postes)
 // ---------------------------------------------------------------------------
 export interface Formation { label: string; lines: Position[][] }
-/** Lignes du but vers l'attaque. Clé = joueurs sur le terrain (gardien compris). */
-export const FORMATIONS: Record<number, Formation> = {
-  5: { label: '2-1-1', lines: [['GK'], ['DEF', 'DEF'], ['MID'], ['FWD']] },
-  6: { label: '2-2-1', lines: [['GK'], ['DEF', 'DEF'], ['MID', 'MID'], ['FWD']] },
-  7: { label: '3-2-1', lines: [['GK'], ['DEF', 'DEF', 'DEF'], ['MID', 'MID'], ['FWD']] },
-  8: { label: '3-3-1', lines: [['GK'], ['DEF', 'DEF', 'DEF'], ['MID', 'MID', 'MID'], ['FWD']] },
-  11: { label: '4-3-3', lines: [['GK'], ['DEF', 'DEF', 'DEF', 'DEF'], ['MID', 'MID', 'MID'], ['FWD', 'FWD', 'FWD']] },
-}
-export const formationFor = (players = 6) => FORMATIONS[players] ?? FORMATIONS[Object.keys(FORMATIONS).map(Number).reduce((a, b) => (Math.abs(b - players) < Math.abs(a - players) ? b : a))]
+/** Lignes du but vers l'avant ; seul le gardien a un rôle, les 5 autres sont des joueurs de champ. */
+export const SIX_A_SIDE: Formation = { label: '6 contre 6', lines: [['GK'], ['FIELD', 'FIELD'], ['FIELD'], ['FIELD', 'FIELD']] }
+/** Conservé pour compatibilité : une seule disposition possible. */
+export const FORMATIONS: Record<number, Formation> = { 6: SIX_A_SIDE }
+export const formationFor = (_players = 6) => SIX_A_SIDE
 /** Positions sur le terrain (en %), attaque en haut */
 export function formationXY(f: Formation) {
   const out: { position: Position; x: number; y: number }[] = []
@@ -59,12 +55,12 @@ export interface TeamOfWeekResult { round: number; formation: Formation; slots: 
 interface Candidate { player_id: string; team_id: string; position: Position; rating: number; xp: number; goals: number; assists: number; saves: number; clean_sheet: boolean; keeper: boolean }
 
 /**
- * Équipe type d'une journée : les meilleurs joueurs du poste selon la note du match
+ * Équipe type d'une journée (6 contre 6) : le meilleur gardien + les 5 meilleurs joueurs de champ selon la note du match
  * (buts, passes, arrêts, clean sheet, victoire, homme du match), départagés par l'XP du match.
  * Une sélection manuelle enregistrée dans l'admin (entité TeamOfWeek) est prioritaire.
  */
 export function teamOfWeek(data: XPData, seasonId: string, round: number, opts: { competitionId?: string | null; players?: number; override?: TeamOfWeek | null; logs?: Map<string, PlayerMatchLine[]> } = {}): TeamOfWeekResult {
-  const formation = opts.override?.formation ? (Object.values(FORMATIONS).find((f) => f.label === opts.override!.formation) ?? formationFor(opts.players)) : formationFor(opts.players)
+  const formation = SIX_A_SIDE
   const ms = periodMatches(data, seasonId, { type: 'round', round }, opts.competitionId)
   const ids = new Set(ms.map((m) => m.id))
   const logs = opts.logs ?? allPlayerLogs(data, seasonId)
@@ -73,7 +69,7 @@ export function teamOfWeek(data: XPData, seasonId: string, round: number, opts: 
   const cands: Candidate[] = []
   for (const [pid, lines] of logs) {
     const l = lines.find((x) => ids.has(x.match.id)); if (!l) continue
-    cands.push({ player_id: pid, team_id: l.team_id, position: pos.get(pid) ?? 'MID', rating: l.rating, xp: xp.get(pid)?.xp ?? 0, goals: l.goals, assists: l.assists, saves: l.saves, clean_sheet: l.clean_sheet, keeper: l.keeper })
+    cands.push({ player_id: pid, team_id: l.team_id, position: pos.get(pid) === 'GK' ? 'GK' : 'FIELD', rating: l.rating, xp: xp.get(pid)?.xp ?? 0, goals: l.goals, assists: l.assists, saves: l.saves, clean_sheet: l.clean_sheet, keeper: l.keeper })
   }
   cands.sort((a, b) => b.rating - a.rating || b.xp - a.xp || b.goals - a.goals || b.assists - a.assists)
   const byId = new Map(cands.map((c) => [c.player_id, c]))
@@ -83,17 +79,19 @@ export function teamOfWeek(data: XPData, seasonId: string, round: number, opts: 
   const slots: TeamOfWeekSlot[] = []
   if (opts.override?.slots?.length) {
     manual = true
-    opts.override.slots.forEach((s, i) => {
+    opts.override.slots.slice(0, xy.length).forEach((s, i) => {
+      if (!s.player_id) return
       const c = byId.get(s.player_id)
-      const at = xy[i] ?? xy[xy.length - 1]
+      const at = xy[i]
       used.add(s.player_id)
-      slots.push({ position: s.position, player_id: s.player_id, team_id: c?.team_id ?? data.players.find((p) => p.id === s.player_id)?.team_id ?? '', rating: c?.rating ?? 0, xp: c?.xp ?? 0, goals: c?.goals ?? 0, assists: c?.assists ?? 0, saves: c?.saves ?? 0, clean_sheet: c?.clean_sheet ?? false, x: at.x, y: at.y })
+      slots.push({ position: at.position, player_id: s.player_id, team_id: c?.team_id ?? data.players.find((p) => p.id === s.player_id)?.team_id ?? '', rating: c?.rating ?? 0, xp: c?.xp ?? 0, goals: c?.goals ?? 0, assists: c?.assists ?? 0, saves: c?.saves ?? 0, clean_sheet: c?.clean_sheet ?? false, x: at.x, y: at.y })
     })
   } else {
     for (const at of xy) {
-      let c = cands.find((x) => !used.has(x.player_id) && x.position === at.position && (at.position !== 'GK' || x.keeper))
-      if (!c && at.position === 'GK') c = cands.find((x) => !used.has(x.player_id) && x.keeper)
-      if (!c && at.position !== 'GK') c = cands.find((x) => !used.has(x.player_id) && x.position !== 'GK' && !x.keeper)
+      // gardien : celui qui a gardé les buts ce jour-là ; joueurs de champ : les 5 meilleures notes hors gardiens
+      const c = at.position === 'GK'
+        ? cands.find((x) => !used.has(x.player_id) && x.keeper)
+        : cands.find((x) => !used.has(x.player_id) && !x.keeper)
       if (!c) continue
       used.add(c.player_id)
       slots.push({ position: at.position, player_id: c.player_id, team_id: c.team_id, rating: c.rating, xp: c.xp, goals: c.goals, assists: c.assists, saves: c.saves, clean_sheet: c.clean_sheet, x: at.x, y: at.y })

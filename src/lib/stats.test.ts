@@ -52,7 +52,7 @@ describe('multiplicateur adversaire', () => {
 })
 
 describe('XP — barème MBL', () => {
-  it('attaquant : buts/passes × multiplicateur, victoire/défaite', () => {
+  it('joueur de champ : buts/passes × multiplicateur, victoire/défaite', () => {
     // J1 : +50 victoire, 2 buts ×1 = 100 · J2 : passe 20×2 (C 2e) = 40 · J3 : défaite −50
     expect(P('A_FWD').xp).toBe(140)
     // J1 : 50 + passe 20 · J2 : but 50×2 = 100 · J3 : −50

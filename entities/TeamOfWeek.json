@@ -14,10 +14,6 @@
       "type": "string",
       "description": "Compétition (vide = toutes)"
     },
-    "formation": {
-      "type": "string",
-      "description": "Ex. 2-2-1, 3-2-1"
-    },
     "slots": {
       "type": "array",
       "items": {
@@ -27,9 +23,7 @@
             "type": "string",
             "enum": [
               "GK",
-              "DEF",
-              "MID",
-              "FWD"
+              "FIELD"
             ]
           },
           "player_id": {
@@ -37,7 +31,7 @@
           }
         }
       },
-      "description": "Joueurs dans l'ordre des postes (gardien d'abord)"
+      "description": "6 joueurs : le gardien d'abord, puis 5 joueurs de champ"
     },
     "note": {
       "type": "string"

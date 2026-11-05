@@ -72,10 +72,10 @@ export function seasonLogs(league: LeagueData, seasonId: string) {
 }
 /** Équipe type d'une journée (sélection manuelle de l'admin prioritaire) */
 export function useTeamOfWeek(seasonId: string | null | undefined, round: number | null | undefined, competitionId?: string | null) {
-  const { league, db, settings } = useData()
+  const { league, db } = useData()
   return useMemo(() => {
     if (!seasonId || !round) return null
     const override = db.TeamOfWeek.find((t) => t.season_id === seasonId && t.round === round && (t.competition_id ?? '') === (competitionId ?? '')) ?? null
-    return teamOfWeek(league, seasonId, round, { competitionId, players: settings.starters_count ?? 6, override, logs: seasonLogs(league, seasonId) })
-  }, [league, db.TeamOfWeek, settings.starters_count, seasonId, round, competitionId])
+    return teamOfWeek(league, seasonId, round, { competitionId, override, logs: seasonLogs(league, seasonId) })
+  }, [league, db.TeamOfWeek, seasonId, round, competitionId])
 }

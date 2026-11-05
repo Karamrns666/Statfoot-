@@ -1,7 +1,7 @@
 // Saison 2025-2026 — données RÉELLES importées du tracker Excel de la ligue
 // (MBL_26_Game_stats_tracker_27_03_26.xlsx) : 16 équipes, championnat en matchs aller simples, 120 matchs.
-// Le fichier Excel ne contient ni dates, ni minutes, ni postes : les dates sont estimées (une journée par semaine),
-// les postes sont déduits des statistiques (gardien = joueur avec des arrêts) et modifiables dans l'admin.
+// Le fichier Excel ne contient ni dates ni minutes : les dates sont estimées (une journée par semaine).
+// 6 contre 6, pas de postes : le rôle de gardien est déduit des arrêts et modifiable dans l'admin.
 import type { Competition, Lineup, Match, MatchEvent, Player, Season, Team } from '@/types/entities'
 import { addDays } from '@/lib/schedule'
 import { S25_MATCHES, S25_PLAYERS, S25_TEAMS } from './season2025.data'
@@ -44,8 +44,8 @@ export function buildSeason2025(): Season2025 {
     team_ids: teams.map((t) => t.id), rounds: Array.from({ length: 15 }, (_, i) => i + 1), half_duration_min: 15, foul_alert_threshold: 5,
     color: '#F85A00', order: 1, description: '16 équipes · matchs aller · 15 journées',
   }
-  const players: Player[] = S25_PLAYERS.map(([team, first, last, position], i) => ({
-    id: s25PlayerId(i), first_name: first, last_name: last, position, team_id: s25TeamId(team), status: 'active', season_ids: [season.id], rookie: false,
+  const players: Player[] = S25_PLAYERS.map(([team, first, last, role], i) => ({
+    id: s25PlayerId(i), first_name: first, last_name: last, position: role, team_id: s25TeamId(team), status: 'active', season_ids: [season.id], rookie: false,
   }))
 
   const matches: Match[] = [], events: MatchEvent[] = [], lineups: Lineup[] = []

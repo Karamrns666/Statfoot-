@@ -1,9 +1,8 @@
-// Terrain de l'équipe type : formation, photo ou initiales, note du match, club.
+// Terrain de l'équipe type (6 contre 6 : 1 gardien + 5 joueurs de champ) : photo ou initiales, note du match, club.
 import { Link } from 'react-router-dom'
 import { Crown } from 'lucide-react'
 import { useLookup } from '@/hooks/useData'
 import { TeamLogo } from '@/components/league/Identity'
-import { POSITION_LABEL } from '@/lib/format'
 import type { TeamOfWeekResult } from '@/lib/rewards'
 import { cn } from '@/lib/utils'
 
@@ -51,7 +50,7 @@ export function TeamOfWeekPitch({ result, size = 'md', link = true, className }:
               <TeamLogo team={t} size={size === 'sm' ? 16 : 22} className="absolute -bottom-1 -right-2" />
             </div>
             <span className={cn('mt-1.5 max-w-full truncate rounded bg-night-950/80 px-1.5 font-bold leading-5', size === 'sm' ? 'text-[11px]' : 'text-sm')}>{p ? `${p.first_name.charAt(0)}. ${p.last_name}` : '—'}</span>
-            {size !== 'sm' && <span className="text-[11px] text-white/75">{POSITION_LABEL[s.position]} · {t?.short_name}{s.goals ? ` · ${s.goals}⚽` : ''}{s.assists ? ` ${s.assists}🅰` : ''}{s.position === 'GK' && s.saves ? ` · ${s.saves} arr.` : ''}</span>}
+            {size !== 'sm' && <span className="text-[11px] text-white/75">{s.position === 'GK' ? 'Gardien · ' : ''}{t?.short_name}{s.goals ? ` · ${s.goals}⚽` : ''}{s.assists ? ` ${s.assists}🅰` : ''}{s.position === 'GK' && s.saves ? ` · ${s.saves} arr.` : ''}</span>}
           </>
         )
         const cls = 'absolute flex w-[30%] -translate-x-1/2 -translate-y-1/2 flex-col items-center text-center'

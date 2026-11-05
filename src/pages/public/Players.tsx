@@ -6,17 +6,16 @@ import { useSeason } from '@/hooks/useSeason'
 import { useRace } from '@/hooks/useStats'
 import { PageHeader, RankDelta, RookieBadge } from '@/components/league/Bits'
 import { FilterSelect } from '@/components/league/FilterSelect'
-import { PlayerAvatar, PositionBadge, TeamLogo } from '@/components/league/Identity'
+import { PlayerAvatar, RoleBadge, TeamLogo } from '@/components/league/Identity'
 import { IPGCard, MaterialLegend, XPCard } from '@/components/players/Cards'
 import { Input } from '@/components/ui/input'
 import { SeasonNotStarted } from '@/components/league/SeasonNotStarted'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { isRookie, type PhaseFilter } from '@/lib/stats'
-import { POSITION_LONG, playerName } from '@/lib/format'
+import { playerName } from '@/lib/format'
 import { IPG_RANKING } from '@/lib/ipg'
 import { cn } from '@/lib/utils'
-import type { Position } from '@/types/entities'
 
 type View = 'cartes' | 'classement' | 'ipg'
 type Sort = 'xp' | 'buts' | 'passes'
@@ -51,7 +50,8 @@ export default function Players() {
       const p = L.player.get(r.item.player_id)
       if (!p) return false
       if (team && p.team_id !== team) return false
-      if (pos && p.position !== pos) return false
+      if (pos === 'GK' && p.position !== 'GK') return false
+      if (pos === 'C' && !(p.is_captain || L.team.get(p.team_id)?.captain_player_id === p.id)) return false
       if (q && !playerName(p).toLowerCase().includes(q.toLowerCase())) return false
       return true
     })
@@ -78,7 +78,7 @@ export default function Players() {
             <div className="relative w-full sm:w-60"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher un joueur" className="h-9 pl-9" aria-label="Rechercher un joueur" /></div>
             {hasCups && <FilterSelect label="Phase" value={phase === 'all' ? '' : phase} onChange={(v) => setPhase((v || 'all') as PhaseFilter)} allLabel="Toute la saison" options={[{ value: 'league_phase', label: 'Phase de ligue' }, { value: 'gold', label: 'Gold Cup' }, { value: 'silver', label: 'Silver Cup' }].filter((o) => db.Competition.some((c) => (!scopeSeasonId || c.season_id === scopeSeasonId) && c.phase === o.value))} />}
             <FilterSelect label="Équipe" value={team} onChange={setTeam} allLabel="Toutes équipes" options={seasonTeams.map((t) => ({ value: t.id, label: t.name }))} />
-            <FilterSelect label="Poste" value={pos} onChange={setPos} allLabel="Tous postes" options={(['GK', 'DEF', 'MID', 'FWD'] as Position[]).map((p) => ({ value: p, label: POSITION_LONG[p] }))} />
+            <FilterSelect label="Rôle" value={pos} onChange={setPos} allLabel="Tous les joueurs" options={[{ value: 'GK', label: 'Gardiens' }, { value: 'C', label: 'Capitaines' }]} />
             {view === 'cartes' && <FilterSelect label="Trier par" value={sort === 'xp' ? '' : sort} onChange={(v) => setSort((v || 'xp') as Sort)} allLabel="Rang XP" options={[{ value: 'buts', label: 'Buts' }, { value: 'passes', label: 'Passes décisives' }]} />}
           </div>
 
@@ -107,7 +107,7 @@ export default function Players() {
                         <TableCell>
                           <Link to={`/joueurs/${p.id}`} className="flex items-center gap-3 hover:text-neon">
                             <PlayerAvatar player={p} team={t} size={36} />
-                            <div className="min-w-0"><div className="flex items-center gap-2 font-semibold">{playerName(p)}</div><div className="flex items-center gap-1.5"><PositionBadge position={p.position} />{isRookie(p) && <RookieBadge />}</div></div>
+                            <div className="min-w-0"><div className="flex items-center gap-2 font-semibold">{playerName(p)}</div><div className="flex items-center gap-1.5"><RoleBadge position={p.position} captain={p.is_captain || L.team.get(p.team_id)?.captain_player_id === p.id} />{isRookie(p) && <RookieBadge />}</div></div>
                           </Link>
                         </TableCell>
                         <TableCell className="hidden sm:table-cell"><span className="flex items-center gap-2 text-sm"><TeamLogo team={t} size={20} />{t?.name}</span></TableCell>

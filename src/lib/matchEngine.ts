@@ -220,13 +220,13 @@ const periodOrder = (p?: Period) => (p ? ['1H', '2H', 'ET1', 'ET2', 'PENS'].inde
 // ---------------------------------------------------------------------------
 export interface TeamLiveStats {
   possession: number; goals: number; shots: number; shots_on_target: number; shots_off_target: number; saves: number
-  corners: number; throw_ins: number; free_kicks: number; fouls: number; offsides: number; yellow: number; red: number
+  corners: number; throw_ins: number; free_kicks: number; fouls: number; yellow: number; red: number
 }
 export const STAT_LABELS: { key: keyof TeamLiveStats; label: string; lowerIsBetter?: boolean; pct?: boolean }[] = [
   { key: 'possession', label: 'Possession', pct: true }, { key: 'goals', label: 'Buts' }, { key: 'shots', label: 'Tirs totaux' },
   { key: 'shots_on_target', label: 'Tirs cadrés' }, { key: 'shots_off_target', label: 'Tirs non cadrés' }, { key: 'saves', label: 'Arrêts' },
   { key: 'corners', label: 'Corners' }, { key: 'throw_ins', label: 'Touches' }, { key: 'free_kicks', label: 'Coups francs' },
-  { key: 'fouls', label: 'Fautes', lowerIsBetter: true }, { key: 'offsides', label: 'Hors-jeu', lowerIsBetter: true },
+  { key: 'fouls', label: 'Fautes', lowerIsBetter: true },
   { key: 'yellow', label: 'Cartons jaunes', lowerIsBetter: true }, { key: 'red', label: 'Cartons rouges', lowerIsBetter: true },
 ]
 
@@ -243,7 +243,7 @@ export function teamStats(m: Pick<Match, 'home_team_id' | 'away_team_id'>, event
       possession: side === 'home' ? pos.home_pct : pos.away_pct,
       goals: c('goal') + evs.filter((e) => e.type === 'own_goal' && e.team_id !== tid).length,
       shots: on + off, shots_on_target: on, shots_off_target: off, saves: c('save', 'penalty_saved'),
-      corners: c('corner'), throw_ins: c('throw_in'), free_kicks: c('free_kick'), fouls: c('foul'), offsides: c('offside'),
+      corners: c('corner'), throw_ins: c('throw_in'), free_kicks: c('free_kick'), fouls: c('foul'),
       yellow: c('yellow_card', 'second_yellow'), red: c('red_card', 'second_yellow'),
     }
   }

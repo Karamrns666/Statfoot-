@@ -4,7 +4,6 @@ import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { RotateCw } from 'lucide-react'
 import type { Position, Team } from '@/types/entities'
-import { POSITION_LABEL, POSITION_LONG } from '@/lib/format'
 import { isBrandLogo, teamLogoSvg } from '@/lib/logos'
 import { cn } from '@/lib/utils'
 import { RankDelta } from '@/components/league/Bits'
@@ -16,7 +15,9 @@ export interface CardStat { label: string; value: ReactNode; hint?: string }
 export interface PlayerCardProps {
   firstName: string
   lastName: string
+  /** 6 contre 6 : seul le rôle de gardien est affiché (pas de postes) */
   position?: Position
+  captain?: boolean
   team?: Team | null
   /** nom d'équipe affiché quand l'équipe n'existe pas dans la base (ex. classement IPG) */
   teamName?: string
@@ -94,7 +95,7 @@ export function PlayerCard(p: PlayerCardProps) {
               <div className="leading-none">
                 <div className="font-display text-[4.1em] font-black leading-[.85] text-white" style={{ textShadow: `0 0 18px ${tier.glow}` }}>{p.rating}</div>
                 <div className="mt-[.3em] text-[.85em] font-bold tracking-wide" style={{ color: tier.text }}>{p.ratingLabel}</div>
-                {p.position && <div className="mt-[.4em] font-display text-[1.55em] font-extrabold leading-none text-white/90" title={POSITION_LONG[p.position]}>{POSITION_LABEL[p.position]}</div>}
+                {(p.position === 'GK' || p.captain) && <div className="mt-[.4em] font-display text-[1.55em] font-extrabold leading-none text-white/90" title={[p.position === 'GK' && 'Gardien', p.captain && 'Capitaine'].filter(Boolean).join(' · ')}>{[p.position === 'GK' && 'GB', p.captain && 'C'].filter(Boolean).join(' · ')}</div>}
               </div>
               {logo && <img src={logo} alt="" className={cn('size-[4em] object-contain', isBrandLogo(logo) ? 'rounded-[22%] bg-white shadow-[0_4px_12px_rgba(0,0,0,.45)]' : 'drop-shadow-[0_4px_8px_rgba(0,0,0,.5)]')} />}
             </div>

@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { FilterSelect } from '@/components/league/FilterSelect'
-import { PositionBadge, TeamLogo } from '@/components/league/Identity'
+import { RoleBadge, TeamLogo } from '@/components/league/Identity'
 import { toast } from '@/components/ui/toast'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { playerName } from '@/lib/format'
@@ -115,7 +115,7 @@ export default function QuickEntry() {
                     const r = rows[p.id] ?? { played: false, goals: 0, og: 0, assists: 0, yc: 0, rc: 0, saves: 0, pens: 0, tab: 0 }
                     return (
                       <TableRow key={p.id} className={r.played ? '' : 'opacity-60'}>
-                        <TableCell className="text-xs"><span className="num mr-1 text-muted-foreground">{p.number}</span>{playerName(p)} <PositionBadge position={p.position} /></TableCell>
+                        <TableCell className="text-xs"><span className="num mr-1 text-muted-foreground">{p.number}</span>{playerName(p)} <RoleBadge position={p.position} captain={p.is_captain} /></TableCell>
                         <TableCell className="text-center"><input type="checkbox" className="size-4 accent-[#F85A00]" checked={r.played} onChange={(e) => set(p.id, { played: e.target.checked })} aria-label="A joué" /></TableCell>
                         {COLS.map((c) => (c.k === 'saves' || c.k === 'pens' || c.k === 'tab') && p.position !== 'GK'
                           ? <TableCell key={c.k} />

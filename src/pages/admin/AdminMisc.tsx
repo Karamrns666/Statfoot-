@@ -23,9 +23,9 @@ import { VisualFrame } from '@/components/share/VisualFrame'
 import { toast } from '@/components/ui/toast'
 import { AWARD_LABELS, computeAwards, computePlayerXP, computeTeamStats, isPlayed, kpis, type PhaseFilter } from '@/lib/stats'
 import { fmtScore } from '@/lib/matchEngine'
-import { fmtDate, playerName, POSITION_LONG } from '@/lib/format'
+import { fmtDate, playerName, roleLabels, toRole } from '@/lib/format'
 import { teamLogoSvg as teamLogoSvgFn } from '@/lib/logos'
-import type { Award, Position } from '@/types/entities'
+import type { Award } from '@/types/entities'
 
 // ---------------------------------------------------------------------------
 //  Statistiques (admin) : filtres + KPIs + onglets Matchs / Joueurs / Équipes + export CSV
@@ -77,7 +77,7 @@ export function StatsAdmin() {
             <TableBody>{mx.slice(0, 120).map((m) => <TableRow key={m.id}><TableCell className="text-xs">{fmtDate(m.date, 'd MMM')}</TableCell><TableCell>{m.round}</TableCell><TableCell>{L.team.get(m.home_team_id)?.name} – {L.team.get(m.away_team_id)?.name}</TableCell><TableCell className="num">{fmtScore(m)}</TableCell></TableRow>)}</TableBody></Table></div>
         </TabsContent>
         <TabsContent value="players">
-          <Button variant="outline" size="sm" className="mb-2" onClick={() => downloadCsv('joueurs.csv', px.map((s) => ({ joueur: playerName(L.player.get(s.player_id)), equipe: L.team.get(s.team_id)?.name, poste: s.position, mj: s.matches, buts: s.goals, passes: s.assists, jaunes: s.yellow, rouges: s.red, arrets: s.saves, clean_sheets: s.clean_sheets, xp: s.xp })))}><Download />Export CSV</Button>
+          <Button variant="outline" size="sm" className="mb-2" onClick={() => downloadCsv('joueurs.csv', px.map((s) => ({ joueur: playerName(L.player.get(s.player_id)), equipe: L.team.get(s.team_id)?.name, gardien: s.position === 'GK' ? 'oui' : 'non', mj: s.matches, buts: s.goals, passes: s.assists, jaunes: s.yellow, rouges: s.red, arrets: s.saves, clean_sheets: s.clean_sheets, xp: s.xp })))}><Download />Export CSV</Button>
           <div className="glass rounded-2xl p-2"><Table><TableHeader><TableRow><TableHead>Joueur</TableHead><TableHead>Équipe</TableHead><TableHead className="text-center">MJ</TableHead><TableHead className="text-center">Buts</TableHead><TableHead className="text-center">Passes</TableHead><TableHead className="text-center">CJ/CR</TableHead><TableHead className="text-center">Arrêts</TableHead><TableHead className="text-center">XP</TableHead></TableRow></TableHeader>
             <TableBody>{px.slice(0, 150).map((s) => <TableRow key={s.player_id}><TableCell>{playerName(L.player.get(s.player_id))}</TableCell><TableCell className="text-xs">{L.team.get(s.team_id)?.short_name}</TableCell><TableCell className="num text-center">{s.matches}</TableCell><TableCell className="num text-center">{s.goals}</TableCell><TableCell className="num text-center">{s.assists}</TableCell><TableCell className="num text-center">{s.yellow}/{s.red}</TableCell><TableCell className="num text-center">{s.saves}</TableCell><TableCell className="num text-center text-neon">{s.xp}</TableCell></TableRow>)}</TableBody></Table></div>
         </TabsContent>
@@ -127,7 +127,7 @@ export function AwardsAdmin() {
                 <div className="min-w-0 flex-1">
                   <div className="title-caps" style={{ color: AWARD_STYLE[a.category].color }}>{AWARD_LABELS[a.category]}</div>
                   <div className="truncate font-semibold">{a.not_awarded ? 'Non attribué' : p ? playerName(p) : t?.name}</div>
-                  <div className="text-xs text-muted-foreground">{p ? `${t?.name} · ${POSITION_LONG[p.position as Position]}` : t?.company} {a.value != null && `· ${a.value}`}</div>
+                  <div className="text-xs text-muted-foreground">{p ? [t?.name, ...roleLabels(p)].join(' · ') : t?.company} {a.value != null && `· ${a.value}`}</div>
                 </div>
                 <div className="flex flex-col items-end gap-1"><Badge variant={st.v}>{st.l}</Badge>{a.locked && <Badge variant="secondary"><Lock className="size-3" />Verrouillé</Badge>}</div>
               </div>
@@ -181,9 +181,12 @@ function AwardPoster({ award, onClose }: { award: Award; onClose: () => void }) 
 // ---------------------------------------------------------------------------
 const TEMPLATES = {
   teams: 'nom;nom_court;entreprise;couleur_principale\nAtlas Digital FC;ATD;Atlas Digital;#F85A00',
-  players: 'prenom;nom;numero;poste;equipe_nom_court;date_naissance;email\nYassine;Benali;9;ATT;ATD;1995-04-12;yassine.benali@exemple.ma',
+  players: 'prenom;nom;numero;gardien;capitaine;equipe_nom_court;date_naissance;email\nYassine;Benali;9;non;oui;ATD;1995-04-12;yassine.benali@exemple.ma\nKarim;Alaoui;1;oui;non;ATD;1992-09-03;',
 }
-const POS: Record<string, Position> = { GB: 'GK', GK: 'GK', DEF: 'DEF', MIL: 'MID', MID: 'MID', ATT: 'FWD', FWD: 'FWD' }
+// 6 contre 6 : pas de postes. Colonnes « gardien » et « capitaine » (oui / non) ; une ancienne colonne « poste » reste acceptée (GB = gardien).
+const YES = /^(oui|o|yes|y|x|1|true|vrai)$/i
+const NO = /^(non|n|no|0|false|faux)?$/i
+const isGk = (r: Record<string, string>) => (r.gardien != null ? YES.test(r.gardien.trim()) : toRole(r.poste) === 'GK')
 export function ImportCsv() {
   const { db } = useData()
   const { seasonId } = useAdminScope()
@@ -194,14 +197,15 @@ export function ImportCsv() {
   const check = (r: Record<string, string>) => {
     if (kind === 'teams') return !r.nom ? 'nom manquant' : !r.nom_court || r.nom_court.length > 3 ? 'nom_court (3 lettres)' : db.Team.some((t) => t.short_name === r.nom_court.toUpperCase()) ? 'existe déjà' : ''
     if (!r.prenom || !r.nom) return 'prénom/nom manquant'
-    if (!POS[(r.poste ?? '').toUpperCase()]) return 'poste invalide (GB/DEF/MIL/ATT)'
+    if (r.gardien != null && !YES.test(r.gardien.trim()) && !NO.test(r.gardien.trim())) return 'gardien : oui ou non'
+    if (r.capitaine != null && !YES.test(r.capitaine.trim()) && !NO.test(r.capitaine.trim())) return 'capitaine : oui ou non'
     if (!db.Team.some((t) => t.short_name === (r.equipe_nom_court ?? '').toUpperCase())) return 'équipe inconnue'
     return ''
   }
   const ok = rows.filter((r) => !check(r))
   const run = async () => {
     if (kind === 'teams') await base44.entities.Team.bulkCreate(ok.map((r) => ({ name: r.nom, short_name: r.nom_court.toUpperCase(), company: r.entreprise, primary_color: r.couleur_principale || '#F85A00', secondary_color: '#04163D', logo_url: teamLogoSvgFn(r.nom_court.toUpperCase(), r.couleur_principale), status: 'active' as const })))
-    else await base44.entities.Player.bulkCreate(ok.map((r) => ({ first_name: r.prenom, last_name: r.nom, number: r.numero ? +r.numero : undefined, position: POS[r.poste.toUpperCase()], team_id: db.Team.find((t) => t.short_name === r.equipe_nom_court.toUpperCase())!.id, birth_date: r.date_naissance || undefined, email: r.email || undefined, status: 'active' as const, season_ids: [seasonId], documents: {} })))
+    else await base44.entities.Player.bulkCreate(ok.map((r) => ({ first_name: r.prenom, last_name: r.nom, number: r.numero ? +r.numero : undefined, position: isGk(r) ? 'GK' as const : 'FIELD' as const, is_captain: r.capitaine != null && YES.test(r.capitaine.trim()), team_id: db.Team.find((t) => t.short_name === r.equipe_nom_court.toUpperCase())!.id, birth_date: r.date_naissance || undefined, email: r.email || undefined, status: 'active' as const, season_ids: [seasonId], documents: {} })))
     toast.success(`${ok.length} ligne(s) importée(s)`); setRows([])
   }
   return (

@@ -11,12 +11,12 @@ import { useData, useLookup } from '@/hooks/useData'
 import { useSeason } from '@/hooks/useSeason'
 import { useEffectiveSeason, usePlayerXP, useRace } from '@/hooks/useStats'
 import { PageHeader, RankDelta, RookieBadge, EmptyState } from '@/components/league/Bits'
-import { PlayerAvatar, PositionBadge, TeamLogo } from '@/components/league/Identity'
+import { PlayerAvatar, RoleBadge, TeamLogo } from '@/components/league/Identity'
 import { AWARD_STYLE, TrophyBadge } from '@/components/awards/TrophyBadge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { competitionStandings, generalStandings, isRookie, race, AWARD_LABELS, type PhaseFilter, type PlayerXP, type Ranked, type RaceKey, type StandingRow } from '@/lib/stats'
-import { playerName, POSITION_LONG } from '@/lib/format'
+import { playerName } from '@/lib/format'
 import type { AwardCategory } from '@/types/entities'
 import { cn } from '@/lib/utils'
 
@@ -106,14 +106,14 @@ function HeroCard({ r, raceKey, color }: { r: Ranked<PlayerXP>; raceKey: RaceKey
       <div className="mt-2 flex flex-col items-center text-center">
         <PlayerAvatar player={p} team={t} size={112} />
         <div className="title-caps mt-4 text-3xl leading-none">{p?.first_name}<br /><span style={{ color }}>{p?.last_name}</span></div>
-        <div className="mt-2 flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground"><TeamLogo team={t} size={20} />{t?.name}{p && <PositionBadge position={p.position} />}</div>
+        <div className="mt-2 flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground"><TeamLogo team={t} size={20} />{t?.name}{p && <RoleBadge position={p.position} captain={p.is_captain} />}</div>
         {p && isRookie(p) && <div className="mt-2"><RookieBadge /></div>}
         <div className="mt-4 grid w-full grid-cols-4 gap-2 rounded-2xl bg-black/20 p-3 text-center">
           {raceKey === 'golden_glove'
             ? [['MJ', r.item.gk_matches], ['CS', r.item.clean_sheets], ['Arrêts', r.item.saves], ['BC', r.item.conceded]].map(([l, v]) => <div key={l}><div className="num text-2xl">{v}</div><div className="text-[10px] uppercase text-muted-foreground">{l}</div></div>)
             : [['MJ', r.item.matches], ['Buts', r.item.goals], ['Passes', r.item.assists], ['XP', r.item.xp]].map(([l, v]) => <div key={l}><div className="num text-2xl">{v}</div><div className="text-[10px] uppercase text-muted-foreground">{l}</div></div>)}
         </div>
-        <div className="mt-3 text-sm text-muted-foreground"><span className="num text-3xl" style={{ color }}>{m.v}</span> {m.u} · {p && POSITION_LONG[p.position]}</div>
+        <div className="mt-3 text-sm text-muted-foreground"><span className="num text-3xl" style={{ color }}>{m.v}</span> {m.u}</div>
       </div>
     </Link>
   )

@@ -15,16 +15,23 @@ export const fmtRelativeDay = (d?: string) => {
 }
 export const fmtAgo = (d?: string) => (d ? formatDistanceToNow(new Date(d), { locale: fr, addSuffix: true }) : '—')
 
-export const POSITION_LABEL: Record<Position, string> = { GK: 'GB', DEF: 'DEF', MID: 'MIL', FWD: 'ATT' }
-export const POSITION_LONG: Record<Position, string> = { GK: 'Gardien', DEF: 'Défenseur', MID: 'Milieu', FWD: 'Attaquant' }
-export const POSITION_COLOR: Record<Position, string> = { GK: '#3b82f6', DEF: '#22c55e', MID: '#f97316', FWD: '#ef4444' }
+/** 6 contre 6 : pas de postes. Seuls « Gardien » et « Capitaine » sont affichés. */
+export const POSITION_LABEL: Record<Position, string> = { GK: 'GB', FIELD: '' }
+export const POSITION_LONG: Record<Position, string> = { GK: 'Gardien', FIELD: 'Joueur' }
+export const POSITION_COLOR: Record<Position, string> = { GK: '#3b82f6', FIELD: '#94a3b8' }
+/** Normalise un poste hérité (DEF/MID/FWD, GB, Gardien…) vers GK / FIELD */
+export const toRole = (v?: string | null): Position => (v && /^(gk|gb|g|gardien|goal(keeper)?)$/i.test(v.trim()) ? 'GK' : 'FIELD')
+export const isKeeper = (p?: Pick<Player, 'position'> | null) => p?.position === 'GK'
+/** Rôles affichés d'un joueur : Gardien et/ou Capitaine (rien pour un joueur de champ) */
+export const roleLabels = (p?: Pick<Player, 'position' | 'is_captain'> | null, captain = p?.is_captain) =>
+  [p?.position === 'GK' && 'Gardien', captain && 'Capitaine'].filter(Boolean) as string[]
 
 export const STATUS_LABEL: Record<MatchStatus, string> = { scheduled: 'Programmé', live: 'En direct', finished: 'Terminé', postponed: 'Reporté', cancelled: 'Annulé' }
 
 export const EVENT_LABEL: Record<EventType, string> = {
   goal: 'But', own_goal: 'But contre son camp', penalty_missed: 'Penalty manqué', goal_disallowed: 'But refusé',
   shot_on_target: 'Tir cadré', shot_off_target: 'Tir non cadré', save: 'Arrêt', penalty_saved: 'Penalty arrêté',
-  corner: 'Corner', throw_in: 'Touche', free_kick: 'Coup franc', foul: 'Faute', offside: 'Hors-jeu',
+  corner: 'Corner', throw_in: 'Touche', free_kick: 'Coup franc', foul: 'Faute',
   yellow_card: 'Carton jaune', second_yellow: '2e jaune (rouge)', red_card: 'Carton rouge', substitution: 'Remplacement', gk_change: 'Changement de gardien',
   shootout_scored: 'TAB réussi', shootout_saved: 'TAB arrêté', shootout_missed: 'TAB manqué',
 }

@@ -21,7 +21,8 @@ export function formationXY(f: Formation) {
   const out: { position: Position; x: number; y: number }[] = []
   const n = f.lines.length
   f.lines.forEach((line, i) => {
-    const y = 88 - (i * 74) / Math.max(1, n - 1)
+    // de 85 % (gardien) à 24 % : la ligne du haut ne touche pas l'étiquette « 6 contre 6 »
+    const y = 85 - (i * 61) / Math.max(1, n - 1)
     line.forEach((position, j) => out.push({ position, x: ((j + 1) * 100) / (line.length + 1), y }))
   })
   return out

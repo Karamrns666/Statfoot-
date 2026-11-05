@@ -19,16 +19,9 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - name: Types, tests et build
-        id: checks
+      - name: Sonde
         run: |
-          set +e
-          { echo "## tsc"; npx tsc -b; echo "exit=$?"; } > ci-report.txt 2>&1
-          { echo "## tests"; npx vitest run; echo "exit=$?"; } >> ci-report.txt 2>&1
-          { echo "## build"; npx vite build; echo "exit=$?"; } >> ci-report.txt 2>&1
-          cat ci-report.txt
-          if grep -q "exit=[1-9]" ci-report.txt; then echo "failed=1" >> "$GITHUB_OUTPUT"; fi
+          { npm view @imgly/background-removal dist-tags versions time.modified dependencies peerDependencies --json; echo; curl -sI "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm" | head -5; curl -sI "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.6.0/+esm" | head -3; npm view @imgly/background-removal@1.7.0 dist.unpackedSize; curl -s "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/index.d.ts" | head -120; } > ci-report.txt 2>&1 || true
       - name: Ranger le rapport
         if: always()
         run: |

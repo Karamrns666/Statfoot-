@@ -75,13 +75,14 @@ function MiniMedal({ b }: { b: BadgeState }) {
 /** Photo de la carte : version détourée en grand ; sinon photo originale fondue dans la carte ; sinon silhouette. */
 function CardPhoto({ cutout, photo, initials, color }: { cutout?: string; photo?: string; initials: string; color: string }) {
   const [failed, setFailed] = useState(false)
+  const [photoFailed, setPhotoFailed] = useState(false)
   const fade = 'linear-gradient(to bottom, #000 72%, transparent 100%)'
   if (cutout && !failed) {
     return <img src={cutout} alt="" onError={() => setFailed(true)} className="absolute bottom-0 right-[-5%] h-[88%] w-[68%] object-contain object-bottom drop-shadow-[0_10px_18px_rgba(0,0,0,.55)]" style={{ maskImage: fade, WebkitMaskImage: fade }} />
   }
-  if (photo) {
+  if (photo && !photoFailed) {
     const m = 'radial-gradient(75% 80% at 55% 40%, #000 55%, transparent 100%)'
-    return <img src={photo} alt="" className="absolute bottom-0 right-0 h-[84%] w-[66%] object-cover object-top" style={{ maskImage: m, WebkitMaskImage: m }} />
+    return <img src={photo} alt="" onError={() => setPhotoFailed(true)} className="absolute bottom-0 right-0 h-[84%] w-[66%] object-cover object-top" style={{ maskImage: m, WebkitMaskImage: m }} />
   }
   return (
     <div className="absolute bottom-0 right-[2%] flex h-[80%] w-[60%] items-end justify-center" aria-hidden>

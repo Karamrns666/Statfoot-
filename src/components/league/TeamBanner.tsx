@@ -1,7 +1,7 @@
 // En-tête de la page équipe : bannière pleine largeur, hauteur « couverture », avec la photo collective
 // ou le poster choisi dans l'admin. Point de recadrage distinct pour ordinateur et mobile.
 // Logo et nom par-dessus, dégradé pour la lisibilité. Sans image : bannière aux couleurs de l'équipe.
-import type { CSSProperties, ReactNode } from 'react'
+import { useState, type CSSProperties, type ReactNode } from 'react'
 import type { Team, TeamMedia } from '@/types/entities'
 import { TeamLogo } from '@/components/league/Identity'
 
@@ -13,13 +13,16 @@ export const focusPos = (m: TeamMedia, mobile = false) =>
   `${mobile ? m.focus_x_mobile ?? m.focus_x ?? 50 : m.focus_x ?? 50}% ${mobile ? m.focus_y_mobile ?? m.focus_y ?? 50 : m.focus_y ?? 50}%`
 
 export function TeamBanner({ team, children }: { team: Team; children?: ReactNode }) {
-  const cover = teamCover(team)
+  const [broken, setBroken] = useState<string | null>(null)
+  const found = teamCover(team)
+  // image introuvable (ex. importée sur un autre navigateur avant la mise en ligne du stockage partagé) → bannière aux couleurs
+  const cover = found && broken !== found.url ? found : undefined
   const c1 = team.primary_color ?? '#F85A00', c2 = team.secondary_color ?? '#04163D'
   return (
     <section className="relative -mt-6 ml-[calc(50%-50vw)] w-screen overflow-hidden sm:-mt-8" aria-label={`${team.name} — en-tête`}>
       <div className={cover ? 'relative h-[78svh] max-h-[680px] min-h-[440px] sm:h-[68vh] sm:min-h-[460px]' : 'relative h-[46svh] min-h-[340px] sm:h-[44vh] sm:min-h-[380px]'}>
         {cover ? (
-          <img src={cover.url} alt={`${cover.kind === 'poster' ? 'Poster' : 'Photo collective'} — ${team.name}`} fetchPriority="high"
+          <img src={cover.url} alt={`${cover.kind === 'poster' ? 'Poster' : 'Photo collective'} — ${team.name}`} fetchPriority="high" onError={() => setBroken(cover.url)}
             className="absolute inset-0 size-full object-cover [object-position:var(--pos-m)] sm:[object-position:var(--pos-d)]"
             style={{ '--pos-m': focusPos(cover, true), '--pos-d': focusPos(cover) } as CSSProperties} />
         ) : (

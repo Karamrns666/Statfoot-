@@ -139,13 +139,13 @@ function Board({ m, now }: { m: Match; now: number }) {
   const cards = (tid: string) => events.filter((e) => e.team_id === tid && (e.type === 'yellow_card' || e.type === 'second_yellow' || e.type === 'red_card'))
   const goal = useGoalFlash(m)
   return (
-    <main className="relative flex flex-1 flex-col items-center justify-center px-[2vw]">
+    <main className="relative flex min-h-0 flex-1 flex-col items-center justify-center px-[2vw]">
       <div className="mb-[1.5vh] text-center font-display text-[clamp(1rem,1.8vw,2.2rem)] font-bold uppercase tracking-[.2em] text-white/70">{comp?.name}{m.round ? ` · Journée ${m.round}` : ''}{m.pitch ? ` · ${m.pitch}` : ''}</div>
       <div className="grid w-full max-w-[92vw] grid-cols-[1fr_auto_1fr] items-center gap-[2vw]">
         <TeamSide team={h} />
         <div className="flex flex-col items-center">
-          <div className="num flex items-center leading-none text-[clamp(5rem,15vw,18rem)]" aria-live="polite" aria-label={`Score ${m.home_score ?? 0} à ${m.away_score ?? 0}`}>
-            <span>{m.home_score ?? 0}</span><span className="mx-[1vw] text-white/25">-</span><span>{m.away_score ?? 0}</span>
+          <div className="num flex items-center leading-none text-[clamp(5rem,13vw,16rem)]" aria-live="polite" aria-label={`Score ${m.home_score ?? 0} à ${m.away_score ?? 0}`}>
+            <span>{m.home_score ?? 0}</span><span className="mx-[1.6vw] inline-block h-[.09em] w-[.32em] rounded-full bg-white/35" aria-hidden /><span>{m.away_score ?? 0}</span>
           </div>
           <div className={cn('mt-[1vh] rounded-full px-[1.6vw] py-[.5vh] font-display text-[clamp(1.4rem,3vw,3.6rem)] font-black uppercase', live ? 'bg-red-600 text-white' : 'bg-white/10')}>
             {live && <span className="mr-3 inline-block size-[.5em] rounded-full bg-white align-middle animate-pulse-live" />}{label}
@@ -154,21 +154,19 @@ function Board({ m, now }: { m: Match; now: number }) {
         <TeamSide team={a} />
       </div>
 
-      {/* buteurs et cartons */}
-      <div className="mt-[2.5vh] grid w-full max-w-[86vw] grid-cols-2 gap-[4vw] text-[clamp(1rem,1.7vw,2.1rem)] font-semibold">
+      {/* buteurs / cartons de chaque équipe, stats live au centre */}
+      <div className="mt-[2.5vh] grid w-full max-w-[94vw] grid-cols-[1fr_minmax(0,1.25fr)_1fr] items-start gap-[3vw]">
         <Timeline goals={sc.home} cards={cards(m.home_team_id)} align="right" />
+        {(live || m.status === 'finished') ? (
+          <div className="grid gap-[1.3vh]">
+            <StatBar label="Tirs" h={st.home.shots} a={st.away.shots} hc={h?.primary_color} ac={a?.primary_color} />
+            <StatBar label="Tirs cadrés" h={st.home.shots_on_target} a={st.away.shots_on_target} hc={h?.primary_color} ac={a?.primary_color} />
+            <StatBar label="Arrêts" h={st.home.saves} a={st.away.saves} hc={h?.primary_color} ac={a?.primary_color} />
+            {ls && <StatBar label="Possession" h={pos.home_pct} a={pos.away_pct} hc={h?.primary_color} ac={a?.primary_color} unit="%" />}
+          </div>
+        ) : <div />}
         <Timeline goals={sc.away} cards={cards(m.away_team_id)} align="left" />
       </div>
-
-      {/* stats live */}
-      {(live || m.status === 'finished') && (
-        <div className="mt-[3vh] grid w-full max-w-[70vw] gap-[1.4vh]">
-          <StatBar label="Tirs" h={st.home.shots} a={st.away.shots} hc={h?.primary_color} ac={a?.primary_color} />
-          <StatBar label="Tirs cadrés" h={st.home.shots_on_target} a={st.away.shots_on_target} hc={h?.primary_color} ac={a?.primary_color} />
-          <StatBar label="Arrêts" h={st.home.saves} a={st.away.saves} hc={h?.primary_color} ac={a?.primary_color} />
-          {ls && <StatBar label="Possession" h={pos.home_pct} a={pos.away_pct} hc={h?.primary_color} ac={a?.primary_color} unit="%" />}
-        </div>
-      )}
       {goal && <GoalFlash team={L.team.get(goal)} />}
     </main>
   )
@@ -177,26 +175,39 @@ function Board({ m, now }: { m: Match; now: number }) {
 function TeamSide({ team }: { team?: Team }) {
   return (
     <div className="flex min-w-0 flex-col items-center gap-[1.2vh] text-center">
-      <TeamLogo team={team} size={220} className="size-[clamp(6rem,13vw,15rem)]" />
-      <div className="title-caps max-w-full truncate text-[clamp(1.6rem,3.6vw,4.6rem)] leading-none">{team?.name}</div>
+      <TeamLogo team={team} size={220} className="size-[clamp(5rem,11vw,13rem)]" />
+      <div className="title-caps line-clamp-2 max-w-full text-[clamp(1.4rem,3vw,3.8rem)] leading-[.95]">{team?.name}</div>
     </div>
   )
 }
 
+/** Buteurs et cartons d'une équipe : une ligne par joueur et par type (⚽×2 12' 30'), 7 lignes au plus. */
 function Timeline({ goals, cards, align }: { goals: MatchEvent[]; cards: MatchEvent[]; align: 'left' | 'right' }) {
   const L = useLookup()
-  const name = (e: MatchEvent) => (e.player_id ? playerShort(L.player.get(e.player_id)) : e.player_name_free ?? '')
-  const items = [
-    ...goals.map((e) => ({ e, icon: '⚽', text: `${name(e)}${e.type === 'own_goal' ? ' (csc)' : e.goal_kind === 'penalty' ? ' (pén.)' : ''}` })),
-    ...cards.map((e) => ({ e, icon: e.type === 'yellow_card' ? '🟨' : '🟥', text: name(e) })),
-  ].sort((x, y) => ['1H', '2H', 'ET1', 'ET2'].indexOf(x.e.period ?? '1H') - ['1H', '2H', 'ET1', 'ET2'].indexOf(y.e.period ?? '1H') || (x.e.minute ?? 0) - (y.e.minute ?? 0))
+  const name = (e: MatchEvent) => (e.player_id ? playerShort(L.player.get(e.player_id)) : e.player_name_free ?? 'Joueur')
+  const order = (e: MatchEvent) => ['1H', '2H', 'ET1', 'ET2'].indexOf(e.period ?? '1H') * 1000 + (e.minute ?? 0)
+  const groups = new Map<string, { icon: string; label: string; events: MatchEvent[] }>()
+  for (const e of [...goals, ...cards].sort((x, y) => order(x) - order(y))) {
+    const icon = e.type === 'goal' || e.type === 'own_goal' ? '⚽' : e.type === 'yellow_card' ? '🟨' : '🟥'
+    const k = `${icon}|${e.player_id ?? e.player_name_free ?? e.id}|${e.type === 'own_goal'}`
+    if (!groups.has(k)) groups.set(k, { icon, label: `${name(e)}${e.type === 'own_goal' ? ' (csc)' : ''}`, events: [] })
+    groups.get(k)!.events.push(e)
+  }
+  const rows = [...groups.values()]
+  const shown = rows.slice(0, 7)
   return (
-    <ul className={cn('space-y-[.6vh]', align === 'right' ? 'text-right' : 'text-left')}>
-      {items.map(({ e, icon, text }) => (
-        <li key={e.id} className={cn('flex items-baseline gap-3', align === 'right' && 'flex-row-reverse')}>
-          <span aria-hidden>{icon}</span><span className="truncate">{text}</span><span className="num text-neon">{fmtMinute(e.minute, e.added_minute)}</span>
-        </li>
-      ))}
+    <ul className={cn('min-w-0 space-y-[.7vh] text-[clamp(1rem,1.6vw,2rem)] font-semibold', align === 'right' ? 'text-right' : 'text-left')}>
+      {shown.map((g, i) => {
+        const mins = g.events.map((e) => fmtMinute(e.minute, e.added_minute) + (e.goal_kind === 'penalty' ? ' pén.' : '')).filter((x) => x.trim())
+        return (
+          <li key={i} className={cn('flex items-baseline gap-[.6vw]', align === 'right' && 'flex-row-reverse')}>
+            <span aria-hidden>{g.icon}{g.events.length > 1 && <span className="num text-[.8em]">×{g.events.length}</span>}</span>
+            <span className="min-w-0 truncate">{g.label}</span>
+            {mins.length > 0 && <span className="num shrink-0 text-neon">{mins.join(' ')}</span>}
+          </li>
+        )
+      })}
+      {rows.length > shown.length && <li className="text-white/60">+ {rows.length - shown.length} autres</li>}
     </ul>
   )
 }
@@ -239,7 +250,7 @@ function useGoalFlash(m: Match) {
 
 function GoalFlash({ team }: { team?: Team }) {
   return (
-    <div className="tv-goal pointer-events-none absolute inset-0 flex items-center justify-center" role="status">
+    <div className="tv-goal pointer-events-none fixed inset-0 z-10 flex items-center justify-center" role="status">
       <div className="flex items-center gap-[2vw] rounded-[3vw] px-[4vw] py-[2vh] shadow-2xl" style={{ background: `linear-gradient(135deg, ${team?.primary_color ?? '#F85A00'}, #04163D)` }}>
         <TeamLogo team={team} size={160} className="size-[clamp(5rem,10vw,12rem)]" />
         <div className="title-caps text-[clamp(4rem,12vw,14rem)] leading-none">But !</div>

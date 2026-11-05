@@ -1,0 +1,35 @@
+package:
+CHANGELOG.md
+LICENSE.md
+README.md
+ThirdPartyLicenses.json
+dist
+package.json
+
+package/dist:
+index.cjs
+index.cjs.map
+index.mjs
+index.mjs.map
+resources.json
+scripts
+src
+tmp
+11:For more detail information please refer to the [CHANGELOG](./CHANGELOG.md).
+21:- **Data Protection**: As `@imgly/background-removal` runs entirely in the browser, users can have peace of mind knowing that their images and sensitive information remain secure within their own devices. With no data transfers to external servers, data privacy concerns are effectively mitigated.
+25:The Neural Network ([ONNX model](https://onnx.ai/)) and WASM files used by `@imgly/background-removal` are hosted by [IMG.LY](https://img.ly/) by default. See the section Custom Asset Serving if you want to host them on your own servers.
+50:Note: On the first run the wasm and onnx model files are fetched. This might, depending on the bandwidth, take time. Therefore, the first run takes proportionally longer than each consecutive run. Also, all files are cached by the browser and an additional model cache.
+58:  publicPath: string; // The public path used for model and wasm files. Default: 'https://staticimgly.com/${PACKAGE_NAME}-data/${PACKAGE_VERSION}/dist/'
+61:  model: 'isnet' | 'isnet_fp16' | 'isnet_quint8'; // The model to use. (Default "isnet_fp16")
+63:    format: 'image/png' | 'image/jpeg' | 'image/webp'; // The output format. (Default "image/png")
+76:The onnx model is shipped in various sizes and needs.
+78:- small (\~40 MB) is the smallest model and is in most cases working fine but sometimes shows some artifacts. It's a quantized model.
+79:- medium (\~80MB) is the default model.
+128:  publicPath: public_path, // path to the wasm files
+/**
+ * Bundled by jsDelivr using Rollup v4.62.2 and esbuild v0.28.1.
+ * Original file: /npm/@imgly/background-removal@1.7.0/dist/index.mjs
+ *
+ * Do NOT use SRI with dynamically generated files! More information: https://www.jsdelivr.com/using-sri-with-dynamic-files
+ */
+var Ze=typeof global<"u"?global:typeof self<"u"?self:typeof window<"u"?window:{},nr=Object.create,yt=Object.defineProperty,sr=Object.getOwnPropertyDescriptor,gt=Object.getOwnPropertyNames,ir=Object.getPrototypeOf,or=Object.prototype.hasOwnProperty,Ye=(t,e)=>function(){return e||(0,t[gt(t)[0]])((e={exports:{}}).exports,e),e.expor

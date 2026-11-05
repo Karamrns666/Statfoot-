@@ -189,7 +189,6 @@ export function Billboard({ slides: content, leagueName, seasonLabel, logoUrl }:
         {/* décor : projecteurs, gradins, pelouse */}
         <div className="pointer-events-none absolute inset-0" aria-hidden>
           <div className="bb-beam bb-beam-l" /><div className="bb-beam bb-beam-r" />
-          <div className="bb-lamps bb-lamps-l" /><div className="bb-lamps bb-lamps-r" />
           <div className="bb-pitch" />
           {prev !== null && <div key={`flash-${tk}`} className="bb-flash" />}
         </div>

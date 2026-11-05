@@ -46,7 +46,7 @@ export default function TeamDetail() {
         </div>
       </section>
       <div className="grid grid-cols-3 gap-2 sm:gap-3">
-        <StatTile label="Matchs joués" value={ts?.played ?? 0} sub={`${ts?.won ?? 0} V · ${ts?.drawn ?? 0} N · ${ts?.lost ?? 0} D`} />
+        <StatTile label="Matchs joués" value={ts?.played ?? 0} sub={`${ts?.won ?? 0}V · ${ts?.drawn ?? 0}N · ${ts?.lost ?? 0}D`} />
         <StatTile label="Buts marqués" value={ts?.gf ?? 0} color="#E04E00" sub={`${ts?.gf_avg ?? 0} / match`} />
         <StatTile label="Buts encaissés" value={ts?.ga ?? 0} color="#2a8fc4" sub={`${ts?.ga_avg ?? 0} / match`} />
       </div>

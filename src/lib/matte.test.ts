@@ -46,3 +46,19 @@ describe('post-traitement du détourage', () => {
     expect(c.w / c.h).toBeCloseTo(0.8, 1)
   })
 })
+
+describe('grillage et filets', () => {
+  it('un grillage fin qui relie plusieurs personnes ne l’emporte pas sur le joueur', () => {
+    const W = 720, H = 480
+    const rects: Parameters<typeof make>[2] = []
+    for (let x = 0; x < W; x += 40) rects.push([x, 0, x + 2, H, [200, 200, 220]]) // barreaux verticaux fins
+    for (let y = 0; y < H; y += 60) rects.push([0, y, W, y + 2, [200, 200, 220]]) // barreaux horizontaux
+    rects.push([300, 150, 380, 470, [248, 90, 0]]) // joueur
+    rects.push([60, 330, 90, 420, [20, 20, 20]]) // petite silhouette au fond
+    const img = make(W, H, rects)
+    keepMainSubject(img)
+    expect(alphaAt(img, 340, 300)).toBe(255) // joueur gardé
+    expect(alphaAt(img, 641, 30)).toBe(0) // grillage effacé
+    expect(alphaAt(img, 75, 380)).toBe(0) // silhouette du fond effacée
+  })
+})

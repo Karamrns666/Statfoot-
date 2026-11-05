@@ -15,6 +15,15 @@ export function keepMainSubject(img: Rgba, threshold = 128): { kept: number; rem
   const gw = Math.ceil(W / s), gh = Math.ceil(H / s)
   const cell = new Uint8Array(gw * gh)
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (data[(y * W + x) * 4 + 3] >= threshold) cell[((y / s) | 0) * gw + ((x / s) | 0)] = 1
+  // ouverture morphologique : les éléments fins (grillage, filet, poteaux) ne relient plus les personnes entre elles
+  const solid = new Uint8Array(gw * gh)
+  for (let cy = 0; cy < gh; cy++) for (let cx = 0; cx < gw; cx++) {
+    let all = 1
+    for (let dy = -1; dy <= 1 && all; dy++) for (let dx = -1; dx <= 1; dx++) { const nx = cx + dx, ny = cy + dy; if (nx < 0 || ny < 0 || nx >= gw || ny >= gh || !cell[ny * gw + nx]) { all = 0; break } }
+    solid[cy * gw + cx] = all
+  }
+  const anySolid = solid.some((v) => v)
+  if (anySolid) cell.set(solid)
   const label = new Int32Array(gw * gh).fill(-1)
   const comps: { area: number; box: Box }[] = []
   const stack: number[] = []
@@ -48,7 +57,8 @@ export function keepMainSubject(img: Rgba, threshold = 128): { kept: number; rem
   for (let i = 0; i < label.length; i++) {
     if (label[i] < 0 || !keep[label[i]]) continue
     const cx = i % gw, cy = (i / gw) | 0
-    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+    const r = anySolid ? 2 : 1 // on rend ce que l'ouverture a retiré (bords des bras, cheveux)
+    for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
       const nx = cx + dx, ny = cy + dy
       if (nx >= 0 && ny >= 0 && nx < gw && ny < gh) ok[ny * gw + nx] = 1
     }

@@ -65,7 +65,7 @@ export default function TvMode() {
   const pitchName = terrain && terrain !== 'tous' ? db.Match.find((x) => pitchSlug(x.pitch) === terrain)?.pitch ?? terrain : 'Tous les terrains'
   const url = `${location.origin}/live/${terrain ?? 'tous'}`
   return (
-    <div className="tv fixed inset-0 z-50 flex flex-col overflow-hidden text-white" style={{ background: 'radial-gradient(ellipse 50% 45% at 8% 0%, rgba(160,210,255,.16), transparent 70%), radial-gradient(ellipse 50% 45% at 92% 0%, rgba(160,210,255,.13), transparent 70%), #020B22' }}>
+    <div className="tv fixed inset-0 z-50 flex flex-col overflow-y-auto text-white sm:overflow-hidden" style={{ background: 'radial-gradient(ellipse 50% 45% at 8% 0%, rgba(160,210,255,.16), transparent 70%), radial-gradient(ellipse 50% 45% at 92% 0%, rgba(160,210,255,.13), transparent 70%), #020B22' }}>
       {/* barre du haut */}
       <header className="flex items-center gap-4 px-[2vw] pt-[1.6vh]">
         <Logo subtitle={settings.league_name} />
@@ -139,12 +139,12 @@ function Board({ m, now }: { m: Match; now: number }) {
   const cards = (tid: string) => events.filter((e) => e.team_id === tid && (e.type === 'yellow_card' || e.type === 'second_yellow' || e.type === 'red_card'))
   const goal = useGoalFlash(m)
   return (
-    <main className="relative flex min-h-0 flex-1 flex-col items-center overflow-hidden px-[2vw] py-[1vh] [justify-content:safe_center]">
+    <main className="relative flex flex-1 flex-col items-center px-[2vw] py-[1vh] [justify-content:safe_center] sm:min-h-0 sm:overflow-hidden">
       <div className="mb-[1vh] text-center font-display text-[clamp(.95rem,min(1.6vw,2.8vh),2rem)] font-bold uppercase tracking-[.2em] text-white/70">{comp?.name}{m.round ? ` · Journée ${m.round}` : ''}{m.pitch ? ` · ${m.pitch}` : ''}</div>
       <div className="grid w-full max-w-[92vw] grid-cols-[1fr_auto_1fr] items-center gap-[2vw]">
         <TeamSide team={h} />
         <div className="flex flex-col items-center">
-          <div className="num flex items-center leading-none text-[clamp(4.5rem,min(13vw,24vh),16rem)]" aria-live="polite" aria-label={`Score ${m.home_score ?? 0} à ${m.away_score ?? 0}`}>
+          <div className="num flex items-center leading-none text-[clamp(4.5rem,min(13vw,21vh),16rem)]" aria-live="polite" aria-label={`Score ${m.home_score ?? 0} à ${m.away_score ?? 0}`}>
             <span>{m.home_score ?? 0}</span><span className="mx-[1.6vw] inline-block h-[.09em] w-[.32em] rounded-full bg-white/35" aria-hidden /><span>{m.away_score ?? 0}</span>
           </div>
           <div className={cn('mt-[1vh] rounded-full px-[1.6vw] py-[.4vh] font-display text-[clamp(1.3rem,min(2.8vw,5vh),3.4rem)] font-black uppercase', live ? 'bg-red-600 text-white' : 'bg-white/10')}>
@@ -175,7 +175,7 @@ function Board({ m, now }: { m: Match; now: number }) {
 function TeamSide({ team }: { team?: Team }) {
   return (
     <div className="flex min-w-0 flex-col items-center gap-[1.2vh] text-center">
-      <div className="aspect-square w-[clamp(3.5rem,min(11vw,17vh),13rem)]"><TeamLogo team={team} size={220} className="!size-full" /></div>
+      <div className="aspect-square w-[clamp(3.5rem,min(11vw,15vh),13rem)]"><TeamLogo team={team} size={220} className="!size-full" /></div>
       <div className="title-caps line-clamp-2 max-w-full text-[clamp(1.3rem,min(3vw,5vh),3.8rem)] leading-[.95]">{team?.name}</div>
     </div>
   )

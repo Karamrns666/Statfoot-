@@ -1,0 +1,59 @@
+[
+ {
+  "file": "photo1.jpg",
+  "title": "File:DFC 5336 A tense moment as a striker fires a shot on goal while the goalkeeper dives to make the save during a nighttime amateur soccer match.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:DFC_5336_A_tense_moment_as_a_striker_fires_a_shot_on_goal_while_the_goalkeeper_dives_to_make_the_save_during_a_nighttime_amateur_soccer_match.jpg"
+ },
+ {
+  "file": "photo2.jpg",
+  "title": "File:Rush Soccer Player 4.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Rush_Soccer_Player_4.jpg"
+ },
+ {
+  "file": "photo3.jpg",
+  "title": "File:Rush Soccer player 3.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Rush_Soccer_player_3.jpg"
+ },
+ {
+  "file": "photo4.jpg",
+  "title": "File:Rush Soccer Player 1.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Rush_Soccer_Player_1.jpg"
+ }
+]
+PHOTO 1 (File:DFC 5336 A tense moment as a striker fires a shot on goal while the goalkeeper dives to make the save during a nighttime amateur soccer match.jpg) → ok en 44 s · progression max 93 % · visage 27.6/18.5 · {"type":"image/webp","w":1280,"h":675,"kb":225,"transparent":"81 %","halo_blanc":"1.6 % des bords"}
+PHOTO 2 (File:Rush Soccer Player 4.jpg) → ok en 43 s · progression max 87 % · visage 47.5/18 · {"type":"image/webp","w":726,"h":753,"kb":63,"transparent":"67 %","halo_blanc":"1.9 % des bords"}
+PHOTO 3 (File:Rush Soccer player 3.jpg) → ok en 43 s · progression max 93 % · visage 44.4/20 · {"type":"image/webp","w":522,"h":553,"kb":48,"transparent":"60 %","halo_blanc":"12.3 % des bords"}
+PHOTO 4 (File:Rush Soccer Player 1.jpg) → ok en 43 s · progression max 93 % · visage 39.2/22.3 · {"type":"image/webp","w":808,"h":630,"kb":81,"transparent":"61 %","halo_blanc":"3.4 % des bords"}
+LOT DÉTOURAGE DES PHOTOS EXISTANTES Supprime le fond des photos des joueurs qui n’ont pas encore de version détourée, une photo après l’autre, dans ce navigateur. Gardez cette fenêtre ouverte pendant le traitement. 2 / 2 photos 100 % 2 photos détourées. Fermer Fermer
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+locator.screenshot: Timeout 29990.76800000001ms exceeded.
+Call log:
+  - taking element screenshot
+  - waiting for fonts to load...
+  - fonts loaded
+  - attempting scroll into view action
+    - waiting for element to be stable
+    - element is not stable
+  - retrying scroll into view action
+    - waiting for element to be stable
+    - element is not visible
+  - retrying scroll into view action
+    - waiting 20ms
+    2 × waiting for element to be stable
+      - element is not visible
+    - retrying scroll into view action
+      - waiting 100ms
+    56 × waiting for element to be stable
+       - element is not visible
+     - retrying scroll into view action
+       - waiting 500ms
+
+    at /home/runner/work/Statfoot-/Statfoot-/e2e/cutout2.mjs:58:39 {
+  name: 'TimeoutError'
+}
+
+Node.js v22.23.4
+exit=1

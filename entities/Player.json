@@ -77,6 +77,22 @@
     "photo_cutout_tries": {
       "type": "integer",
       "description": "Essais de détourage automatique ratés"
+    },
+    "photo_cutout_disabled": {
+      "type": "boolean",
+      "description": "Photo originale choisie pour la carte (pas de détourage)"
+    },
+    "photo_cutout_validated": {
+      "type": "boolean",
+      "description": "Détourage validé par l'admin"
+    },
+    "photo_face_x": {
+      "type": "number",
+      "description": "Centre du visage (% horizontal de la photo originale)"
+    },
+    "photo_face_y": {
+      "type": "number",
+      "description": "Centre du visage (% vertical de la photo originale)"
     }
   },
   "required": [

@@ -38,5 +38,10 @@ export const EVENT_LABEL: Record<EventType, string> = {
 
 export const playerName = (p?: Player | null) => (p ? `${p.first_name} ${p.last_name}` : 'Joueur inconnu')
 export const playerShort = (p?: Player | null) => (p ? `${p.first_name.charAt(0)}. ${p.last_name}` : '—')
+/** Avatar rond centré sur le visage (centre détecté lors du détourage), sinon haut de la photo. */
+export const faceStyle = (p?: Pick<Player, 'photo_face_x' | 'photo_face_y'> | null): { objectPosition: string; transform?: string; transformOrigin?: string } =>
+  p?.photo_face_x != null && p.photo_face_y != null
+    ? { objectPosition: `${p.photo_face_x}% ${p.photo_face_y}%`, transform: 'scale(1.7)', transformOrigin: `${p.photo_face_x}% ${p.photo_face_y}%` }
+    : { objectPosition: '50% 18%' }
 export const initials = (p?: Player | null) => (p ? `${p.first_name[0] ?? ''}${p.last_name[0] ?? ''}`.toUpperCase() : '?')
 export const ordinal = (n: number) => (n === 1 ? '1er' : `${n}e`)

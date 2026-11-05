@@ -15,6 +15,7 @@ import { toast } from '@/components/ui/toast'
 import { playerName } from '@/lib/format'
 import { syncCaptain } from '@/lib/captain'
 import { PlayerPhotoField } from '@/components/admin/PlayerPhotoField'
+import { BatchCutoutButton } from '@/components/admin/BatchCutoutDialog'
 import type { DocStatus, DocType, Player } from '@/types/entities'
 
 const DOCS: { key: DocType; label: string }[] = [{ key: 'id_card', label: 'CIN' }, { key: 'medical', label: 'Certificat médical' }, { key: 'license', label: 'Licence / autorisation entreprise' }]
@@ -58,7 +59,7 @@ export default function PlayersAdmin() {
       const p = db.Player.find((x) => norm(`${x.first_name}${x.last_name}`) === base || norm(`${x.last_name}${x.first_name}`) === base || (team && x.team_id === team && String(x.number) === base))
       if (!p) { unmatched.push(f.name); continue }
       const url = (await base44.integrations.Core.UploadFile({ file: f, maxSize: 1600, hint: 'photo' })).file_url
-      await base44.entities.Player.update(p.id, { photo_url: url, photo_cutout_url: undefined, photo_cutout_status: undefined, photo_cutout_source: undefined, photo_cutout_tries: 0 }); ok++
+      await base44.entities.Player.update(p.id, { photo_url: url, photo_cutout_url: undefined, photo_cutout_status: undefined, photo_cutout_source: undefined, photo_cutout_tries: 0, photo_cutout_disabled: undefined, photo_cutout_validated: undefined, photo_face_x: undefined, photo_face_y: undefined }); ok++
       done.push({ id: p.id, url })
     }
     // le détourage est fait automatiquement en arrière-plan (indicateur « Détourage » en haut de l'admin)
@@ -67,6 +68,7 @@ export default function PlayersAdmin() {
   const toolbar = (
     <>
       <FilterSelect value={team} onChange={setTeam} allLabel="Toutes équipes" options={db.Team.map((t) => ({ value: t.id, label: t.name })).sort((a, b) => a.label.localeCompare(b.label))} />
+      <BatchCutoutButton />
       <FilterSelect value={docFilter} onChange={setDocFilter} allLabel="Tous dossiers" options={[{ value: 'ok', label: 'Dossier complet' }, { value: 'ko', label: 'Documents à traiter' }]} />
       <label className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-input px-3 text-xs hover:bg-white/5" title="Nom de fichier : prenom-nom.jpg (ou numéro.jpg si une équipe est filtrée)"><ImageUp className="size-4" />Photos en masse<input type="file" accept="image/*" multiple className="hidden" onChange={(e) => bulkPhotos(e.target.files)} /></label>
       <div className="flex rounded-lg border border-input p-0.5">{(['list', 'grid'] as const).map((v) => <button key={v} onClick={() => setView(v)} className={`rounded-md p-1.5 cursor-pointer ${view === v ? 'bg-neon/20 text-neon' : 'text-muted-foreground'}`} title={v === 'list' ? 'Liste' : 'Trombinoscope'}>{v === 'list' ? <List className="size-4" /> : <Grid2x2 className="size-4" />}</button>)}</div>

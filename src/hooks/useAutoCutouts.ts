@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { base44 } from '@/api/base44Client'
 import { useData } from '@/hooks/useData'
-import { cutoutFromUrl } from '@/components/admin/PlayerPhotoField'
-import { needsCutout } from '@/lib/cutoutQueue'
+import { cutoutPlayerPhoto, failedCutout } from '@/api/playerPhotos'
+import { autoCutoutsPaused, needsCutout } from '@/lib/cutoutQueue'
 
 const LOCK = 'statfoot:cutout-lock'
 const me = Math.random().toString(36).slice(2)
@@ -26,15 +26,16 @@ export function useAutoCutouts(enabled: boolean) {
   const running = useRef(false)
   useEffect(() => {
     if (!enabled || running.current || !pending.length) return
+    if (autoCutoutsPaused()) { const t = setTimeout(() => setTick((x) => x + 1), 5_000); return () => clearTimeout(t) }
     if (!takeLock()) { const t = setTimeout(() => setTick((x) => x + 1), 30_000); return () => clearTimeout(t) } // un autre onglet travaille
     running.current = true
     const p = pending[0]
     setCurrent(p.id)
     const beat = setInterval(() => { try { localStorage.setItem(LOCK, `${me}|${Date.now()}`) } catch { /* */ } }, 20_000)
     const photo = p.photo_url!
-    cutoutFromUrl(photo)
-      .then((url) => base44.entities.Player.update(p.id, { photo_cutout_url: url, photo_cutout_status: 'ok', photo_cutout_source: photo, photo_cutout_tries: 0 }))
-      .catch(() => base44.entities.Player.update(p.id, { photo_cutout_url: undefined, photo_cutout_status: 'failed', photo_cutout_source: photo, photo_cutout_tries: (p.photo_cutout_source === photo ? p.photo_cutout_tries ?? 0 : 0) + 1 }))
+    cutoutPlayerPhoto(photo)
+      .then((patch) => base44.entities.Player.update(p.id, patch))
+      .catch(() => base44.entities.Player.update(p.id, failedCutout(p, photo)))
       .finally(() => { clearInterval(beat); running.current = false; releaseLock(); setCurrent(null) })
   }, [enabled, pending.length, pending[0]?.id, current, tick]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => releaseLock, [])

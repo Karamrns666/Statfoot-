@@ -3,6 +3,7 @@
 // son modèle IA (~80 Mo) est téléchargé une fois puis gardé en cache par le navigateur.
 // La photo ne quitte jamais le navigateur.
 import { canvasToBlob, decodeImage, fitSize } from './imageOptimize'
+import { bustCrop, keepMainSubject, refineEdges, subjectBox } from './matte'
 
 type RemoveFn = (image: Blob, config?: { output?: { format?: string; quality?: number }; progress?: (key: string, current: number, total: number) => void }) => Promise<Blob>
 let lib: Promise<RemoveFn> | null = null
@@ -19,44 +20,74 @@ function loadLib(): Promise<RemoveFn> {
   return lib
 }
 
-export type CutoutProgress = (step: 'chargement' | 'analyse' | 'finition', pct?: number) => void
+/** Avancement global en % (chargement du modèle puis analyse), avec une étiquette lisible. */
+export type CutoutProgress = (pct: number, label: string) => void
 
-/** Supprime le fond d'une photo → PNG transparent recadré sur le joueur (marges vides retirées). */
-export async function removePhotoBackground(photo: Blob, onProgress?: CutoutProgress, timeoutMs = 180_000): Promise<Blob> {
-  onProgress?.('chargement')
+export interface CutoutResult {
+  blob: Blob
+  /** centre du visage dans la photo originale, en % (sert au recadrage des avatars ronds) */
+  face: { x: number; y: number }
+  /** personnes / objets d'arrière-plan effacés (pixels) */
+  removed: number
+}
+
+/** Supprime le fond, ne garde que le joueur, cadre en buste et produit un WebP transparent de 800 px de haut. */
+export async function removePhotoBackground(photo: Blob, onProgress?: CutoutProgress, timeoutMs = 240_000): Promise<CutoutResult> {
+  onProgress?.(2, 'Chargement de l’outil de détourage…')
   const run = (async () => {
     const remove = await loadLib()
+    const seen = new Map<string, number>()
     const out = await remove(photo, {
       output: { format: 'image/png' },
-      progress: (key, cur, total) => onProgress?.(key.startsWith('fetch') ? 'chargement' : 'analyse', total ? Math.round((cur / total) * 100) : undefined),
+      progress: (key, cur, total) => {
+        if (!total) return
+        seen.set(key, cur / total)
+        if (key.startsWith('fetch')) {
+          const avg = [...seen].filter(([k]) => k.startsWith('fetch')).reduce((a, [, v]) => a + v, 0) / Math.max(1, [...seen.keys()].filter((k) => k.startsWith('fetch')).length)
+          onProgress?.(Math.round(2 + avg * 68), 'Chargement du modèle (une seule fois)…')
+        } else onProgress?.(Math.round(70 + (cur / total) * 22), 'Suppression du fond…')
+      },
     })
-    onProgress?.('finition')
-    return trimTransparent(out)
+    onProgress?.(93, 'Finitions : bords, cadrage…')
+    const res = await refineCutout(out)
+    onProgress?.(100, 'Terminé')
+    return res
   })()
   const timeout = new Promise<never>((_, rej) => setTimeout(() => rej(new Error('Détourage trop long')), timeoutMs))
   return Promise.race([run, timeout])
 }
 
-/** Recadre une image transparente sur son contenu (+ petite marge) et limite sa taille à 1000 px de haut. */
-export async function trimTransparent(png: Blob, maxH = 1000, margin = 0.02): Promise<Blob> {
+/**
+ * Post-traitement : seul le joueur au premier plan, bords lissés sans halo, cadrage buste / mi-corps
+ * (tête en haut, centré), 800 px de haut, WebP avec transparence (PNG si le navigateur ne sait pas encoder le WebP).
+ */
+export async function refineCutout(png: Blob, targetH = 800): Promise<CutoutResult> {
   const img = await decodeImage(png)
   const W = 'naturalWidth' in img ? img.naturalWidth : img.width, H = 'naturalHeight' in img ? img.naturalHeight : img.height
   const c = document.createElement('canvas'); c.width = W; c.height = H
   const ctx = c.getContext('2d', { willReadFrequently: true })!
   ctx.drawImage(img, 0, 0)
-  const { data } = ctx.getImageData(0, 0, W, H)
-  let x0 = W, y0 = H, x1 = -1, y1 = -1
-  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-    if (data[(y * W + x) * 4 + 3] > 12) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y }
-  }
-  if (x1 < 0) throw new Error('Aucun joueur détecté sur la photo')
-  const m = Math.round(Math.max(x1 - x0, y1 - y0) * margin)
-  x0 = Math.max(0, x0 - m); y0 = Math.max(0, y0 - m); x1 = Math.min(W - 1, x1 + m); y1 = Math.min(H - 1, y1 + m)
-  const cw = x1 - x0 + 1, ch = y1 - y0 + 1
-  const { w, h } = fitSize(cw, ch, maxH, maxH)
+  const px = ctx.getImageData(0, 0, W, H)
+  const { removed } = keepMainSubject(px)
+  refineEdges(px)
+  const subj = subjectBox(px)
+  if (!subj) throw new Error('Aucun joueur détecté sur la photo')
+  ctx.putImageData(px, 0, 0)
+  const crop = bustCrop(subj.box, subj.head.x, H)
+  const { w, h } = fitSize(crop.w, crop.h, Math.round(targetH * 0.8 * 2), targetH)
+  const k = w / crop.w
   const out = document.createElement('canvas'); out.width = w; out.height = h
   const o = out.getContext('2d')!
   o.imageSmoothingQuality = 'high'
-  o.drawImage(c, x0, y0, cw, ch, 0, 0, w, h)
-  return canvasToBlob(out, 'image/png')
+  // partie de la zone de cadrage qui est dans l'image (le reste reste transparent)
+  const sx = Math.max(0, crop.x), sy = Math.max(0, crop.y), ex = Math.min(W, crop.x + crop.w), ey = Math.min(H, crop.y + crop.h)
+  if (ex > sx && ey > sy) o.drawImage(c, sx, sy, ex - sx, ey - sy, (sx - crop.x) * k, (sy - crop.y) * k, (ex - sx) * k, (ey - sy) * k)
+  let blob = await canvasToBlob(out, 'image/webp', 0.9)
+  if (blob.type !== 'image/webp') blob = await canvasToBlob(out, 'image/png')
+  return { blob, face: { x: Math.round((subj.head.x / W) * 1000) / 10, y: Math.round((subj.head.y / H) * 1000) / 10 }, removed }
+}
+
+/** PNG / WebP déjà détouré fourni par l'admin : même finition (cadrage, taille, format). */
+export async function trimTransparent(file: Blob): Promise<Blob> {
+  return (await refineCutout(file)).blob
 }

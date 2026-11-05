@@ -1,13 +1,22 @@
-// File de détourage automatique : chaque joueur qui a une photo sans version détourée est traité
-// en arrière-plan dans l'admin, un par un. 3 essais au plus par photo ; si la photo change, on recommence.
+// Détourage des photos joueurs : règles communes à la file automatique, au traitement en lot et au formulaire.
 import type { Player } from '@/types/entities'
 
 export const MAX_CUTOUT_TRIES = 3
 
+type P = Pick<Player, 'photo_url' | 'photo_cutout_url' | 'photo_cutout_source' | 'photo_cutout_tries' | 'photo_cutout_disabled'>
+
+/** La version détourée correspond-elle à la photo actuelle ? */
+export const hasCurrentCutout = (p: P) => !!p.photo_url && !!p.photo_cutout_url && (!p.photo_cutout_source || p.photo_cutout_source === p.photo_url)
+
 /** Ce joueur a-t-il besoin d'un détourage automatique ? (fonction pure) */
-export function needsCutout(p: Pick<Player, 'photo_url' | 'photo_cutout_url' | 'photo_cutout_source' | 'photo_cutout_tries'>) {
-  if (!p.photo_url) return false
+export function needsCutout(p: P, ignoreTries = false) {
+  if (!p.photo_url || p.photo_cutout_disabled) return false
+  if (hasCurrentCutout(p)) return false
   const stale = !!p.photo_cutout_source && p.photo_cutout_source !== p.photo_url
-  if (p.photo_cutout_url && !stale) return false
-  return (p.photo_cutout_tries ?? 0) < MAX_CUTOUT_TRIES || stale
+  return ignoreTries || stale || (p.photo_cutout_tries ?? 0) < MAX_CUTOUT_TRIES
 }
+
+/** Pause de la file automatique pendant un traitement en lot lancé à la main. */
+let paused = false
+export const pauseAutoCutouts = (v: boolean) => { paused = v }
+export const autoCutoutsPaused = () => paused

@@ -94,6 +94,13 @@ export interface Player extends BaseEntity {
   photo_cutout_source?: string
   /** essais de détourage automatique ratés (3 au plus) */
   photo_cutout_tries?: number
+  /** l'admin a choisi la photo originale pour la carte (détourage raté) : plus de détourage automatique */
+  photo_cutout_disabled?: boolean
+  /** l'admin a validé le détourage */
+  photo_cutout_validated?: boolean
+  /** centre du visage dans la photo originale, en % (avatars ronds centrés sur le visage) */
+  photo_face_x?: number
+  photo_face_y?: number
   position: Position
   number?: number
   team_id: string

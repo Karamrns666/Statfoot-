@@ -26,6 +26,9 @@ export interface PlayerCardProps {
   photoUrl?: string
   /** photo détourée (PNG transparent) : affichée en grand, posée sur la carte */
   cutoutUrl?: string
+  /** centre du visage dans la photo originale (en %), pour recadrer la photo originale proprement */
+  faceX?: number
+  faceY?: number
   /** indice de performance (IPG), affiché en pastille s'il existe */
   ipg?: number
   rating: ReactNode
@@ -72,12 +75,12 @@ function MiniMedal({ b }: { b: BadgeState }) {
   )
 }
 
-/** Photo de la carte : uniquement la version détourée (jamais le fond). En attendant le détourage automatique : silhouette. */
-function CardPhoto({ cutout, initials, color }: { cutout?: string; initials: string; color: string }) {
+/** Photo originale (pas de version détourée) : recadrée sur le visage, fondue dans la carte ; sinon silhouette. */
+function OriginalPhoto({ photo, faceX, faceY, initials, color }: { photo?: string; faceX?: number; faceY?: number; initials: string; color: string }) {
   const [failed, setFailed] = useState(false)
-  const fade = 'linear-gradient(to bottom, #000 72%, transparent 100%)'
-  if (cutout && !failed) {
-    return <img src={cutout} alt="" onError={() => setFailed(true)} className="absolute bottom-0 right-[-5%] h-[88%] w-[68%] object-contain object-bottom drop-shadow-[0_10px_18px_rgba(0,0,0,.55)]" style={{ maskImage: fade, WebkitMaskImage: fade }} />
+  if (photo && !failed) {
+    const m = 'radial-gradient(70% 78% at 50% 42%, #000 58%, transparent 100%)'
+    return <img src={photo} alt="" onError={() => setFailed(true)} className="absolute bottom-[2%] right-[2%] h-[86%] w-[62%] rounded-t-[40%] object-cover" style={{ objectPosition: `${faceX ?? 50}% ${Math.max(0, (faceY ?? 22) - 12)}%`, maskImage: m, WebkitMaskImage: m }} />
   }
   return (
     <div className="absolute bottom-0 right-[2%] flex h-[80%] w-[60%] items-end justify-center" aria-hidden>
@@ -98,6 +101,8 @@ export function PlayerCard(p: PlayerCardProps) {
   const logo = p.team?.logo_url || (p.teamName ? teamLogoSvg(p.teamName.replace(/[^A-Za-zÀ-ÿ ]/g, '').split(/\s+/).map((w) => w[0]).join('').slice(0, 3).toUpperCase(), '#6CB4CC', '#0B2E73') : undefined)
   const teamLabel = p.team?.name ?? p.teamName ?? ''
   const toggle = () => setFlipped((f) => !f)
+  const [cutoutFailed, setCutoutFailed] = useState(false)
+  const cutoutOk = !!p.cutoutUrl && !cutoutFailed
   return (
     <div
       className={cn('pcard group aspect-[63/92] w-full cursor-pointer select-none outline-none', p.className)}
@@ -111,7 +116,14 @@ export function PlayerCard(p: PlayerCardProps) {
     >
       <div className="pcard-inner text-[clamp(8.5px,4.6cqw,13px)]">
         {/* ---------- RECTO ---------- */}
-        <div className="pcard-face pcard-shape overflow-hidden rounded-b-2xl group-focus-visible:outline-2 group-focus-visible:outline-neon" style={{ background: tier.frame, padding: 2, filter: `drop-shadow(0 14px 22px ${tier.glow})` }}>
+        <div className="pcard-face">
+          {/* le joueur détouré est posé PAR-DESSUS le cadre : sa tête dépasse légèrement en haut (effet carte FIFA) */}
+          {cutoutOk && (
+            <img src={p.cutoutUrl} alt="" onError={() => setCutoutFailed(true)} draggable={false}
+              className="pointer-events-none absolute left-[27%] right-[-4%] top-[-4%] z-20 h-[64%] w-auto object-contain object-bottom drop-shadow-[0_12px_14px_rgba(0,0,0,.55)]"
+              style={{ maskImage: 'linear-gradient(to bottom, #000 80%, transparent 99%)', WebkitMaskImage: 'linear-gradient(to bottom, #000 80%, transparent 99%)' }} />
+          )}
+        <div className="pcard-shape absolute inset-0 overflow-hidden rounded-b-2xl group-focus-visible:outline-2 group-focus-visible:outline-neon" style={{ background: tier.frame, padding: 2, filter: `drop-shadow(0 14px 22px ${tier.glow})` }}>
           <div className="pcard-shape relative flex h-full flex-col overflow-hidden rounded-b-[14px]" style={{ background: tier.bg }}>
             <div className="pcard-sheen pointer-events-none absolute inset-0" />
             {p.material && <div className="absolute inset-x-0 top-[2.6%] text-center text-[.7em] font-extrabold tracking-[.2em]" style={{ color: tier.text }}>{TIER_LABEL[p.material].toUpperCase()}</div>}
@@ -119,7 +131,9 @@ export function PlayerCard(p: PlayerCardProps) {
             <div className="relative h-[60%] shrink-0">
               <div className="pointer-events-none absolute inset-0" style={{ background: `radial-gradient(60% 55% at 62% 58%, ${color}55, transparent 70%)` }} />
               <div className="pointer-events-none absolute right-[-6%] top-[14%] font-display text-[9em] font-black leading-none opacity-[.07]" aria-hidden>{(p.lastName[0] ?? '').toUpperCase()}</div>
-              <CardPhoto cutout={p.cutoutUrl} initials={(p.firstName.replace('.', '')[0] ?? '') + (p.lastName[0] ?? '')} color={color} />
+              {/* ombre portée sous le joueur */}
+              <div className="pointer-events-none absolute bottom-[1%] left-[38%] h-[9%] w-[54%] rounded-[50%] bg-black/55 blur-[6px]" aria-hidden />
+              {!cutoutOk && <OriginalPhoto photo={p.photoUrl} faceX={p.faceX} faceY={p.faceY} initials={(p.firstName.replace('.', '')[0] ?? '') + (p.lastName[0] ?? '')} color={color} />}
               {/* colonne gauche : note, rôle, club, IPG */}
               <div className="absolute left-[7%] top-[13%] z-10 flex flex-col items-center leading-none">
                 <div className={cn('font-display font-black leading-[.85] text-white', String(p.rating).length > 3 ? 'text-[2.7em]' : 'text-[3.6em]')} style={{ textShadow: `0 2px 0 rgb(0 0 0 / .35), 0 0 18px ${tier.glow}` }}>{p.rating}</div>
@@ -149,6 +163,7 @@ export function PlayerCard(p: PlayerCardProps) {
             </div>
             <RotateCw className="absolute bottom-[17%] right-[5%] size-[1.1em] text-white/30 transition group-hover:text-white/70" aria-hidden />
           </div>
+        </div>
         </div>
         {/* ---------- VERSO ---------- */}
         <div className="pcard-face pcard-back pcard-shape overflow-hidden rounded-b-2xl" style={{ background: tier.frame, padding: 2 }}>

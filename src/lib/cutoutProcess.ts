@@ -80,6 +80,8 @@ export function mainSubject(alpha: (i: number) => number, w: number, h: number, 
     return c.area * upright * (1 - 0.6 * Math.abs(c.cx - 0.5)) * (0.6 + 0.4 * c.maxY)
   }
   const best = comps.reduce((bi, c, i) => (score(c) > score(comps[bi]) ? i : bi), 0)
+  const bc = comps[best]
+  const bw = bc.maxX - bc.minX + 1, bh = (bc.maxY - bc.minY) * sh + 1
   const main = new Uint8Array(sw * sh)
   for (let i = 0; i < label.length; i++) if (label[i] === best) main[i] = 1
   // bords du joueur : on rend ce que l'ouverture avait rogné (+ marge), sans dépasser la silhouette d'origine
@@ -87,7 +89,13 @@ export function mainSubject(alpha: (i: number) => number, w: number, h: number, 
   const keepLow = new Uint8Array(sw * sh)
   for (let i = 0; i < keepLow.length; i++) keepLow[i] = grown[i] && (m[i] || main[i]) ? 1 : 0
   const halo = morph(keepLow, sw, sh, 1, 'dilate') // 1 pixel réduit de marge pour les cheveux / transitions douces
-  return { keep: (x: number, y: number) => halo[Math.min(sh - 1, Math.floor(y / s)) * sw + Math.min(sw - 1, Math.floor(x / s))] === 1, components: comps.length }
+  return {
+    keep: (x: number, y: number) => halo[Math.min(sh - 1, Math.floor(y / s)) * sw + Math.min(sw - 1, Math.floor(x / s))] === 1,
+    components: comps.length,
+    /** part de l'image occupée par le joueur retenu (0–1) et silhouette verticale ou non */
+    areaFraction: bc.area / (sw * sh),
+    upright: bh / bw >= 0.8,
+  }
 }
 
 /** Boîte englobante des pixels visibles. */

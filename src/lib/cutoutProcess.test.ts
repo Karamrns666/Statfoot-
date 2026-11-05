@@ -15,6 +15,8 @@ describe('post-traitement du détourage', () => {
     const a = img(w, h, [[150, 100, 250, 599], [10, 300, 50, 420], [340, 280, 390, 400]])
     const s = mainSubject((i) => a[i], w, h)!
     expect(s.components).toBe(3)
+    expect(s.upright).toBe(true)
+    expect(s.areaFraction).toBeGreaterThan(0.1)
     expect(s.keep(200, 300)).toBe(true)
     expect(s.keep(30, 350)).toBe(false)
     expect(s.keep(360, 350)).toBe(false)
@@ -30,6 +32,11 @@ describe('post-traitement du détourage', () => {
     expect(s.keep(300, 400)).toBe(true) // le joueur
     expect(s.keep(41, 500)).toBe(false) // fil loin du joueur
     expect(s.keep(560, 81)).toBe(false)
+  })
+  it('photo inadaptée (barre horizontale, joueur minuscule) : signalée', () => {
+    const a = img(600, 400, [[0, 20, 599, 60], [300, 300, 306, 320]])
+    const s = mainSubject((i) => a[i], 600, 400)!
+    expect(s.upright && s.areaFraction >= 0.02).toBe(false)
   })
   it('cadre en buste un joueur en pied, centré sur la tête', () => {
     const w = 400, h = 900

@@ -21,7 +21,7 @@ jobs:
           cache: npm
       - name: Sonde
         run: |
-          { npm view @imgly/background-removal dist-tags versions time.modified dependencies peerDependencies --json; echo; curl -sI "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm" | head -5; curl -sI "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.6.0/+esm" | head -3; npm view @imgly/background-removal@1.7.0 dist.unpackedSize; curl -s "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/index.d.ts" | head -120; } > ci-report.txt 2>&1 || true
+          { mkdir -p /tmp/p && cd /tmp/p && npm pack @imgly/background-removal@1.7.0 >/dev/null 2>&1 && tar xzf imgly-background-removal-1.7.0.tgz && ls package package/dist | head -30; cat package/dist/*.d.ts 2>/dev/null | head -150; grep -n "isnet\|model\|publicPath\|format" package/README.md | head -60; curl -s "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm" | head -c 600; } > $GITHUB_WORKSPACE/ci-report.txt 2>&1 || true
       - name: Ranger le rapport
         if: always()
         run: |

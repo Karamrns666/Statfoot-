@@ -40,7 +40,8 @@ for (const [i, ph] of photos.entries()) {
     }, pl.photo_cutout_url)
     fs.writeFileSync(`shots/cutout-${i + 1}.${info.type === 'image/webp' ? 'webp' : 'png'}`, Buffer.from(info.data.split(',')[1], 'base64')); delete info.data
   }
-  console.log(`PHOTO ${i + 1} (${ph.title}) → ${res} en ${Math.round((Date.now() - t0) / 1000)} s · progression max ${maxPct} % · visage ${pl.photo_face_x}/${pl.photo_face_y} · ${JSON.stringify(info)}`)
+  const warn = await p.locator('[role=note]').innerText().catch(() => '')
+  console.log(`PHOTO ${i + 1} (${ph.title}) → ${res} en ${Math.round((Date.now() - t0) / 1000)} s · progression max ${maxPct} % · visage ${pl.photo_face_x}/${pl.photo_face_y} · ${JSON.stringify(info)}${warn ? ' · conseil affiché' : ''}`)
 }
 // traitement en lot : 2 joueurs avec photo mais sans détourage
 const orig = await p.evaluate(() => JSON.parse(localStorage.getItem('statfoot:v1:Player')).find((x) => x.last_name === 'Orch').photo_url)
@@ -48,7 +49,7 @@ await p.evaluate((u) => { const K = 'statfoot:v1:Player'; const pl = JSON.parse(
 await p.goto(B + '/admin/joueurs', { waitUntil: 'networkidle' }); await p.waitForTimeout(800)
 await p.getByRole('button', { name: /Détourer toutes les photos existantes/ }).click(); await p.waitForTimeout(300)
 await p.getByRole('dialog').getByRole('button', { name: /Lancer le détourage/ }).click()
-await p.getByRole('dialog').getByText(/détourée/).waitFor({ timeout: 240000 }).catch(() => {})
+await p.getByRole('dialog').getByText(/photos? détourées?\b.*\./).waitFor({ timeout: 240000 }).catch(() => {}); await p.waitForTimeout(800)
 await p.waitForTimeout(500)
 console.log('LOT', (await p.getByRole('dialog').innerText()).replace(/\s+/g, ' ').slice(0, 300))
 await p.getByRole('dialog').screenshot({ path: 'shots/lot.png' })

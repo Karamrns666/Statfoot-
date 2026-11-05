@@ -21,50 +21,73 @@ function downscaleAlpha(alpha: (i: number) => number, w: number, h: number, maxS
   return { m, sw, sh, s }
 }
 
+/** Min / max sur un carré de rayon r (séparable) : érosion (min) ou dilatation (max) d'un masque binaire. */
+export function morph(m: Uint8Array, w: number, h: number, r: number, op: 'erode' | 'dilate') {
+  if (r <= 0) return m.slice()
+  const pick = op === 'erode' ? 0 : 1
+  const tmp = new Uint8Array(w * h), out = new Uint8Array(w * h)
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    let v = 1 - pick
+    for (let d = -r; d <= r; d++) { const xx = x + d; const s = xx < 0 || xx >= w ? 0 : m[y * w + xx]; if (s === pick) { v = pick; break } }
+    tmp[y * w + x] = v
+  }
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    let v = 1 - pick
+    for (let d = -r; d <= r; d++) { const yy = y + d; const s = yy < 0 || yy >= h ? 0 : tmp[yy * w + x]; if (s === pick) { v = pick; break } }
+    out[y * w + x] = v
+  }
+  return out
+}
+
 /**
- * Masque (taille réduite) du sujet principal : composantes connexes, on garde la plus grande en
- * favorisant celle qui est centrée horizontalement et qui touche le bas de l'image (le joueur au premier plan).
+ * Masque (taille réduite) du sujet principal :
+ *  1. « ouverture » morphologique : les structures fines (filets, grillages, poteaux, rubans fins) disparaissent,
+ *     les corps restent ;
+ *  2. composantes connexes : on garde celle qui ressemble le plus au joueur au premier plan
+ *     (grande, plutôt verticale, centrée, touchant le bas) ;
+ *  3. dilatation pour récupérer les bords fins du joueur (cheveux, doigts) ; tout le reste est effacé.
  * Renvoie une fonction keep(x, y) en coordonnées de l'image d'origine.
  */
 export function mainSubject(alpha: (i: number) => number, w: number, h: number, dilate = 3) {
   const { m, sw, sh, s } = downscaleAlpha(alpha, w, h)
+  const r = Math.max(2, Math.round(Math.max(sw, sh) * 0.012))
+  const opened = morph(morph(m, sw, sh, r, 'erode'), sw, sh, r, 'dilate')
   const label = new Int32Array(sw * sh).fill(-1)
-  const comps: { area: number; cx: number; maxY: number; minY: number }[] = []
+  const comps: { area: number; cx: number; maxY: number; minY: number; minX: number; maxX: number }[] = []
   const stack: number[] = []
-  for (let i = 0; i < m.length; i++) {
-    if (!m[i] || label[i] >= 0) continue
+  for (let i = 0; i < opened.length; i++) {
+    if (!opened[i] || label[i] >= 0) continue
     const id = comps.length
-    let area = 0, sx = 0, maxY = 0, minY = sh
+    let area = 0, sx = 0, maxY = 0, minY = sh, minX = sw, maxX = 0
     label[i] = id; stack.push(i)
     while (stack.length) {
       const j = stack.pop()!
       const x = j % sw, y = (j - x) / sw
-      area++; sx += x; if (y > maxY) maxY = y; if (y < minY) minY = y
+      area++; sx += x; if (y > maxY) maxY = y; if (y < minY) minY = y; if (x < minX) minX = x; if (x > maxX) maxX = x
       for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
         const nx = x + dx, ny = y + dy
         if (nx < 0 || ny < 0 || nx >= sw || ny >= sh) continue
         const k = ny * sw + nx
-        if (m[k] && label[k] < 0) { label[k] = id; stack.push(k) }
+        if (opened[k] && label[k] < 0) { label[k] = id; stack.push(k) }
       }
     }
-    comps.push({ area, cx: sx / area / sw, maxY: maxY / sh, minY: minY / sh })
+    comps.push({ area, cx: sx / area / sw, maxY: maxY / sh, minY: minY / sh, minX, maxX })
   }
   if (!comps.length) return null
-  const score = (c: (typeof comps)[number]) => c.area * (1 - 0.6 * Math.abs(c.cx - 0.5)) * (0.6 + 0.4 * c.maxY)
-  const best = comps.reduce((bi, c, i) => (score(c) > score(comps[bi]) ? i : bi), 0)
-  // garde aussi les petits morceaux collés au sujet (mèches, doigts) grâce à une dilatation
-  const keepLow = new Uint8Array(sw * sh)
-  for (let i = 0; i < label.length; i++) if (label[i] === best) keepLow[i] = 1
-  let cur = keepLow
-  for (let d = 0; d < dilate; d++) {
-    const next = cur.slice()
-    for (let y = 0; y < sh; y++) for (let x = 0; x < sw; x++) {
-      if (cur[y * sw + x]) continue
-      if ((x > 0 && cur[y * sw + x - 1]) || (x < sw - 1 && cur[y * sw + x + 1]) || (y > 0 && cur[(y - 1) * sw + x]) || (y < sh - 1 && cur[(y + 1) * sw + x])) next[y * sw + x] = 1
-    }
-    cur = next
+  const score = (c: (typeof comps)[number]) => {
+    const bw = c.maxX - c.minX + 1, bh = (c.maxY - c.minY) * sh + 1
+    const upright = bh / bw >= 0.8 ? 1 : 0.35 // un joueur est plutôt vertical ; un ruban, une barre, non
+    return c.area * upright * (1 - 0.6 * Math.abs(c.cx - 0.5)) * (0.6 + 0.4 * c.maxY)
   }
-  return { keep: (x: number, y: number) => cur[Math.min(sh - 1, Math.floor(y / s)) * sw + Math.min(sw - 1, Math.floor(x / s))] === 1, components: comps.length }
+  const best = comps.reduce((bi, c, i) => (score(c) > score(comps[bi]) ? i : bi), 0)
+  const main = new Uint8Array(sw * sh)
+  for (let i = 0; i < label.length; i++) if (label[i] === best) main[i] = 1
+  // bords du joueur : on rend ce que l'ouverture avait rogné (+ marge), sans dépasser la silhouette d'origine
+  const grown = morph(main, sw, sh, r + dilate, 'dilate')
+  const keepLow = new Uint8Array(sw * sh)
+  for (let i = 0; i < keepLow.length; i++) keepLow[i] = grown[i] && (m[i] || main[i]) ? 1 : 0
+  const halo = morph(keepLow, sw, sh, 1, 'dilate') // 1 pixel réduit de marge pour les cheveux / transitions douces
+  return { keep: (x: number, y: number) => halo[Math.min(sh - 1, Math.floor(y / s)) * sw + Math.min(sw - 1, Math.floor(x / s))] === 1, components: comps.length }
 }
 
 /** Boîte englobante des pixels visibles. */

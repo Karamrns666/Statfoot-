@@ -3,7 +3,7 @@
 // son modèle IA (~80 Mo) est téléchargé une fois puis gardé en cache par le navigateur.
 // La photo ne quitte jamais le navigateur.
 import { canvasToBlob, decodeImage, fitSize } from './imageOptimize'
-import { bustCrop, keepMainSubject, refineEdges, subjectBox } from './matte'
+import { bustCrop, keepMainSubject, refineEdges, rowsExtent, subjectBox } from './matte'
 
 type RemoveFn = (image: Blob, config?: { output?: { format?: string; quality?: number }; progress?: (key: string, current: number, total: number) => void }) => Promise<Blob>
 let lib: Promise<RemoveFn> | null = null
@@ -29,6 +29,8 @@ export interface CutoutResult {
   face: { x: number; y: number }
   /** personnes / objets d'arrière-plan effacés (pixels) */
   removed: number
+  /** conseil si la photo se prête mal à une carte (joueur trop petit, trop loin…) */
+  warning?: string
 }
 
 /** Supprime le fond, ne garde que le joueur, cadre en buste et produit un WebP transparent de 800 px de haut. */
@@ -73,7 +75,11 @@ export async function refineCutout(png: Blob, targetH = 800): Promise<CutoutResu
   const subj = subjectBox(px)
   if (!subj) throw new Error('Aucun joueur détecté sur la photo')
   ctx.putImageData(px, 0, 0)
-  const crop = bustCrop(subj.box, subj.head.x, H)
+  const crop = bustCrop(subj.box, subj.head.x, H, (y0, y1) => rowsExtent(px, y0, y1))
+  const sh = subj.box.y1 - subj.box.y0 + 1
+  const warning = sh < H * 0.35 || crop.h < 360
+    ? 'Le joueur est petit sur cette photo (pris de loin) : la carte sera moins nette. Idéal : joueur seul, cadré en pied ou en buste, de face.'
+    : undefined
   const { w, h } = fitSize(crop.w, crop.h, Math.round(targetH * 0.8 * 2), targetH)
   const k = w / crop.w
   const out = document.createElement('canvas'); out.width = w; out.height = h
@@ -84,7 +90,7 @@ export async function refineCutout(png: Blob, targetH = 800): Promise<CutoutResu
   if (ex > sx && ey > sy) o.drawImage(c, sx, sy, ex - sx, ey - sy, (sx - crop.x) * k, (sy - crop.y) * k, (ex - sx) * k, (ey - sy) * k)
   let blob = await canvasToBlob(out, 'image/webp', 0.9)
   if (blob.type !== 'image/webp') blob = await canvasToBlob(out, 'image/png')
-  return { blob, face: { x: Math.round((subj.head.x / W) * 1000) / 10, y: Math.round((subj.head.y / H) * 1000) / 10 }, removed }
+  return { blob, face: { x: Math.round((subj.head.x / W) * 1000) / 10, y: Math.round((subj.head.y / H) * 1000) / 10 }, removed, warning }
 }
 
 /** PNG / WebP déjà détouré fourni par l'admin : même finition (cadrage, taille, format). */

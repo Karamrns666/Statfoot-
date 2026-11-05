@@ -37,7 +37,9 @@ export function keepMainSubject(img: Rgba, threshold = 128): { kept: number; rem
     comps.push({ area, box })
   }
   if (!comps.length) return { kept: 0, removed: 0 }
-  const main = comps.reduce((a, c, i) => (c.area > comps[a].area ? i : a), 0)
+  // joueur = grande silhouette « pleine » (un grillage ou un filet est grand mais creux : score faible)
+  const score = (c: { area: number; box: Box }) => c.area * Math.sqrt(c.area / ((c.box.x1 - c.box.x0 + 1) * (c.box.y1 - c.box.y0 + 1)))
+  const main = comps.reduce((a, c, i) => (score(c) > score(comps[a]) ? i : a), 0)
   const mb = comps[main].box
   const keep = new Uint8Array(comps.length)
   comps.forEach((c, i) => { keep[i] = i === main || (c.box.x0 >= mb.x0 && c.box.x1 <= mb.x1 && c.box.y0 >= mb.y0 && c.box.y1 <= mb.y1) ? 1 : 0 })
@@ -104,6 +106,14 @@ export function refineEdges(img: Rgba) {
   }
 }
 
+/** Étendue horizontale des pixels opaques entre deux lignes. */
+export function rowsExtent(img: Rgba, y0: number, y1: number, threshold = 64): { x0: number; x1: number } | null {
+  const { data, width: W, height: H } = img
+  let x0 = W, x1 = -1
+  for (let y = Math.max(0, y0); y < Math.min(H, y1); y++) for (let x = 0; x < W; x++) if (data[(y * W + x) * 4 + 3] > threshold) { if (x < x0) x0 = x; if (x > x1) x1 = x }
+  return x1 < 0 ? null : { x0, x1 }
+}
+
 /** Cadre de la silhouette et centre approximatif de la tête (haut de la silhouette). */
 export function subjectBox(img: Rgba, threshold = 24): { box: Box; head: { x: number; y: number } } | null {
   const { data, width: W, height: H } = img
@@ -124,14 +134,19 @@ export function subjectBox(img: Rgba, threshold = 24): { box: Box; head: { x: nu
  * Cadrage buste / mi-corps au format portrait 4:5 : tête en haut (petite marge), centré sur la tête.
  * Un joueur photographié en pied est coupé vers le haut des cuisses ; un portrait serré est gardé entier.
  */
-export function bustCrop(box: Box, headX: number, imgH: number) {
+export function bustCrop(box: Box, headX: number, imgH: number, extent?: (y0: number, y1: number) => { x0: number; x1: number } | null) {
   const bw = box.x1 - box.x0 + 1, bh = box.y1 - box.y0 + 1
-  const full = bh > bw * 1.45 // photo en pied
+  const full = bh > bw * 1.1 // joueur photographié en pied (même en mouvement)
   let ch = full ? Math.round(bh * 0.6) : bh
   const top = Math.max(0, Math.round(box.y0 - ch * 0.04))
   ch = Math.min(imgH - top, Math.round(ch * 1.04))
+  // largeur : portrait 4:5, élargi pour ne couper ni les épaules ni les bras dans la zone gardée
+  const ext = extent?.(top, top + ch) ?? (full ? null : { x0: box.x0, x1: box.x1 })
   let cw = Math.round(ch * 0.8)
-  if (!full) cw = Math.max(cw, bw) // ne jamais couper les épaules d'un portrait
-  const x = Math.round(headX - cw / 2)
+  let x = Math.round(headX - cw / 2)
+  if (ext) {
+    const need = Math.max(headX - ext.x0, ext.x1 - headX) * 2 + 8
+    if (need > cw) { cw = Math.round(need); x = Math.round(headX - cw / 2) }
+  }
   return { x, y: top, w: cw, h: ch, full }
 }

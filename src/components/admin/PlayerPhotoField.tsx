@@ -24,6 +24,7 @@ export function PlayerPhotoField({ value, patch }: { value: Record<string, unkno
   const photo = v.photo_url, cutout = v.photo_cutout_url
   const [progress, setProgress] = useState<{ pct: number; label: string } | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [warning, setWarning] = useState<string | null>(null)
   const alive = useRef(true)
   useEffect(() => { alive.current = true; return () => { alive.current = false } }, [])
   const busy = !!progress
@@ -31,7 +32,8 @@ export function PlayerPhotoField({ value, patch }: { value: Record<string, unkno
   const runCutout = async (url: string) => {
     setError(null); setProgress({ pct: 1, label: 'Préparation…' })
     try {
-      const res = await cutoutPlayerPhoto(url, (pct, label) => { if (alive.current) setProgress({ pct, label }) })
+      setWarning(null)
+      const res = await cutoutPlayerPhoto(url, (pct, label) => { if (alive.current) setProgress({ pct, label }) }, (w) => alive.current && setWarning(w))
       patch(res)
     } catch (e) {
       patch({ photo_cutout_url: undefined, photo_cutout_status: 'failed', photo_cutout_source: url, photo_cutout_tries: 1 })
@@ -93,6 +95,7 @@ export function PlayerPhotoField({ value, patch }: { value: Record<string, unkno
         </label>
       </div>
       {error && <p className="text-xs text-amber-300" role="alert">{error}</p>}
+      {warning && !error && <p className="text-xs text-amber-200/90" role="note">⚠ {warning}</p>}
       <p className="text-[11px] leading-snug text-muted-foreground">Le fond est supprimé dans votre navigateur (la photo n’est envoyée à aucun service extérieur) : seul le joueur au premier plan est gardé, cadré en buste, bords lissés, fond transparent. Le tout premier détourage télécharge le modèle (~80 Mo, une seule fois) ; les suivants prennent quelques secondes.</p>
     </div>
   )

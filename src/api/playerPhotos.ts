@@ -4,8 +4,9 @@ import { loadBlob, saveFile } from './fileStore'
 import { removePhotoBackground, type CutoutProgress } from '@/lib/bgRemoval'
 import type { Player } from '@/types/entities'
 
-export async function cutoutPlayerPhoto(photoUrl: string, onProgress?: CutoutProgress): Promise<Partial<Player>> {
+export async function cutoutPlayerPhoto(photoUrl: string, onProgress?: CutoutProgress, onWarning?: (w: string) => void): Promise<Partial<Player>> {
   const res = await removePhotoBackground(await loadBlob(photoUrl), onProgress)
+  if (res.warning) onWarning?.(res.warning)
   const url = await saveFile(res.blob, 'cutout')
   return { photo_cutout_url: url, photo_cutout_status: 'ok', photo_cutout_source: photoUrl, photo_cutout_tries: 0, photo_cutout_disabled: undefined, photo_cutout_validated: undefined, photo_face_x: res.face.x, photo_face_y: res.face.y }
 }

@@ -140,14 +140,14 @@ function Board({ m, now }: { m: Match; now: number }) {
   const goal = useGoalFlash(m)
   return (
     <main className="relative flex min-h-0 flex-1 flex-col items-center overflow-hidden px-[2vw] py-[1vh] [justify-content:safe_center]">
-      <div className="mb-[1.5vh] text-center font-display text-[clamp(1rem,1.8vw,2.2rem)] font-bold uppercase tracking-[.2em] text-white/70">{comp?.name}{m.round ? ` · Journée ${m.round}` : ''}{m.pitch ? ` · ${m.pitch}` : ''}</div>
+      <div className="mb-[1vh] text-center font-display text-[clamp(.95rem,min(1.6vw,2.8vh),2rem)] font-bold uppercase tracking-[.2em] text-white/70">{comp?.name}{m.round ? ` · Journée ${m.round}` : ''}{m.pitch ? ` · ${m.pitch}` : ''}</div>
       <div className="grid w-full max-w-[92vw] grid-cols-[1fr_auto_1fr] items-center gap-[2vw]">
         <TeamSide team={h} />
         <div className="flex flex-col items-center">
           <div className="num flex items-center leading-none text-[clamp(4.5rem,min(13vw,24vh),16rem)]" aria-live="polite" aria-label={`Score ${m.home_score ?? 0} à ${m.away_score ?? 0}`}>
             <span>{m.home_score ?? 0}</span><span className="mx-[1.6vw] inline-block h-[.09em] w-[.32em] rounded-full bg-white/35" aria-hidden /><span>{m.away_score ?? 0}</span>
           </div>
-          <div className={cn('mt-[1vh] rounded-full px-[1.6vw] py-[.5vh] font-display text-[clamp(1.4rem,3vw,3.6rem)] font-black uppercase', live ? 'bg-red-600 text-white' : 'bg-white/10')}>
+          <div className={cn('mt-[1vh] rounded-full px-[1.6vw] py-[.4vh] font-display text-[clamp(1.3rem,min(2.8vw,5vh),3.4rem)] font-black uppercase', live ? 'bg-red-600 text-white' : 'bg-white/10')}>
             {live && <span className="mr-3 inline-block size-[.5em] rounded-full bg-white align-middle animate-pulse-live" />}{label}
           </div>
         </div>
@@ -155,10 +155,10 @@ function Board({ m, now }: { m: Match; now: number }) {
       </div>
 
       {/* buteurs / cartons de chaque équipe, stats live au centre */}
-      <div className="mt-[2.5vh] grid w-full max-w-[94vw] grid-cols-[1fr_minmax(0,1.25fr)_1fr] items-start gap-[3vw]">
+      <div className="mt-[2vh] grid w-full max-w-[94vw] grid-cols-[1fr_minmax(0,1.25fr)_1fr] items-start gap-[3vw]">
         <Timeline goals={sc.home} cards={cards(m.home_team_id)} align="right" />
         {(live || m.status === 'finished') ? (
-          <div className="grid gap-[1.3vh]">
+          <div className="grid gap-[.9vh]">
             <StatBar label="Tirs" h={st.home.shots} a={st.away.shots} hc={h?.primary_color} ac={a?.primary_color} />
             <StatBar label="Tirs cadrés" h={st.home.shots_on_target} a={st.away.shots_on_target} hc={h?.primary_color} ac={a?.primary_color} />
             <StatBar label="Arrêts" h={st.home.saves} a={st.away.saves} hc={h?.primary_color} ac={a?.primary_color} />
@@ -218,9 +218,9 @@ function StatBar({ label, h, a, hc = '#F85A00', ac = '#6CB4CC', unit = '' }: { l
   return (
     <div>
       <div className="flex items-baseline justify-between font-display font-black">
-        <span className="num text-[clamp(1.4rem,2.6vw,3.2rem)]">{h}{unit}</span>
-        <span className="text-[clamp(.9rem,1.3vw,1.6rem)] uppercase tracking-[.18em] text-white/70">{label}</span>
-        <span className="num text-[clamp(1.4rem,2.6vw,3.2rem)]">{a}{unit}</span>
+        <span className="num text-[clamp(1.2rem,min(2.4vw,4vh),3rem)]">{h}{unit}</span>
+        <span className="text-[clamp(.85rem,min(1.2vw,2.1vh),1.5rem)] uppercase tracking-[.18em] text-white/75">{label}</span>
+        <span className="num text-[clamp(1.2rem,min(2.4vw,4vh),3rem)]">{a}{unit}</span>
       </div>
       <div className="mt-1 flex h-[clamp(8px,1.1vh,16px)] gap-1 overflow-hidden rounded-full">
         <div className="tv-bar rounded-full" style={{ width: `${hp}%`, background: hc }} />

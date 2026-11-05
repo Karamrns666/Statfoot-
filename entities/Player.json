@@ -69,6 +69,14 @@
         "ok",
         "failed"
       ]
+    },
+    "photo_cutout_source": {
+      "type": "string",
+      "description": "Photo d'origine du détourage"
+    },
+    "photo_cutout_tries": {
+      "type": "integer",
+      "description": "Essais de détourage automatique ratés"
     }
   },
   "required": [

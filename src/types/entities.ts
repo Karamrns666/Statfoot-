@@ -90,6 +90,10 @@ export interface Player extends BaseEntity {
   /** photo détourée (PNG transparent) pour la carte joueur */
   photo_cutout_url?: string
   photo_cutout_status?: 'ok' | 'failed'
+  /** photo d'origine du détourage (si la photo change, le détourage est refait) */
+  photo_cutout_source?: string
+  /** essais de détourage automatique ratés (3 au plus) */
+  photo_cutout_tries?: number
   position: Position
   number?: number
   team_id: string

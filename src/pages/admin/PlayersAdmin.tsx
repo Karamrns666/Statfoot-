@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { toast } from '@/components/ui/toast'
 import { playerName } from '@/lib/format'
 import { syncCaptain } from '@/lib/captain'
-import { PlayerPhotoField, cutoutFromUrl } from '@/components/admin/PlayerPhotoField'
+import { PlayerPhotoField } from '@/components/admin/PlayerPhotoField'
 import type { DocStatus, DocType, Player } from '@/types/entities'
 
 const DOCS: { key: DocType; label: string }[] = [{ key: 'id_card', label: 'CIN' }, { key: 'medical', label: 'Certificat médical' }, { key: 'license', label: 'Licence / autorisation entreprise' }]
@@ -58,17 +58,11 @@ export default function PlayersAdmin() {
       const p = db.Player.find((x) => norm(`${x.first_name}${x.last_name}`) === base || norm(`${x.last_name}${x.first_name}`) === base || (team && x.team_id === team && String(x.number) === base))
       if (!p) { unmatched.push(f.name); continue }
       const url = (await base44.integrations.Core.UploadFile({ file: f, maxSize: 1600, hint: 'photo' })).file_url
-      await base44.entities.Player.update(p.id, { photo_url: url, photo_cutout_url: undefined, photo_cutout_status: undefined }); ok++
+      await base44.entities.Player.update(p.id, { photo_url: url, photo_cutout_url: undefined, photo_cutout_status: undefined, photo_cutout_source: undefined, photo_cutout_tries: 0 }); ok++
       done.push({ id: p.id, url })
     }
-    toast.success(`${ok} photo(s) importée(s)${unmatched.length ? ` · non reconnues : ${unmatched.join(', ')}` : ''}${done.length ? ' — détourage en cours…' : ''}`)
-    // détourage automatique, une photo après l'autre (l'originale reste utilisée en cas d'échec)
-    let cut = 0
-    for (const d of done) {
-      try { await base44.entities.Player.update(d.id, { photo_cutout_url: await cutoutFromUrl(d.url), photo_cutout_status: 'ok' }); cut++ }
-      catch { await base44.entities.Player.update(d.id, { photo_cutout_status: 'failed' }) }
-    }
-    if (done.length) toast[cut === done.length ? 'success' : 'info'](`Détourage : ${cut} / ${done.length} photo(s)${cut < done.length ? ' — les autres gardent la photo originale' : ''}`)
+    // le détourage est fait automatiquement en arrière-plan (indicateur « Détourage » en haut de l'admin)
+    toast.success(`${ok} photo(s) importée(s)${unmatched.length ? ` · non reconnues : ${unmatched.join(', ')}` : ''}${done.length ? ' — détourage automatique en cours' : ''}`)
   }
   const toolbar = (
     <>

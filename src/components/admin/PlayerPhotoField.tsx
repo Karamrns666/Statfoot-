@@ -2,7 +2,7 @@
 // aperçu côte à côte. L'admin peut relancer le détourage, importer son propre PNG détouré
 // ou revenir à la photo originale. En cas d'échec, l'originale reste utilisée partout.
 import { useEffect, useRef, useState } from 'react'
-import { Loader2, RefreshCw, Scissors, Upload, Undo2 } from 'lucide-react'
+import { Loader2, RefreshCw, Scissors, Upload } from 'lucide-react'
 import { base44 } from '@/api/base44Client'
 import { loadBlob, saveFile } from '@/api/fileStore'
 import { removePhotoBackground, trimTransparent } from '@/lib/bgRemoval'
@@ -33,17 +33,17 @@ export function PlayerPhotoField({ value, patch }: { value: Record<string, unkno
     setError(null); setBusy(STEP.chargement)
     try {
       const out = await cutoutFromUrl(url, (s, pct) => alive.current && setBusy(`${STEP[s] ?? s}${pct != null && s === 'chargement' ? ` ${pct} %` : ''}`))
-      patch({ photo_cutout_url: out, photo_cutout_status: 'ok' })
+      patch({ photo_cutout_url: out, photo_cutout_status: 'ok', photo_cutout_source: url, photo_cutout_tries: 0 })
     } catch (e) {
-      patch({ photo_cutout_status: 'failed' })
-      if (alive.current) setError(`Détourage impossible (${(e as Error).message || 'erreur'}) — la photo originale sera utilisée.`)
+      patch({ photo_cutout_status: 'failed', photo_cutout_source: url, photo_cutout_tries: 1 })
+      if (alive.current) setError(`Détourage impossible pour l’instant (${(e as Error).message || 'erreur'}). Il sera relancé automatiquement ; d’ici là la carte affiche une silhouette.`)
     } finally { if (alive.current) setBusy(null) }
   }
   const upload = async (f?: File) => {
     if (!f) return
     setBusy('Compression de la photo…')
     const { file_url } = await base44.integrations.Core.UploadFile({ file: f, maxSize: 1600, hint: 'photo' })
-    patch({ photo_url: file_url, photo_cutout_url: undefined, photo_cutout_status: undefined })
+    patch({ photo_url: file_url, photo_cutout_url: undefined, photo_cutout_status: undefined, photo_cutout_source: undefined, photo_cutout_tries: 0 })
     await runCutout(file_url)
   }
   const uploadCutout = async (f?: File) => {
@@ -52,11 +52,9 @@ export function PlayerPhotoField({ value, patch }: { value: Record<string, unkno
     try {
       const png = await trimTransparent(f)
       const url = await saveFile(png, 'cutout')
-      patch({ photo_cutout_url: url, photo_cutout_status: 'ok' })
+      patch({ photo_cutout_url: url, photo_cutout_status: 'ok', photo_cutout_source: photo, photo_cutout_tries: 0 })
     } catch (e) { setError(`PNG refusé : ${(e as Error).message}`) } finally { setBusy(null) }
   }
-  // (les anciens fichiers ne sont pas supprimés : le formulaire peut encore être annulé)
-  const useOriginal = () => patch({ photo_cutout_url: undefined, photo_cutout_status: undefined })
 
   return (
     <div className="space-y-2">
@@ -85,10 +83,9 @@ export function PlayerPhotoField({ value, patch }: { value: Record<string, unkno
           <Upload className="size-4" />Importer un PNG détouré
           <input type="file" accept="image/png,image/webp" className="hidden" onChange={(e) => { void uploadCutout(e.target.files?.[0]); e.target.value = '' }} />
         </label>
-        {cutout && <Button type="button" size="sm" variant="ghost" className="h-8" disabled={!!busy} onClick={useOriginal}><Undo2 />Utiliser l’originale</Button>}
       </div>
       {error && <p className="text-xs text-amber-300">{error}</p>}
-      <p className="text-[11px] text-muted-foreground">Le fond est supprimé automatiquement dans votre navigateur (aucune photo n’est envoyée à un service extérieur). Le premier détourage télécharge l’outil (~80 Mo), les suivants sont rapides.</p>
+      <p className="text-[11px] text-muted-foreground">Le fond est supprimé automatiquement dans votre navigateur (la photo n’est envoyée à aucun service extérieur) : la carte joueur n’affiche jamais le fond. Le premier détourage télécharge l’outil (~80 Mo), les suivants sont rapides.</p>
     </div>
   )
 }

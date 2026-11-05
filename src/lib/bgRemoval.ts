@@ -1,17 +1,16 @@
 // Détourage automatique des photos joueurs, dans le navigateur, avec @imgly/background-removal.
-// La bibliothèque (et son modèle IA, ~80 Mo mis en cache par le navigateur après le 1er usage)
-// est chargée à la demande depuis un CDN : rien n'alourdit le site public.
-// En cas d'échec (hors ligne, navigateur trop ancien…), l'appelant garde la photo originale.
+// La bibliothèque est intégrée au site mais chargée seulement quand un détourage est nécessaire (admin) ;
+// son modèle IA (~80 Mo) est téléchargé une fois puis gardé en cache par le navigateur.
+// La photo ne quitte jamais le navigateur.
 import { canvasToBlob, decodeImage, fitSize } from './imageOptimize'
 
-const LIB_URL = 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm'
 type RemoveFn = (image: Blob, config?: { output?: { format?: string; quality?: number }; progress?: (key: string, current: number, total: number) => void }) => Promise<Blob>
 let lib: Promise<RemoveFn> | null = null
 
 function loadLib(): Promise<RemoveFn> {
   if (!lib) {
-    lib = import(/* @vite-ignore */ LIB_URL).then((m: { removeBackground?: RemoveFn; default?: RemoveFn }) => {
-      const fn = m.removeBackground ?? m.default
+    lib = import('@imgly/background-removal').then((m) => {
+      const fn = (m.removeBackground ?? m.default) as unknown as RemoveFn
       if (typeof fn !== 'function') throw new Error('Bibliothèque de détourage indisponible')
       return fn
     })

@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate, NavLink, Outlet, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, CalendarRange, Trophy, Layers, Shield, Users, Grid3x3, Shuffle, CalendarDays, Radio, Zap, BarChart3, Award, Image, Upload,
-  ScrollText, UserCog, Settings, BookOpen, LogOut, Menu, X, ExternalLink, QrCode, Star } from 'lucide-react'
+  ScrollText, UserCog, Settings, BookOpen, LogOut, Menu, X, ExternalLink, QrCode, Star, Scissors, Loader2 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { useAutoCutouts } from '@/hooks/useAutoCutouts'
 import { useData } from '@/hooks/useData'
 import { AdminScopeProvider, useAdminScope } from '@/hooks/useAdminScope'
 import { can, ROLE_LABEL, type Area } from '@/lib/permissions'
@@ -59,6 +60,9 @@ export function AdminLayout() {
   const loc = useLocation()
   const [open, setOpen] = useState(false)
   useEffect(() => setOpen(false), [loc.pathname])
+  // détourage automatique des photos joueurs (pas pendant la saisie d'un match en direct)
+  const inMatch = loc.pathname.startsWith('/admin/match-center/')
+  const cut = useAutoCutouts(!!user && user.role !== 'operator' && !inMatch)
   if (loading) return <Spinner />
   if (!user) return <Navigate to={`/admin/login?next=${encodeURIComponent(loc.pathname)}`} replace />
   if (user.role === 'operator' && loc.pathname === '/admin') return <Navigate to="/admin/match-center" replace />
@@ -91,6 +95,7 @@ export function AdminLayout() {
             <button className={cn('rounded-lg p-2 hover:bg-white/10', !live && 'lg:hidden')} onClick={() => setOpen(true)} aria-label="Menu"><Menu className="size-5" /></button>
             {user.role !== 'operator' && <ScopeSelectors />}
             <div className="ml-auto flex items-center gap-2">
+              {cut.pending > 0 && <span className="hidden items-center gap-1.5 rounded-full bg-neon/10 px-2.5 py-1 text-[11px] font-semibold text-neon md:inline-flex" role="status" title="Le fond des photos joueurs est supprimé automatiquement pour les cartes"><Scissors className="size-3.5" />{cut.current ? <Loader2 className="size-3 animate-spin" /> : null}Détourage : {cut.pending} photo{cut.pending > 1 ? 's' : ''}</span>}
               <Link to="/" target="_blank" className="hidden items-center gap-1 rounded-lg px-2 py-1.5 text-xs text-muted-foreground hover:bg-white/5 sm:flex"><ExternalLink className="size-3.5" />Site public</Link>
               <div className="hidden text-right sm:block"><div className="text-xs font-semibold">{user.full_name ?? user.email}</div><div className="text-[10px] text-neon">{ROLE_LABEL[user.role]}</div></div>
               <button onClick={logout} className="rounded-lg p-2 hover:bg-white/10" title="Déconnexion"><LogOut className="size-4" /></button>

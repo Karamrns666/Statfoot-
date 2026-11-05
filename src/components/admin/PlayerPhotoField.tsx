@@ -26,18 +26,16 @@ export function PlayerPhotoField({ value, patch }: { value: Record<string, unkno
   const status = value.photo_cutout_status as 'ok' | 'failed' | undefined
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const latest = useRef(patch)
-  useEffect(() => { latest.current = patch })
   const alive = useRef(true)
-  useEffect(() => () => { alive.current = false }, [])
+  useEffect(() => { alive.current = true; return () => { alive.current = false } }, [])
 
   const runCutout = async (url: string) => {
     setError(null); setBusy(STEP.chargement)
     try {
       const out = await cutoutFromUrl(url, (s, pct) => alive.current && setBusy(`${STEP[s] ?? s}${pct != null && s === 'chargement' ? ` ${pct} %` : ''}`))
-      latest.current({ photo_cutout_url: out, photo_cutout_status: 'ok' })
+      patch({ photo_cutout_url: out, photo_cutout_status: 'ok' })
     } catch (e) {
-      latest.current({ photo_cutout_status: 'failed' })
+      patch({ photo_cutout_status: 'failed' })
       if (alive.current) setError(`Détourage impossible (${(e as Error).message || 'erreur'}) — la photo originale sera utilisée.`)
     } finally { if (alive.current) setBusy(null) }
   }
@@ -45,7 +43,7 @@ export function PlayerPhotoField({ value, patch }: { value: Record<string, unkno
     if (!f) return
     setBusy('Compression de la photo…')
     const { file_url } = await base44.integrations.Core.UploadFile({ file: f, maxSize: 1600, hint: 'photo' })
-    latest.current({ photo_url: file_url, photo_cutout_url: undefined, photo_cutout_status: undefined })
+    patch({ photo_url: file_url, photo_cutout_url: undefined, photo_cutout_status: undefined })
     await runCutout(file_url)
   }
   const uploadCutout = async (f?: File) => {
@@ -54,7 +52,7 @@ export function PlayerPhotoField({ value, patch }: { value: Record<string, unkno
     try {
       const png = await trimTransparent(f)
       const url = await saveFile(png, 'cutout')
-      latest.current({ photo_cutout_url: url, photo_cutout_status: 'ok' })
+      patch({ photo_cutout_url: url, photo_cutout_status: 'ok' })
     } catch (e) { setError(`PNG refusé : ${(e as Error).message}`) } finally { setBusy(null) }
   }
   // (les anciens fichiers ne sont pas supprimés : le formulaire peut encore être annulé)

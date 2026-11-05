@@ -22,9 +22,11 @@ export interface Field {
 }
 export interface Column<T> { label: string; render: (row: T) => ReactNode; className?: string }
 
-export function EntityForm({ fields, value, onChange }: { fields: Field[]; value: Record<string, unknown>; onChange: (v: Record<string, unknown>) => void }) {
-  const set = (k: string, v: unknown) => onChange({ ...value, [k]: v })
-  const patch = (p: Record<string, unknown>) => onChange({ ...value, ...p })
+type FormValue = Record<string, unknown>
+/** onChange accepte une valeur ou une fonction (prev → next) : les mises à jour asynchrones (détourage…) ne s'écrasent pas. */
+export function EntityForm({ fields, value, onChange }: { fields: Field[]; value: FormValue; onChange: (v: FormValue | ((prev: FormValue | null) => FormValue)) => void }) {
+  const set = (k: string, v: unknown) => onChange((prev) => ({ ...(prev ?? {}), [k]: v }))
+  const patch = (p: FormValue) => onChange((prev) => ({ ...(prev ?? {}), ...p }))
   return (
     <div className="grid gap-3 sm:grid-cols-2">
       {fields.map((f) => {

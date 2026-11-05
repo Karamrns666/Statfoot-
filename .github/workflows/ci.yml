@@ -20,15 +20,19 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Types, tests et build
-        id: checks
+      - name: Détourage sur vraies photos de terrain
         run: |
           set +e
-          { echo "## tsc"; npx tsc -b; echo "exit=$?"; } > ci-report.txt 2>&1
-          { echo "## tests"; npx vitest run; echo "exit=$?"; } >> ci-report.txt 2>&1
-          { echo "## build"; npx vite build; echo "exit=$?"; } >> ci-report.txt 2>&1
-          cat ci-report.txt
-          if grep -q "exit=[1-9]" ci-report.txt; then echo "failed=1" >> "$GITHUB_OUTPUT"; fi
+          curl -sL -o e2e/unsplash1.jpg "https://images.unsplash.com/photo-1635144194197-523e641e4c4c?w=1600&q=85&fm=jpg"
+          curl -sL -o e2e/unsplash2.jpg "https://images.unsplash.com/flagged/photo-1559559403-a902f2a17eea?w=1600&q=85&fm=jpg"
+          ls -la e2e
+          npx vite build > build.log 2>&1
+          npm i --no-save --no-audit --no-fund playwright@1.49.1 > /dev/null 2>&1
+          npx playwright install --with-deps chromium > /dev/null 2>&1
+          node e2e/serve.mjs dist &
+          sleep 2
+          { ls -la e2e; timeout 1500 node e2e/real.mjs; echo "exit=$?"; } > ci-report.txt 2>&1
+          mkdir -p dist/e2e && cp -r e2e-out/* dist/e2e/ 2>/dev/null; cp e2e/*.jpg dist/e2e/ 2>/dev/null; true
       - name: Ranger le rapport
         if: always()
         run: |

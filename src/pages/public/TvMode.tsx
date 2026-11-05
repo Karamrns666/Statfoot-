@@ -69,8 +69,8 @@ export default function TvMode() {
       {/* barre du haut */}
       <header className="flex items-center gap-4 px-[2vw] pt-[1.6vh]">
         <Logo subtitle={settings.league_name} />
-        <div className="title-caps ml-auto text-[clamp(1.1rem,2.2vw,2.6rem)] text-neon">{pitchName}</div>
-        <div className="num text-[clamp(1.1rem,2.2vw,2.6rem)] text-white/80" aria-label="Heure">{fmtTime(new Date(now).toISOString())}</div>
+        <div className="title-caps ml-auto hidden text-[clamp(1.1rem,2.2vw,2.6rem)] text-neon sm:block">{pitchName}</div>
+        <div className="num ml-auto text-[clamp(1.1rem,2.2vw,2.6rem)] text-white/80 sm:ml-0" aria-label="Heure">{fmtTime(new Date(now).toISOString())}</div>
         <div className="flex items-center gap-1">
           <button className="hidden cursor-pointer rounded-lg p-2 hover:bg-white/10 sm:block" onClick={() => document.documentElement.requestFullscreen?.()} title="Plein écran"><Maximize /></button>
           <Link to="/" className="rounded-lg p-2 hover:bg-white/10" title="Quitter"><X /></Link>
@@ -80,7 +80,7 @@ export default function TvMode() {
       {/* onglets : un par match en cours */}
       {multi && (
         <nav className="mt-[1.4vh] flex flex-wrap items-stretch gap-2 px-[2vw]" aria-label="Matchs en cours">
-          <div className="flex flex-1 flex-wrap gap-2" role="tablist">
+          <div className="scrollbar-none -mx-1 flex min-w-0 flex-1 gap-2 overflow-x-auto px-1 sm:flex-wrap" role="tablist">
             {matches.map((m) => <MatchTab key={m.id} m={m} active={m.id === current?.id} onClick={() => pick(m.id)} />)}
           </div>
           <button onClick={toggleRotate} aria-pressed={rotate} className={cn('relative flex cursor-pointer items-center gap-2 overflow-hidden rounded-xl border px-4 font-display text-[clamp(.9rem,1.2vw,1.4rem)] font-bold uppercase', rotate ? 'border-neon/60 bg-neon/15 text-white' : 'border-white/15 bg-white/5 text-white/70')}>
@@ -110,7 +110,7 @@ function MatchTab({ m, active, onClick }: { m: Match; active: boolean; onClick: 
   const h = L.team.get(m.home_team_id), a = L.team.get(m.away_team_id)
   return (
     <button role="tab" aria-selected={active} onClick={onClick}
-      className={cn('flex min-w-0 cursor-pointer items-center gap-3 rounded-xl border px-4 py-2 text-left transition', active ? 'border-neon bg-neon/20 shadow-[0_0_30px_-8px_rgb(248_90_0/.8)]' : 'border-white/10 bg-white/5 hover:bg-white/10')}>
+      className={cn('flex shrink-0 cursor-pointer items-center gap-3 rounded-xl border px-4 py-2 text-left transition', active ? 'border-neon bg-neon/20 shadow-[0_0_30px_-8px_rgb(248_90_0/.8)]' : 'border-white/10 bg-white/5 hover:bg-white/10')}>
       <div className="leading-tight">
         <div className="flex items-center gap-2 font-display text-[clamp(.8rem,1vw,1.2rem)] font-bold uppercase tracking-wider text-white/70">
           {m.status === 'live' && <span className="size-2.5 rounded-full bg-red-500 animate-pulse-live" />}{m.pitch ?? 'Terrain'}
@@ -155,17 +155,17 @@ function Board({ m, now }: { m: Match; now: number }) {
       </div>
 
       {/* buteurs / cartons de chaque équipe, stats live au centre */}
-      <div className="mt-[2vh] grid w-full max-w-[94vw] grid-cols-[1fr_minmax(0,1.25fr)_1fr] items-start gap-[3vw]">
-        <Timeline goals={sc.home} cards={cards(m.home_team_id)} align="right" />
+      <div className="mt-[2vh] grid w-full max-w-[94vw] grid-cols-2 items-start gap-x-[5vw] gap-y-4 sm:grid-cols-[1fr_minmax(0,1.25fr)_1fr] sm:gap-[3vw]">
+        <Timeline goals={sc.home} cards={cards(m.home_team_id)} align="right" className="sm:col-start-1 sm:row-start-1" />
         {(live || m.status === 'finished') ? (
-          <div className="grid gap-[.9vh]">
+          <div className="col-span-2 row-start-1 grid gap-[.9vh] sm:col-span-1 sm:col-start-2">
             <StatBar label="Tirs" h={st.home.shots} a={st.away.shots} hc={h?.primary_color} ac={a?.primary_color} />
             <StatBar label="Tirs cadrés" h={st.home.shots_on_target} a={st.away.shots_on_target} hc={h?.primary_color} ac={a?.primary_color} />
             <StatBar label="Arrêts" h={st.home.saves} a={st.away.saves} hc={h?.primary_color} ac={a?.primary_color} />
             {ls && <StatBar label="Possession" h={pos.home_pct} a={pos.away_pct} hc={h?.primary_color} ac={a?.primary_color} unit="%" />}
           </div>
-        ) : <div />}
-        <Timeline goals={sc.away} cards={cards(m.away_team_id)} align="left" />
+        ) : <div className="hidden sm:block" />}
+        <Timeline goals={sc.away} cards={cards(m.away_team_id)} align="left" className="sm:col-start-3 sm:row-start-1" />
       </div>
       {goal && <GoalFlash team={L.team.get(goal)} />}
     </main>
@@ -175,14 +175,14 @@ function Board({ m, now }: { m: Match; now: number }) {
 function TeamSide({ team }: { team?: Team }) {
   return (
     <div className="flex min-w-0 flex-col items-center gap-[1.2vh] text-center">
-      <TeamLogo team={team} size={220} className="size-[clamp(4rem,min(11vw,17vh),13rem)]" />
+      <div className="aspect-square w-[clamp(3.5rem,min(11vw,17vh),13rem)]"><TeamLogo team={team} size={220} className="!size-full" /></div>
       <div className="title-caps line-clamp-2 max-w-full text-[clamp(1.3rem,min(3vw,5vh),3.8rem)] leading-[.95]">{team?.name}</div>
     </div>
   )
 }
 
 /** Buteurs et cartons d'une équipe : une ligne par joueur et par type (⚽×2 12' 30'), 7 lignes au plus. */
-function Timeline({ goals, cards, align }: { goals: MatchEvent[]; cards: MatchEvent[]; align: 'left' | 'right' }) {
+function Timeline({ goals, cards, align, className }: { goals: MatchEvent[]; cards: MatchEvent[]; align: 'left' | 'right'; className?: string }) {
   const L = useLookup()
   const name = (e: MatchEvent) => (e.player_id ? playerShort(L.player.get(e.player_id)) : e.player_name_free ?? 'Joueur')
   const order = (e: MatchEvent) => ['1H', '2H', 'ET1', 'ET2'].indexOf(e.period ?? '1H') * 1000 + (e.minute ?? 0)
@@ -196,7 +196,7 @@ function Timeline({ goals, cards, align }: { goals: MatchEvent[]; cards: MatchEv
   const rows = [...groups.values()]
   const shown = rows.slice(0, 7)
   return (
-    <ul className={cn('min-w-0 space-y-[.5vh] text-[clamp(.95rem,min(1.6vw,2.8vh),2rem)] font-semibold', align === 'right' ? 'text-right' : 'text-left')}>
+    <ul className={cn(className, 'min-w-0 space-y-[.5vh] text-[clamp(.95rem,min(1.6vw,2.8vh),2rem)] font-semibold', align === 'right' ? 'text-right' : 'text-left')}>
       {shown.map((g, i) => {
         const mins = g.events.map((e) => fmtMinute(e.minute, e.added_minute) + (e.goal_kind === 'penalty' ? ' pén.' : '')).filter((x) => x.trim())
         return (
@@ -252,7 +252,7 @@ function GoalFlash({ team }: { team?: Team }) {
   return (
     <div className="tv-goal pointer-events-none fixed inset-0 z-10 flex items-center justify-center" role="status">
       <div className="flex items-center gap-[2vw] rounded-[3vw] px-[4vw] py-[2vh] shadow-2xl" style={{ background: `linear-gradient(135deg, ${team?.primary_color ?? '#F85A00'}, #04163D)` }}>
-        <TeamLogo team={team} size={160} className="size-[clamp(5rem,10vw,12rem)]" />
+        <div className="aspect-square w-[clamp(4rem,10vw,12rem)]"><TeamLogo team={team} size={160} className="!size-full" /></div>
         <div className="title-caps text-[clamp(4rem,12vw,14rem)] leading-none">But !</div>
       </div>
     </div>

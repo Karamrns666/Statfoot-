@@ -20,7 +20,7 @@ const releaseLock = () => { try { if (localStorage.getItem(LOCK)?.startsWith(me)
 
 export function useAutoCutouts(enabled: boolean) {
   const { db } = useData()
-  const pending = db.Player.filter(needsCutout)
+  const pending = db.Player.filter((p) => needsCutout(p))
   const [current, setCurrent] = useState<string | null>(null)
   const [tick, setTick] = useState(0)
   const running = useRef(false)

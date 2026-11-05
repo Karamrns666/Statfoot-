@@ -21,7 +21,7 @@ export function PlayerAvatar({ player, team, size = 40, className }: { player?: 
   return (
     <div className={cn('relative shrink-0 overflow-hidden rounded-full', className)} style={{ width: size, height: size, boxShadow: `0 0 0 2px ${color}, 0 0 16px -2px ${color}88` }}>
       {player?.photo_url
-        ? <img src={player.photo_url} alt={playerName(player)} className="size-full object-cover" />
+        ? <img src={player.photo_url} alt={playerName(player)} className="size-full object-cover object-[50%_18%]" />
         : <div className="flex size-full items-center justify-center font-display font-extrabold text-white" style={{ background: `linear-gradient(135deg, ${color}55, #04163D)`, fontSize: size * 0.38 }}>{initials(player)}</div>}
     </div>
   )

@@ -42,7 +42,7 @@ export function TeamOfWeekPitch({ result, size = 'md', link = true, className }:
           <>
             <div className="relative">
               <div className="overflow-hidden rounded-full" style={{ width: av, height: av, boxShadow: `0 0 0 3px ${s.player_id === best ? '#E8B931' : color}, 0 8px 18px rgba(0,0,0,.5)` }}>
-                {p?.photo_url ? <img src={p.photo_url} alt="" className="size-full object-cover" />
+                {p?.photo_url ? <img src={p.photo_url} alt="" className="size-full object-cover object-[50%_18%]" />
                   : <div className="flex size-full items-center justify-center font-display font-black text-white" style={{ fontSize: av * 0.38, background: `radial-gradient(circle at 30% 25%, ${color}, #04163D 80%)` }}>{(p?.first_name[0] ?? '') + (p?.last_name[0] ?? '')}</div>}
               </div>
               {s.rating > 0 && <span className="absolute -right-2 -top-1 rounded-md px-1.5 font-display text-[13px] font-black leading-5 text-ink shadow" style={{ background: ratingColor(s.rating) }}>{fmtRating(s.rating)}</span>}

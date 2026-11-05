@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
-import { FileCheck2, Grid2x2, List, ImageUp } from 'lucide-react'
+import { FileCheck2, Grid2x2, List, ImageUp, Scissors } from 'lucide-react'
+import { BulkCutoutDialog } from '@/components/admin/BulkCutoutDialog'
 import { base44 } from '@/api/base44Client'
 import { useData, useLookup } from '@/hooks/useData'
 import { useAdminScope } from '@/hooks/useAdminScope'
@@ -29,6 +30,7 @@ export default function PlayersAdmin() {
   const [docFilter, setDocFilter] = useState('')
   const [view, setView] = useState<'list' | 'grid'>('list')
   const [docs, setDocs] = useState<Player | null>(null)
+  const [bulkCut, setBulkCut] = useState(false)
   const comp = db.Competition.find((c) => c.id === competitionId)
   const filter = useMemo(() => (p: Player) => (!team || p.team_id === team) && (!comp || !!comp.team_ids?.includes(p.team_id)) && (!seasonId || !!p.season_ids?.includes(seasonId))
     && (!docFilter || (docFilter === 'ok' ? DOCS.every((d) => p.documents?.[d.key]?.status === 'valid') : DOCS.some((d) => p.documents?.[d.key]?.status !== 'valid'))), [team, comp, seasonId, docFilter])
@@ -66,6 +68,7 @@ export default function PlayersAdmin() {
   }
   const toolbar = (
     <>
+      <Button variant="outline" size="sm" className="h-9" onClick={() => setBulkCut(true)}><Scissors />Détourer toutes les photos existantes</Button>
       <FilterSelect value={team} onChange={setTeam} allLabel="Toutes équipes" options={db.Team.map((t) => ({ value: t.id, label: t.name })).sort((a, b) => a.label.localeCompare(b.label))} />
       <FilterSelect value={docFilter} onChange={setDocFilter} allLabel="Tous dossiers" options={[{ value: 'ok', label: 'Dossier complet' }, { value: 'ko', label: 'Documents à traiter' }]} />
       <label className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-input px-3 text-xs hover:bg-white/5" title="Nom de fichier : prenom-nom.jpg (ou numéro.jpg si une équipe est filtrée)"><ImageUp className="size-4" />Photos en masse<input type="file" accept="image/*" multiple className="hidden" onChange={(e) => bulkPhotos(e.target.files)} /></label>
@@ -75,7 +78,7 @@ export default function PlayersAdmin() {
   return (
     <AdminPage title="Joueurs" subtitle="Effectifs, photos et documents">
       {view === 'list' ? (
-        <EntityCrud entity="Player" title="Joueur" fields={fields} filter={filter} toolbar={toolbar} searchText={(p) => `${p.first_name} ${p.last_name} ${L.team.get(p.team_id)?.name}`}
+        <EntityCrud entity="Player" title="Joueur" dialogClassName="max-w-4xl" fields={fields} filter={filter} toolbar={toolbar} searchText={(p) => `${p.first_name} ${p.last_name} ${L.team.get(p.team_id)?.name}`}
           sort={(a, b) => (L.team.get(a.team_id)?.name ?? '').localeCompare(L.team.get(b.team_id)?.name ?? '') || (a.number ?? 0) - (b.number ?? 0)}
           defaults={() => ({ status: 'active', position: 'FIELD', is_captain: false, team_id: team || undefined, season_ids: [seasonId] })}
           prepare={(v) => ({ ...v, is_goalkeeper: v.position === 'GK' })}
@@ -106,6 +109,7 @@ export default function PlayersAdmin() {
         </>
       )}
       {docs && <DocsDialog player={docs} onClose={() => setDocs(null)} />}
+      <BulkCutoutDialog open={bulkCut} onOpenChange={setBulkCut} />
     </AdminPage>
   )
 }

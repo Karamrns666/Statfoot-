@@ -94,6 +94,8 @@ export interface Player extends BaseEntity {
   photo_cutout_source?: string
   /** essais de détourage automatique ratés (3 au plus) */
   photo_cutout_tries?: number
+  /** photo affichée sur la carte : version détourée (par défaut) ou photo originale (secours choisi dans l'admin) */
+  photo_card_mode?: 'cutout' | 'original'
   position: Position
   number?: number
   team_id: string

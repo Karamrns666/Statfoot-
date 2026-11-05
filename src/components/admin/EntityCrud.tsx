@@ -73,7 +73,7 @@ export function ImageInput({ value, onChange }: { value?: string; onChange: (v: 
   )
 }
 
-export function EntityCrud<N extends EntityName>({ entity, title, fields, columns, filter, defaults, toolbar, rowActions, sort, searchText, emptyLabel, canDelete = true, transform, prepare, afterSave }: {
+export function EntityCrud<N extends EntityName>({ entity, title, fields, columns, filter, defaults, toolbar, rowActions, sort, searchText, emptyLabel, canDelete = true, transform, prepare, afterSave, dialogClassName }: {
   entity: N; title: string; fields: Field[]; columns: Column<EntityMap[N]>[]
   filter?: (r: EntityMap[N]) => boolean; defaults?: () => Record<string, unknown>; toolbar?: ReactNode; rowActions?: (r: EntityMap[N]) => ReactNode
   sort?: (a: EntityMap[N], b: EntityMap[N]) => number; searchText?: (r: EntityMap[N]) => string; emptyLabel?: string; canDelete?: boolean
@@ -82,6 +82,8 @@ export function EntityCrud<N extends EntityName>({ entity, title, fields, column
   prepare?: (v: Record<string, unknown>) => Record<string, unknown>
   /** après enregistrement (ex. un seul capitaine par équipe) */
   afterSave?: (saved: Record<string, unknown>) => Promise<void> | void
+  /** largeur du formulaire (ex. 'max-w-4xl' pour la photo joueur) */
+  dialogClassName?: string
 }) {
   const { db } = useData()
   const [q, setQ] = useState('')
@@ -136,7 +138,7 @@ export function EntityCrud<N extends EntityName>({ entity, title, fields, column
       </div>
       <p className="text-xs text-muted-foreground">{rows.length} élément(s)</p>
       <Dialog open={!!edit} onOpenChange={(o) => !o && setEdit(null)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className={cn('max-h-[94vh] max-w-2xl overflow-y-auto', dialogClassName)}>
           <DialogHeader><DialogTitle>{edit?.id ? 'Modifier' : 'Ajouter'} · {title}</DialogTitle></DialogHeader>
           {edit && <EntityForm fields={fields} value={edit} onChange={setEdit} />}
           <DialogFooter><Button variant="outline" onClick={() => setEdit(null)}>Annuler</Button><Button onClick={save}>Enregistrer</Button></DialogFooter>

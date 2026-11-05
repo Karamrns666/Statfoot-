@@ -77,6 +77,14 @@
     "photo_cutout_tries": {
       "type": "integer",
       "description": "Essais de détourage automatique ratés"
+    },
+    "photo_card_mode": {
+      "type": "string",
+      "enum": [
+        "cutout",
+        "original"
+      ],
+      "description": "Photo affichée sur la carte joueur"
     }
   },
   "required": [

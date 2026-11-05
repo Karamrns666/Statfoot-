@@ -5,8 +5,8 @@ import type { Player } from '@/types/entities'
 export const MAX_CUTOUT_TRIES = 3
 
 /** Ce joueur a-t-il besoin d'un détourage automatique ? (fonction pure) */
-export function needsCutout(p: Pick<Player, 'photo_url' | 'photo_cutout_url' | 'photo_cutout_source' | 'photo_cutout_tries'>) {
-  if (!p.photo_url) return false
+export function needsCutout(p: Pick<Player, 'photo_url' | 'photo_cutout_url' | 'photo_cutout_source' | 'photo_cutout_tries' | 'photo_card_mode'>) {
+  if (!p.photo_url || p.photo_card_mode === 'original') return false
   const stale = !!p.photo_cutout_source && p.photo_cutout_source !== p.photo_url
   if (p.photo_cutout_url && !stale) return false
   return (p.photo_cutout_tries ?? 0) < MAX_CUTOUT_TRIES || stale

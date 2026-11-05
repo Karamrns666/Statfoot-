@@ -11,5 +11,6 @@ describe('détourage automatique', () => {
     expect(needsCutout({ photo_url: '/a', photo_cutout_source: '/a', photo_cutout_tries: MAX_CUTOUT_TRIES - 1 })).toBe(true)
     expect(needsCutout({ photo_url: '/a', photo_cutout_source: '/a', photo_cutout_tries: MAX_CUTOUT_TRIES })).toBe(false)
     expect(needsCutout({ photo_url: '/b', photo_cutout_source: '/a', photo_cutout_tries: MAX_CUTOUT_TRIES })).toBe(true)
+    expect(needsCutout({ photo_url: '/a', photo_card_mode: 'original' })).toBe(false) // l'admin a choisi la photo originale
   })
 })

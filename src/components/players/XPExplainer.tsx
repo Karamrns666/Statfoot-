@@ -40,10 +40,10 @@ function ExampleTable({ lines, total }: { lines: XPLine[]; total: number }) {
           <tr key={i} className="border-b border-white/5">
             <td className="py-1 pr-2">{l.label}</td>
             <td className="num py-1 text-right text-muted-foreground">{l.count > 1 ? `${l.count} × ` : ''}{signed(l.base)}{l.mult !== 1 ? ` ${mult(l.mult)}` : ''}</td>
-            <td className="num w-16 py-1 text-right text-white">{signed(l.points)}</td>
+            <td className="num w-20 whitespace-nowrap py-1 text-right text-white">{signed(l.points)}</td>
           </tr>
         ))}
-        <tr><td className="pt-2 font-bold">Total du match</td><td /><td className="num pt-2 text-right text-lg text-neon">{signed(total)} XP</td></tr>
+        <tr><td colSpan={2} className="pt-2 font-bold">Total du match</td><td className="num whitespace-nowrap pt-2 text-right text-lg text-neon">{signed(total)} XP</td></tr>
       </tbody>
     </table>
   )

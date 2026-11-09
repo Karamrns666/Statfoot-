@@ -111,7 +111,7 @@ export function applyReglementV4(db: Rules6Data): Rules6Data {
   const out: Rules6Data = {}
   const books = buildRulebooks()
   const have = new Set((db.Rulebook ?? []).map((r) => r.version))
-  if (books.some((b) => !have.has(b.version)))
+  if (db.Rulebook && books.some((b) => !have.has(b.version)))
     out.Rulebook = [...(db.Rulebook ?? []).map((r) => (r.status === 'current' ? { ...r, status: 'archived' as const } : r)), ...books.filter((b) => !have.has(b.version))]
   if (db.Season?.some((x) => x.id === SEASON_2026_ID && !x.rulebook_version))
     out.Season = db.Season.map((x) => (x.id === SEASON_2026_ID && !x.rulebook_version ? { ...x, rulebook_version: CURRENT_RULEBOOK } : x))

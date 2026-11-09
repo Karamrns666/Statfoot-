@@ -227,6 +227,8 @@ export function matchXPLines(data: XPData, match: Match, cfg: XPConfig, opts: { 
       if (k.conceded) out.push(line(k.player_id, 'goal_conceded_gk', cfg, k.conceded, 1, base))
     }
   }
+  // homme du match (désigné à la fin du match : admin ou vote du public)
+  if (match.motm_player_id) out.push(line(match.motm_player_id, 'motm', cfg, 1, 1, base))
   return out.filter((l) => l.points !== 0 || l.key === 'clean_sheet_gk')
 }
 
@@ -274,8 +276,6 @@ export function xpSuspensions(data: Pick<XPData, 'suspensions' | 'seasons' | 'co
     const { players } = computeDiscipline(c.id, { matches: data.matches, events: data.events, lineups: data.lineups, players: data.players, extras: data.suspensions.filter((s) => s.kind === 'extra') })
     for (const d of players.values()) for (const r of d.suspensions) out.push({ season_id: c.season_id, player_id: d.player_id, origin_match_id: r.origin_match_id, matches: r.matches, label: SUSPENSION_LABEL[r.kind] })
   }
-  // homme du match (désigné à la fin du match : admin ou vote du public)
-  if (match.motm_player_id) out.push(line(match.motm_player_id, 'motm', cfg, 1, 1, base))
   return out
 }
 

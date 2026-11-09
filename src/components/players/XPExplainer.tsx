@@ -2,6 +2,7 @@
 // valeurs (XP_DEFAULTS + réglages de la saison), critères de classement (RACE_CRITERIA) et exemples
 // calculés par le moteur lui-même (xpExamples → matchXPLines). Modifier le barème met ce texte à jour.
 import { useMemo, type ReactNode } from 'react'
+import { ArtLink } from '@/components/reglement/ArtLink'
 import { ChevronDown, Calculator } from 'lucide-react'
 import { useData } from '@/hooks/useData'
 import { RACE_CRITERIA, RACE_ELIGIBLE, XP_LABELS, xpConfig, xpExamples, type XPConfig, type XPLine } from '@/lib/xp'
@@ -65,6 +66,7 @@ export function XPExplainer({ seasonId, className }: { seasonId?: string | null;
       </summary>
       <div className="space-y-4 px-4 pb-5 text-sm leading-relaxed">
         <p className="text-muted-foreground">Chaque action d’un match rapporte (ou coûte) des points d’expérience, les <b className="text-white">XP</b>. Ils sont recalculés automatiquement après chaque match. Chaque ligne est arrondie à l’entier.</p>
+        <p className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-muted-foreground"><b className="text-white">Ce qui vient du règlement Ardentia :</b> le résultat d’un match (victoire, nul, défaite <ArtLink art="17.2" />), les cartons et les suspensions (3 jaunes cumulés = 1 match, rouge = au moins 1 match <ArtLink art="11.5" /> <ArtLink art="11.6" />). <b className="text-white">Ce qui est propre à la MBL :</b> le barème des XP ci-dessous (valeur de chaque action, multiplicateurs) — il ne change ni le classement des équipes ni les suspensions.</p>
         <div className="grid gap-3 md:grid-cols-2">
           <Block title="Résultat">
             <Item label={XP_LABELS.win} value={pts(cfg, 'win')} note="pour chaque joueur ayant joué le match" />

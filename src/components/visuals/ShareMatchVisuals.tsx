@@ -60,7 +60,7 @@ function ShareDialog({ match, open, onOpenChange }: { match: Match; open: boolea
           {(prev.busy || !prev.url) && <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="size-6 animate-spin text-neon" /></div>}
         </div>
         <div className="grid gap-2 sm:grid-cols-2">
-          <Button onClick={() => share()} disabled={!!busy}>{busy === 'share' ? <Loader2 className="animate-spin" /> : <Share2 />}{canShareFiles ? 'Partager' : 'Télécharger l’image'}</Button>
+          <Button onClick={() => share()} disabled={!!busy}>{busy === 'share' ? <Loader2 className="animate-spin" /> : canShareFiles ? <Share2 /> : <Download />}{canShareFiles ? 'Partager' : 'Télécharger l’image'}</Button>
           {canShareFiles ? <Button variant="outline" onClick={() => share(true)} disabled={!!busy}>{busy === 'story' ? <Loader2 className="animate-spin" /> : <Smartphone />}Partager en story</Button>
             : <Button variant="outline" onClick={() => download(true)} disabled={!!busy}>{busy === 'dls' ? <Loader2 className="animate-spin" /> : <Smartphone />}Format story</Button>}
         </div>

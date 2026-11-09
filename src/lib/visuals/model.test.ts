@@ -85,7 +85,7 @@ describe('homme du match', () => {
     expect(field.scoreLine.score).toBe('2 - 0')
     const gk = buildMvpModel(d, 'A_GK')!
     expect(gk.keeper).toBe(true)
-    expect(gk.stats.map((s) => [s.label, s.value])).toEqual([['Arrêts', '2'], ['Buts encaissés', '0'], ['XP gagnés', expect.stringMatching(/^[+-]?\d+$/)]])
+    expect(gk.stats.map((s) => [s.label, s.value])).toEqual([['Arrêts', '2'], ['But encaissé', '0'], ['XP gagnés', expect.stringMatching(/^[+-]?\d+$/)]])
   })
 })
 
@@ -106,5 +106,13 @@ describe('mise en page et ZIP', () => {
     const b = new Uint8Array(await z.arrayBuffer())
     expect([b[0], b[1], b[2], b[3]]).toEqual([0x50, 0x4b, 0x03, 0x04])
     expect(b.length).toBe(30 + 5 + 7 + 46 + 5 + 22)
+  })
+})
+
+describe('buteurs sans minute (données importées)', () => {
+  it('« Nom ×N » quand les minutes ne sont pas connues', () => {
+    const m: Match = { ...matches[0], id: 'nomin' }
+    const evs: MatchEvent[] = [1, 2, 3].map((i) => ({ id: `n${i}`, match_id: 'nomin', team_id: 'A', type: 'goal', player_id: 'A_FWD' }))
+    expect(scorerLines(m, [...evs, { id: 'n9', match_id: 'nomin', team_id: 'A', type: 'goal', player_id: 'A_MID' }], 'A', P)).toEqual(['A-FWD ×3', 'A-MID'])
   })
 })

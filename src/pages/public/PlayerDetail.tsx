@@ -16,7 +16,7 @@ import { SortableTable } from '@/components/league/SortableTable'
 import { shotColumns } from '@/components/league/shotColumns'
 import { fmtAccuracy, fmtShots, fmtShotsPerGoal } from '@/lib/shots'
 import { AXIS, ChartBox, GRID, Legend, SERIES, TOOLTIP } from '@/components/charts/theme'
-import { AWARD_LABELS, computePlayerXP, isRookie, ageAt, type XPLine } from '@/lib/stats'
+import { AWARD_LABELS, computePlayerXP, isPlayed, isRookie, ageAt, type XPLine } from '@/lib/stats'
 import { BADGES, RATING_RULES, TIER_LABEL, TIER_STYLE, cardMaterial, challengeResult, challengeTargets, decisiveStreak, nextBadges, playerBadges, playerMatchLog, type BadgeGroup } from '@/lib/badges'
 import { fmtDate, ordinal, playerName, playerShort } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -42,6 +42,7 @@ export default function PlayerDetail() {
   const history = useMemo(() => seasons.filter((s) => p?.season_ids?.includes(s.id)).map((s) => ({ season: s, x: computePlayerXP(league, { seasonId: s.id }).get(id ?? '') })), [seasons, league, id, p])
   const log = useMemo(() => (id ? playerMatchLog(league, id, sid) : []), [league, id, sid])
   const suspendedLeft = useIsSuspended(id, sid)
+  const motmCount = useMemo(() => league.matches.filter((m) => m.motm_player_id === id && isPlayed(m) && (!sid || m.season_id === sid)).length, [league.matches, id, sid])
   if (!p) return <EmptyState title="Joueur introuvable" />
 
   const t = L.team.get(p.team_id)
@@ -99,7 +100,7 @@ export default function PlayerDetail() {
           {me ? <XPCard r={me} player={p} team={t} className="w-56 shrink-0" /> : <PlayerAvatar player={p} team={t} size={132} />}
           <div className="min-w-0 flex-1 text-center sm:text-left">
             <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-              <RoleBadge long position={p.position} captain={p.is_captain || t?.captain_player_id === p.id} />{isRookie(p) && <RookieBadge />}<SuspendedBadge remaining={suspendedLeft} />
+              <RoleBadge long position={p.position} captain={p.is_captain || t?.captain_player_id === p.id} />{isRookie(p) && <RookieBadge />}<SuspendedBadge remaining={suspendedLeft} />{motmCount > 0 && <span className="inline-flex items-center gap-1 rounded-full bg-neon/15 px-2.5 py-0.5 text-[11px] font-extrabold uppercase text-neon" title="Nombre de fois homme du match (saison sélectionnée)"><Trophy className="size-3" aria-hidden />Homme du match ×{motmCount}</span>}
               {material && <span className="rounded-full px-2.5 py-0.5 text-[11px] font-extrabold" style={{ background: `linear-gradient(135deg, ${TIER_STYLE[material].light}, ${TIER_STYLE[material].edge})`, color: material === 'black' ? '#fff' : '#0A0F33' }}>Carte {TIER_LABEL[material]}</span>}
             </div>
             <h1 className="title-caps mt-2 text-4xl sm:text-6xl">{p.first_name} <span className="text-neon">{p.last_name}</span></h1>

@@ -154,6 +154,12 @@ export interface Match extends BaseEntity {
   opponent_rank_snapshot?: { home_rank: number | null; away_rank: number | null }
   motm_player_id?: string
   motm_vote_closes_at?: string
+  /** forfait (tapis vert, Art. 14) : équipe forfait — score officiel 3-0 pour l'adversaire */
+  forfeit_team_id?: string
+  /** modèle du visuel homme du match : variante 1 ou 2 */
+  visual_mvp_template?: 'mvp' | 'mvp2'
+  /** visuels réseaux sociaux générés (cache, version dans l'URL) */
+  visuals?: { hash: string; version: number; resultat_url?: string; mvp_url?: string; generated_at: string }
   referee?: string
   assistant_referees?: string[]
   operator_user_id?: string
@@ -364,6 +370,8 @@ export interface Settings extends BaseEntity {
   /** instagram = compte MBL ; organizer_instagram / linkedin = Ardentia */
   socials?: { instagram?: string; organizer_instagram?: string; facebook?: string; linkedin?: string; youtube?: string; tiktok?: string }
   motm_vote_minutes_after?: number
+  /** surcharge de la mise en page des visuels réseaux sociaux (JSON partiel, voir src/config/visuals.json) */
+  visuals_config?: Record<string, unknown>
 }
 
 export interface Page extends BaseEntity { slug: string; title: string; content?: string; published?: boolean }

@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Gavel,
+import { Image as ImageIcon, Gavel,
   LayoutDashboard, CalendarRange, Trophy, Layers, Shield, Users, Grid3x3, Shuffle, CalendarDays, Radio, Zap, BarChart3, Award, Image, Upload,
   ScrollText, UserCog, Settings, BookOpen, LogOut, Menu, X, ExternalLink, QrCode, Star, Scissors, Loader2 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useAutoCutouts } from '@/hooks/useAutoCutouts'
+import { useAutoVisuals } from '@/hooks/useMatchVisuals'
 import { useData } from '@/hooks/useData'
 import { AdminScopeProvider, useAdminScope } from '@/hooks/useAdminScope'
 import { can, ROLE_LABEL, type Area } from '@/lib/permissions'
@@ -33,6 +34,7 @@ export const ADMIN_NAV: { group: string; items: { to: string; label: string; ico
   ] },
   { group: 'XP & trophées', items: [
     { to: '/admin/discipline', label: 'Discipline', icon: Gavel, area: 'sport' },
+    { to: '/admin/visuels', label: 'Visuels réseaux', icon: ImageIcon, area: 'content' },
     { to: '/admin/xp', label: 'Règles XP', icon: Zap, area: 'xp' },
     { to: '/admin/trophees', label: 'Awards', icon: Award, area: 'awards' },
     { to: '/admin/equipe-type', label: 'Équipe type', icon: Star, area: 'sport' },
@@ -64,6 +66,8 @@ export function AdminLayout() {
   // détourage automatique des photos joueurs (pas pendant la saisie d'un match en direct)
   const inMatch = loc.pathname.startsWith('/admin/match-center/')
   const cut = useAutoCutouts(!!user && user.role !== 'operator' && !inMatch)
+  // visuels réseaux sociaux : générés dès qu'un match passe « Terminé », régénérés après correction
+  useAutoVisuals(!!user && user.role !== 'operator')
   if (loading) return <Spinner />
   if (!user) return <Navigate to={`/admin/login?next=${encodeURIComponent(loc.pathname)}`} replace />
   if (user.role === 'operator' && loc.pathname === '/admin') return <Navigate to="/admin/match-center" replace />

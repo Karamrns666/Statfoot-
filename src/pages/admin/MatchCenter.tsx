@@ -27,6 +27,8 @@ import {
 } from '@/lib/matchEngine'
 import { isKnockout, matchXPLines, xpConfig, XP_LABELS } from '@/lib/stats'
 import { REGLEMENT, inferiorityAt, rulesForSeason } from '@/lib/reglement'
+import { suggestMotm } from '@/lib/visuals/model'
+import { MatchVisualsPanel } from '@/components/visuals/MatchVisualsPanel'
 import { InferiorityBar } from '@/components/reglement/InferiorityBar'
 import { ArtLink } from '@/components/reglement/ArtLink'
 import { EVENT_LABEL, fmtDate, fmtTime, playerShort } from '@/lib/format'
@@ -239,6 +241,13 @@ export default function MatchCenter() {
         </section>
         <div className="mt-1.5 flex h-2 overflow-hidden rounded-full bg-white/10"><div style={{ width: `${pos.home_pct}%`, background: home?.primary_color }} /><div style={{ width: `${pos.away_pct}%`, background: away?.primary_color }} /></div>
 
+        {m.status === 'finished' && (
+          <section className="mt-3 rounded-2xl border border-white/10 bg-night-900/60 p-3 sm:p-4" aria-labelledby="visuels-titre">
+            <div className="mb-3 grid gap-2 sm:grid-cols-[auto_minmax(0,320px)] sm:items-center"><h2 id="visuels-titre" className="title-caps text-xl">Visuels réseaux sociaux</h2>
+              <label className="text-xs text-muted-foreground">Homme du match<MotmPicker match={m} events={events} /></label></div>
+            <MatchVisualsPanel match={m} />
+          </section>
+        )}
         <Tabs value={tab} onValueChange={setTab} className="mt-3 lg:hidden">
           <TabsList className="w-full"><TabsTrigger value="input" className="flex-1">Saisie</TabsTrigger><TabsTrigger value="stats" className="flex-1">Statistiques</TabsTrigger><TabsTrigger value="summary" className="flex-1">Résumé</TabsTrigger><TabsTrigger value="xp" className="flex-1">XP</TabsTrigger></TabsList>
         </Tabs>
@@ -638,16 +647,24 @@ function FlowDialog({ flow, setFlow, match, events, act, ls }: { flow: Flow; set
   )
 }
 
+/** Homme du match : pré-rempli avec le joueur qui a gagné le plus d'XP dans le match (modifiable). */
 function MotmPicker({ match, events }: { match: Match; events: MatchEvent[] }) {
-  const { db } = useData()
+  const { db, league } = useData()
   const L = useLookup()
-  const ids = db.Lineup.filter((l) => l.match_id === match.id).flatMap((l) => [...(l.starter_ids ?? []), ...events.filter((e) => e.type === 'substitution' && e.team_id === l.team_id).map((e) => e.player_id!)])
+  const cur = db.Match.find((m) => m.id === match.id) ?? match
+  const sc = scoreFromEvents(cur, events)
+  const suggestion = useMemo(() => suggestMotm(league, { ...cur, home_score: sc.home, away_score: sc.away }), [league, cur, sc.home, sc.away])
+  const ids = [...new Set([...db.Lineup.filter((l) => l.match_id === match.id).flatMap((l) => [...(l.starter_ids ?? []), ...events.filter((e) => e.type === 'substitution' && e.team_id === l.team_id).map((e) => e.player_id!)]), ...events.filter((e) => e.player_id && e.card_target !== 'official').map((e) => e.player_id!), ...(suggestion ? [suggestion.player_id] : []), ...(cur.motm_player_id ? [cur.motm_player_id] : [])])].filter((pid) => L.player.get(pid))
   const votes = db.MotmVote.filter((v) => v.match_id === match.id)
+  useEffect(() => { if (!cur.motm_player_id && suggestion) void base44.entities.Match.update(match.id, { motm_player_id: suggestion.player_id }) }, [cur.motm_player_id, suggestion?.player_id]) // eslint-disable-line react-hooks/exhaustive-deps
   return (
-    <select className="h-11 w-full rounded-lg border border-input bg-night-950 px-2" value={db.Match.find((m) => m.id === match.id)?.motm_player_id ?? ''} onChange={(e) => base44.entities.Match.update(match.id, { motm_player_id: e.target.value || undefined })} aria-label="Homme du match">
-      <option value="">— Choisir —</option>
-      {ids.map((pid) => <option key={pid} value={pid}>{playerShort(L.player.get(pid))} ({L.team.get(L.player.get(pid)?.team_id ?? '')?.short_name}) {votes.length ? `· ${votes.filter((v) => v.player_id === pid).length} vote(s)` : ''}</option>)}
-    </select>
+    <>
+      <select className="mt-1 h-11 w-full rounded-lg border border-input bg-night-950 px-2 text-sm text-foreground" value={cur.motm_player_id ?? ''} onChange={(e) => base44.entities.Match.update(match.id, { motm_player_id: e.target.value || undefined })} aria-label="Homme du match">
+        <option value="">— Choisir —</option>
+        {ids.map((pid) => <option key={pid} value={pid}>{playerShort(L.player.get(pid))} ({L.team.get(L.player.get(pid)?.team_id ?? '')?.short_name}){pid === suggestion?.player_id ? ` · suggéré, ${suggestion.xp} XP` : ''}{votes.length ? ` · ${votes.filter((v) => v.player_id === pid).length} vote(s)` : ''}</option>)}
+      </select>
+      {suggestion && cur.motm_player_id && cur.motm_player_id !== suggestion.player_id && <span className="mt-1 block text-[11px] text-muted-foreground">Suggestion (plus d’XP) : {playerShort(L.player.get(suggestion.player_id))} — {suggestion.xp} XP</span>}
+    </>
   )
 }
 

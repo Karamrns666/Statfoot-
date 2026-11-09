@@ -34,7 +34,7 @@ export const ADMIN_NAV: { group: string; items: { to: string; label: string; ico
   ] },
   { group: 'XP & trophées', items: [
     { to: '/admin/discipline', label: 'Discipline', icon: Gavel, area: 'sport' },
-    { to: '/admin/visuels', label: 'Visuels réseaux', icon: ImageIcon, area: 'content' },
+    { to: '/admin/visuels', label: 'Visuels réseaux', icon: ImageIcon, area: 'media' },
     { to: '/admin/xp', label: 'Règles XP', icon: Zap, area: 'xp' },
     { to: '/admin/trophees', label: 'Awards', icon: Award, area: 'awards' },
     { to: '/admin/equipe-type', label: 'Équipe type', icon: Star, area: 'sport' },

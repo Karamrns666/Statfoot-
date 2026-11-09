@@ -74,7 +74,7 @@ export default function App() {
           <Route path="match-center/:id" element={guard('match_center', <A.McLive />)} />
           <Route path="xp" element={guard('xp', <A.XP />)} />
           <Route path="discipline" element={guard('sport', <A.Discipline />)} />
-          <Route path="visuels" element={guard('content', <A.Visuels />)} />
+          <Route path="visuels" element={guard('media', <A.Visuels />)} />
           <Route path="equipe-type" element={guard('sport', <A.TeamOfWeek />)} />
           <Route path="statistiques" element={guard('sport', <A.Stats />)} />
           <Route path="trophees" element={guard('awards', <A.Awards />)} />

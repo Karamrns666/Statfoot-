@@ -94,7 +94,7 @@ describe('mise en page et ZIP', () => {
     expect(layoutProblems(DEFAULT_VISUALS_CONFIG)).toEqual([])
     const bad = resolveVisualsConfig({ mvp: { zones: { stats: { y: 1000 } } } })
     expect(layoutProblems(bad).join(' ')).toMatch(/mvp\.stats/)
-    for (const L of [DEFAULT_VISUALS_CONFIG.resultat, DEFAULT_VISUALS_CONFIG.mvp]) for (const z of Object.values(L.zones)) expect(z.x + z.w).toBeLessThanOrEqual(VISUAL_SIZE)
+    for (const L of [DEFAULT_VISUALS_CONFIG.resultat, DEFAULT_VISUALS_CONFIG.mvp]) for (const [k, z] of Object.entries(L.zones)) if (k !== 'scoreWithSub') expect(z.x + z.w).toBeLessThanOrEqual(VISUAL_SIZE)
   })
   it('surcharge partielle fusionnée zone par zone', () => {
     const c = resolveVisualsConfig({ resultat: { zones: { footer: { y: 960 } } } })

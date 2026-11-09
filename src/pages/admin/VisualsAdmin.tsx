@@ -46,7 +46,7 @@ export default function VisualsAdmin() {
       files.push({ name: visualFileName('resultat', league, m).replace('-resultat.png', '-texte.txt'), data: new TextEncoder().encode(caption) })
     }
     const first = matches[0]
-    downloadBlob(makeZip(files), `mbl-visuels-${L.competition.get(first?.competition_id ?? '')?.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') ?? 'journee'}-j${first?.round ?? ''}.zip`)
+    downloadBlob(makeZip(files), `mbl-visuels-${L.competition.get(first?.competition_id ?? '')?.name?.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') ?? 'journee'}-j${first?.round ?? ''}.zip`)
     setZip(null)
   }
 

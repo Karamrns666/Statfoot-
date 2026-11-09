@@ -48,17 +48,19 @@ export function scorerLines(m: Match, events: MatchEvent[], teamId: string, play
   const goals = events
     .filter((e) => e.match_id === m.id && e.period !== 'PENS' && ((e.type === 'goal' && e.team_id === teamId) || (e.type === 'own_goal' && e.team_id !== teamId)))
     .sort((a, b) => order.indexOf(a.period ?? '1H') - order.indexOf(b.period ?? '1H') || (a.minute ?? 0) - (b.minute ?? 0))
-  const groups = new Map<string, { name: string; mins: string[] }>()
+  const groups = new Map<string, { name: string; mins: string[]; n: number }>()
   for (const e of goals) {
     const p = e.player_id ? players.get(e.player_id) : undefined
     const base = p ? p.last_name : e.player_name_free || (e.type === 'own_goal' ? 'Contre son camp' : 'But')
     const key = e.type === 'own_goal' ? `csc:${e.player_id ?? e.id}` : p ? p.id : `x:${e.id}`
     const name = e.type === 'own_goal' ? `${base} (csc)` : base
-    if (!groups.has(key)) groups.set(key, { name, mins: [] })
+    if (!groups.has(key)) groups.set(key, { name, mins: [], n: 0 })
+    groups.get(key)!.n++
     const min = fmtMinute(e.minute, e.added_minute)
     if (min) groups.get(key)!.mins.push(e.goal_kind === 'penalty' ? `${min} (s.p.)` : min)
   }
-  const lines = [...groups.values()].map((g) => (g.mins.length ? `${g.name} ${g.mins.join(', ')}` : g.name))
+  // minutes si elles sont connues (« Lamghari 12', 31' »), sinon nombre de buts (« Afakhar ×8 »)
+  const lines = [...groups.values()].map((g) => (g.mins.length ? `${g.name} ${g.mins.join(', ')}` : g.n > 1 ? `${g.name} ×${g.n}` : g.name))
   if (lines.length <= max) return lines
   const rest = lines.length - (max - 1)
   return [...lines.slice(0, max - 1), `+${rest} autre${rest > 1 ? 's' : ''}`]
@@ -135,7 +137,7 @@ export function buildMvpModel(d: VisualData & { xp: XPData }, playerId: string):
   if (keeper) {
     const saves = evs.filter((e) => e.type === 'save' && e.player_id === p.id).length
     const conceded = p.team_id === m.home_team_id ? r.awayScore : r.homeScore
-    stats.push({ label: 'Arrêts', value: String(saves) }, { label: 'Buts encaissés', value: String(conceded) })
+    stats.push({ label: saves > 1 ? 'Arrêts' : 'Arrêt', value: String(saves) }, { label: conceded > 1 ? 'Buts encaissés' : 'But encaissé', value: String(conceded) })
     if (goals) stats.push({ label: goals > 1 ? 'Buts' : 'But', value: String(goals) })
   } else {
     stats.push({ label: goals > 1 ? 'Buts' : 'But', value: String(goals) }, { label: assists > 1 ? 'Passes déc.' : 'Passe déc.', value: String(assists) })
@@ -161,7 +163,7 @@ export function captionText(d: VisualData, motm?: Player) {
   const h = teams.get(m.home_team_id), a = teams.get(m.away_team_id)
   const comp = [competition?.name, m.stage && KNOCKOUT_LABEL[m.stage] ? KNOCKOUT_LABEL[m.stage] : m.round ? `J${m.round}` : ''].filter(Boolean).join(' · ')
   const lines = [`🔥 RÉSULTAT | ${comp}`, `${h?.name ?? ''} ${r.homeScore} - ${r.awayScore} ${a?.name ?? ''}${r.sub && !r.forfeit ? ` (${r.sub.toLowerCase()})` : ''}`]
-  if (r.forfeit) lines.push(`🟩 Victoire sur tapis vert (forfait de ${teams.get(m.forfeit_team_id!)?.name ?? '—'})`)
+  if (r.forfeit) lines.push(`🟩 Victoire sur tapis vert (forfait : ${teams.get(m.forfeit_team_id!)?.name ?? '—'})`)
   const list = (teamId: string) => {
     const by = new Map<string, number>()
     for (const e of d.events.filter((x) => x.match_id === m.id && x.type === 'goal' && x.team_id === teamId && x.period !== 'PENS')) {

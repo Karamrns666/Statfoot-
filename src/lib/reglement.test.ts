@@ -212,3 +212,16 @@ describe('texte du règlement', () => {
     expect(V4).toMatch(/Trois \(3\) cartons jaunes cumulés entraînent automatiquement un \(1\) match de suspension/)
   })
 })
+
+describe('saison 2025-2026 recalculée avec l’Art. 17.3', () => {
+  it('seul changement d’ordre : Chaabi LLD 10e (bat Cooper Pharma 3-0), Cooper Pharma 11e', async () => {
+    const { buildSeason2025 } = await import('@/api/seed/season2025')
+    const s = buildSeason2025()
+    const name = new Map(s.teams.map((t) => [t.id, t.short_name]))
+    const t = computeStandings(s.matches, s.competition.team_ids!, null, s.events, (a, b) => name.get(a)!.localeCompare(name.get(b)!))
+    expect(t.map((r) => name.get(r.team_id))).toEqual(['MDS', 'DST', 'DEL', 'WAF', 'AVR', 'ARW', 'CAC', 'CVG', 'ALM', 'CHL', 'COP', 'VIV', 'DSW', 'CTR', 'MPT', 'AVC'])
+    expect(t[9].tiebreak).toBeUndefined()
+    expect(t[10].tiebreak).toMatchObject({ key: 'h2h' })
+    expect(t[3].tiebreak).toMatchObject({ key: 'h2h' }) // DEL devant WAF : DEL 8-4 WAF
+  })
+})

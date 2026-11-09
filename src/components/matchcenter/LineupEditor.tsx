@@ -61,7 +61,7 @@ export function LineupEditor({ match, teamId, onValidated, readOnly }: { match: 
   }
   const waive = async (p: Player, motif: string) => {
     const reason = elig.get(p.id)!.reasons[0].reason
-    setLu({ ...lu, waivers: [...(lu.waivers ?? []), { player_id: p.id, reason, motif, by: user!.email, at: new Date().toISOString() }] })
+    setLu({ ...lu, present_ids: [...new Set([...(lu.present_ids ?? []), p.id])], waivers: [...(lu.waivers ?? []), { player_id: p.id, reason, motif, by: user!.email, at: new Date().toISOString() }] })
     base44.logActivity('waiver', 'Lineup', { id: existing?.id ?? match.id, name: `${p.first_name} ${p.last_name}` } as never, { joueur: `${p.first_name} ${p.last_name}`, blocage: elig.get(p.id)!.reasons.map((r) => r.label).join(' · '), motif, match: match.id })
     setWaiving(null)
     toast.info('Ajout forcé (motif enregistré au journal)')

@@ -32,6 +32,7 @@ export default function Stats() {
   return (
     <div className="space-y-8">
       <PageHeader title="Statistiques" subtitle="Leaders et chiffres clés">
+        <Link to="/discipline" className="rounded-full border border-white/10 px-3 py-1 text-xs font-bold uppercase text-muted-foreground hover:border-neon hover:text-neon">Discipline</Link>
         {hasCups && (['all', 'league_phase', 'gold', 'silver'] as const).filter((x) => x === 'all' || league.competitions.some((c) => (!scopeSeasonId || c.season_id === scopeSeasonId) && c.phase === x)).map((p) => <button key={p} onClick={() => setPhase(p)} className={cn('rounded-full border px-3 py-1 text-xs font-bold uppercase cursor-pointer', phase === p ? 'border-neon bg-neon/15 text-neon' : 'border-white/10 text-muted-foreground')}>{{ all: 'Toutes', league_phase: 'Phase de ligue', gold: 'Gold Cup', silver: 'Silver Cup' }[p]}</button>)}
       </PageHeader>
       {k.matches === 0 ? <SeasonNotStarted what="Les statistiques" /> : <>

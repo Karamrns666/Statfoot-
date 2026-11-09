@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, NavLink, Outlet, useLocation } from 'react-router-dom'
-import {
+import { Gavel,
   LayoutDashboard, CalendarRange, Trophy, Layers, Shield, Users, Grid3x3, Shuffle, CalendarDays, Radio, Zap, BarChart3, Award, Image, Upload,
   ScrollText, UserCog, Settings, BookOpen, LogOut, Menu, X, ExternalLink, QrCode, Star, Scissors, Loader2 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
@@ -32,6 +32,7 @@ export const ADMIN_NAV: { group: string; items: { to: string; label: string; ico
     { to: '/admin/import', label: 'Import CSV', icon: Upload, area: 'import' },
   ] },
   { group: 'XP & trophées', items: [
+    { to: '/admin/discipline', label: 'Discipline', icon: Gavel, area: 'sport' },
     { to: '/admin/xp', label: 'Règles XP', icon: Zap, area: 'xp' },
     { to: '/admin/trophees', label: 'Awards', icon: Award, area: 'awards' },
     { to: '/admin/equipe-type', label: 'Équipe type', icon: Star, area: 'sport' },

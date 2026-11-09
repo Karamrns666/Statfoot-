@@ -59,5 +59,6 @@ export function useLookup() {
     group: new Map(db.Group.map((g) => [g.id, g])),
     division: new Map(db.Division.map((d) => [d.id, d])),
     live: new Map(db.LiveState.map((l) => [l.match_id, l])),
+    match: new Map(db.Match.map((m) => [m.id, m])),
   }), [db])
 }

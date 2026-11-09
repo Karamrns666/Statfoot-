@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { applyLot1, applyRules6v6, migrate } from './migrations'
+import { applyLot1, applyReglementV4, applyRules6v6, migrate } from './migrations'
 import { captainUpdates } from '@/lib/captain'
 import { generateLeagueData } from './generate'
 import type { Player, Team } from '@/types/entities'
@@ -8,8 +8,8 @@ describe('règles 6 contre 6', () => {
   it('données de la ligue : rôles GK / FIELD uniquement, aucun hors-jeu, aucun trophée par poste', () => {
     const db = generateLeagueData(new Date('2026-11-04T19:00:00'))
     expect(new Set(db.Player.map((p) => p.position))).toEqual(new Set(['GK', 'FIELD']))
-    expect(JSON.stringify({ ...db, Page: [] })).not.toMatch(/offside|hors-jeu|best_defender|best_midfielder|best_forward|best_young|young_max_age/i)
-    expect(db.Page.find((p) => p.slug === 'reglement')!.content).toMatch(/Pas de hors-jeu/)
+    expect(JSON.stringify({ ...db, Page: [], Rulebook: [] })).not.toMatch(/offside|hors-jeu|best_defender|best_midfielder|best_forward|best_young|young_max_age/i)
+    expect(db.Rulebook.find((r) => r.status === 'current')!.content).toMatch(/La règle du hors-jeu ne s'applique pas/)
   })
   it('migration des données déjà enregistrées', () => {
     const legacy = (position: string) => ({ id: position, first_name: 'a', last_name: 'b', team_id: 't', position }) as unknown as Player
@@ -52,5 +52,29 @@ describe('règles 6 contre 6', () => {
     const players = [P('a1', 'A', true), P('a2', 'A'), P('b1', 'B', true)]
     expect(captainUpdates(players, teams, 'a2', 'A', true)).toEqual({ players: [{ id: 'a1', is_captain: false }, { id: 'a2', is_captain: true }], teams: [{ id: 'A', captain_player_id: 'a2' }] })
     expect(captainUpdates(players, teams, 'a1', 'A', false)).toEqual({ players: [{ id: 'a1', is_captain: false }], teams: [{ id: 'A', captain_player_id: null }] })
+  })
+})
+
+describe('règlement Ardentia v4', () => {
+  it('données neuves : v4 en vigueur (saison 2026-2027), v3 dans l’historique, saison rattachée, mi-temps 20 min', () => {
+    const db = generateLeagueData(new Date('2026-11-09T10:00:00'))
+    expect(db.Rulebook.map((r) => [r.version, r.status])).toEqual([['v4', 'current'], ['v3', 'archived']])
+    expect(db.Season.find((s) => s.id === 'season_2026')!.rulebook_version).toBe('v4')
+    expect(db.Competition.filter((c) => c.season_id === 'season_2026').every((c) => c.half_duration_min === 20)).toBe(true)
+    expect(db.Settings[0]).not.toHaveProperty('tiebreakers')
+  })
+  it('migration des données déjà enregistrées (idempotente)', () => {
+    const out = applyReglementV4({
+      Rulebook: [], Season: [{ id: 'season_2026', name: 'S', start_date: '2026-08-22' }],
+      Competition: [{ id: 'c', season_id: 'season_2026', name: 'C', phase: 'league_phase', half_duration_min: 15 }],
+      Match: [{ id: 'm', season_id: 'season_2026', competition_id: 'c', home_team_id: 'a', away_team_id: 'b', status: 'scheduled', half_duration_min: 15 }],
+      Settings: [{ id: 'settings', points_win: 3, tiebreakers: ['points'] } as never],
+    })
+    expect(out.Rulebook!.map((r) => r.version)).toEqual(['v4', 'v3'])
+    expect(out.Season![0].rulebook_version).toBe('v4')
+    expect(out.Competition![0].half_duration_min).toBe(20)
+    expect(out.Match![0].half_duration_min).toBe(20)
+    expect(out.Settings![0]).toEqual({ id: 'settings' })
+    expect(applyReglementV4({ ...out })).toEqual({})
   })
 })

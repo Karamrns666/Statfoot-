@@ -1,5 +1,8 @@
 import { useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { SuspendedBadge } from '@/components/reglement/PlayerDisciplineCard'
+import { useSeasonDiscipline } from '@/hooks/useDiscipline'
+import { useEffectiveSeason } from '@/hooks/useStats'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { useData, useLookup } from '@/hooks/useData'
 import { useSeason } from '@/hooks/useSeason'
@@ -29,6 +32,9 @@ export default function TeamDetail() {
   const team = L.team.get(id ?? '')
   const ts = useTeamStats({ seasonId: scopeSeasonId }).get(id ?? '')
   const xp = usePlayerXP({ seasonId: scopeSeasonId })
+  const effSeason = useEffectiveSeason()
+  const discipline = useSeasonDiscipline(scopeSeasonId ?? effSeason?.id)
+  const suspended = useMemo(() => { const m = new Map<string, number>(); for (const c of discipline) for (const d of c.players.values()) if (d.remaining > 0) m.set(d.player_id, (m.get(d.player_id) ?? 0) + d.remaining); return m }, [discipline])
   const squad = useMemo(() => db.Player.filter((p) => p.team_id === id && (!scopeSeasonId || p.season_ids?.includes(scopeSeasonId))).sort((a, b) => (POS_ORDER[a.position] ?? 1) - (POS_ORDER[b.position] ?? 1) || (a.number ?? 0) - (b.number ?? 0)), [db.Player, id, scopeSeasonId])
   const matches = db.Match.filter((m) => (m.home_team_id === id || m.away_team_id === id) && (!scopeSeasonId || m.season_id === scopeSeasonId)).sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''))
   if (!team) return <EmptyState title="Équipe introuvable" />
@@ -54,7 +60,7 @@ export default function TeamDetail() {
           <div className="glass rounded-2xl p-2 sm:p-4">
             <SortableTable rows={squad} rowKey={(p) => p.id} initial={{ key: 'role', dir: 'asc' }} columns={[
               { key: 'number', label: '#', first: 'asc', className: 'num text-muted-foreground', sort: (p) => p.number, render: (p) => p.number },
-              { key: 'name', label: 'Joueur', sort: (p) => playerName(p), render: (p) => <Link to={`/joueurs/${p.id}`} className="flex items-center gap-2 hover:text-neon"><PlayerAvatar player={p} team={team} size={30} /><span className="font-semibold">{playerName(p)}</span></Link> },
+              { key: 'name', label: 'Joueur', sort: (p) => playerName(p), render: (p) => <Link to={`/joueurs/${p.id}`} className="flex items-center gap-2 hover:text-neon"><PlayerAvatar player={p} team={team} size={30} /><span className="font-semibold">{playerName(p)}</span><SuspendedBadge remaining={suspended.get(p.id) ?? 0} /></Link> },
               { key: 'role', label: 'Rôle', first: 'asc', sort: (p) => (p.position === 'GK' ? 0 : p.is_captain || team?.captain_player_id === p.id ? 1 : 2), render: (p) => <RoleBadge long position={p.position} captain={p.is_captain || team?.captain_player_id === p.id} /> },
               { key: 'mj', label: 'MJ', title: 'Matchs joués', headClassName: 'text-center', className: 'num text-center', sort: (p) => xp.get(p.id)?.matches ?? 0, render: (p) => xp.get(p.id)?.matches ?? 0 },
               { key: 'goals', label: 'Buts', headClassName: 'text-center', className: 'num text-center', sort: (p) => xp.get(p.id)?.goals ?? 0, render: (p) => xp.get(p.id)?.goals ?? 0 },

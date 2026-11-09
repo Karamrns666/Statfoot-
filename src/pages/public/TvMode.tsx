@@ -10,7 +10,9 @@ import { useData, useLookup } from '@/hooks/useData'
 import { useNow } from '@/hooks/useNow'
 import { TeamLogo } from '@/components/league/Identity'
 import { QrCode, pitchSlug } from '@/components/league/QrCode'
-import { durationsFor, fmtMinute, liveLabel, possession, teamStats } from '@/lib/matchEngine'
+import { durationsFor, elapsedMs, fmtMinute, isPlaying, liveLabel, possession, teamStats } from '@/lib/matchEngine'
+import { inferiorityAt } from '@/lib/reglement'
+import { InferiorityBar } from '@/components/reglement/InferiorityBar'
 import { matchScorers } from '@/lib/stats'
 import { fmtTime, playerShort } from '@/lib/format'
 import { Logo } from '@/components/layout/Logo'
@@ -138,6 +140,8 @@ function Board({ m, now }: { m: Match; now: number }) {
   const label = live ? liveLabel(ls, durationsFor(m, comp), now) : m.status === 'finished' ? 'Terminé' : `Coup d’envoi ${fmtTime(m.date)}`
   const cards = (tid: string) => events.filter((e) => e.team_id === tid && (e.type === 'yellow_card' || e.type === 'second_yellow' || e.type === 'red_card'))
   const goal = useGoalFlash(m)
+  const d = durationsFor(m, comp)
+  const inf = live && ls && isPlaying(ls.period) ? inferiorityAt(m, events, (ls.period === '2H' ? d.half * 60_000 : 0) + elapsedMs(ls, now), d.half) : []
   return (
     <main className="relative flex flex-1 flex-col items-center px-[2vw] py-[1vh] [justify-content:safe_center] sm:min-h-0 sm:overflow-hidden">
       <div className="mb-[1vh] text-center font-display text-[clamp(.95rem,min(1.6vw,2.8vh),2rem)] font-bold uppercase tracking-[.2em] text-white/70">{comp?.name}{m.round ? ` · Journée ${m.round}` : ''}{m.pitch ? ` · ${m.pitch}` : ''}</div>
@@ -153,6 +157,7 @@ function Board({ m, now }: { m: Match; now: number }) {
         </div>
         <TeamSide team={a} />
       </div>
+      <InferiorityBar list={inf} home={h?.short_name} away={a?.short_name} size="xl" />
 
       {/* buteurs / cartons de chaque équipe, stats live au centre */}
       <div className="mt-[2vh] grid w-full max-w-[94vw] grid-cols-2 items-start gap-x-[5vw] gap-y-4 sm:grid-cols-[1fr_minmax(0,1.25fr)_1fr] sm:gap-[3vw]">

@@ -8,6 +8,7 @@ import type {
 import { competitionStandings, isKnockout, isPlayed } from './standings'
 import { keeperMatchStats, participants } from './matchEngine'
 import { addShots, emptyShots, playerMatchShots, type ShotTotals } from './shots'
+import { SUSPENSION_LABEL, computeDiscipline, rulesForSeason } from './reglement'
 
 // ---------------------------------------------------------------------------
 //  Barème
@@ -259,18 +260,34 @@ export function xpExamples(cfg: XPConfig): XPExample[] {
   ]
 }
 
+/**
+ * Suspensions comptées dans l'XP (« par match de suspension ») :
+ *  - saisons au règlement avec cumul (v4) : suspensions automatiques (3 jaunes, rouge) + supplémentaires d'Ardentia ;
+ *  - anciennes saisons : suspensions saisies à la main.
+ */
+export function xpSuspensions(data: Pick<XPData, 'suspensions' | 'seasons' | 'competitions' | 'matches' | 'events' | 'lineups' | 'players'>) {
+  const out: { season_id: string; player_id: string; origin_match_id?: string; matches: number; label?: string }[] = []
+  const cumulative = new Set(data.seasons.filter((x) => rulesForSeason(x).cumulativeCards).map((x) => x.id))
+  for (const s of data.suspensions) if (!cumulative.has(s.season_id) && s.kind !== 'extra') out.push(s)
+  for (const c of data.competitions.filter((x) => cumulative.has(x.season_id))) {
+    const { players } = computeDiscipline(c.id, { matches: data.matches, events: data.events, lineups: data.lineups, players: data.players, extras: data.suspensions.filter((s) => s.kind === 'extra') })
+    for (const d of players.values()) for (const r of d.suspensions) out.push({ season_id: c.season_id, player_id: d.player_id, origin_match_id: r.origin_match_id, matches: r.matches, label: SUSPENSION_LABEL[r.kind] })
+  }
+  return out
+}
+
 /** Lignes hors match : suspensions et récompenses mensuelles. */
 export function seasonXPLines(data: XPData, seasonId: string | null | undefined, cfg: XPConfig, comps: Map<string, Competition>, scope: XPScope): XPLine[] {
   const out: XPLine[] = []
   const matchById = new Map(data.matches.map((m) => [m.id, m]))
-  for (const s of data.suspensions) {
+  for (const s of xpSuspensions(data)) {
     if (seasonId && s.season_id !== seasonId) continue
     const om = s.origin_match_id ? matchById.get(s.origin_match_id) : undefined
     if (om && !matchInScope(om, comps, { ...scope, excludeFromRoundKey: null })) continue
     if (!om && scope.phase && scope.phase !== 'all') continue
     const rk = om ? roundKey(om) : null
     if (scope.excludeFromRoundKey && rk && rk >= scope.excludeFromRoundKey) continue
-    out.push(line(s.player_id, 'per_suspension_match', cfg, s.matches, 1, { match_id: om?.id, round_key: rk, detail: `${s.matches} match(s)` }))
+    out.push(line(s.player_id, 'per_suspension_match', cfg, s.matches, 1, { match_id: om?.id, round_key: rk, detail: s.label ? `${s.label} · ${s.matches} match(s)` : `${s.matches} match(s)` }))
   }
   if (scope.phase && scope.phase !== 'all') return out
   for (const a of data.monthlyAwards) {

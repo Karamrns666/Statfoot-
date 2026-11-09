@@ -1,5 +1,6 @@
 import { useMemo, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { PlayerDisciplineCard, SuspendedBadge, useIsSuspended } from '@/components/reglement/PlayerDisciplineCard'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { Bar, BarChart, CartesianGrid, Cell, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
@@ -40,6 +41,7 @@ export default function PlayerDetail() {
   const me = meIdx >= 0 ? ranking[meIdx] : undefined
   const history = useMemo(() => seasons.filter((s) => p?.season_ids?.includes(s.id)).map((s) => ({ season: s, x: computePlayerXP(league, { seasonId: s.id }).get(id ?? '') })), [seasons, league, id, p])
   const log = useMemo(() => (id ? playerMatchLog(league, id, sid) : []), [league, id, sid])
+  const suspendedLeft = useIsSuspended(id, sid)
   if (!p) return <EmptyState title="Joueur introuvable" />
 
   const t = L.team.get(p.team_id)
@@ -97,7 +99,7 @@ export default function PlayerDetail() {
           {me ? <XPCard r={me} player={p} team={t} className="w-56 shrink-0" /> : <PlayerAvatar player={p} team={t} size={132} />}
           <div className="min-w-0 flex-1 text-center sm:text-left">
             <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-              <RoleBadge long position={p.position} captain={p.is_captain || t?.captain_player_id === p.id} />{isRookie(p) && <RookieBadge />}
+              <RoleBadge long position={p.position} captain={p.is_captain || t?.captain_player_id === p.id} />{isRookie(p) && <RookieBadge />}<SuspendedBadge remaining={suspendedLeft} />
               {material && <span className="rounded-full px-2.5 py-0.5 text-[11px] font-extrabold" style={{ background: `linear-gradient(135deg, ${TIER_STYLE[material].light}, ${TIER_STYLE[material].edge})`, color: material === 'black' ? '#fff' : '#0A0F33' }}>Carte {TIER_LABEL[material]}</span>}
             </div>
             <h1 className="title-caps mt-2 text-4xl sm:text-6xl">{p.first_name} <span className="text-neon">{p.last_name}</span></h1>
@@ -180,6 +182,8 @@ export default function PlayerDetail() {
             : <p className="mt-4 text-sm text-muted-foreground">Aucun titre pour l’instant. Prochain titre accessible : Joueur du mois, attribué chaque mois par la ligue.</p>}
         </section>
       </div>
+
+      <PlayerDisciplineCard playerId={p.id} seasonId={sid} />
 
       {/* PROCHAINS BADGES */}
       {next.length > 0 && (

@@ -102,7 +102,7 @@ function Footer() {
               <li key={x.label}><a href={x.href} target="_blank" rel="noreferrer" aria-label={x.label} className="flex items-center gap-2.5 text-sm text-muted-foreground hover:text-neon"><span className="glass rounded-lg p-2"><x.icon className="size-4" /></span>{x.icon === IconLinkedin ? 'LinkedIn' : 'Instagram'} · {x.short}</a></li>
             ))}
           </ul>
-          <div className="flex flex-wrap gap-x-4 gap-y-1 pt-2 text-sm"><Link to="/reglement" className="text-muted-foreground hover:text-neon">Règlement</Link><Link to="/historique" className="text-muted-foreground hover:text-neon">Historique</Link><Link to="/admin" className="text-muted-foreground hover:text-neon">Espace admin</Link></div>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 pt-2 text-sm"><Link to="/reglement" className="text-muted-foreground hover:text-neon">Règlement</Link><Link to="/discipline" className="text-muted-foreground hover:text-neon">Discipline</Link><Link to="/historique" className="text-muted-foreground hover:text-neon">Historique</Link><Link to="/admin" className="text-muted-foreground hover:text-neon">Espace admin</Link></div>
         </div>
       </div>
       <div className="border-t border-white/5 py-4 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} {L.name} · organisée par {o.name}</div>

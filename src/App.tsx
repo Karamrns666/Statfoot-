@@ -21,6 +21,7 @@ const P = {
   Media: lazy(() => import('@/pages/public/Media')),
   History: lazy(() => import('@/pages/public/History')),
   Rules: lazy(() => import('@/pages/public/Rules')),
+  Discipline: lazy(() => import('@/pages/public/Discipline')),
   Tv: lazy(() => import('@/pages/public/TvMode')),
 }
 const named = <T extends string>(loader: () => Promise<Record<T, React.ComponentType>>, name: T) => lazy(() => loader().then((m) => ({ default: m[name] })))
@@ -40,6 +41,7 @@ const A = {
   McProgram: lazy(() => import('@/pages/admin/MatchCenterProgram')),
   McLive: lazy(() => import('@/pages/admin/MatchCenter')),
   XP: lazy(() => import('@/pages/admin/XPRules')),
+  Discipline: lazy(() => import('@/pages/admin/DisciplineAdmin')),
   TeamOfWeek: lazy(() => import('@/pages/admin/TeamOfWeekAdmin')),
   Stats: named(misc, 'StatsAdmin'), Awards: named(misc, 'AwardsAdmin'), Import: named(misc, 'ImportCsv'), Broadcast: named(misc, 'Broadcast'),
   Media: named(content, 'MediaAdmin'), Rules: named(content, 'RulesEditor'), Settings: named(content, 'SettingsPage'), Admins: named(content, 'AdminsPage'), Audit: named(content, 'AuditPage'),
@@ -70,6 +72,7 @@ export default function App() {
           <Route path="match-center" element={guard('match_center', <A.McProgram />)} />
           <Route path="match-center/:id" element={guard('match_center', <A.McLive />)} />
           <Route path="xp" element={guard('xp', <A.XP />)} />
+          <Route path="discipline" element={guard('sport', <A.Discipline />)} />
           <Route path="equipe-type" element={guard('sport', <A.TeamOfWeek />)} />
           <Route path="statistiques" element={guard('sport', <A.Stats />)} />
           <Route path="trophees" element={guard('awards', <A.Awards />)} />
@@ -97,6 +100,7 @@ export default function App() {
           <Route path="media" element={<P.Media />} />
           <Route path="historique" element={<P.History />} />
           <Route path="reglement" element={<P.Rules />} />
+          <Route path="discipline" element={<P.Discipline />} />
           <Route path="*" element={<div className="py-20 text-center"><h1 className="title-caps text-5xl">404</h1><p className="text-muted-foreground">Page introuvable</p></div>} />
         </Route>
       </Routes>

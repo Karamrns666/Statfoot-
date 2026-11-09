@@ -26,6 +26,9 @@ import {
   pause, periodLength, playerBadges, possession, possessionAfter, resume, setAddedTime, setPossession, shootout, sortEvents, startPeriod, timelineByPeriod, PERIOD_LABEL, scoreFromEvents,
 } from '@/lib/matchEngine'
 import { isKnockout, matchXPLines, xpConfig, XP_LABELS } from '@/lib/stats'
+import { REGLEMENT, inferiorityAt, rulesForSeason } from '@/lib/reglement'
+import { InferiorityBar } from '@/components/reglement/InferiorityBar'
+import { ArtLink } from '@/components/reglement/ArtLink'
 import { EVENT_LABEL, fmtDate, fmtTime, playerShort } from '@/lib/format'
 import { STAGE_LABELS } from '@/lib/schedule'
 import { can } from '@/lib/permissions'
@@ -106,9 +109,9 @@ export default function MatchCenter() {
     const after = possessionAfter(m, { type, team_id: team })
     if (after && ls.running) await mutateLive((s, t) => setPossession(s, after, t))
     const main = rows[0] as MatchEvent
-    const label = `${main.type === 'second_yellow' ? '2e jaune → rouge' : EVENT_LABEL[main.type]}${main.player_id ? ` · ${playerShort(L.player.get(main.player_id))}` : ''} · ${fmtMinute(main.minute, main.added_minute)}`
+    const label = `${main.type === 'second_yellow' ? '2e avertissement → rouge' : EVENT_LABEL[main.type]}${main.player_id ? ` · ${playerShort(L.player.get(main.player_id))}` : ''} · ${fmtMinute(main.minute, main.added_minute)}`
     setUndo({ id: main.id!, label, until: Date.now() + 4500 })
-    if ((main.type === 'red_card' || main.type === 'second_yellow') && main.player_id) setFlow({ kind: 'suspension', player: main.player_id, event: main.id! })
+    if ((main.type === 'red_card' || main.type === 'second_yellow') && main.player_id && main.card_target !== 'official') setFlow({ kind: 'suspension', player: main.player_id, event: main.id! })
     return main
   }, [m, ls, canWrite, d, events, db.Lineup, user, mutateLive, L.player])
 
@@ -135,8 +138,10 @@ export default function MatchCenter() {
   const lineupsOk = !!lineups[m.home_team_id]?.validated && !!lineups[m.away_team_id]?.validated
   const score = scoreFromEvents(m, events)
   const knockout = isKnockout(m) || comp?.phase === 'knockout'
-  const etEnabled = knockout || !!comp?.extra_time?.enabled
-  const step = nextStep(ls, { extraTime: etEnabled, drawn: score.home === score.away })
+  // Art. 5.5 : pas de prolongation ; en phase éliminatoire, égalité → tirs au but directement
+  const step = nextStep(ls, { extraTime: REGLEMENT.duration.extraTime, shootout: knockout, drawn: score.home === score.away })
+  const effNow = isPlaying(ls?.period ?? 'pre') ? ((ls?.period === '2H' ? d.half * 60_000 : 0) + elapsedMs(ls!, now)) : 0
+  const inferiority = isPlaying(ls?.period ?? 'pre') ? inferiorityAt(m, events, effNow, d.half) : []
   const period = ls?.period ?? 'pre'
   const ms = ls ? elapsedMs(ls, now) : 0
   const fm = isPlaying(period) ? footballMinute(period, ms, d) : null
@@ -205,11 +210,12 @@ export default function MatchCenter() {
             </div>
             <ScoreSide team={away} scorers={events.filter((e) => (e.type === 'goal' && e.team_id === m.away_team_id) || (e.type === 'own_goal' && e.team_id === m.home_team_id))} xp={xpBy} align="right" />
           </div>
+          <InferiorityBar list={inferiority} home={home?.short_name} away={away?.short_name} />
           {canWrite && (
             <div className="mt-3 flex flex-wrap justify-center gap-2">
               {step && <Button size="lg" className="h-14 min-w-44 text-base" onClick={runStep}>{step.action === 'kickoff' ? <Play /> : <Flag />}{step.label}</Button>}
               {isPlaying(period) && <Button size="lg" variant="outline" className="h-14" onClick={() => mutateLive((s, t) => (s.running ? pause(s, t) : resume(s, t)))}>{ls?.running ? <><Pause />Pause</> : <><Play />Reprendre</>}</Button>}
-              {isPlaying(period) && <AddedTime value={addedPlanned ?? 0} onChange={(v) => mutateLive((s) => setAddedTime(s, period as Period, v))} />}
+              {isPlaying(period) && !REGLEMENT.duration.effectiveTime && <AddedTime value={addedPlanned ?? 0} onChange={(v) => mutateLive((s) => setAddedTime(s, period as Period, v))} />}
             </div>
           )}
           {m.status === 'finished' && user && can(user, 'match_center') && <div className="mt-3 flex justify-center"><Button variant="outline" onClick={async () => { await reopenMatch(m, user); await mutateLive((s) => ({ ...s, period: '2H', running: false })); toast.info('Match rouvert — l’XP officiel est retiré jusqu’à la nouvelle clôture') }}><RotateCcw />Rouvrir le match</Button></div>}
@@ -430,6 +436,36 @@ function ShootoutPanel({ match, events, onKick }: { match: Match; events: MatchE
 // ---------------------------------------------------------------------------
 //  Dialogues d'action
 // ---------------------------------------------------------------------------
+/** Le joueur est-il sur le terrain (titulaire non remplacé ou entré en jeu) ? Sinon : remplaçant sur le banc. */
+function onPitch(match: Match, events: MatchEvent[], teamId: string, pid: string, lineups: { match_id: string; team_id: string; starter_ids?: string[] }[]) {
+  const lu = lineups.find((l) => l.match_id === match.id && l.team_id === teamId)
+  let on = !lu || !!lu.starter_ids?.includes(pid)
+  for (const e of sortEvents(events.filter((x) => x.team_id === teamId && x.type === 'substitution'))) {
+    if (e.player_id === pid) on = true
+    if (e.related_player_id === pid) on = false
+  }
+  return on
+}
+
+/** Après un rouge : 1 match automatique (Art. 11.6) + suspension supplémentaire éventuelle décidée par Ardentia. */
+function ExtraSuspensionForm({ player, xpPer, onSave, onCancel }: { player?: Player; xpPer: number; onSave: (x: { matches: number; reason: string; report: string; notified: string }) => void; onCancel: () => void }) {
+  const [v, setV] = useState({ matches: 0, reason: '', report: '', notified: '' })
+  return (
+    <form className="space-y-3 text-sm" onSubmit={(e) => { e.preventDefault(); onSave(v) }}>
+      <p><b>{player?.first_name} {player?.last_name}</b> est expulsé : <b>1 match de suspension automatique</b>, à purger au prochain match disputé de son équipe. <ArtLink art={REGLEMENT.cards.artRed} /></p>
+      <fieldset className="space-y-2 rounded-xl border border-white/10 p-3">
+        <legend className="px-1 text-xs font-semibold">Suspension supplémentaire (décision Ardentia, selon la gravité)</legend>
+        <label className="flex items-center gap-2 text-xs">Matchs en plus<Input type="number" min={0} max={20} value={v.matches} onChange={(e) => setV({ ...v, matches: Math.max(0, +e.target.value) })} className="h-8 w-20" /></label>
+        <Input value={v.reason} onChange={(e) => setV({ ...v, reason: e.target.value })} placeholder="Motif (violence, insultes, menaces, refus de quitter le terrain…)" aria-label="Motif" />
+        <textarea value={v.report} onChange={(e) => setV({ ...v, report: e.target.value })} placeholder="Rapport de l’arbitre" aria-label="Rapport de l’arbitre" className="min-h-16 w-full rounded-lg border border-input bg-night-950/40 p-2 text-sm" />
+        <label className="flex flex-wrap items-center gap-2 text-xs">Décision notifiée au capitaine le<Input type="date" value={v.notified} onChange={(e) => setV({ ...v, notified: e.target.value })} className="h-8 w-40" /></label>
+        <p className="text-[11px] text-muted-foreground">La décision doit être communiquée au capitaine avant le match suivant. Modifiable ensuite dans Admin → Discipline. −{xpPer} XP par match de suspension.</p>
+      </fieldset>
+      <div className="flex gap-2"><Button type="submit" disabled={v.matches > 0 && !v.reason.trim()}>{v.matches > 0 ? `Enregistrer (${1 + v.matches} matchs au total)` : 'Valider (1 match)'}</Button><Button type="button" variant="ghost" onClick={onCancel}>Plus tard</Button></div>
+    </form>
+  )
+}
+
 function PlayerGrid({ match, teamId, events, onPick, includeBench = true, onlyGk }: { match: Match; teamId: string; events: MatchEvent[]; onPick: (pid: string) => void; includeBench?: boolean; onlyGk?: boolean }) {
   const { db } = useData()
   const L = useLookup()
@@ -455,6 +491,7 @@ function FlowDialog({ flow, setFlow, match, events, act, ls }: { flow: Flow; set
   const { user } = useAuth()
   const [free, setFree] = useState('')
   const [n, setN] = useState('1')
+  const [official, setOfficial] = useState('')
   const opp = (t: string) => (t === match.home_team_id ? match.away_team_id : match.home_team_id)
   const close = () => setFlow(null)
   const teamName = (t: string) => L.team.get(t)?.name
@@ -483,7 +520,13 @@ function FlowDialog({ flow, setFlow, match, events, act, ls }: { flow: Flow; set
     }
     case 'card':
       title = `${flow.type === 'yellow_card' ? 'Carton jaune' : 'Carton rouge'} — ${teamName(flow.team)}`
-      body = <div className="space-y-3"><PlayerGrid match={match} teamId={flow.team} events={events} onPick={async (p) => { setFlow(null); await act(flow.team, flow.type, { player_id: p }) }} />
+      body = <div className="space-y-3">
+        <p className="text-xs text-muted-foreground">Joueur sur le terrain ou remplaçant (un jaune reçu sur le banc compte dans le cumul) — {flow.type === 'yellow_card' ? <>2e jaune du match = rouge automatique « 2e avertissement ». <ArtLink art={REGLEMENT.cards.artYellow} /></> : <>au moins 1 match de suspension et 2 min d’infériorité. <ArtLink art={REGLEMENT.cards.artRed} /></>}</p>
+        <PlayerGrid match={match} teamId={flow.team} events={events} onPick={async (p) => { setFlow(null); await act(flow.team, flow.type, { player_id: p, card_target: onPitch(match, events, flow.team, p, db.Lineup) ? 'player' : 'substitute' }) }} />
+        <form className="flex gap-2" onSubmit={async (e) => { e.preventDefault(); const name = official.trim(); setFlow(null); await act(flow.team, flow.type, { card_target: 'official', player_name_free: name || 'Officiel d’équipe' }) }}>
+          <Input value={official} onChange={(e) => setOfficial(e.target.value)} placeholder="Officiel d’équipe (nom)" aria-label="Nom de l’officiel d’équipe" />
+          <Button type="submit" variant="outline">Officiel</Button>
+        </form>
         <Button variant="outline" className="w-full" onClick={async () => { setFlow(null); await act(flow.team, flow.type) }}>Joueur inconnu</Button></div>
       break
     case 'shot':
@@ -544,8 +587,17 @@ function FlowDialog({ flow, setFlow, match, events, act, ls }: { flow: Flow; set
     }
     case 'suspension': {
       const p = L.player.get(flow.player)
+      const xpPer = Math.abs(xpConfig(db.XPRule, match.season_id).per_suspension_match)
+      if (rulesForSeason(db.Season.find((s) => s.id === match.season_id)).cumulativeCards) {
+        title = 'Expulsion — suspension'
+        body = <ExtraSuspensionForm player={p} xpPer={xpPer} onCancel={close} onSave={async (x) => {
+          if (x.matches > 0) await base44.entities.Suspension.create({ kind: 'extra', season_id: match.season_id, player_id: flow.player, team_id: p?.team_id, origin_match_id: match.id, origin_event_id: flow.event, date: match.date?.slice(0, 10), matches: x.matches, reason: x.reason, referee_report: x.report, notified_at: x.notified || undefined, created_by: user?.email })
+          toast.success(x.matches > 0 ? `Suspension : 1 match automatique + ${x.matches} supplémentaire(s)` : 'Suspension automatique : 1 match'); close()
+        }} />
+        break
+      }
       title = 'Créer la suspension ?'
-      body = <div className="space-y-3"><p className="text-sm">{p?.first_name} {p?.last_name} est exclu. Nombre de match(s) de suspension (−{Math.abs(xpConfig(db.XPRule, match.season_id).per_suspension_match)} XP par match) :</p>
+      body = <div className="space-y-3"><p className="text-sm">{p?.first_name} {p?.last_name} est exclu. Nombre de match(s) de suspension (−{xpPer} XP par match) :</p>
         <Input type="number" min={0} value={n} onChange={(e) => setN(e.target.value)} className="w-24" />
         <div className="flex gap-2"><Button onClick={async () => { await base44.entities.Suspension.create({ season_id: match.season_id, player_id: flow.player, origin_match_id: match.id, origin_event_id: flow.event, date: match.date?.slice(0, 10), matches: +n, created_by: user?.email }); toast.success('Suspension créée'); close() }}>Créer</Button><Button variant="ghost" onClick={close}>Plus tard (Règles XP → Suspensions)</Button></div></div>
       break

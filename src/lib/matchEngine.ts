@@ -8,9 +8,11 @@ import type {
   EventType, LivePeriod, LiveState, Lineup, Match, MatchEvent, Period, PossessionSlice, Player, Suspension,
 } from '@/types/entities'
 import { teamLiveShots } from './shots'
+import { REGLEMENT } from './reglement'
 
 export type Side = 'home' | 'away'
-export const DEFAULT_HALF_MIN = 15
+/** Art. 5.1 : 2 × 20 min de temps de jeu effectif */
+export const DEFAULT_HALF_MIN = REGLEMENT.duration.halfMin
 
 // ---------------------------------------------------------------------------
 //  Chrono
@@ -127,13 +129,13 @@ export function setAddedTime(ls: LiveState, p: Period, minutes: number): LiveSta
 }
 
 /** Prochaine étape proposée au bouton principal du tableau de score */
-export function nextStep(ls: LiveState | undefined, opts: { extraTime: boolean; drawn: boolean }): { label: string; action: 'kickoff' | 'halftime' | 'second_half' | 'end_regular' | 'start_et1' | 'start_et2' | 'end_et' | 'end_match' } | null {
+export function nextStep(ls: LiveState | undefined, opts: { extraTime: boolean; drawn: boolean; shootout?: boolean }): { label: string; action: 'kickoff' | 'halftime' | 'second_half' | 'end_regular' | 'start_et1' | 'start_et2' | 'end_et' | 'end_match' } | null {
   const p = ls?.period ?? 'pre'
   switch (p) {
     case 'pre': return { label: "Coup d'envoi", action: 'kickoff' }
     case '1H': return { label: 'Mi-temps', action: 'halftime' }
     case 'HT': return { label: 'Début 2e MT', action: 'second_half' }
-    case '2H': return opts.extraTime && opts.drawn ? { label: 'Fin du temps réglementaire', action: 'end_regular' } : { label: 'Fin du match', action: 'end_match' }
+    case '2H': return opts.extraTime && opts.drawn ? { label: 'Fin du temps réglementaire', action: 'end_regular' } : opts.shootout && opts.drawn ? { label: 'Tirs au but', action: 'end_et' } : { label: 'Fin du match', action: 'end_match' }
     case 'ET_BREAK': return { label: 'Début prolongation', action: 'start_et1' }
     case 'ET1': return { label: '2e période de prolongation', action: 'start_et2' }
     case 'ET2': return opts.drawn ? { label: 'Tirs au but', action: 'end_et' } : { label: 'Fin du match', action: 'end_match' }
@@ -407,7 +409,7 @@ export function timelineByPeriod(events: MatchEvent[]) {
 }
 export const PERIOD_LABEL: Record<Period, string> = { '1H': '1re mi-temps', '2H': '2e mi-temps', ET1: 'Prolongation 1', ET2: 'Prolongation 2', PENS: 'Tirs au but' }
 
-/** Durées d'un match (mi-temps 15 min par défaut, prolongation 5 min) */
+/** Durées d'un match (mi-temps 20 min par défaut — Art. 5.1 ; pas de prolongation — Art. 5.5) */
 export function durationsFor(m?: Pick<Match, 'half_duration_min'> | null, comp?: { half_duration_min?: number; extra_time?: { enabled: boolean; period_min: number } } | null): Durations {
   return { half: m?.half_duration_min ?? comp?.half_duration_min ?? DEFAULT_HALF_MIN, et: comp?.extra_time?.period_min ?? 5 }
 }

@@ -1,5 +1,7 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import { rulesForSeason } from '@/lib/reglement'
+import { useSeasonDiscipline } from '@/hooks/useDiscipline'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { AlertTriangle, CalendarCheck, CalendarClock, Goal, Plus, Radio, Shield, Square, Trophy, Users, CalendarDays, FileWarning, Gavel } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
@@ -19,6 +21,7 @@ export default function Dashboard() {
   const { db, league } = useData()
   const L = useLookup()
   const { seasonId, competitionId } = useAdminScope()
+  const discipline = useSeasonDiscipline(seasonId)
   const scope = { seasonId, competitionId: competitionId || null }
   const ms = db.Match.filter((m) => m.season_id === seasonId && (!competitionId || m.competition_id === competitionId))
   const k = useMemo(() => kpis(league, scope), [league, seasonId, competitionId]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -40,10 +43,13 @@ export default function Dashboard() {
   const docsKo = players.filter((p) => (['id_card', 'medical', 'license'] as const).some((d) => p.documents?.[d]?.status !== 'valid'))
   const pastOpen = ms.filter((m) => (m.status === 'scheduled' || m.status === 'live') && (m.date ?? '') < new Date(Date.now() - 3 * 3600_000).toISOString())
   const unsigned = ms.filter((m) => m.status === 'finished' && m.sheet?.status !== 'signed')
-  const exclusions = db.MatchEvent.filter((e) => (e.type === 'red_card' || e.type === 'second_yellow') && ms.some((m) => m.id === e.match_id) && !db.Suspension.some((s) => s.origin_event_id === e.id))
+  const cumulative = rulesForSeason(db.Season.find((s) => s.id === seasonId)).cumulativeCards
+  const exclusions = db.MatchEvent.filter((e) => (e.type === 'red_card' || e.type === 'second_yellow') && e.card_target !== 'official' && ms.some((m) => m.id === e.match_id) && !db.Suspension.some((s) => s.origin_event_id === e.id && (!cumulative || !!s.notified_at)))
+  const violations = discipline.flatMap((c) => [...c.players.values()].flatMap((d) => d.violations))
   const alerts = [
     pastOpen.length && { icon: CalendarClock, text: `${pastOpen.length} match(s) passé(s) non clôturé(s)`, to: '/admin/matchs?statut=scheduled' },
-    exclusions.length && { icon: Gavel, text: `${exclusions.length} exclusion(s) sans suspension saisie`, to: '/admin/xp' },
+    violations.length && { icon: Gavel, text: `${violations.length} joueur(s) suspendu(s) aligné(s) quand même`, to: '/admin/discipline' },
+    exclusions.length && { icon: Gavel, text: cumulative ? `${exclusions.length} expulsion(s) sans décision notifiée au capitaine` : `${exclusions.length} exclusion(s) sans suspension saisie`, to: cumulative ? '/admin/discipline' : '/admin/xp' },
     docsKo.length && { icon: FileWarning, text: `${docsKo.length} joueur(s) avec documents à traiter`, to: '/admin/joueurs' },
     unsigned.length && { icon: AlertTriangle, text: `${unsigned.length} feuille(s) de match non signée(s)`, to: '/admin/matchs' },
   ].filter(Boolean) as { icon: typeof Goal; text: string; to: string }[]

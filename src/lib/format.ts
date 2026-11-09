@@ -32,7 +32,7 @@ export const EVENT_LABEL: Record<EventType, string> = {
   goal: 'But', own_goal: 'But contre son camp', penalty_missed: 'Penalty manqué', goal_disallowed: 'But refusé',
   shot_on_target: 'Tir cadré', shot_off_target: 'Tir non cadré', save: 'Arrêt', penalty_saved: 'Penalty arrêté',
   corner: 'Corner', throw_in: 'Touche', free_kick: 'Coup franc', foul: 'Faute',
-  yellow_card: 'Carton jaune', second_yellow: '2e jaune (rouge)', red_card: 'Carton rouge', substitution: 'Remplacement', gk_change: 'Changement de gardien',
+  yellow_card: 'Carton jaune', second_yellow: '2e avertissement (rouge)', red_card: 'Carton rouge', substitution: 'Remplacement', gk_change: 'Changement de gardien',
   shootout_scored: 'TAB réussi', shootout_saved: 'TAB arrêté', shootout_missed: 'TAB manqué',
 }
 

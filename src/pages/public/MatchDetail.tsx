@@ -9,6 +9,9 @@ import { Button } from '@/components/ui/button'
 import { CompetitionBadge, EmptyState, FormPills } from '@/components/league/Bits'
 import { PlayerAvatar, PlayerLink, TeamLogo } from '@/components/league/Identity'
 import { LineupList } from '@/components/match/LineupList'
+import { SuspendedAbsents } from '@/components/reglement/SuspendedAbsents'
+import { ArtLink } from '@/components/reglement/ArtLink'
+import { REGLEMENT } from '@/lib/reglement'
 import { MotmVoteWidget } from '@/components/match/MotmVoteWidget'
 import { ShareVisualsDialog } from '@/components/share/ShareVisualsDialog'
 import { LiveBadge } from '@/components/match/LiveBadge'
@@ -118,11 +121,11 @@ export default function MatchDetail() {
         <TabsContent value="stats"><StatsTab match={m} events={events} now={now} /></TabsContent>
         <TabsContent value="lineups">
           <div className="grid gap-4 md:grid-cols-2">
-            <LineupList lineup={lineups.home} team={home} events={events} />
-            <LineupList lineup={lineups.away} team={away} events={events} />
+            <div><LineupList lineup={lineups.home} team={home} events={events} /><SuspendedAbsents match={m} teamId={m.home_team_id} /></div>
+            <div><LineupList lineup={lineups.away} team={away} events={events} /><SuspendedAbsents match={m} teamId={m.away_team_id} /></div>
           </div>
         </TabsContent>
-        <TabsContent value="preview"><PreMatch match={m} /></TabsContent>
+        <TabsContent value="preview"><div className="mb-3 grid gap-2 md:grid-cols-2"><SuspendedAbsents match={m} teamId={m.home_team_id} /><SuspendedAbsents match={m} teamId={m.away_team_id} /></div><PreMatch match={m} /></TabsContent>
       </Tabs>
       <MatchGallery match={m} />
       {share && <ShareVisualsDialog open={share} onOpenChange={setShare} match={m} />}
@@ -203,7 +206,7 @@ export function Timeline({ match, events }: { match: Match; events: MatchEvent[]
 }
 
 function EventText({ e, p, rel, align }: { e: MatchEvent; p?: Player; rel?: Player; align: 'left' | 'right' }) {
-  const label: Record<string, string> = { goal: e.goal_kind === 'penalty' ? 'But sur penalty' : e.goal_kind === 'header' ? 'But de la tête' : e.goal_kind === 'direct_free_kick' ? 'Coup franc direct' : 'But', own_goal: 'But contre son camp', penalty_missed: 'Penalty manqué', penalty_saved: 'Penalty arrêté', yellow_card: 'Carton jaune', second_yellow: '2e jaune → rouge', red_card: 'Carton rouge', goal_disallowed: 'But refusé', gk_change: 'Changement de gardien' }
+  const label: Record<string, string> = { goal: e.goal_kind === 'penalty' ? 'But sur penalty' : e.goal_kind === 'header' ? 'But de la tête' : e.goal_kind === 'direct_free_kick' ? 'Coup franc direct' : 'But', own_goal: 'But contre son camp', penalty_missed: 'Penalty manqué', penalty_saved: 'Penalty arrêté', yellow_card: 'Carton jaune', second_yellow: '2e avertissement → rouge', red_card: 'Carton rouge', goal_disallowed: 'But refusé', gk_change: 'Changement de gardien' }
   return (
     <div className={cn('text-sm', align === 'right' ? 'text-right' : 'text-left')}>
       <div className="font-semibold">
@@ -319,13 +322,13 @@ function CardsCard({ events }: { events: MatchEvent[] }) {
   if (!cards.length) return null
   return (
     <Card>
-      <CardHeader><CardTitle>Cartons</CardTitle></CardHeader>
+      <CardHeader><CardTitle className="flex flex-wrap items-center gap-2">Cartons<span className="ml-auto flex gap-2"><ArtLink art={REGLEMENT.cards.artYellow} /><ArtLink art={REGLEMENT.cards.artRed} /></span></CardTitle></CardHeader>
       <CardContent className="space-y-1 text-sm">
         {cards.map((e) => (
           <div key={e.id} className="flex items-center gap-2">
             <span className={cn('inline-block h-4 w-3 rounded-sm', e.type === 'yellow_card' ? 'bg-yellow-400' : 'bg-red-500')} aria-label={e.type === 'yellow_card' ? 'Carton jaune' : 'Carton rouge'} />
             <TeamLogo team={L.team.get(e.team_id)} size={16} />
-            <span className="flex-1">{playerShort(L.player.get(e.player_id ?? ''))}</span>
+            <span className="flex-1">{e.card_target === 'official' ? `${e.player_name_free ?? 'Officiel'} (officiel)` : playerShort(L.player.get(e.player_id ?? '')) || e.player_name_free}{e.card_target === 'substitute' ? <span className="text-xs text-muted-foreground"> (banc)</span> : null}{e.type === 'second_yellow' ? <span className="text-xs text-red-300"> 2e avertissement</span> : null}</span>
             <span className="text-xs text-muted-foreground">{fmtMinute(e.minute, e.added_minute)}</span>
           </div>
         ))}

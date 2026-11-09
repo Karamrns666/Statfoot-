@@ -205,7 +205,7 @@ export interface Lineup extends BaseEntity {
   validated?: boolean
   validated_by?: string
   validated_at?: string
-  waivers?: { player_id: string; reason: 'suspended' | 'documents'; by: string; at: string }[]
+  waivers?: { player_id: string; reason: 'suspended' | 'documents'; motif?: string; by: string; at: string }[]
 }
 
 export type LivePeriod = 'pre' | '1H' | 'HT' | '2H' | 'ET_BREAK' | 'ET1' | 'ET2' | 'PENS' | 'FT'

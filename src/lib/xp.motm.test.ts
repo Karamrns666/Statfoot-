@@ -13,6 +13,6 @@ describe('XP — homme du match', () => {
     const before = computePlayerXP(makeLeague(), { seasonId: 's1' }).get('A_FWD')!.xp
     expect(computePlayerXP(data, { seasonId: 's1' }).get('A_FWD')!.xp).toBe(before + 70)
     const custom = matchXPLines(data, m, xpConfig([{ id: 'r', season_id: 's1', key: 'motm', value: 0 }], 's1')).filter((l) => l.key === 'motm')
-    expect(custom[0].points).toBe(0)
+    expect(custom).toEqual([]) // valeur 0 : aucune ligne XP
   })
 })

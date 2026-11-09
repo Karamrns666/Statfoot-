@@ -28,7 +28,7 @@ jobs:
           npx playwright install --with-deps chromium > /dev/null 2>&1
           node e2e/serve.mjs dist &
           sleep 2
-          { timeout 600 node e2e/motm.mjs; echo "exit=$?"; } > ci-report.txt 2>&1
+          { timeout 900 node e2e/visuels.mjs; echo "exit=$?"; } > ci-report.txt 2>&1
           mkdir -p dist/e2e && cp -r e2e-out/* dist/e2e/ 2>/dev/null; true
       - name: Ranger le rapport
         if: always()

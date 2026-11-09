@@ -60,8 +60,8 @@ export default function Rules() {
           </p>
         )}
         <div className="mt-4 flex flex-wrap gap-2">
-          {book.pdf_url && <a href={book.pdf_url} download className="inline-flex h-10 items-center gap-2 rounded-lg bg-neon px-4 text-sm font-bold text-white hover:bg-neon/90"><FileDown className="size-4" />Télécharger le règlement (PDF)</a>}
-          <label className="relative flex h-10 min-w-0 flex-1 items-center sm:max-w-sm">
+          {book.pdf_url && <a href={book.pdf_url} download className="inline-flex h-10 w-full items-center justify-center gap-2 sm:w-auto rounded-lg bg-neon px-4 text-sm font-bold text-white hover:bg-neon/90"><FileDown className="size-4" />Télécharger le règlement (PDF)</a>}
+          <label className="relative flex h-10 min-w-0 basis-full items-center sm:max-w-sm sm:flex-1 sm:basis-0">
             <Search className="pointer-events-none absolute left-3 size-4 text-muted-foreground" aria-hidden />
             <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher dans le règlement (ex. carton, forfait)" aria-label="Rechercher dans le règlement"
               className="h-10 w-full rounded-lg border border-input bg-night-950/40 pl-9 pr-9 text-sm outline-none focus-visible:ring-2 focus-visible:ring-neon" />

@@ -21,6 +21,7 @@ const GROUPS: { title: string; keys: XPKey[] }[] = [
   { title: 'Résultat', keys: ['win', 'loss'] },
   { title: 'Discipline', keys: ['yellow', 'double_yellow_total', 'red_direct', 'per_suspension_match'] },
   { title: 'Gardien', keys: ['clean_sheet_gk', 'importance_league_phase', 'importance_gold', 'importance_silver', 'importance_knockout', 'save', 'penalty_saved', 'shootout_saved', 'goal_conceded_gk'] },
+  { title: 'Homme du match', keys: ['motm'] },
   { title: 'Bonus mensuels & trophées', keys: ['player_of_month', 'team_of_month', 'goal_of_month', 'min_matches_awards'] },
 ]
 

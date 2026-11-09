@@ -1,0 +1,48 @@
+MATCHS {"normal":"m25_1","big":"m25_100","gk":"m25_6","ff":"e2e_ff","fieldId":"p25_150","gkId":"p25_166","bigTop":"p25_53"}
+normal resultat mbl-j1-cop-waf-resultat.png 2407312 octets
+normal mvp mbl-j1-cop-waf-homme-du-match.png 2300874 octets
+normal MATCH {"motm":"p25_150","score":"3-2"}
+normal TEXTE
+🔥 RÉSULTAT | Championnat · J1
+Cooper Pharma 3 - 2 Wafasalaf
+⚽ COP : El Morabet ×2, Moradi · WAF : Naouar ×2
+🏆 Homme du match : Mohammed Amine El Morabet (COP)
+
+#MoroccoBusinessLeague #MBL #Ardentia #FootEntreprise
+buteurs resultat mbl-j13-avr-avc-resultat.png 2411561 octets
+buteurs mvp mbl-j13-avr-avc-homme-du-match.png 2309557 octets
+buteurs MATCH {"motm":"p25_53","score":"17-9"}
+buteurs TEXTE
+🔥 RÉSULTAT | Championnat · J13
+Atelier Vert Rabat 17 - 9 Atelier Vert Casa
+⚽ AVR : Afakhar ×8, Barouk ×4, Abderrahim ×4, Khalid · AVC : Tawil ×6, Lahbouki ×2, Fakih
+🏆 Homme du match : Zouhair Afakhar (AVR)
+
+#MoroccoBusinessLeague #MBL #Ardentia #FootEntreprise
+gardien resultat mbl-j1-cac-ctr-resultat.png 2420949 octets
+gardien mvp mbl-j1-cac-ctr-homme-du-match.png 2304781 octets
+gardien MATCH {"motm":"p25_166","score":"3-1"}
+gardien TEXTE
+🔥 RÉSULTAT | Championnat · J1
+CAC 3 - 1 CTR
+⚽ CAC : Youssef, Chafiq, Karim · CTR : Agourram
+🏆 Homme du match : Baki Said (CAC)
+
+#MoroccoBusinessLeague #MBL #Ardentia #FootEntreprise
+forfait resultat mbl-j3-atw-avr-resultat.png 2408415 octets
+forfait mvp désactivé (pas d’homme du match)
+forfait MATCH {"visuals":1,"score":"3-0"}
+forfait TEXTE
+🔥 RÉSULTAT | Phase de sélection · J3
+Attijariwafa bank 3 - 0 Atelier Vert Rabat
+🟩 Victoire sur tapis vert (forfait : Atelier Vert Rabat)
+
+#MoroccoBusinessLeague #MBL #Ardentia #FootEntreprise
+STORY mbl-j1-cop-waf-homme-du-match-story.png
+AUTO forfait {"hash":"11kymgt","version":1,"resultat_url":"/_files/visuel-resultat-mw9h6nzjvfdodg.png?v=1","generated_at":"2026-11-09T16:28:24.945Z"}
+ZIP mbl-visuels-phase-de-selection-j3.zip 2408891
+MISE EN PAGE alertes 0
+MOBILE partage boutons Télécharger l’image | Format story | Fermer
+FICHE JOUEUR HOMME DU MATCH ×1
+LOGS []
+exit=0

@@ -14,6 +14,7 @@ import { ArtLink } from '@/components/reglement/ArtLink'
 import { REGLEMENT } from '@/lib/reglement'
 import { MotmVoteWidget } from '@/components/match/MotmVoteWidget'
 import { ShareVisualsDialog } from '@/components/share/ShareVisualsDialog'
+import { ShareMatchButton } from '@/components/visuals/ShareMatchVisuals'
 import { LiveBadge } from '@/components/match/LiveBadge'
 import { TeamStatsBars } from '@/components/match/TeamStatsBars'
 import { fmtDate, fmtDateTime, playerShort, STATUS_LABEL } from '@/lib/format'
@@ -49,7 +50,7 @@ export default function MatchDetail() {
         <Button asChild variant="ghost" size="sm"><Link to="/matchs"><ArrowLeft />Matchs</Link></Button>
         <div className="flex gap-2">
           {m.status === 'scheduled' && <AddToCalendar matches={[m]} filename={`mbl-${home?.short_name ?? ''}-${away?.short_name ?? ''}.ics`.toLowerCase()} />}
-          {showScore && <Button variant="outline" size="sm" onClick={() => setShare(true)}><Share2 />Visuels Instagram</Button>}
+          {m.status === 'finished' && showScore ? <ShareMatchButton match={m} /> : showScore && <Button variant="outline" size="sm" onClick={() => setShare(true)}><Share2 />Visuels Instagram</Button>}
         </div>
       </div>
       <section className="relative overflow-hidden rounded-3xl border border-white/10 p-5 sm:p-8">

@@ -1,6 +1,7 @@
 // Opérations métier sur un match (couche data) : utilisées par la saisie rapide, le Match Center et la feuille de match.
 // Dans Base44, ces fonctions deviennent des appels base44.entities.* (ou une fonction backend).
 import { base44, store } from './base44Client'
+import { suggestMotm } from '@/lib/visuals/model'
 import { newId } from './localStore'
 import type { AdminUser, LiveState, Match, MatchEvent } from '@/types/entities'
 import type { LeagueData } from '@/lib/stats'
@@ -118,6 +119,8 @@ export async function closeMatch(data: LeagueData, match: Match, by: AdminUser |
     penalties: so.home.length + so.away.length > 0 || undefined, home_pens: so.home.length ? so.home_score : null, away_pens: so.away.length ? so.away_score : null,
     extra_time: evs.some((e) => e.period === 'ET1' || e.period === 'ET2') || match.extra_time,
   }
+  // homme du match pré-rempli (plus d'XP dans le match) si l'admin ne l'a pas désigné — modifiable ensuite
+  if (!match.motm_player_id) patch.motm_player_id = suggestMotm(data, { ...match, home_score: s.home, away_score: s.away })?.player_id
   await base44.entities.Match.update(match.id, patch)
   const ls = store.all<LiveState>('LiveState').find((l) => l.match_id === match.id)
   if (ls) await base44.entities.LiveState.update(ls.id, { period: 'FT', running: false, period_started_at: null })

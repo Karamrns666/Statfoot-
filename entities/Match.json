@@ -134,6 +134,21 @@
     "half_duration_min": {
       "type": "integer",
       "default": 15
+    },
+    "forfeit_team_id": {
+      "type": "string",
+      "description": "équipe forfait (tapis vert, 3-0)"
+    },
+    "visual_mvp_template": {
+      "type": "string",
+      "enum": [
+        "mvp",
+        "mvp2"
+      ]
+    },
+    "visuals": {
+      "type": "object",
+      "description": "cache des visuels réseaux sociaux (hash, version, urls)"
     }
   },
   "required": [

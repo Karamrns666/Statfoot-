@@ -19,6 +19,7 @@ export const XP_DEFAULTS: Record<XPKey, number> = {
   win: 50, loss: -50,
   yellow: -20, double_yellow_total: -40, red_direct: -50, per_suspension_match: -50,
   clean_sheet_gk: 50, save: 5, penalty_saved: 30, shootout_saved: 20, goal_conceded_gk: -10,
+  motm: 70,
   player_of_month: 100, team_of_month: 50, goal_of_month: 50,
   min_matches_awards: 1,
   // ⚠️ Coefficients d'importance (clean sheet × importance) : valeurs à confirmer par la ligue → neutres (×1) par défaut.
@@ -30,7 +31,7 @@ export const XP_LABELS: Record<XPKey, string> = {
   mult_top3: 'Multiplicateur adversaire classé 1er–3e', mult_4_6: 'Multiplicateur adversaire classé 4e–6e', mult_7plus: 'Multiplicateur adversaire classé 7e et +',
   win: 'Victoire', loss: 'Défaite', yellow: 'Carton jaune', double_yellow_total: '2 jaunes même match (total)', red_direct: 'Carton rouge direct',
   per_suspension_match: 'Par match de suspension', clean_sheet_gk: 'Clean sheet gardien (× importance)', save: 'Arrêt', penalty_saved: 'Penalty arrêté',
-  shootout_saved: 'Tir au but arrêté', goal_conceded_gk: 'But encaissé (gardien)', player_of_month: 'Joueur du mois', team_of_month: 'Équipe du mois',
+  shootout_saved: 'Tir au but arrêté', goal_conceded_gk: 'But encaissé (gardien)', motm: 'Homme du match', player_of_month: 'Joueur du mois', team_of_month: 'Équipe du mois',
   goal_of_month: 'But du mois', min_matches_awards: "Matchs minimum (Ballon d'or / Gant d'or)",
   importance_league_phase: 'Importance — phase de ligue', importance_gold: 'Importance — Gold Cup', importance_silver: 'Importance — Silver Cup', importance_knockout: 'Importance — phases finales',
 }
@@ -226,6 +227,8 @@ export function matchXPLines(data: XPData, match: Match, cfg: XPConfig, opts: { 
       if (k.conceded) out.push(line(k.player_id, 'goal_conceded_gk', cfg, k.conceded, 1, base))
     }
   }
+  // homme du match (désigné à la fin du match : admin ou vote du public)
+  if (match.motm_player_id) out.push(line(match.motm_player_id, 'motm', cfg, 1, 1, base))
   return out.filter((l) => l.points !== 0 || l.key === 'clean_sheet_gk')
 }
 

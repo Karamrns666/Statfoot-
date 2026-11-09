@@ -246,6 +246,7 @@ export type XPKey =
   | 'red_direct' | 'per_suspension_match' | 'clean_sheet_gk' | 'save' | 'penalty_saved' | 'shootout_saved'
   | 'goal_conceded_gk' | 'player_of_month' | 'team_of_month' | 'goal_of_month' | 'min_matches_awards'
   | 'importance_league_phase' | 'importance_gold' | 'importance_silver' | 'importance_knockout'
+  | 'motm'
 export interface XPRule extends BaseEntity { season_id: string; key: XPKey; value: number }
 
 export interface Suspension extends BaseEntity {

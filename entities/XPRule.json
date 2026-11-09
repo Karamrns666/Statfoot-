@@ -31,7 +31,8 @@
         "importance_league_phase",
         "importance_gold",
         "importance_silver",
-        "importance_knockout"
+        "importance_knockout",
+        "motm"
       ]
     },
     "value": {

@@ -95,6 +95,9 @@ export function XPExplainer({ seasonId, className }: { seasonId?: string | null;
             <Item label={XP_LABELS.red_direct} value={pts(cfg, 'red_direct')} />
             <Item label="Chaque match de suspension" value={pts(cfg, 'per_suspension_match')} />
           </Block>
+          <Block title="Homme du match">
+            <Item label={XP_LABELS.motm} value={pts(cfg, 'motm')} note="désigné à la fin de chaque match" />
+          </Block>
           <Block title="Bonus du mois">
             <Item label={XP_LABELS.player_of_month} value={pts(cfg, 'player_of_month')} />
             <Item label={XP_LABELS.team_of_month} value={pts(cfg, 'team_of_month')} note="pour chaque joueur de l’équipe ayant joué ce mois-ci" />

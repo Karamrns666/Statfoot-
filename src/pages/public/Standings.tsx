@@ -7,11 +7,12 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { StandingsTable } from '@/components/standings/StandingsTable'
-import { competitionStandings, generalStandings, pointsConfig } from '@/lib/stats'
+import { competitionStandings, generalStandings } from '@/lib/stats'
+import { REGLEMENT } from '@/lib/reglement'
+import { TiebreakNote } from '@/components/reglement/TiebreakNote'
 import { competitionZones } from '@/lib/zones'
 import { exportStandingsPdf } from '@/lib/pdf'
 
-const TB: Record<string, string> = { points: 'points', goal_diff: 'différence de buts', goals_for: 'buts marqués', head_to_head: 'confrontation directe', fair_play: 'fair-play', wins: 'victoires' }
 
 export default function Standings() {
   const { league, settings } = useData()
@@ -22,7 +23,7 @@ export default function Standings() {
   const [tab, setTab] = useState(defaultTab)
   const general = useMemo(() => (season ? generalStandings(league, season.id) : []), [league, season])
   if (!comps.length) return <EmptyState title="Aucune compétition pour cette saison" />
-  const pc = pointsConfig(settings)
+  const pc = REGLEMENT.points
   const tabs = [...comps.map((c) => ({ id: c.id, label: c.name, rows: competitionStandings(league, c.id), comp: c })), ...(comps.length > 1 ? [{ id: 'general', label: 'Général', rows: general, comp: undefined }] : [])]
   const current = tabs.find((t) => t.id === tab) ?? tabs[0]
   return (
@@ -37,7 +38,8 @@ export default function Standings() {
             <Card><CardContent className="px-1 pt-4 sm:px-4">
               <StandingsTable rows={t.rows} zones={t.comp ? competitionZones(t.comp, t.rows.length, season?.gold_size ?? 10) : [{ from: 1, to: 10, color: '#facc15', label: 'Gold Cup' }, { from: 11, to: 20, color: '#94a3b8', label: 'Silver Cup' }]} />
             </CardContent></Card>
-            <p className="mt-3 text-xs text-muted-foreground">Départage : {pc.tiebreakers.map((x) => TB[x]).join(' › ')}.{t.id === 'general' ? ' Classement général : Gold Cup (1–10) puis Silver Cup (11–20).' : ''}</p>
+            <TiebreakNote rows={t.rows} />
+            {t.id === 'general' && <p className="mt-2 px-1 text-xs text-muted-foreground">Classement général : Gold Cup (1–10) puis Silver Cup (11–20).</p>}
           </TabsContent>
         ))}
       </Tabs>

@@ -26,6 +26,8 @@ export interface Season extends BaseEntity {
   cup_rounds?: number
   gold_size?: number
   closed_at?: string
+  /** version du règlement Ardentia applicable (ex. 'v4') */
+  rulebook_version?: string
 }
 
 export interface Competition extends BaseEntity {
@@ -48,6 +50,8 @@ export interface Competition extends BaseEntity {
   split?: { gold_to: number; silver_from: number; gold_name?: string; silver_name?: string }
   /** division issue de la phase de sélection */
   parent_id?: string
+  /** Art. 17.3 : ordre fixé par tirage au sort par Ardentia (égalité parfaite) */
+  draw_order?: string[]
 }
 
 export interface Division extends BaseEntity { name: string; level: number; promotion_count?: number; relegation_count?: number; color?: string }
@@ -181,6 +185,8 @@ export interface MatchEvent extends BaseEntity {
   auto?: boolean
   parent_event_id?: string
   shootout_order?: number
+  /** carton : joueur sur le terrain, remplaçant (banc) ou officiel d'équipe (Art. 2.5) — nom de l'officiel dans player_name_free */
+  card_target?: 'player' | 'substitute' | 'official'
   client_id?: string
   client_ts?: string
   operator?: string
@@ -251,6 +257,25 @@ export interface Suspension extends BaseEntity {
   matches: number
   served_match_ids?: string[]
   created_by?: string
+  /** 'extra' = suspension supplémentaire décidée par Ardentia (s'ajoute au match automatique, Art. 11.6) */
+  kind?: 'extra'
+  team_id?: string
+  reason?: string
+  referee_report?: string
+  /** date de notification de la décision au capitaine */
+  notified_at?: string
+}
+
+/** Version du règlement officiel Ardentia (texte intégral, rattaché à une saison) */
+export interface Rulebook extends BaseEntity {
+  version: string
+  title: string
+  date: string
+  season_id?: string
+  content: string
+  pdf_url?: string
+  status: 'current' | 'archived'
+  changes?: string
 }
 
 export interface MonthlyAward extends BaseEntity {
@@ -325,7 +350,6 @@ export interface TeamOfWeek extends BaseEntity {
 
 export interface MotmVote extends BaseEntity { match_id: string; player_id: string; voter_key: string }
 
-export type Tiebreaker = 'points' | 'head_to_head' | 'goal_diff' | 'goals_for' | 'wins' | 'fair_play'
 export interface Settings extends BaseEntity {
   league_name?: string
   short_name?: string
@@ -338,10 +362,6 @@ export interface Settings extends BaseEntity {
   website?: string
   /** instagram = compte MBL ; organizer_instagram / linkedin = Ardentia */
   socials?: { instagram?: string; organizer_instagram?: string; facebook?: string; linkedin?: string; youtube?: string; tiktok?: string }
-  points_win?: number
-  points_draw?: number
-  points_loss?: number
-  tiebreakers?: Tiebreaker[]
   motm_vote_minutes_after?: number
 }
 
@@ -394,9 +414,10 @@ export interface EntityMap {
   Page: Page
   AuditLog: AuditLog
   AdminUser: AdminUser
+  Rulebook: Rulebook
 }
 export type EntityName = keyof EntityMap
 export const ENTITY_NAMES: EntityName[] = [
   'Season', 'Competition', 'Division', 'Group', 'Venue', 'Team', 'Player', 'Match', 'MatchEvent', 'Lineup', 'LiveState',
-  'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser',
+  'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser', 'Rulebook',
 ]

@@ -3,9 +3,9 @@
 //  • Saison 2026-2027 — saison en cours : 20 entreprises, Gold Cup et Silver Cup (./season2026.ts).
 //    Matchs et effectifs : import du fichier de la ligue ou saisie dans l'admin.
 // Pur : renvoie { Entité: lignes[] }.
-import type { AdminUser, Award, EntityMap, EntityName, Page, Settings, Venue, XPRule } from '@/types/entities'
+import type { AdminUser, Award, EntityMap, EntityName, Settings, Venue, XPRule } from '@/types/entities'
 import { computeAwards, computePlayerXP, teamRankBefore, XP_DEFAULTS, XP_KEYS, type LeagueData } from '@/lib/stats'
-import { RULES_MARKDOWN } from './rules'
+import { buildRulebooks } from './rulebook'
 import { LEAGUE } from '@/config/league'
 import { buildSeason2025 } from './season2025'
 import { buildSeason2026 } from './season2026'
@@ -17,17 +17,16 @@ const id = (p: string) => `${p}_${(++c).toString(36)}`
 
 export function generateLeagueData(now = new Date()): DB {
   c = 0
-  const db = Object.fromEntries((['Season', 'Competition', 'Division', 'Group', 'Venue', 'Team', 'Player', 'Match', 'MatchEvent', 'Lineup', 'LiveState', 'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser'] as EntityName[]).map((n) => [n, []])) as unknown as DB
+  const db = Object.fromEntries((['Season', 'Competition', 'Division', 'Group', 'Venue', 'Team', 'Player', 'Match', 'MatchEvent', 'Lineup', 'LiveState', 'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser', 'Rulebook'] as EntityName[]).map((n) => [n, []])) as unknown as DB
 
   const settings: Settings = {
     id: 'settings', league_name: LEAGUE.name, short_name: LEAGUE.shortName, tagline: LEAGUE.tagline,
     organizer: LEAGUE.organizer.name, logo_url: LEAGUE.logo, contact_email: LEAGUE.organizer.email, contact_phone: LEAGUE.organizer.phone, address: LEAGUE.organizer.address,
     website: LEAGUE.organizer.website, socials: { instagram: LEAGUE.instagram, organizer_instagram: LEAGUE.organizer.instagram, linkedin: LEAGUE.organizer.linkedin },
-    points_win: 3, points_draw: 1, points_loss: 0, tiebreakers: ['points', 'goal_diff', 'goals_for', 'head_to_head', 'fair_play'],
     motm_vote_minutes_after: 15,
   }
   db.Settings.push(settings)
-  db.Page.push({ id: 'page_rules', slug: 'reglement', title: 'Règlement de la ligue', content: RULES_MARKDOWN, published: true } as Page)
+  db.Rulebook.push(...buildRulebooks())
   db.Venue.push({ id: 'venue_main', name: 'Complexe sportif MBL', address: 'Casablanca', pitches: ['Terrain 1', 'Terrain 2'] } as Venue)
   db.Division.push({ id: 'div_gold', name: 'Gold', level: 1, color: '#E8B931' }, { id: 'div_silver', name: 'Silver', level: 2, color: '#C9D3DD' })
 

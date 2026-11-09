@@ -44,6 +44,6 @@ export function makeLeague(o: Partial<LeagueData> = {}): LeagueData {
     seasons: [{ id: 's1', name: 'Saison test', start_date: '2025-09-01' }],
     competitions: [{ id: 'lp', season_id: 's1', name: 'Phase de ligue', phase: 'league_phase', team_ids: ['A', 'B', 'C', 'D'] }],
     teams, players, matches, events, lineups, xpRules: [], suspensions: [], monthlyAwards: [],
-    settings: { points_win: 3, points_draw: 1, points_loss: 0 }, ...o,
+    settings: {}, ...o,
   }
 }

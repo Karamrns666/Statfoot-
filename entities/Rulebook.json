@@ -1,0 +1,43 @@
+{
+  "name": "Rulebook",
+  "type": "object",
+  "description": "Version du règlement officiel Ardentia (texte intégral, une version par saison)",
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "season_id": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string",
+      "description": "texte intégral (markdown)"
+    },
+    "pdf_url": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "current",
+        "archived"
+      ]
+    },
+    "changes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "version",
+    "title",
+    "content",
+    "status"
+  ]
+}

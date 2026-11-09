@@ -3,6 +3,7 @@
 //  Classements : ./standings  ·  XP & trophées : ./xp  ·  Match en direct : ./matchEngine
 // ============================================================================
 import type { AwardCategory, Competition, Division, Group, Match, MatchEvent, MatchTeamStats, Position } from '@/types/entities'
+import { REGLEMENT } from './reglement'
 import { addShots, emptyShots, teamMatchShots, type ShotTotals } from './shots'
 import { byDate, competitionStandings, isKnockout, isPlayed, winnerOf, type StandingRow } from './standings'
 import { computePlayerXP, matchInScope, race, xpConfig, type PlayerXP, type XPData, type XPScope } from './xp'
@@ -80,7 +81,7 @@ export function computeTeamStats(data: LeagueData, scope: XPScope = {}): Map<str
     if (!out.has(id)) out.set(id, { team_id: id, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, gd: 0, points: 0, clean_sheets: 0, yellow: 0, red: 0, gf_avg: 0, ga_avg: 0, shot: emptyShots(), timeline: [] })
     return out.get(id)!
   }
-  const pw = data.settings.points_win ?? 3, pd = data.settings.points_draw ?? 1, pl = data.settings.points_loss ?? 0
+  const pw = REGLEMENT.points.win, pd = REGLEMENT.points.draw, pl = REGLEMENT.points.loss
   const evByMatch = new Map<string, MatchEvent[]>()
   for (const e of data.events) { if (!evByMatch.has(e.match_id)) evByMatch.set(e.match_id, []); evByMatch.get(e.match_id)!.push(e) }
   for (const m of ms) {

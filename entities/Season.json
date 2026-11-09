@@ -39,6 +39,10 @@
     "closed_at": {
       "type": "string",
       "format": "date-time"
+    },
+    "rulebook_version": {
+      "type": "string",
+      "description": "version du règlement Ardentia applicable"
     }
   },
   "required": [

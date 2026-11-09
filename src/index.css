@@ -215,3 +215,8 @@
   .tv-progress, .tv-goal { animation: none !important; } .tv-bar { transition: none; }
   .animate-marquee { animation: none; }
 }
+
+/* Règlement : article ciblé par un lien partagé (/reglement#art-17-3) */
+.rule-section:target { animation: rule-target 2.4s ease-out 1; }
+@keyframes rule-target { 0%, 40% { background: color-mix(in oklab, var(--color-neon) 14%, transparent); box-shadow: 0 0 0 8px color-mix(in oklab, var(--color-neon) 14%, transparent); } 100% { background: transparent; box-shadow: 0 0 0 8px transparent; } }
+@media (prefers-reduced-motion: reduce) { .rule-section:target { animation: none; outline: 2px solid var(--color-neon); outline-offset: 6px; } }

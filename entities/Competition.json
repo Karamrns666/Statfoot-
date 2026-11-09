@@ -101,6 +101,13 @@
     "parent_id": {
       "type": "string",
       "description": "Compétition d'origine (phase de sélection)"
+    },
+    "draw_order": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Art. 17.3 : ordre fixé par tirage au sort"
     }
   },
   "required": [

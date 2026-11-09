@@ -5,6 +5,7 @@ import { TeamLogo } from '@/components/league/Identity'
 import { FormPills } from '@/components/league/Bits'
 import { SortableTable, type SortColumn } from '@/components/league/SortableTable'
 import { cn } from '@/lib/utils'
+import { tiebreakText } from '@/components/reglement/TiebreakNote'
 
 export interface Zone { from: number; to: number; color: string; label: string }
 
@@ -17,7 +18,7 @@ export function StandingsTable({ rows, compact = false, zones: zonesIn = [], hig
   const full = !compact
   const n = 'num text-center text-base'
   const columns: SortColumn<StandingRow>[] = [
-    { key: 'rank', label: 'Pos', headClassName: 'w-12 text-center', className: 'relative text-center', first: 'asc', sort: (r) => r.rank, render: (r) => { const z = zoneOf(r.rank); return <>{z && <span className="absolute inset-y-1 left-0 w-1 rounded-full" style={{ background: z.color }} title={z.label} />}<span className="num text-lg">{r.rank}</span></> } },
+    { key: 'rank', label: 'Pos', headClassName: 'w-12 text-center', className: 'relative text-center', first: 'asc', sort: (r) => r.rank, render: (r) => { const z = zoneOf(r.rank); return <>{z && <span className="absolute inset-y-1 left-0 w-1 rounded-full" style={{ background: z.color }} title={z.label} />}<span className="num text-lg">{r.rank}</span>{r.tiebreak && r.played > 0 && <span className="absolute right-0.5 top-1 size-1.5 rounded-full bg-neon/80" title={tiebreakText(r, (id) => L.team.get(id)?.name ?? id) ?? ''} aria-label="Départagé à égalité de points" />}</> } },
     { key: 'team', label: 'Équipe', className: 'max-w-[46vw] sm:max-w-none', sort: (r) => L.team.get(r.team_id)?.name, render: (r) => { const t = L.team.get(r.team_id); return <Link to={`/equipes/${r.team_id}`} className="flex items-center gap-2 hover:text-neon"><TeamLogo team={t} size={26} /><span className="truncate font-semibold">{t?.name}</span></Link> } },
     { key: 'played', label: 'MJ', title: 'Matchs joués', headClassName: 'text-center', className: cn(n, 'text-muted-foreground'), sort: (r) => r.played, render: (r) => r.played },
     ...(full ? [
@@ -26,6 +27,8 @@ export function StandingsTable({ rows, compact = false, zones: zonesIn = [], hig
       { key: 'lost', label: 'D', title: 'Défaites', headClassName: 'text-center', className: n, sort: (r) => r.lost, render: (r) => r.lost },
       { key: 'gf', label: 'BP', title: 'Buts pour', headClassName: 'text-center hidden sm:table-cell', className: cn(n, 'hidden sm:table-cell'), sort: (r) => r.gf, render: (r) => r.gf },
       { key: 'ga', label: 'BC', title: 'Buts contre', headClassName: 'text-center hidden sm:table-cell', className: cn(n, 'hidden sm:table-cell'), sort: (r) => r.ga, render: (r) => r.ga },
+      { key: 'yellow', label: 'CJ', title: 'Cartons jaunes (départage, critère 5)', headClassName: 'text-center hidden md:table-cell', className: cn(n, 'hidden md:table-cell text-amber-300/90'), sort: (r) => r.yellow, render: (r) => r.yellow },
+      { key: 'red', label: 'CR', title: 'Cartons rouges (départage, critère 6)', headClassName: 'text-center hidden md:table-cell', className: cn(n, 'hidden md:table-cell text-red-300/90'), sort: (r) => r.red, render: (r) => r.red },
     ] as SortColumn<StandingRow>[] : []),
     { key: 'gd', label: 'Diff', title: 'Différence de buts', headClassName: 'text-center', sort: (r) => r.gd, className: 'num text-center text-base', render: (r) => <span className={r.gd > 0 ? 'text-win' : r.gd < 0 ? 'text-loss' : 'text-muted-foreground'}>{r.gd > 0 ? `+${r.gd}` : r.gd}</span> },
     { key: 'points', label: 'Pts', title: 'Points', headClassName: 'text-center', className: 'num text-center text-xl text-white', sort: (r) => r.points, render: (r) => r.points },

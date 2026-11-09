@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import { Link2, RotateCcw, Save, Send } from 'lucide-react'
+import { AlertTriangle, Check, Link2, Plus, RotateCcw, Save, Send, Upload } from 'lucide-react'
 import { base44 } from '@/api/base44Client'
 import { resetLeagueData } from '@/api/seed'
 import { useData, useLookup } from '@/hooks/useData'
@@ -17,7 +16,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { toast } from '@/components/ui/toast'
 import { fmtAgo, fmtDateTime } from '@/lib/format'
 import { ROLE_LABEL } from '@/lib/permissions'
-import type { Settings, Tiebreaker } from '@/types/entities'
+import type { Rulebook, Settings } from '@/types/entities'
+import { cn } from '@/lib/utils'
+import { REGLEMENT, TIEBREAKERS, TIEBREAK_ART, coherenceWarnings } from '@/lib/reglement'
+import { ArtLink } from '@/components/reglement/ArtLink'
 
 // ---------------------------------------------------------------------------
 export function MediaAdmin() {
@@ -67,31 +69,85 @@ export function MediaAdmin() {
 // ---------------------------------------------------------------------------
 export function RulesEditor() {
   const { db } = useData()
-  const page = db.Page.find((p) => p.slug === 'reglement')
-  const [title, setTitle] = useState(page?.title ?? 'Règlement')
-  const [content, setContent] = useState(page?.content ?? '')
+  const { user } = useAuth()
+  const books = [...db.Rulebook].sort((x, y) => (x.status === 'current' ? -1 : 0) - (y.status === 'current' ? -1 : 0) || y.version.localeCompare(x.version, 'fr', { numeric: true }))
+  const [sel, setSel] = useState<string | undefined>(books[0]?.id)
+  const book = books.find((b) => b.id === sel) ?? books[0]
+  const [draft, setDraft] = useState<Partial<Rulebook> | null>(null)
+  const v = draft ?? book ?? {}
+  const warnings = coherenceWarnings(v.content ?? '')
+  const set = (patch: Partial<Rulebook>) => setDraft({ ...v, ...patch })
   const save = async () => {
-    if (page) await base44.entities.Page.update(page.id, { title, content, published: true })
-    else await base44.entities.Page.create({ slug: 'reglement', title, content, published: true })
-    toast.success('Règlement publié')
+    if (!book || !draft) return
+    await base44.entities.Rulebook.update(book.id, { title: v.title, date: v.date, season_id: v.season_id || undefined, content: v.content, pdf_url: v.pdf_url, changes: v.changes })
+    base44.logActivity('update', 'Rulebook', book, { version: book.version, par: user?.email })
+    setDraft(null); toast.success(`Version ${book.version} enregistrée`)
+  }
+  const makeCurrent = async () => {
+    if (!book) return
+    for (const b of db.Rulebook) if (b.status === 'current' && b.id !== book.id) await base44.entities.Rulebook.update(b.id, { status: 'archived' })
+    await base44.entities.Rulebook.update(book.id, { status: 'current' })
+    toast.success(`Version ${book.version} en vigueur sur /reglement`)
+  }
+  const newVersion = async () => {
+    const base = books.find((b) => b.status === 'current') ?? book
+    const n = Math.max(0, ...books.map((b) => Number(b.version.replace(/\D/g, '')) || 0)) + 1
+    const row = await base44.entities.Rulebook.create({ version: `v${n}`, title: base?.title ?? 'Règlement officiel', date: new Date().toISOString().slice(0, 10), content: base?.content ?? '', status: 'archived', changes: '' })
+    setSel(row.id); setDraft(null); toast.info(`Brouillon v${n} créé à partir de la version en vigueur`)
+  }
+  const uploadPdf = async (f?: File) => {
+    if (!f) return
+    const { file_url } = await base44.integrations.Core.UploadFile({ file: f, hint: 'reglement' })
+    set({ pdf_url: file_url }); toast.info('PDF joint — pensez à enregistrer')
   }
   return (
-    <AdminPage title="Règlement" subtitle="Page publique éditable (markdown)" actions={<Button onClick={save}><Save />Publier</Button>}>
-      <Input value={title} onChange={(e) => setTitle(e.target.value)} className="mb-3" />
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Textarea value={content} onChange={(e) => setContent(e.target.value)} className="min-h-[60vh] font-mono text-xs" />
-        <Card><CardContent className="markdown pt-4"><ReactMarkdown>{content}</ReactMarkdown></CardContent></Card>
+    <AdminPage title="Règlement" subtitle="Texte officiel Ardentia par version (une saison = une version). Les calculs (points, départage, cartons, durée) restent dans lib/reglement.ts."
+      actions={<div className="flex flex-wrap gap-2"><Button variant="outline" onClick={newVersion}><Plus />Nouvelle version</Button><Button onClick={save} disabled={!draft}><Save />Enregistrer</Button></div>}>
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        {books.map((b) => (
+          <button key={b.id} onClick={() => { setSel(b.id); setDraft(null) }} className={cn('cursor-pointer rounded-lg border px-3 py-1.5 text-sm font-semibold', b.id === book?.id ? 'border-neon bg-neon/15 text-neon' : 'border-white/10 text-muted-foreground hover:text-white')}>
+            {b.version}{b.status === 'current' ? ' · en vigueur' : ''}
+          </button>
+        ))}
+        {book && book.status !== 'current' && <Button size="sm" variant="outline" onClick={makeCurrent}><Check />Mettre en vigueur</Button>}
+        <a href={`/reglement${book?.status === 'current' ? '' : `?version=${book?.version}`}`} target="_blank" rel="noreferrer" className="ml-auto text-sm text-neon hover:underline">Voir la page publique</a>
       </div>
+      {warnings.length > 0 && (
+        <div role="alert" className="mb-4 rounded-xl border border-amber-400/40 bg-amber-400/10 p-3 text-sm text-amber-100">
+          <p className="mb-1 flex items-center gap-2 font-semibold"><AlertTriangle className="size-4" />Le texte et les constantes de calcul semblent incohérents</p>
+          <ul className="list-disc space-y-0.5 pl-5 text-xs">{warnings.map((w) => <li key={w}>{w}</li>)}</ul>
+          <p className="mt-1 text-xs text-amber-200/80">Le site calcule toujours avec lib/reglement.ts. Si le règlement a changé, faites aussi mettre à jour ces constantes.</p>
+        </div>
+      )}
+      {book && (
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="space-y-2">
+            <Input value={v.title ?? ''} onChange={(e) => set({ title: e.target.value })} aria-label="Titre" />
+            <Textarea value={v.content ?? ''} onChange={(e) => set({ content: e.target.value })} className="min-h-[65vh] font-mono text-xs" aria-label="Texte du règlement (Markdown)" />
+            <p className="text-xs text-muted-foreground">Markdown : « # ARTICLE 17 — … » pour un article, « ## 17.3 … » pour une section (ancre /reglement#art-17-3), « - » pour une liste, **gras**.</p>
+          </div>
+          <Card><CardContent className="space-y-3 pt-4 text-sm">
+            <label className="block"><span className="text-xs text-muted-foreground">Date de la version</span><Input type="date" value={v.date ?? ''} onChange={(e) => set({ date: e.target.value })} /></label>
+            <label className="block"><span className="text-xs text-muted-foreground">Saison rattachée</span>
+              <select className="mt-1 h-9 w-full rounded-lg border border-input bg-night-950/40 px-2" value={v.season_id ?? ''} onChange={(e) => set({ season_id: e.target.value })}>
+                <option value="">— Aucune —</option>{db.Season.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
+              </select></label>
+            <label className="block"><span className="text-xs text-muted-foreground">Changements (affiché dans l’historique)</span><Textarea value={v.changes ?? ''} onChange={(e) => set({ changes: e.target.value })} className="min-h-24 text-xs" /></label>
+            <div><span className="text-xs text-muted-foreground">PDF</span>
+              <div className="mt-1 flex flex-wrap items-center gap-2">{v.pdf_url ? <a href={v.pdf_url} target="_blank" rel="noreferrer" className="text-neon hover:underline">Ouvrir le PDF</a> : <span className="text-muted-foreground">Aucun</span>}
+                <label className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border border-input px-2 text-xs hover:bg-white/5"><Upload className="size-3.5" />Remplacer<input type="file" accept="application/pdf" className="hidden" onChange={(e) => { void uploadPdf(e.target.files?.[0]); e.target.value = '' }} /></label></div></div>
+            <p className="text-xs text-muted-foreground">Statut : {book.status === 'current' ? 'en vigueur' : 'archivée (consultable dans l’historique)'}</p>
+          </CardContent></Card>
+        </div>
+      )}
     </AdminPage>
   )
 }
 
 // ---------------------------------------------------------------------------
-const TB_LABEL: Record<Tiebreaker, string> = { points: 'Points', goal_diff: 'Différence de buts', goals_for: 'Buts marqués', head_to_head: 'Confrontation directe', fair_play: 'Fair-play', wins: 'Victoires' }
 export function SettingsPage() {
   const { settings } = useData()
   const [v, setV] = useState<Record<string, unknown>>({ ...settings, ...Object.fromEntries(Object.entries(settings.socials ?? {}).map(([k, x]) => [`social_${k}`, x])) })
-  const [tb, setTb] = useState<Tiebreaker[]>(settings.tiebreakers ?? ['points', 'goal_diff', 'goals_for', 'head_to_head', 'fair_play'])
   const fields: Field[] = [
     { key: 'league_name', label: 'Nom de la ligue' }, { key: 'short_name', label: 'Nom court' }, { key: 'tagline', label: 'Accroche', full: true },
     { key: 'organizer', label: 'Organisateur' }, { key: 'logo_url', label: 'Logo', type: 'image', full: true },
@@ -99,24 +155,24 @@ export function SettingsPage() {
     { key: 'website', label: 'Site de l’organisateur' },
     { key: 'social_instagram', label: 'Instagram MBL' }, { key: 'social_organizer_instagram', label: 'Instagram Ardentia' }, { key: 'social_linkedin', label: 'LinkedIn Ardentia' },
     { key: 'social_facebook', label: 'Facebook (facultatif)' }, { key: 'social_youtube', label: 'YouTube (facultatif)' },
-    { key: 'points_win', label: 'Points victoire', type: 'number' }, { key: 'points_draw', label: 'Points nul', type: 'number' }, { key: 'points_loss', label: 'Points défaite', type: 'number' },
     { key: 'motm_vote_minutes_after', label: 'Fermeture du vote HdM (min après la fin)', type: 'number' },
   ]
   const save = async () => {
     const socials = { instagram: v.social_instagram, organizer_instagram: v.social_organizer_instagram, facebook: v.social_facebook, linkedin: v.social_linkedin, youtube: v.social_youtube } as Settings['socials']
     const clean = Object.fromEntries(Object.entries(v).filter(([k]) => !k.startsWith('social_') && !['id', 'created_date', 'updated_date'].includes(k)))
-    await base44.entities.Settings.update(settings.id, { ...clean, socials, tiebreakers: tb })
+    await base44.entities.Settings.update(settings.id, { ...clean, socials })
     toast.success('Paramètres enregistrés — classements recalculés')
   }
-  const move = (i: number, d: number) => { const x = [...tb]; const j = i + d; if (j < 0 || j >= x.length) return; [x[i], x[j]] = [x[j], x[i]]; setTb(x) }
   return (
-    <AdminPage title="Paramètres" subtitle="Infos officielles (par défaut : src/config/league.ts), réseaux, points de classement. Un champ vide reprend la valeur officielle." actions={<Button onClick={save}><Save />Enregistrer</Button>}>
+    <AdminPage title="Paramètres" subtitle="Infos officielles (par défaut : src/config/league.ts) et réseaux. Un champ vide reprend la valeur officielle." actions={<Button onClick={save}><Save />Enregistrer</Button>}>
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2"><CardContent className="pt-5"><EntityForm fields={fields} value={v} onChange={setV} /></CardContent></Card>
         <div className="space-y-4">
-          <Card><CardHeader><CardTitle>Départage du classement</CardTitle></CardHeader><CardContent className="space-y-1.5">
-            {tb.map((t, i) => <div key={t} className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2 text-sm"><span className="num w-5 text-neon">{i + 1}</span><span className="flex-1">{TB_LABEL[t]}</span><button className="px-1 cursor-pointer" onClick={() => move(i, -1)}>▲</button><button className="px-1 cursor-pointer" onClick={() => move(i, 1)}>▼</button></div>)}
-            {(Object.keys(TB_LABEL) as Tiebreaker[]).filter((t) => !tb.includes(t)).map((t) => <button key={t} className="block text-xs text-muted-foreground hover:text-neon cursor-pointer" onClick={() => setTb([...tb, t])}>+ {TB_LABEL[t]}</button>)}
+          <Card><CardHeader><CardTitle>Points et départage</CardTitle></CardHeader><CardContent className="space-y-2 text-sm">
+            <p className="text-xs text-muted-foreground">Fixés par le règlement officiel (lib/reglement.ts) — non modifiables ici.</p>
+            <p>Victoire <b>{REGLEMENT.points.win}</b> · Nul <b>{REGLEMENT.points.draw}</b> · Défaite <b>{REGLEMENT.points.loss}</b> <ArtLink art={REGLEMENT.points.art} /></p>
+            <ol className="space-y-1">{TIEBREAKERS.map((t, i) => <li key={t.key} className="flex gap-2 rounded-lg bg-white/5 px-3 py-1.5"><span className="num w-4 text-neon">{i + 1}</span>{t.label}</li>)}</ol>
+            <ArtLink art={TIEBREAK_ART} />
           </CardContent></Card>
           <Card><CardHeader><CardTitle>Données locales</CardTitle></CardHeader><CardContent>
             <p className="mb-3 text-xs text-muted-foreground">Recharge les données officielles (archive 2025-2026, équipes 2026-2027) et efface les modifications faites dans ce navigateur.</p>

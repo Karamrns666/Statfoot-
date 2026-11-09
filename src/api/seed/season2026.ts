@@ -3,6 +3,7 @@
 // Les matchs et les effectifs sont importés depuis le fichier de la ligue (scripts/import_excel_*.py) ou saisis dans l'admin.
 // Les équipes déjà présentes en 2025-2026 réutilisent la même fiche (historique continu).
 import type { Competition, Season, Team } from '@/types/entities'
+import { CURRENT_RULEBOOK, REGLEMENT } from '@/lib/reglement'
 import { teamLogoSvg } from '@/lib/logos'
 import { s25TeamId } from './season2025'
 
@@ -37,7 +38,7 @@ export const s26TeamId = (short: string) => `t26_${short.toLowerCase()}`
 export function buildSeason2026() {
   const season: Season = {
     id: SEASON_2026_ID, name: 'Saison 2026-2027', start_date: '2026-08-22', status: 'active', is_active: true,
-    league_phase_rounds: 0, cup_rounds: 10, gold_size: 10,
+    league_phase_rounds: 0, cup_rounds: 10, gold_size: 10, rulebook_version: CURRENT_RULEBOOK,
   }
   const teams: Team[] = []
   const ids = (cup: 'gold' | 'silver') => NEW_TEAMS.filter((t) => t.cup === cup).map((t) => (t.reuse ? s25TeamId(t.reuse) : s26TeamId(t.short)))
@@ -48,7 +49,7 @@ export function buildSeason2026() {
   // Phase de sélection : un seul groupe, un seul classement. Le tirage (Admin → Tirage & divisions) crée les matchs ;
   // Gold Cup et Silver Cup sont constituées ensuite à partir du classement.
   const competitions: Competition[] = [
-    { id: 'comp_2026_selection', season_id: season.id, name: 'Phase de sélection', phase: 'league_phase', format: 'swiss', status: 'draft', team_ids: [...ids('gold'), ...ids('silver')].sort(), half_duration_min: 15, foul_alert_threshold: 5, color: '#F85A00', order: 1, description: 'Un seul groupe · matchs tirés au sort' },
+    { id: 'comp_2026_selection', season_id: season.id, name: 'Phase de sélection', phase: 'league_phase', format: 'swiss', status: 'draft', team_ids: [...ids('gold'), ...ids('silver')].sort(), half_duration_min: REGLEMENT.duration.halfMin, foul_alert_threshold: 5, color: '#F85A00', order: 1, description: 'Un seul groupe · matchs tirés au sort' },
   ]
   return { season, teams, competitions }
 }

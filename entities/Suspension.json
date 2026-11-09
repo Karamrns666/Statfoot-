@@ -30,6 +30,25 @@
     },
     "created_by": {
       "type": "string"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "extra"
+      ]
+    },
+    "team_id": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "referee_report": {
+      "type": "string"
+    },
+    "notified_at": {
+      "type": "string",
+      "format": "date"
     }
   },
   "required": [

@@ -99,6 +99,14 @@
         "type": "object"
       },
       "description": "historique des corrections { at, by, before }"
+    },
+    "card_target": {
+      "type": "string",
+      "enum": [
+        "player",
+        "substitute",
+        "official"
+      ]
     }
   },
   "required": [

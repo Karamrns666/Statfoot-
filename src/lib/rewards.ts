@@ -3,6 +3,7 @@
 //  Même source que l'XP et les badges : événements de match → journal des joueurs.
 // ============================================================================
 import type { Match, Position, TeamOfWeek } from '@/types/entities'
+import { REGLEMENT } from './reglement'
 import { allPlayerLogs, type PlayerMatchLine } from './badges'
 import { isPlayed } from './standings'
 import { computePlayerXP, type PlayerXP, type XPData } from './xp'
@@ -133,7 +134,7 @@ export function periodRewards(data: XPData, seasonId: string, p: Period, competi
   const gk = [...x].filter((s) => s.gk_matches > 0).sort((a, b) => b.xp - a.xp || b.clean_sheets - a.clean_sheets || b.saves - a.saves || a.conceded - b.conceded)[0]
   if (gk) out.push({ key: 'best_keeper', player_id: gk.player_id, team_id: gk.team_id, value: gk.saves, unit: 'arrêts', detail: `${gk.clean_sheets} clean sheet${gk.clean_sheets > 1 ? 's' : ''}, ${gk.conceded} but${gk.conceded > 1 ? 's' : ''} encaissé${gk.conceded > 1 ? 's' : ''} · ${gk.xp} XP` })
   // meilleure équipe : points sur la période, puis différence de buts, puis buts marqués
-  const pw = data.settings.points_win ?? 3, pd = data.settings.points_draw ?? 1, plz = data.settings.points_loss ?? 0
+  const pw = REGLEMENT.points.win, pd = REGLEMENT.points.draw, plz = REGLEMENT.points.loss
   const t = new Map<string, { pts: number; gf: number; ga: number; w: number; d: number; l: number }>()
   for (const m of ms) for (const home of [true, false]) {
     const id = home ? m.home_team_id : m.away_team_id

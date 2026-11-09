@@ -1,6 +1,9 @@
 // Migrations NON destructives des données déjà enregistrées dans le navigateur.
 // Elles adaptent les anciennes données aux règles en vigueur sans effacer ce que l'admin a saisi.
-import type { Award, Lineup, Page, Position, MatchEvent, MatchTeamStats, Player, Settings, Team, TeamOfWeek } from '@/types/entities'
+import type { Award, Competition, Lineup, Match, Page, Position, MatchEvent, MatchTeamStats, Player, Rulebook, Season, Settings, Team, TeamOfWeek } from '@/types/entities'
+import { CURRENT_RULEBOOK, REGLEMENT, isDisputed } from '@/lib/reglement'
+import { buildRulebooks } from './rulebook'
+import { SEASON_2026_ID } from './season2026'
 import { toRole } from '@/lib/format'
 import { capStarters } from '@/lib/lineup'
 import { store } from '../localStore'
@@ -20,6 +23,10 @@ export interface Rules6Data {
   Page?: Page[]
   Team?: Team[]
   Settings?: Settings[]
+  Rulebook?: Rulebook[]
+  Season?: Season[]
+  Competition?: Competition[]
+  Match?: Match[]
 }
 
 /**
@@ -93,8 +100,33 @@ export function applyLot1(db: Rules6Data): Rules6Data {
   return out
 }
 
+/**
+ * Règlement officiel Ardentia v4 :
+ * - texte intégral v4 (saison 2026-2027) + v3 dans l'historique des versions ;
+ * - saison 2026-2027 rattachée à la v4 ;
+ * - matchs non encore disputés et compétitions 2026-2027 : mi-temps de 20 min (Art. 5.1) ;
+ * - points et ordre de départage ne sont plus des réglages (Art. 17.2, 17.3 dans lib/reglement.ts).
+ */
+export function applyReglementV4(db: Rules6Data): Rules6Data {
+  const out: Rules6Data = {}
+  const books = buildRulebooks()
+  const have = new Set((db.Rulebook ?? []).map((r) => r.version))
+  if (books.some((b) => !have.has(b.version)))
+    out.Rulebook = [...(db.Rulebook ?? []).map((r) => (r.status === 'current' ? { ...r, status: 'archived' as const } : r)), ...books.filter((b) => !have.has(b.version))]
+  if (db.Season?.some((x) => x.id === SEASON_2026_ID && !x.rulebook_version))
+    out.Season = db.Season.map((x) => (x.id === SEASON_2026_ID && !x.rulebook_version ? { ...x, rulebook_version: CURRENT_RULEBOOK } : x))
+  const half = REGLEMENT.duration.halfMin
+  if (db.Competition?.some((c) => c.season_id === SEASON_2026_ID && c.half_duration_min !== half))
+    out.Competition = db.Competition.map((c) => (c.season_id === SEASON_2026_ID && c.half_duration_min !== half ? { ...c, half_duration_min: half } : c))
+  if (db.Match?.some((m) => m.season_id === SEASON_2026_ID && !isDisputed(m) && m.status !== 'live' && m.half_duration_min !== half))
+    out.Match = db.Match.map((m) => (m.season_id === SEASON_2026_ID && !isDisputed(m) && m.status !== 'live' && m.half_duration_min !== half ? { ...m, half_duration_min: half } : m))
+  if (db.Settings?.some((x) => 'tiebreakers' in x || 'points_win' in x))
+    out.Settings = db.Settings.map((x) => omit(omit(omit(omit(x, 'tiebreakers'), 'points_win'), 'points_draw'), 'points_loss'))
+  return out
+}
+
 /** Étapes de migration, dans l'ordre. Le numéro atteint est mémorisé dans le navigateur. */
-const STEPS = [applyRules6v6, applyLot1]
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */
@@ -113,7 +145,7 @@ export function migrateStoredData() {
   const legacy = store.getFlag('migrated-6v6') ? 1 : 0
   const from = Number(store.getFlag(VERSION_FLAG) ?? legacy) || legacy
   if (from >= STEPS.length) return
-  const names = ['Player', 'MatchEvent', 'MatchTeamStats', 'Award', 'TeamOfWeek', 'Lineup', 'Page', 'Team', 'Settings'] as const
+  const names = ['Player', 'MatchEvent', 'MatchTeamStats', 'Award', 'TeamOfWeek', 'Lineup', 'Page', 'Team', 'Settings', 'Rulebook', 'Season', 'Competition', 'Match'] as const
   const db = Object.fromEntries(names.map((n) => [n, store.all(n)])) as Rules6Data
   const changed = migrate(db, from)
   store.batch(() => { for (const [name, rows] of Object.entries(changed)) store.replace(name as (typeof names)[number], rows as never) })

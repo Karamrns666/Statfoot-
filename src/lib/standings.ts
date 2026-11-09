@@ -1,17 +1,18 @@
 // Classements, forme, confrontations — fonctions pures.
-import type { Competition, Match, MatchEvent, MatchStage, Settings, Tiebreaker } from '@/types/entities'
+import type { Competition, Match, MatchEvent, MatchStage, Settings } from '@/types/entities'
+import { REGLEMENT, isDisputed, rankTable, type TiebreakReason } from './reglement'
 
 export const KNOCKOUT_STAGES: MatchStage[] = ['round_of_16', 'quarter', 'semi', 'third_place', 'final']
 export const isKnockout = (m: Pick<Match, 'stage'>) => !!m.stage && KNOCKOUT_STAGES.includes(m.stage)
 
-export const DEFAULT_TIEBREAKERS: Tiebreaker[] = ['points', 'goal_diff', 'goals_for', 'head_to_head', 'fair_play']
-export function pointsConfig(s?: Partial<Settings> | null) {
-  return { win: s?.points_win ?? 3, draw: s?.points_draw ?? 1, loss: s?.points_loss ?? 0, tiebreakers: s?.tiebreakers?.length ? s.tiebreakers : DEFAULT_TIEBREAKERS }
+/** Points (Art. 17.2) — lus dans le module de règles, plus dans les réglages. */
+export function pointsConfig(_s?: unknown) {
+  void _s
+  return { win: REGLEMENT.points.win, draw: REGLEMENT.points.draw, loss: REGLEMENT.points.loss }
 }
 
 /** Un match compte s'il est terminé, publié et a un score. */
-export const isPlayed = (m: Match) =>
-  m.status === 'finished' && typeof m.home_score === 'number' && typeof m.away_score === 'number' && m.published !== false
+export const isPlayed = (m: Match) => isDisputed(m)
 
 export function byDate(a: Match, b: Match) {
   return (a.date ?? '').localeCompare(b.date ?? '') || (a.round ?? 0) - (b.round ?? 0) || a.id.localeCompare(b.id)
@@ -42,6 +43,8 @@ export function loserOf(m: Match): string | null {
 export interface StandingRow {
   team_id: string; rank: number; played: number; won: number; drawn: number; lost: number
   gf: number; ga: number; gd: number; points: number; yellow: number; red: number; form: Result[]
+  /** pourquoi l'équipe est derrière celle du dessus à égalité de points (Art. 17.3) */
+  tiebreak?: TiebreakReason
 }
 const emptyRow = (team_id: string): StandingRow => ({ team_id, rank: 0, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, gd: 0, points: 0, yellow: 0, red: 0, form: [] })
 
@@ -66,44 +69,28 @@ export function computeTable(matches: Match[], teamIds: string[], settings?: Par
   for (const e of events) {
     if (!ids.has(e.match_id)) continue
     const r = rows.get(e.team_id); if (!r) continue
-    if (e.type === 'yellow_card') r.yellow++
+    // critères 5 et 6 : cartons reçus par l'équipe (joueurs, remplaçants, officiels) ; une expulsion sur 2e jaune = 2 jaunes + 1 rouge
+    if (e.type === 'yellow_card' || e.type === 'second_yellow') r.yellow++
     if (e.type === 'red_card' || e.type === 'second_yellow') r.red++
   }
   for (const r of rows.values()) { r.gd = r.gf - r.ga; r.form = r.results.slice(-5) }
   return rows
 }
 
-function value(c: Tiebreaker, r: StandingRow) {
-  switch (c) {
-    case 'points': return r.points
-    case 'goal_diff': return r.gd
-    case 'goals_for': return r.gf
-    case 'wins': return r.won
-    case 'fair_play': return -(r.yellow + 3 * r.red)
-    default: return 0
+/** Classement trié selon l'Art. 17.3 (rang + raison du départage). */
+export function computeStandings(matches: Match[], teamIds: string[], _settings?: Partial<Settings> | null, events: MatchEvent[] = [], order?: (a: string, b: string) => number, drawOrder: string[] = []): StandingRow[] {
+  void _settings
+  const table = computeTable(matches, teamIds, null, events)
+  const rows = [...table.values()].map(({ results: _r, ...row }) => { void _r; return row as StandingRow })
+  const played = matches.filter(isPlayed)
+  const mini = (ids: string[]) => {
+    const set = new Set(ids)
+    return computeTable(played.filter((m) => set.has(m.home_team_id) && set.has(m.away_team_id)), ids, null)
   }
-}
-
-/** Tri récursif ; 'head_to_head' = mini-classement entre les équipes encore à égalité. */
-export function sortStandings(rows: StandingRow[], criteria: Tiebreaker[], matches: Match[], settings?: Partial<Settings> | null, order?: (a: string, b: string) => number): StandingRow[] {
-  if (rows.length <= 1) return rows
-  if (!criteria.length) return [...rows].sort((a, b) => (order ? order(a.team_id, b.team_id) : a.team_id.localeCompare(b.team_id)))
-  const [c, ...rest] = criteria
-  let key: (r: StandingRow) => number
-  if (c === 'head_to_head') {
-    const ids = new Set(rows.map((r) => r.team_id))
-    const mini = computeTable(matches.filter((m) => ids.has(m.home_team_id) && ids.has(m.away_team_id)), [...ids], settings)
-    key = (r) => { const x = mini.get(r.team_id)!; return x.points * 1e6 + (x.gd + 1000) * 1e3 + x.gf }
-  } else key = (r) => value(c, r)
-  const buckets = new Map<number, StandingRow[]>()
-  for (const r of rows) { const k = key(r); if (!buckets.has(k)) buckets.set(k, []); buckets.get(k)!.push(r) }
-  return [...buckets.keys()].sort((a, b) => b - a).flatMap((k) => sortStandings(buckets.get(k)!, rest, matches, settings, order))
-}
-
-export function computeStandings(matches: Match[], teamIds: string[], settings?: Partial<Settings> | null, events: MatchEvent[] = [], order?: (a: string, b: string) => number): StandingRow[] {
-  const table = computeTable(matches, teamIds, settings, events)
-  const rows = [...table.values()].map(({ results: _r, ...row }) => { void _r; return row })
-  return sortStandings(rows, pointsConfig(settings).tiebreakers, matches.filter(isPlayed), settings, order).map((r, i) => ({ ...r, rank: i + 1 }))
+  // ordre provisoire en cas d'égalité parfaite sans tirage : `order` (nom d'équipe) sinon identifiant
+  const sorted = [...rows].sort((a, b) => (order ? order(a.team_id, b.team_id) : a.team_id.localeCompare(b.team_id)))
+  const names = new Map(sorted.map((r, i) => [r.team_id, String(i).padStart(4, '0')]))
+  return rankTable(rows, mini, drawOrder, (id) => names.get(id) ?? id).map(({ row, reason }, i) => ({ ...row, rank: i + 1, tiebreak: reason }))
 }
 
 export interface StandingsInput { competitions: Competition[]; matches: Match[]; events: MatchEvent[]; settings: Partial<Settings>; teams: { id: string; name: string }[] }
@@ -114,7 +101,7 @@ export function competitionStandings(data: StandingsInput, competitionId: string
   const teamIds = opts.teamIds ?? comp?.team_ids ?? []
   const ms = data.matches.filter((m) => m.competition_id === competitionId && !isKnockout(m) && (opts.beforeRound == null || (m.round ?? 0) < opts.beforeRound))
   const name = new Map(data.teams.map((t) => [t.id, t.name]))
-  return computeStandings(ms, teamIds, data.settings, data.events, (a, b) => (name.get(a) ?? a).localeCompare(name.get(b) ?? b))
+  return computeStandings(ms, teamIds, data.settings, data.events, (a, b) => (name.get(a) ?? a).localeCompare(name.get(b) ?? b), comp?.draw_order)
 }
 
 export function teamForm(matches: Match[], teamId: string, n = 5): Result[] {

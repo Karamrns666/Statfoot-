@@ -21,6 +21,7 @@ export const PUBLIC_NAV = [
   { to: '/statistiques', label: 'Stats', wide: true },
   { to: '/media', label: 'Média' },
   { to: '/historique', label: 'Historique', wide: true },
+  { to: '/reglement', label: 'Règlement' },
 ] as { to: string; label: string; end?: boolean; wide?: boolean }[]
 
 export function PublicLayout() {
@@ -52,7 +53,6 @@ export function PublicLayout() {
               {PUBLIC_NAV.map((n) => (
                 <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => cn('rounded-lg px-3 py-2.5 font-display text-lg font-bold uppercase tracking-wide text-muted-foreground', isActive && 'text-neon bg-neon/10')}>{n.label}</NavLink>
               ))}
-              <NavLink to="/reglement" className="rounded-lg px-3 py-2.5 font-display text-lg font-bold uppercase text-muted-foreground">Règlement</NavLink>
               <NavLink to="/tv" className="rounded-lg px-3 py-2.5 font-display text-lg font-bold uppercase text-muted-foreground">Mode TV</NavLink>
               <NavLink to="/admin" className="rounded-lg px-3 py-2.5 font-display text-lg font-bold uppercase text-muted-foreground">Admin</NavLink>
             </nav>

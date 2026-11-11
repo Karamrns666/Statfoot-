@@ -4,6 +4,7 @@ import { useEffectiveSeason, useSeasonCompetitions } from '@/hooks/useStats'
 import { PageHeader, CompetitionBadge } from '@/components/league/Bits'
 import { TeamLogo } from '@/components/league/Identity'
 import { competitionStandings } from '@/lib/stats'
+import { SeniorityBadge, SeniorityLegend } from '@/components/league/SeniorityBadge'
 
 export default function Teams() {
   const { db, league } = useData()
@@ -14,6 +15,7 @@ export default function Teams() {
   return (
     <div>
       <PageHeader title="Équipes" subtitle={`${teams.length} entreprises engagées · ${season?.name ?? ''}`} />
+      <SeniorityLegend className="mb-4" />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {teams.map((t) => {
           const c = cupOf(t.id)
@@ -21,6 +23,7 @@ export default function Teams() {
           return (
             <Link key={t.id} to={`/equipes/${t.id}`} className="glass group relative overflow-hidden rounded-2xl p-4 text-center transition hover:-translate-y-1">
               <div className="absolute inset-x-0 top-0 h-1" style={{ background: t.primary_color }} />
+              <SeniorityBadge teamId={t.id} size="xs" className="absolute right-2 top-2.5" />
               <TeamLogo team={t} size={72} className="mx-auto transition group-hover:scale-105" />
               <div className="title-caps mt-3 truncate text-lg">{t.name}</div>
               <div className="truncate text-xs text-muted-foreground">{t.company}</div>

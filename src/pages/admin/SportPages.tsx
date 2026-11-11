@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Lock, CheckCircle2, AlertTriangle, Images } from 'lucide-react'
 import { teamSeasonId } from '@/lib/clubs'
+import { SeniorityControl } from '@/components/admin/SeniorityControl'
 import { SeasonLinkControl } from '@/components/admin/SeasonLinkControl'
 import { phaseName } from '@/lib/competitionNames'
 import { TeamMediaManager } from '@/components/admin/TeamMediaManager'
@@ -152,6 +153,7 @@ export function Teams() {
           { label: 'Couleurs', render: (t) => <span className="flex gap-1"><span className="size-4 rounded" style={{ background: t.primary_color }} /><span className="size-4 rounded ring-1 ring-white/20" style={{ background: t.secondary_color }} /></span>, className: 'hidden sm:table-cell' },
           { label: 'Série', render: (t) => db.Division.find((d) => d.id === t.division_id)?.name ?? '—', className: 'hidden xl:table-cell' },
           { label: 'Saison précédente', render: (t) => <SeasonLinkControl kind="team" item={t} /> },
+          { label: 'Ancienneté', render: (t) => <SeniorityControl team={t} />, className: 'hidden sm:table-cell' },
           { label: 'Capitaine', render: (t) => { const c = db.Player.find((p) => p.team_id === t.id && p.is_captain); return c ? `${c.first_name} ${c.last_name}` : <span className="text-muted-foreground">—</span> }, className: 'hidden lg:table-cell' },
           { label: 'Effectif', render: (t) => db.Player.filter((p) => p.team_id === t.id && p.season_ids?.includes(seasonId)).length, className: 'text-center' },
           { label: 'Statut', render: (t) => <Badge variant={t.status === 'active' ? 'success' : 'outline'}>{t.status === 'active' ? 'Active' : t.status === 'pending' ? 'En attente' : 'Inactive'}</Badge> },

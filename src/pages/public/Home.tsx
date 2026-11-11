@@ -1,5 +1,7 @@
 import { useMemo, type ReactNode } from 'react'
 import { Billboard, type BillboardSlide } from '@/components/home/Billboard'
+import { SeasonStrip } from '@/components/home/SeasonStrip'
+import { seasonStrip } from '@/lib/seasonStrip'
 import { IPGCard, XPCard } from '@/components/players/Cards'
 import { IPG_RANKING } from '@/lib/ipg'
 import { SEASON_2025_ID } from '@/api/seed/season2025'
@@ -41,6 +43,7 @@ export default function Home() {
   }, [db.Match, sid])
 
   const k = useMemo(() => kpis(league, { seasonId: sid }), [league, sid])
+  const strip = useMemo(() => seasonStrip(league, sid ?? ''), [league, sid, settings.competition_names]) // eslint-disable-line react-hooks/exhaustive-deps
   // l'accueil affiche UNIQUEMENT la saison sélectionnée (aucun repli sur une autre saison)
   const refSid = sid
   const notStarted = k.matches === 0
@@ -117,12 +120,7 @@ export default function Home() {
   return (
     <div className="space-y-12">
       <Billboard slides={slides} leagueName={settings.league_name ?? 'Morocco Business League'} seasonLabel={season?.name.replace(/^Saison /, 'saison ') ?? ''} logoUrl={settings.logo_url} />
-      <div className="-mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatTile label="Équipes" value={teamsInSeason.size || db.Team.length} icon={<Users />} color="#8FD0E6" />
-        <StatTile label="Matchs joués" value={k.matches} icon={<CalendarDays />} color="#FFFFFF" />
-        <StatTile label="Buts" value={k.goals} icon={<Goal />} color="#F85A00" sub={`${k.goals_avg} par match`} />
-        <StatTile label="Passes décisives" value={k.assists} icon={<Trophy />} color="#FF8A3D" />
-      </div>
+      <div className="-mt-6">{sid && <SeasonStrip s={strip} />}</div>
 
       {live.length > 0 && (
         <section>

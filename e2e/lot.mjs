@@ -17,7 +17,7 @@ await p.screenshot({ path: `${out}/projection-0.png` })
 for (let i = 0; i < 7; i++) { await p.keyboard.press('Space'); await p.waitForTimeout(1500) }
 await p.screenshot({ path: `${out}/projection-7.png` })
 await p.emulateMedia({ reducedMotion: 'reduce' })
-for (let i = 7; i < 23; i++) { await p.keyboard.press('Space'); await p.waitForTimeout(120) }
+for (let i = 7; i < 23; i++) { await p.keyboard.press('Space'); await p.waitForTimeout(900) }
 await p.waitForTimeout(500); await p.screenshot({ path: `${out}/projection-fin.png` })
 console.log('PROJECTION', (await p.locator('[role=dialog][aria-label^="Tirage"] header').innerText()).replace(/\n+/g, ' | '))
 await p.keyboard.press('Escape'); await p.waitForTimeout(400)
@@ -45,8 +45,9 @@ for (const r of ['journée 2', 'journée 3', 'journée 4', 'rattrapage']) {
     // J1 : X–Y ; en J2 X joue P, Y joue Q → échanger P et Y crée X–Y (rematch)
     const j1 = M[0]; const pX = pend.pairs.find((q) => q.home === j1.home_team_id || q.away === j1.home_team_id); const P = pX.home === j1.home_team_id ? pX.away : pX.home
     await p.getByRole('button', { name: 'Modifier un match' }).click(); await p.waitForTimeout(300)
-    const d = p.getByRole('dialog'); const sel = d.locator('select')
-    await sel.nth(0).selectOption({ label: T[P] }); await sel.nth(1).selectOption({ label: T[j1.away_team_id] }); await d.locator('#sw-motif').fill('test rematch')
+    const d = p.getByRole('dialog'); const sel = d.getByRole('combobox')
+    await sel.nth(0).click(); await p.getByRole('option', { name: T[P], exact: true }).click()
+    await sel.nth(1).click(); await p.getByRole('option', { name: T[j1.away_team_id], exact: true }).click(); await d.locator('#sw-motif').fill('test rematch')
     console.log('REMATCH refusé :', (await d.innerText()).includes('Rematch interdit'), '| bouton désactivé :', await d.getByRole('button', { name: /Appliquer/ }).isDisabled())
     await d.screenshot({ path: `${out}/admin-echange.png` }); await p.keyboard.press('Escape')
   }

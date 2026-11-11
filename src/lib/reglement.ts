@@ -68,11 +68,13 @@ export const ESSENTIALS: { text: string; art: string }[] = [
   { text: '2 × 20 minutes de temps de jeu effectif, pas de prolongation', art: '5.1' },
   { text: 'Pas de hors-jeu', art: '7' },
   { text: 'Touches au pied', art: '8.2' },
+  { text: 'Pré-saison en système suisse : J1 tirée au sort, puis adversaires aux points proches, sans revanche · 4 matchs par équipe', art: '17.1' },
+  { text: 'Après la pré-saison : places 1 à 12 → MASTER, places 13 à 23 → CHALLENGER', art: '17.1' },
   { text: 'Victoire 3 pts · Nul 1 pt · Défaite 0 pt', art: '17.2' },
   { text: 'Forfait = défaite 3-0', art: '14.1' },
-  { text: 'Départage : points, confrontation directe, différence de buts, buts marqués, moins de jaunes, moins de rouges, tirage au sort', art: '17.3' },
+  { text: 'Départage MASTER / CHALLENGER : points, confrontation directe, différence de buts, buts marqués, moins de jaunes, moins de rouges, tirage au sort', art: '17.3' },
   { text: '2 jaunes dans le même match = rouge · Pas de cumul de jaunes d’un match à l’autre', art: '11.5' },
-  { text: 'Pas de suspension automatique : seul le conseil de discipline suspend un joueur', art: '19' },
+  { text: 'Pas de suspension automatique : seul le conseil de discipline (Ardentia, Sifflé d’Or, capitaines de l’autre division) suspend un joueur', art: '19' },
   { text: 'Réclamation sous 24 h après le coup de sifflet final', art: '17.4' },
 ]
 
@@ -90,7 +92,7 @@ export const RULEBOOK_RULES: Record<string, RulebookRules> = {
   v8: { council: true },
   v9: { council: true },
 }
-export const CURRENT_RULEBOOK = 'v8'
+export const CURRENT_RULEBOOK = 'v9'
 /** Règles de cartons d'une saison : celles de sa version du règlement (les saisons sans version gardent l'ancien régime manuel). */
 export function rulesForSeason(season?: Pick<Season, 'rulebook_version'> | null): RulebookRules {
   return RULEBOOK_RULES[season?.rulebook_version ?? ''] ?? { council: false }

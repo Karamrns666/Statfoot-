@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { applyLot1, applyReglementV4, applyDisciplineV8, applyRules6v6, migrate } from './migrations'
+import { applyLot1, applyReglementV4, applyDisciplineV8, applyReglementV9, applyRules6v6, migrate } from './migrations'
 import { captainUpdates } from '@/lib/captain'
 import { generateLeagueData } from './generate'
 import type { Player, Team } from '@/types/entities'
@@ -58,8 +58,8 @@ describe('règles 6 contre 6', () => {
 describe('règlement Ardentia v4', () => {
   it('données neuves : v4 en vigueur (saison 2026-2027), v3 dans l’historique, saison rattachée, mi-temps 20 min', () => {
     const db = generateLeagueData(new Date('2026-11-09T10:00:00'))
-    expect(db.Rulebook.map((r) => [r.version, r.status])).toEqual([['v4', 'current'], ['v3', 'archived']])
-    expect(db.Season.find((s) => s.id === 'season_2026')!.rulebook_version).toBe('v8')
+    expect(db.Rulebook.map((r) => [r.version, r.status])).toEqual([['v9', 'current'], ['v4', 'archived'], ['v3', 'archived']])
+    expect(db.Season.find((s) => s.id === 'season_2026')!.rulebook_version).toBe('v9')
     expect(db.Competition.filter((c) => c.season_id === 'season_2026').every((c) => c.half_duration_min === 20)).toBe(true)
     expect(db.Settings[0]).not.toHaveProperty('tiebreakers')
   })
@@ -70,8 +70,8 @@ describe('règlement Ardentia v4', () => {
       Match: [{ id: 'm', season_id: 'season_2026', competition_id: 'c', home_team_id: 'a', away_team_id: 'b', status: 'scheduled', half_duration_min: 15 }],
       Settings: [{ id: 'settings', points_win: 3, tiebreakers: ['points'] } as never],
     })
-    expect(out.Rulebook!.map((r) => r.version)).toEqual(['v4', 'v3'])
-    expect(out.Season![0].rulebook_version).toBe('v8')
+    expect(out.Rulebook!.map((r) => r.version)).toEqual(['v9', 'v4', 'v3'])
+    expect(out.Season![0].rulebook_version).toBe('v9')
     expect(out.Competition![0].half_duration_min).toBe(20)
     expect(out.Match![0].half_duration_min).toBe(20)
     expect(out.Settings![0]).toEqual({ id: 'settings' })
@@ -85,5 +85,16 @@ describe('règlement v8 — discipline', () => {
     const out = applyDisciplineV8(db)
     expect(out.Season!.map((x) => x.rulebook_version)).toEqual(['v8', 'v3'])
     expect(applyDisciplineV8({ ...db, ...out })).toEqual({})
+  })
+})
+
+describe('règlement v9 publié', () => {
+  it('données déjà enregistrées (v4 en vigueur) : v9 ajouté en tête et en vigueur, v4 et v3 archivés, saison rattachée à la v9 (idempotent)', () => {
+    const db = { Rulebook: [{ id: 'rulebook_v4', version: 'v4', title: 'R', date: '2026-11-09', content: 'x', status: 'current' as const }, { id: 'rulebook_v3', version: 'v3', title: 'R', date: '2026-11-09', content: 'y', status: 'archived' as const }], Season: [{ id: 'season_2026', name: 'S', start_date: '2026-08-22', rulebook_version: 'v8' }] }
+    const out = applyReglementV9(db)
+    expect(out.Rulebook!.map((r) => [r.version, r.status])).toEqual([['v9', 'current'], ['v4', 'archived'], ['v3', 'archived']])
+    expect(out.Rulebook![0].docx_url).toMatch(/v9\.docx$/)
+    expect(out.Season![0].rulebook_version).toBe('v9')
+    expect(applyReglementV9({ ...db, ...out })).toEqual({})
   })
 })

@@ -373,6 +373,8 @@ export interface Rulebook extends BaseEntity {
   season_id?: string
   content: string
   pdf_url?: string
+  /** version Word téléchargeable (.docx) */
+  docx_url?: string
   status: 'current' | 'archived'
   changes?: string
 }

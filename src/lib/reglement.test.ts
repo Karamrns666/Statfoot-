@@ -4,6 +4,7 @@ import { REGLEMENT, captainsVoice, coherenceWarnings, computeDiscipline, council
 import { computeStandings } from './standings'
 import V4 from '@/api/seed/reglement-v4.md?raw'
 import V3 from '@/api/seed/reglement-v3.md?raw'
+import V9 from '@/api/seed/reglement-v9.md?raw'
 
 // ---------------------------------------------------------------------------
 let n = 0
@@ -206,6 +207,15 @@ describe('Art. 2.7 — infériorité numérique de 2 minutes', () => {
 })
 
 describe('texte du règlement', () => {
+  it('v9 cohérente avec les constantes et la plateforme', () => {
+    expect(coherenceWarnings(V9)).toEqual([])
+    for (const h of ['## 17.1 Format de la compétition', '## 17.3 Critères de classement des équipes', '## 17.7 Procès-verbaux (PV)', '# ARTICLE 19 — CONSEIL DE DISCIPLINE', '## 19.3 Capitaines qui votent', '## 19.9 Communication']) expect(V9).toContain(h)
+    expect(V9).toMatch(/joue en MASTER, ce sont les capitaines de CHALLENGER qui votent/)
+    expect(V9).not.toMatch(/Ligue 1|Ligue 2|les joueurs est|ce ce délai|les joueurs ne peut/)
+    expect(V9).toMatch(/\*\*Classement de la pré-saison :\*\*.*1\) Points 2\) Différence de buts 3\) Buts marqués 4\) Force des adversaires/)
+    expect(V9).toMatch(/de la 1re à la 12e place forment la division MASTER/)
+    expect(V9).not.toMatch(/plus de quatre \(4\) secondes/) // retiré de l'Art. 11.2 (seul l'Art. 15.3 s'applique)
+  })
   it('v3 et v4 signalées : elles ne disent pas que les jaunes ne se cumulent pas ni qui vote au conseil (v8)', () => {
     for (const t of [V3, V4]) {
       const w = coherenceWarnings(t).join(' ')

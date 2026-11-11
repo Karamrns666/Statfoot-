@@ -247,11 +247,24 @@ export function applyOfficialTeams2026(db: Rules6Data & { Club?: Club[] }): Rule
 
 /** Règlement v8 (2026-2027) : la saison passe au régime « conseil de discipline » (pas de cumul, pas de suspension automatique). */
 export function applyDisciplineV8(db: Rules6Data): Rules6Data {
-  if (!db.Season?.some((x) => x.id === SEASON_2026_ID && x.rulebook_version !== CURRENT_RULEBOOK && (!x.rulebook_version || x.rulebook_version === 'v4'))) return {}
-  return { Season: db.Season.map((x) => (x.id === SEASON_2026_ID && (!x.rulebook_version || x.rulebook_version === 'v4') ? { ...x, rulebook_version: CURRENT_RULEBOOK } : x)) }
+  const old = (v?: string) => !v || v === 'v4'
+  if (!db.Season?.some((x) => x.id === SEASON_2026_ID && old(x.rulebook_version))) return {}
+  return { Season: db.Season.map((x) => (x.id === SEASON_2026_ID && old(x.rulebook_version) ? { ...x, rulebook_version: 'v8' } : x)) }
 }
 
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8]
+/** Règlement v9 publié (v8 + fonctionnement de la plateforme) : ajouté à l'historique, rattaché à 2026-2027. */
+export function applyReglementV9(db: Rules6Data): Rules6Data {
+  const out: Rules6Data = {}
+  const books = buildRulebooks()
+  const have = new Set((db.Rulebook ?? []).map((r) => r.version))
+  if (db.Rulebook && books.some((b) => !have.has(b.version)))
+    out.Rulebook = [...books.filter((b) => !have.has(b.version)), ...db.Rulebook.map((r) => (r.status === 'current' ? { ...r, status: 'archived' as const, changes: books.find((b) => b.version === r.version)?.changes ?? r.changes } : r))]
+  if (db.Season?.some((x) => x.id === SEASON_2026_ID && (!x.rulebook_version || ['v4', 'v8'].includes(x.rulebook_version))))
+    out.Season = db.Season.map((x) => (x.id === SEASON_2026_ID && (!x.rulebook_version || ['v4', 'v8'].includes(x.rulebook_version)) ? { ...x, rulebook_version: CURRENT_RULEBOOK } : x))
+  return out
+}
+
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */

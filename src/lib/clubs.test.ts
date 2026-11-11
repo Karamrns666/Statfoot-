@@ -45,7 +45,7 @@ describe('saisons séparées : clubs et équipes de saison', () => {
     const comps = db.Competition.map((c) => (c.season_id === 'season_2026' ? { ...c, team_ids: c.team_ids!.map((x) => (x === t26.id ? t25.id : x)) } : c))
     const m26 = { id: 'm26', season_id: 'season_2026', competition_id: 'comp_2026_selection', home_team_id: t25.id, away_team_id: 'x', status: 'scheduled' as const }
     const old = { Team: db.Team.filter((t) => t.id !== t26.id).map(({ season_id: _s, club_id: _c, ...t }) => t), Competition: comps, Season: db.Season, Match: [m26], MatchEvent: [{ id: 'e', match_id: 'm26', team_id: t25.id, type: 'goal' as const }], Player: [{ id: 'np', first_name: 'N', last_name: 'P', team_id: t25.id, position: 'FIELD' as const, status: 'active' as const, season_ids: ['season_2026'] }], Club: [] as never[] }
-    const out = migrate(old as never, 5)
+    const out = migrate(old as never, 4) // étapes « séparation » puis « clubs »
     const clone = out.Team!.find((t) => t.season_id === 'season_2026' && t.short_name === 'AVR')!
     expect(clone.id).not.toBe(t25.id)
     expect(out.Team!.find((t) => t.id === t25.id)!.season_id).toBe('season_2025')

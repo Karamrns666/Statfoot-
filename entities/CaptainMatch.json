@@ -1,0 +1,43 @@
+{
+  "name": "CaptainMatch",
+  "type": "object",
+  "description": "Match des capitaines — feuille de match (hors ligue : ne compte dans aucun calcul de la ligue)",
+  "properties": {
+    "date": {
+      "type": "string"
+    },
+    "pitch": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "scheduled",
+        "finished",
+        "cancelled"
+      ]
+    },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "orange_pens": {
+      "type": "number"
+    },
+    "bleue_pens": {
+      "type": "number"
+    },
+    "motm_player_id": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "date",
+    "status"
+  ]
+}

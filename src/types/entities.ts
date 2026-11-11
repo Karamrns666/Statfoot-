@@ -381,6 +381,47 @@ export interface TeamOfWeek extends BaseEntity {
 
 export interface MotmVote extends BaseEntity { match_id: string; player_id: string; voter_key: string }
 
+// ---------------------------------------------------------------------------
+//  Match des capitaines : mini-tournoi mensuel ORANGE vs BLEUE, SANS AUCUN LIEN avec la ligue.
+//  Entités séparées (CaptainTeam / CaptainMatch) : jamais lues par les calculs de la ligue
+//  (classements, XP, IPG, stats joueurs, cartons / suspensions, bandeau de saison).
+// ---------------------------------------------------------------------------
+export type CaptainSide = 'orange' | 'bleue'
+export interface CaptainTeam extends BaseEntity {
+  side: CaptainSide
+  name: string
+  logo_url?: string
+  color?: string
+  /** joueurs inscrits à la ligue choisis pour l'effectif */
+  player_ids: string[]
+  captain_id?: string
+}
+/** ligne de feuille de match d'un joueur (même saisie qu'un match normal, 6 contre 6) */
+export interface CaptainLine {
+  side: CaptainSide
+  player_id: string
+  played: boolean
+  goals: number
+  /** buts contre son camp */
+  og: number
+  assists: number
+  yc: number
+  rc: number
+  saves: number
+  gk?: boolean
+}
+export interface CaptainMatch extends BaseEntity {
+  date: string
+  pitch?: string
+  status: 'scheduled' | 'finished' | 'cancelled'
+  lines: CaptainLine[]
+  /** tirs au but (si égalité) */
+  orange_pens?: number | null
+  bleue_pens?: number | null
+  motm_player_id?: string
+  notes?: string
+}
+
 export interface Settings extends BaseEntity {
   league_name?: string
   short_name?: string
@@ -427,6 +468,8 @@ export interface AdminUser extends BaseEntity {
 }
 
 export interface EntityMap {
+  CaptainTeam: CaptainTeam
+  CaptainMatch: CaptainMatch
   Season: Season
   Competition: Competition
   Division: Division
@@ -457,5 +500,5 @@ export interface EntityMap {
 export type EntityName = keyof EntityMap
 export const ENTITY_NAMES: EntityName[] = [
   'Season', 'Competition', 'Division', 'Group', 'Venue', 'Team', 'Player', 'Match', 'MatchEvent', 'Lineup', 'LiveState',
-  'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser', 'Rulebook', 'Club',
+  'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser', 'Rulebook', 'Club', 'CaptainTeam', 'CaptainMatch',
 ]

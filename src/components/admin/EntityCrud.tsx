@@ -52,7 +52,7 @@ export function EntityForm({ fields, value, onChange }: { fields: Field[]; value
   )
 }
 
-function MultiSelect({ options, value, onChange }: { options: { value: string; label: string }[]; value: string[]; onChange: (v: string[]) => void }) {
+export function MultiSelect({ options, value, onChange }: { options: { value: string; label: string }[]; value: string[]; onChange: (v: string[]) => void }) {
   return (
     <div className="flex max-h-48 flex-wrap gap-1.5 overflow-y-auto rounded-lg border border-input bg-night-950/40 p-2">
       {options.map((o) => { const on = value.includes(o.value); return <button type="button" key={o.value} onClick={() => onChange(on ? value.filter((x) => x !== o.value) : [...value, o.value])} className={cn('rounded-full px-2.5 py-1 text-xs cursor-pointer', on ? 'bg-neon text-white' : 'bg-white/5 text-muted-foreground hover:bg-white/10')}>{o.label}</button> })}

@@ -7,6 +7,7 @@ import { AdminLayout, RequireArea } from '@/components/admin/AdminLayout'
 import type { Area } from '@/lib/permissions'
 
 const P = {
+  Captains: lazy(() => import('@/pages/public/Captains')),
   Home: lazy(() => import('@/pages/public/Home')),
   Matches: lazy(() => import('@/pages/public/Matches')),
   MatchDetail: lazy(() => import('@/pages/public/MatchDetail')),
@@ -29,6 +30,8 @@ const sport = () => import('@/pages/admin/SportPages')
 const content = () => import('@/pages/admin/ContentPages')
 const misc = () => import('@/pages/admin/AdminMisc')
 const A = {
+  Captains: lazy(() => import('@/pages/admin/CaptainsAdmin')),
+  CaptainMatch: lazy(() => import('@/pages/admin/CaptainsAdmin').then((m) => ({ default: m.CaptainMatchEditor }))),
   Login: lazy(() => import('@/pages/admin/Login')),
   Dashboard: lazy(() => import('@/pages/admin/Dashboard')),
   Seasons: named(sport, 'Seasons'), Competitions: named(sport, 'Competitions'), Divisions: named(sport, 'Divisions'), Teams: named(sport, 'Teams'),
@@ -78,6 +81,8 @@ export default function App() {
           <Route path="equipe-type" element={guard('sport', <A.TeamOfWeek />)} />
           <Route path="statistiques" element={guard('sport', <A.Stats />)} />
           <Route path="trophees" element={guard('awards', <A.Awards />)} />
+          <Route path="capitaines" element={guard('sport', <A.Captains />)} />
+          <Route path="capitaines/:id" element={guard('match_center', <A.CaptainMatch />)} />
           <Route path="import" element={guard('import', <A.Import />)} />
           <Route path="medias" element={guard('media', <A.Media />)} />
           <Route path="reglement" element={guard('settings', <A.Rules />)} />
@@ -98,10 +103,12 @@ export default function App() {
           <Route path="equipes/:id" element={<P.TeamDetail />} />
           <Route path="joueurs" element={<P.Players />} />
           <Route path="joueurs/:id" element={<P.PlayerDetail />} />
-          <Route path="meilleure-performance" element={<P.Awards />} />
-          <Route path="trophees" element={<Navigate to="/meilleure-performance" replace />} />
-          <Route path="recompenses" element={<Navigate to="/meilleure-performance" replace />} />
+          <Route path="trophees" element={<P.Awards />} />
+          <Route path="meilleure-performance" element={<Navigate to="/trophees" replace />} />
+          <Route path="recompenses" element={<Navigate to="/trophees" replace />} />
           <Route path="statistiques" element={<P.Stats />} />
+          <Route path="match-des-capitaines" element={<P.Captains />} />
+          <Route path="capitaines" element={<Navigate to="/match-des-capitaines" replace />} />
           <Route path="equipe-type" element={<P.TeamOfRound />} />
           <Route path="equipe-de-la-journee" element={<Navigate to="/equipe-type" replace />} />
           <Route path="media" element={<P.Media />} />

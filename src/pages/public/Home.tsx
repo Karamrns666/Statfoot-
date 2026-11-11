@@ -3,6 +3,7 @@ import { Billboard, type BillboardSlide } from '@/components/home/Billboard'
 import { previousSeasons } from '@/lib/clubs'
 import { returningHighlights } from '@/lib/heritage'
 import { SeasonStrip } from '@/components/home/SeasonStrip'
+import { NextCaptainBlock } from '@/components/captains/CaptainBits'
 import { seasonStrip } from '@/lib/seasonStrip'
 import { IPGCard, XPCard } from '@/components/players/Cards'
 import { IPG_RANKING } from '@/lib/ipg'
@@ -152,6 +153,9 @@ export default function Home() {
           </div>
         )}
       </section>
+
+      {/* MATCH DES CAPITAINES (hors championnat) */}
+      <NextCaptainBlock />
 
       {/* CLASSEMENTS */}
       <section>

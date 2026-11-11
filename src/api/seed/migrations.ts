@@ -1,6 +1,6 @@
 // Migrations NON destructives des données déjà enregistrées dans le navigateur.
 // Elles adaptent les anciennes données aux règles en vigueur sans effacer ce que l'admin a saisi.
-import type { Award, Club, Draw, Suspension, Competition, Lineup, Match, Page, Position, MatchEvent, MatchTeamStats, Player, Rulebook, Season, Settings, Team, TeamOfWeek } from '@/types/entities'
+import type { Award, CaptainTeam, Club, Draw, Suspension, Competition, Lineup, Match, Page, Position, MatchEvent, MatchTeamStats, Player, Rulebook, Season, Settings, Team, TeamOfWeek } from '@/types/entities'
 import { CURRENT_RULEBOOK, REGLEMENT, isDisputed } from '@/lib/reglement'
 import { buildRulebooks } from './rulebook'
 import { DEFAULT_COMPETITION_NAMES, LEGACY_COMPETITION_NAMES } from '@/lib/competitionNames'
@@ -8,6 +8,7 @@ import { LEAGUE } from '@/config/league'
 import { SEASON_2026_ID } from './season2026'
 import { toRole } from '@/lib/format'
 import { capStarters } from '@/lib/lineup'
+import { defaultCaptainTeams } from '@/lib/captains'
 import { store } from '../localStore'
 
 /** copie sans la clé donnée */
@@ -16,6 +17,7 @@ function omit<T extends object>(o: T, key: string): T { const c = { ...o } as Re
 const REMOVED_AWARDS = new Set(['best_defender', 'best_midfielder', 'best_forward'])
 
 export interface Rules6Data {
+  CaptainTeam?: CaptainTeam[]
   Suspension?: Suspension[]
   Draw?: Draw[]
   Player?: Player[]
@@ -218,7 +220,13 @@ export function applyClubs(db: Rules6Data & { Club?: Club[] }): Rules6Data & { C
 }
 
 /** Étapes de migration, dans l'ordre. Le numéro atteint est mémorisé dans le navigateur. */
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs]
+/** Match des capitaines : crée les équipes ORANGE et BLEUE (effectifs vides) si elles n'existent pas. */
+export function applyCaptains(db: Rules6Data): Rules6Data {
+  if (!db.CaptainTeam || db.CaptainTeam.length) return {}
+  return { CaptainTeam: defaultCaptainTeams() }
+}
+
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */
@@ -237,7 +245,7 @@ export function migrateStoredData() {
   const legacy = store.getFlag('migrated-6v6') ? 1 : 0
   const from = Number(store.getFlag(VERSION_FLAG) ?? legacy) || legacy
   if (from >= STEPS.length) return
-  const names = ['Player', 'MatchEvent', 'MatchTeamStats', 'Award', 'TeamOfWeek', 'Lineup', 'Page', 'Team', 'Settings', 'Rulebook', 'Season', 'Competition', 'Match', 'Division', 'Club', 'Suspension', 'Draw'] as const
+  const names = ['Player', 'MatchEvent', 'MatchTeamStats', 'Award', 'TeamOfWeek', 'Lineup', 'Page', 'Team', 'Settings', 'Rulebook', 'Season', 'Competition', 'Match', 'Division', 'Club', 'Suspension', 'Draw', 'CaptainTeam'] as const
   const db = Object.fromEntries(names.map((n) => [n, store.all(n)])) as Rules6Data
   const changed = migrate(db, from)
   store.batch(() => { for (const [name, rows] of Object.entries(changed)) store.replace(name as (typeof names)[number], rows as never) })

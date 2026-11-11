@@ -6,6 +6,7 @@ import { base44, store } from '@/api/base44Client'
 import { ensureSeeded } from '@/api/seed'
 import { ENTITY_NAMES, type EntityMap, type EntityName, type Settings } from '@/types/entities'
 import type { LeagueData } from '@/lib/stats'
+import { leagueFromDb } from '@/lib/leagueData'
 
 export type DB = { [N in EntityName]: EntityMap[N][] }
 interface DataState { db: DB; league: LeagueData; settings: Settings; ready: boolean }
@@ -33,11 +34,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const value = useMemo<DataState>(() => {
     const settings = db.Settings[0] ?? ({ id: 'settings' } as Settings)
     applyCompetitionNames(settings) // noms MASTER / CHALLENGER (config admin) disponibles partout
-    const league: LeagueData = {
-      seasons: db.Season, competitions: db.Competition, divisions: db.Division, groups: db.Group, teams: db.Team,
-      players: db.Player, matches: db.Match, events: db.MatchEvent, lineups: db.Lineup, xpRules: db.XPRule,
-      suspensions: db.Suspension, monthlyAwards: db.MonthlyAward, settings, teamStats: db.MatchTeamStats,
-    }
+    const league: LeagueData = leagueFromDb(db, settings)
     return { db, league, settings, ready }
   }, [db, ready])
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>

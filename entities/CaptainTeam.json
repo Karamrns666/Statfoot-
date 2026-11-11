@@ -1,0 +1,36 @@
+{
+  "name": "CaptainTeam",
+  "type": "object",
+  "description": "Match des capitaines — équipe ORANGE ou BLEUE (hors ligue)",
+  "properties": {
+    "side": {
+      "type": "string",
+      "enum": [
+        "orange",
+        "bleue"
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "logo_url": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string"
+    },
+    "player_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "captain_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "side",
+    "name"
+  ]
+}

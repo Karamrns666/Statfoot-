@@ -56,7 +56,7 @@ function ShareDialog({ match, open, onOpenChange }: { match: Match; open: boolea
           ))}
         </div>
         {/* aperçu limité en hauteur : les boutons restent visibles même sur un petit écran */}
-        <div className="relative mx-auto aspect-square w-full max-w-[min(100%,40dvh)] overflow-hidden rounded-xl bg-white/5">
+        <div className="relative mx-auto aspect-square w-full max-w-[min(100%,34dvh)] overflow-hidden rounded-xl bg-white/5">
           {prev.url && <img src={prev.url} alt={kind === 'resultat' ? 'Visuel du résultat' : 'Visuel homme du match'} className="size-full" />}
           {(prev.busy || !prev.url) && <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-xs text-white/80"><Loader2 className="size-6 animate-spin text-neon" />Préparation de l’image…</div>}
         </div>

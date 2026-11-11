@@ -5,7 +5,7 @@ import type { Competition, Match, Player } from '@/types/entities'
 
 const comp = (id: string, phase: Competition['phase'], name: string, team_ids: string[] = ['A', 'B', 'C', 'D']): Competition => ({ id, season_id: 's1', name, phase, team_ids, format: phase === 'league_phase' ? 'swiss' : 'league' })
 const m = (id: string, c: string, round: number, played: boolean, o: Partial<Match> = {}): Match => ({ id, season_id: 's1', competition_id: c, round, date: `2026-09-${10 + round}T19:00:00`, home_team_id: 'A', away_team_id: 'B', home_score: played ? 1 : null, away_score: played ? 0 : null, status: played ? 'finished' : 'scheduled', published: true, ...o })
-const pl = (id: string, seasons: string[], status: Player['status'] = 'active'): Player => ({ id, first_name: 'x', last_name: id, team_id: 'A', status, season_ids: seasons })
+const pl = (id: string, seasons: string[], status: Player['status'] = 'active'): Player => ({ id, first_name: 'x', last_name: id, team_id: 'A', position: 'FIELD', status, season_ids: seasons })
 
 describe('bandeau de chiffres de l’accueil', () => {
   const competitions = [comp('pre', 'league_phase', 'Phase de sélection')]

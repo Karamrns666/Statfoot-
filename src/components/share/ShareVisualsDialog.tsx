@@ -46,7 +46,7 @@ export function ShareVisualsDialog({ open, onOpenChange, match }: { open: boolea
             <div ref={ref}><Visual kind={kind} match={match} goal={goals.find((g) => g.id === goalId)} /></div>
           </div>
         </div>
-        <Button onClick={download} disabled={busy}>{busy ? <Loader2 className="animate-spin" /> : <Download />}Télécharger le PNG</Button>
+        <Button size="lg" onClick={download} disabled={busy} className="w-full">{busy ? <><Loader2 className="animate-spin" />Génération…</> : <><Download />Télécharger le PNG</>}</Button>
       </DialogContent>
     </Dialog>
   )

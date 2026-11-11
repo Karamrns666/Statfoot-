@@ -1,5 +1,7 @@
 import { useMemo, type ReactNode } from 'react'
 import { Billboard, type BillboardSlide } from '@/components/home/Billboard'
+import { previousSeasons } from '@/lib/clubs'
+import { returningHighlights } from '@/lib/heritage'
 import { SeasonStrip } from '@/components/home/SeasonStrip'
 import { seasonStrip } from '@/lib/seasonStrip'
 import { IPGCard, XPCard } from '@/components/players/Cards'
@@ -10,7 +12,7 @@ import { Link } from 'react-router-dom'
 import { Hand } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
 import { useSeason } from '@/hooks/useSeason'
-import { useEffectiveSeason, useSeasonCompetitions, useRace, usePlayerXP, useTeamOfWeek, useTeamStats } from '@/hooks/useStats'
+import { useSeasonCompetitions, useRace, usePlayerXP, useTeamOfWeek, useTeamStats } from '@/hooks/useStats'
 import { TeamOfWeekPitch } from '@/components/teamweek/TeamOfWeekPitch'
 import { RewardsList } from '@/components/teamweek/RewardsList'
 import { seasonRounds } from '@/lib/rewards'
@@ -27,10 +29,13 @@ import { competitionZones } from '@/lib/zones'
 export default function Home() {
   const { db, league, settings } = useData()
   const L = useLookup()
-  const { scopeSeasonId } = useSeason()
-  const season = useEffectiveSeason()
-  const comps = useSeasonCompetitions()
-  const sid = scopeSeasonId ?? season?.id
+  // l'accueil montre TOUJOURS la saison en cours (2026-2027) ; les autres saisons restent dans leurs pages (sélecteur)
+  const { seasons } = useSeason()
+  const season = seasons.find((x) => x.is_active) ?? seasons[0] ?? null
+  const comps = useSeasonCompetitions(season?.id)
+  const sid = season?.id
+  const prevSid = previousSeasons(sid, seasons)[0]
+  const heritage = useMemo(() => (sid && prevSid ? returningHighlights(league, prevSid, sid) : []), [league, sid, prevSid])
 
   const { lastRound, live, next } = useMemo(() => {
     const ms = db.Match.filter((m) => m.season_id === sid && m.published !== false)
@@ -104,6 +109,11 @@ export default function Home() {
     const tstats = [...teamStatsAll.values()].filter((t) => t.played > 0)
     const att = bestAttack(tstats)[0]; if (att && att.team_id !== lead?.team_id) pushTeam('attack', 'Meilleure attaque', att.team_id, att.gf, 'BUTS', `${att.gf_avg} buts par match en ${att.played} matchs`, 'orange')
     const def = bestDefense(tstats)[0]; if (def) pushTeam('defense', 'Meilleure défense', def.team_id, def.ga_avg.toLocaleString('fr-FR'), 'BC / MATCH', `${def.ga} buts encaissés en ${def.played} matchs`, 'sky')
+    // saison précédente : seulement les équipes / joueurs revenus avec un lien approuvé
+    for (const h of heritage) {
+      if (h.kind === 'team') teams.push({ key: h.key, kind: 'team', eyebrow: h.label, title: h.team.name, value: h.value, unit: h.unit, image: h.team.logo_url, color: h.team.primary_color, sub: h.sub, href: `/equipes/${h.team.id}`, tone: 'orange' })
+      else if (h.player) players.push({ key: h.key, kind: 'player', eyebrow: h.label, title: playerShort(h.player), value: h.value, unit: h.unit, image: h.team.logo_url, color: h.team.primary_color, photo: h.player.photo_url, initials: initials(h.player), sub: h.sub, href: `/joueurs/${h.player.id}`, tone: 'sky' })
+    }
     if (notStarted) {
       const engaged = [...teamsInSeason].map((id) => team(id)).filter((t): t is NonNullable<typeof t> => !!t).sort((a, b) => a.name.localeCompare(b.name)).slice(0, 6)
       for (const t of engaged) pushTeam(`team-${t.id}`, `Engagée en ${season?.name.replace('Saison ', '') ?? ''}`, t.id, undefined, '', t.company && t.company !== t.name ? t.company : 'Entreprise engagée dans la ligue', 'white')
@@ -115,7 +125,7 @@ export default function Home() {
     }
     if (refK.matches) out.push({ key: 'kpi', kind: 'info', eyebrow: `${archive ? archive.name : 'La saison'} en chiffres`, title: `${refK.matches} matchs`, value: refK.goals, unit: 'BUTS', sub: `${refK.goals_avg} buts par match · ${refK.assists} passes décisives · ${refK.yellow} cartons jaunes`, tone: 'white' })
     return out
-  }, [sid, refSid, archive, comps, teamsInSeason, tag, live, league, xpAll, teamStatsAll, tow, L, season, showIPG, refK, notStarted])
+  }, [sid, refSid, archive, comps, teamsInSeason, tag, live, league, xpAll, teamStatsAll, tow, L, season, showIPG, refK, notStarted, heritage])
 
   return (
     <div className="space-y-12">

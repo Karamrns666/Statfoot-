@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { Lock, CheckCircle2, AlertTriangle, Images } from 'lucide-react'
+import { teamSeasonId } from '@/lib/clubs'
+import { SeasonLinkControl } from '@/components/admin/SeasonLinkControl'
 import { phaseName } from '@/lib/competitionNames'
 import { TeamMediaManager } from '@/components/admin/TeamMediaManager'
 import { base44 } from '@/api/base44Client'
@@ -135,19 +137,21 @@ export function Teams() {
     { key: 'contact_name', label: 'Contact' }, { key: 'contact_email', label: 'Email contact', type: 'email' }, { key: 'contact_phone', label: 'Téléphone' },
   ]
   return (
-    <AdminPage title="Équipes" subtitle={comp ? `Filtré sur ${comp.name}` : 'Toutes les équipes'}>
+    <AdminPage title="Équipes" subtitle={`${db.Season.find((s) => s.id === seasonId)?.name ?? ''}${comp ? ` · ${comp.name}` : ''} — une équipe appartient à une seule saison ; son club fait le lien d’une saison à l’autre`}>
       <EntityCrud entity="Team" title="Équipe" fields={fields} sort={(a, b) => a.name.localeCompare(b.name)}
-        filter={(t) => (!comp || !!comp.team_ids?.includes(t.id)) && (!div || t.division_id === div)}
+        filter={(t) => teamSeasonId(t, db.Competition) === seasonId && (!comp || !!comp.team_ids?.includes(t.id)) && (!div || t.division_id === div)}
         searchText={(t) => `${t.name} ${t.company} ${t.short_name}`}
         transform={(v) => ({ ...v, short_name: String(v.short_name ?? '').toUpperCase().slice(0, 3) })}
         toolbar={<FilterSelect value={div} onChange={setDiv} allLabel="Toutes séries" options={db.Division.map((d) => ({ value: d.id, label: d.name }))} />}
-        defaults={() => ({ status: 'active', primary_color: '#F85A00', secondary_color: '#04163D' })}
+        defaults={() => ({ status: 'active', primary_color: '#F85A00', secondary_color: '#04163D', season_id: seasonId })}
+        afterSave={async (v) => { const id = v.id as string; const t = db.Team.find((x) => x.id === id); if (!v.club_id && !t?.club_id) { const club = `club_${id}`; await base44.entities.Team.update(id, { club_id: club, season_id: (v.season_id as string) ?? seasonId }); if (!db.Club.some((c) => c.id === club)) await base44.entities.Club.create({ id: club, name: v.name as string, logo_url: v.logo_url as string | undefined } as never) } }}
         rowActions={(t) => <Button size="sm" variant="outline" className="h-8" onClick={() => setMediaFor(t.id)}><Images />Photos & poster{t.media?.length ? ` (${t.media.length})` : ''}</Button>}
         columns={[
           { label: 'Équipe', render: (t) => <span className="flex items-center gap-2"><TeamLogo team={t} size={28} /><span><span className="font-semibold">{t.name}</span><span className="ml-2 text-xs text-muted-foreground">{t.short_name}</span></span></span> },
           { label: 'Entreprise', render: (t) => <span className="flex items-center gap-2">{t.company_logo_url && <img src={t.company_logo_url} className="size-5 rounded" alt="" />}{t.company}</span>, className: 'hidden md:table-cell' },
           { label: 'Couleurs', render: (t) => <span className="flex gap-1"><span className="size-4 rounded" style={{ background: t.primary_color }} /><span className="size-4 rounded ring-1 ring-white/20" style={{ background: t.secondary_color }} /></span>, className: 'hidden sm:table-cell' },
-          { label: 'Série', render: (t) => db.Division.find((d) => d.id === t.division_id)?.name ?? '—' },
+          { label: 'Série', render: (t) => db.Division.find((d) => d.id === t.division_id)?.name ?? '—', className: 'hidden xl:table-cell' },
+          { label: 'Saison précédente', render: (t) => <SeasonLinkControl kind="team" item={t} /> },
           { label: 'Capitaine', render: (t) => { const c = db.Player.find((p) => p.team_id === t.id && p.is_captain); return c ? `${c.first_name} ${c.last_name}` : <span className="text-muted-foreground">—</span> }, className: 'hidden lg:table-cell' },
           { label: 'Effectif', render: (t) => db.Player.filter((p) => p.team_id === t.id && p.season_ids?.includes(seasonId)).length, className: 'text-center' },
           { label: 'Statut', render: (t) => <Badge variant={t.status === 'active' ? 'success' : 'outline'}>{t.status === 'active' ? 'Active' : t.status === 'pending' ? 'En attente' : 'Inactive'}</Badge> },

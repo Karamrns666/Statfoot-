@@ -18,7 +18,7 @@ const id = (p: string) => `${p}_${(++c).toString(36)}`
 
 export function generateLeagueData(now = new Date()): DB {
   c = 0
-  const db = Object.fromEntries((['Season', 'Competition', 'Division', 'Group', 'Venue', 'Team', 'Player', 'Match', 'MatchEvent', 'Lineup', 'LiveState', 'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser', 'Rulebook'] as EntityName[]).map((n) => [n, []])) as unknown as DB
+  const db = Object.fromEntries((['Season', 'Competition', 'Division', 'Group', 'Venue', 'Team', 'Player', 'Match', 'MatchEvent', 'Lineup', 'LiveState', 'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser', 'Rulebook', 'Club'] as EntityName[]).map((n) => [n, []])) as unknown as DB
 
   const settings: Settings = {
     id: 'settings', league_name: LEAGUE.name, short_name: LEAGUE.shortName, tagline: LEAGUE.tagline,
@@ -41,7 +41,7 @@ export function generateLeagueData(now = new Date()): DB {
   for (const s of [s25.season, s26.season]) for (const key of XP_KEYS) db.XPRule.push({ id: id('xp'), season_id: s.id, key, value: XP_DEFAULTS[key] } as XPRule)
 
   // 2025-2026 : rang adverse figé journée par journée, homme du match, palmarès publié
-  db.Team.push(...s25.teams); db.Player.push(...s25.players); db.Competition.push(s25.competition)
+  db.Team.push(...s25.teams.map((t) => ({ ...t, season_id: s25.season.id, club_id: `club_${t.id}` }))); db.Player.push(...s25.players); db.Competition.push(s25.competition)
   db.Match.push(...s25.matches); db.MatchEvent.push(...s25.events); db.Lineup.push(...s25.lineups)
   for (const m of [...s25.matches].filter((x) => x.status === 'finished').sort((a, b) => (a.round ?? 0) - (b.round ?? 0))) {
     m.opponent_rank_snapshot = { home_rank: teamRankBefore(league(), m, m.home_team_id), away_rank: teamRankBefore(league(), m, m.away_team_id) }
@@ -55,7 +55,9 @@ export function generateLeagueData(now = new Date()): DB {
   }
 
   // 2026-2027 : équipes inscrites et phase de sélection (un seul groupe)
-  db.Team.push(...s26.teams); db.Competition.push(...s26.competitions)
+  db.Team.push(...s26.teams.map((t) => ({ ...t, season_id: s26.season.id, club_id: `club_${t.id}` }))); db.Competition.push(...s26.competitions)
+  // un club permanent par équipe ; les liens entre saisons sont approuvés par l'admin (aucun lien automatique)
+  db.Club.push(...db.Team.map((t) => ({ id: t.club_id!, name: t.name, logo_url: t.logo_url })))
 
   // ---- administrateurs (à remplacer par les vrais comptes au lancement) -----------
   const ts = new Date(now.getTime() - 30 * 86400000).toISOString()

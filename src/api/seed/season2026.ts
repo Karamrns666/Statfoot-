@@ -5,7 +5,6 @@
 import type { Competition, Season, Team } from '@/types/entities'
 import { CURRENT_RULEBOOK, REGLEMENT } from '@/lib/reglement'
 import { teamLogoSvg } from '@/lib/logos'
-import { s25TeamId } from './season2025'
 
 export const SEASON_2026_ID = 'season_2026'
 
@@ -41,10 +40,12 @@ export function buildSeason2026() {
     league_phase_rounds: 0, cup_rounds: 10, gold_size: 10, rulebook_version: CURRENT_RULEBOOK,
   }
   const teams: Team[] = []
-  const ids = (cup: 'gold' | 'silver') => NEW_TEAMS.filter((t) => t.cup === cup).map((t) => (t.reuse ? s25TeamId(t.reuse) : s26TeamId(t.short)))
+  // une équipe = une saison : les équipes qui reviennent de 2025-2026 ont leur propre fiche 2026-2027 (mêmes logos) ;
+  // le lien avec leur fiche 2025-2026 est proposé dans l'admin et n'existe qu'après approbation
+  const ids = (cup: 'gold' | 'silver') => NEW_TEAMS.filter((t) => t.cup === cup).map((t) => s26TeamId(t.short))
   NEW_TEAMS.forEach((t, i) => {
-    if (t.reuse) return // fiche existante (2025-2026)
-    teams.push({ id: s26TeamId(t.short), name: t.name, short_name: t.short, company: t.name, logo_url: teamLogoSvg(t.short, t.c1, t.c2, i), primary_color: t.c1, secondary_color: t.c2, status: 'active' })
+    const logo = t.reuse ? { logo_url: `/logos/${t.reuse.toLowerCase()}.png`, company_logo_url: `/logos/${t.reuse.toLowerCase()}-full.png` } : { logo_url: teamLogoSvg(t.short, t.c1, t.c2, i) }
+    teams.push({ id: s26TeamId(t.short), name: t.name, short_name: t.short, company: t.name, ...logo, primary_color: t.c1, secondary_color: t.c2, status: 'active' })
   })
   // Phase de sélection : un seul groupe, un seul classement. Le tirage (Admin → Tirage & divisions) crée les matchs ;
   // Gold Cup et Silver Cup sont constituées ensuite à partir du classement.

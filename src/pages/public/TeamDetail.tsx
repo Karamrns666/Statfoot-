@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { ClubHistory } from '@/components/league/ClubHistory'
 import { SuspendedBadge } from '@/components/reglement/PlayerDisciplineCard'
 import { useSeasonDiscipline } from '@/hooks/useDiscipline'
 import { useEffectiveSeason } from '@/hooks/useStats'
@@ -48,6 +49,7 @@ export default function TeamDetail() {
           {team.company_logo_url && <img src={team.company_logo_url} alt={team.company ?? ''} className={team.company_logo_url.startsWith('/logos/') ? 'h-9 w-auto rounded-lg bg-white' : 'size-6 rounded'} />}<span>{team.company}</span><CompetitionBadge competition={cup} />{row && <span className="font-semibold">{row.rank}e · {row.points} pts</span>}
         </div>
         <div className="mt-3"><FormPills form={teamForm(matches, team.id)} size="md" /></div>
+        <ClubHistory team={team} />
       </TeamBanner>
       <div className="grid grid-cols-3 gap-2 sm:gap-3">
         <StatTile label="Matchs joués" value={ts?.played ?? 0} sub={`${ts?.won ?? 0}V · ${ts?.drawn ?? 0}N · ${ts?.lost ?? 0}D`} />

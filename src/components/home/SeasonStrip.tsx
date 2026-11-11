@@ -34,7 +34,7 @@ function PhaseTile({ p, color }: { p: PhaseState; color: string }) {
     <Link to={p.href} className="glass group relative overflow-hidden rounded-2xl p-4 outline-none focus-visible:ring-2 focus-visible:ring-neon" aria-label={`${p.name} : ${p.label}. Voir le classement`}>
       <div className="pointer-events-none absolute -right-6 -top-6 size-20 rounded-full opacity-30 blur-2xl" style={{ background: color }} />
       <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground"><Flag className="size-4" style={{ color }} aria-hidden />{p.name}</div>
-      <div className="num mt-1 text-3xl sm:text-4xl"><StateLine p={p} color={color} /></div>
+      <div className="num mt-1 text-2xl sm:text-3xl"><StateLine p={p} color={color} /></div>
       <div className="text-xs text-muted-foreground">{p.status === 'running' ? `${p.played}/${p.total} matchs` : p.status === 'done' ? `${p.total} matchs joués` : 'Calendrier à venir'}</div>
     </Link>
   )

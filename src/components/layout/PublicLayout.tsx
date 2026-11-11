@@ -39,11 +39,11 @@ export function PublicLayout() {
           <Logo subtitle="" className="shrink-0" />
           <nav className="ml-6 hidden min-w-0 flex-1 items-center gap-0.5 xl:flex">
             {PUBLIC_NAV.filter((n) => !n.more).map((n) => (
-              <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => cn('whitespace-nowrap rounded-lg px-1.5 py-1.5 font-display text-[14px] font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:text-white 2xl:px-2 2xl:text-[15px]', isActive && 'text-neon bg-neon/10')}>{n.label}</NavLink>
+              <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => cn('whitespace-nowrap rounded-lg px-1.5 py-1.5 font-display text-[14px] font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:text-white', isActive && 'text-neon bg-neon/10')}>{n.label}</NavLink>
             ))}
             {/* pages secondaires : menu « Plus » (le menu principal tient sur une ligne à toutes les largeurs) */}
             <DropdownMenu>
-              <DropdownMenuTrigger className={cn('inline-flex cursor-pointer items-center gap-1 whitespace-nowrap rounded-lg px-1.5 py-1.5 font-display text-[14px] font-bold uppercase tracking-wide text-muted-foreground outline-none transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-neon 2xl:px-2 2xl:text-[15px]', PUBLIC_NAV.some((n) => n.more && loc.pathname.startsWith(n.to)) && 'bg-neon/10 text-neon')}>Plus<ChevronDown className="size-4" /></DropdownMenuTrigger>
+              <DropdownMenuTrigger className={cn('inline-flex cursor-pointer items-center gap-1 whitespace-nowrap rounded-lg px-1.5 py-1.5 font-display text-[14px] font-bold uppercase tracking-wide text-muted-foreground outline-none transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-neon', PUBLIC_NAV.some((n) => n.more && loc.pathname.startsWith(n.to)) && 'bg-neon/10 text-neon')}>Plus<ChevronDown className="size-4" /></DropdownMenuTrigger>
               <DropdownMenuContent align="start">
                 {PUBLIC_NAV.filter((n) => n.more).map((n) => <DropdownMenuItem key={n.to} asChild><Link to={n.to} className={cn('font-display text-[15px] font-bold uppercase', loc.pathname.startsWith(n.to) && 'text-neon')}>{n.label}</Link></DropdownMenuItem>)}
               </DropdownMenuContent>

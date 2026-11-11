@@ -1,4 +1,4 @@
-// Accroche de la ligue : phrase en français + ligne en arabe (dir="rtl", police Cairo embarquée).
+// Accroche de la ligue : phrase en français + ligne en arabe (dir="rtl", police Tajawal embarquée).
 // Chaque phrase tient sur UNE ligne : la taille suit la largeur du bloc (unités cqi), sans retour à la ligne, dès 320 px.
 import { useLeague } from '@/hooks/useLeague'
 import { cn } from '@/lib/utils'

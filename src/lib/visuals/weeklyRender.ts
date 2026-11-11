@@ -38,8 +38,9 @@ function textAt(ctx: CanvasRenderingContext2D, cfg: VisualsConfig, z: Zone, text
   ctx.textAlign = align; ctx.textBaseline = 'middle'; ctx.fillStyle = color ?? colorOf(cfg, z.color)
   ctx.shadowColor = 'rgba(0, 12, 48, .4)'; ctx.shadowBlur = 5; ctx.shadowOffsetY = 1
   ctx.fillText(t, x, cy + size * 0.05)
+  const w = Math.min(ctx.measureText(t).width, maxW)
   ctx.restore()
-  return Math.min(ctx.measureText(t).width, maxW)
+  return w
 }
 
 const TIER_FILL: Record<SeniorityTier, string> = { platinum: '#EEF4FB', gold: '#E8B931', silver: '#C9D3DD' }
@@ -174,6 +175,6 @@ export async function renderTop10(entries: TopEntry[], cfg: VisualsConfig, opts:
     textAt(ctx, cfg, band, e.name, x, cy, band.x + band.w - x - tw - 30, band.size ?? 44, 'left', fg)
     withAlpha(ctx, team.opacity, () => textAt(ctx, cfg, team, tname, band.x + band.w - 16, cy, tw + 2, team.size ?? 22, 'right', fg))
   })
-  if (opts.showZones) drawZones(ctx, Object.fromEntries([...Object.entries(Z), ...L.bands.map((y, k) => [`rang${k + 4}`, { ...band, y }])]), L.decor)
+  if (opts.showZones) drawZones(ctx, Object.fromEntries([...Object.entries(Z).filter(([k]) => k !== 'podiumRank' && k !== 'podiumValue'), ...L.bands.map((y, k) => [`rang${k + 4}`, { ...band, y }])]), L.decor)
   return c
 }

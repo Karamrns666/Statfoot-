@@ -176,7 +176,7 @@ export function TeamPathCard({ v, teamId, compact = false }: { v: PreseasonView;
         {row && row.played > 0 && <DivisionMark div={row.rank <= m ? 'master' : 'challenger'} size={26} className="text-xs" label={!compact} />}
       </div>
       <ol className="mt-3 grid gap-1.5">
-        {path.lines.map((l) => <li key={`${l.round}-${l.opp}`} className={cn('rounded-lg border px-2.5 py-1.5 text-sm', l.result ? tone[l.result] : 'border-dashed border-white/15 text-muted-foreground')}>{l.text}</li>)}
+        {path.lines.map((l) => <li key={`${l.round}-${l.opp}`} className={cn('rounded-lg border px-2.5 py-1.5 text-sm', l.result ? tone[l.result as keyof typeof tone] : 'border-dashed border-white/15 text-muted-foreground')}>{l.text}</li>)}
         {!path.lines.length && <li className="text-sm text-muted-foreground">Aucun match publié.</li>}
       </ol>
       {path.rest && <p className="mt-2 text-xs text-muted-foreground">Au repos : {v.shortLabel(path.rest)} → match rattrapé à la fin</p>}

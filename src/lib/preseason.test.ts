@@ -66,7 +66,7 @@ describe('pré-saison — rejeu du fichier de référence', () => {
     expect(got).toEqual(R[j].map(([a, , , , b, , why]) => [a, b, why]))
     const before = preseasonRanking(TEAMS, played.filter((m) => m.round < j), { order: cfg.intermediateOrder, drawOrder: ALPHA })
     const pts = new Map(before.map((r) => [r.team_id, r.points]))
-    expect(R[j].map(([a, pa, , , b, pb]) => [pts.get(a), pts.get(b)])).toEqual(R[j].map(([, pa, , , , pb]) => [pa, pb]))
+    expect(R[j].map(([a, , , , b]) => [pts.get(a), pts.get(b)])).toEqual(R[j].map(([, pa, , , , pb]) => [pa, pb]))
   })
   it('rattrapage : CAC – L’Heure Joyeuse et Mega Post Tension – Cobco, avec l’explication', () => {
     expect(plans[5].pairs.map((m) => [m.home, m.away, m.reason])).toEqual(R[5].map(([a, , , , b, , why]) => [a, b, why]))

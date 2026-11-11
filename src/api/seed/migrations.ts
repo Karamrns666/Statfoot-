@@ -1,6 +1,6 @@
 // Migrations NON destructives des données déjà enregistrées dans le navigateur.
 // Elles adaptent les anciennes données aux règles en vigueur sans effacer ce que l'admin a saisi.
-import type { Award, Competition, Lineup, Match, Page, Position, MatchEvent, MatchTeamStats, Player, Rulebook, Season, Settings, Team, TeamOfWeek } from '@/types/entities'
+import type { Award, Club, Competition, Lineup, Match, Page, Position, MatchEvent, MatchTeamStats, Player, Rulebook, Season, Settings, Team, TeamOfWeek } from '@/types/entities'
 import { CURRENT_RULEBOOK, REGLEMENT, isDisputed } from '@/lib/reglement'
 import { buildRulebooks } from './rulebook'
 import { DEFAULT_COMPETITION_NAMES, LEGACY_COMPETITION_NAMES } from '@/lib/competitionNames'
@@ -148,8 +148,31 @@ export function applyRenameCompetitions(db: Rules6Data & { Division?: { id: stri
   return out
 }
 
+/**
+ * Lot 3 — saisons séparées : chaque équipe est rattachée à UNE saison (déduite des compétitions) et à son
+ * propre club permanent. Aucun lien entre saisons n'est créé automatiquement : c'est l'admin qui les approuve.
+ */
+export function applyClubs(db: Rules6Data & { Club?: Club[] }): Rules6Data & { Club?: Club[] } {
+  const out: Rules6Data & { Club?: Club[] } = {}
+  if (!db.Team) return out
+  const comps = db.Competition ?? []
+  const clubs = new Map((db.Club ?? []).map((c) => [c.id, c]))
+  let teamsChanged = false
+  const teams = db.Team.map((t) => {
+    const season_id = t.season_id ?? comps.find((c) => c.team_ids?.includes(t.id))?.season_id
+    const club_id = t.club_id ?? `club_${t.id}`
+    if (!clubs.has(club_id)) clubs.set(club_id, { id: club_id, name: t.name, logo_url: t.logo_url })
+    if (season_id === t.season_id && club_id === t.club_id) return t
+    teamsChanged = true
+    return { ...t, season_id, club_id }
+  })
+  if (teamsChanged) out.Team = teams
+  if (clubs.size !== (db.Club ?? []).length) out.Club = [...clubs.values()]
+  return out
+}
+
 /** Étapes de migration, dans l'ordre. Le numéro atteint est mémorisé dans le navigateur. */
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions]
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applyClubs]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */
@@ -168,7 +191,7 @@ export function migrateStoredData() {
   const legacy = store.getFlag('migrated-6v6') ? 1 : 0
   const from = Number(store.getFlag(VERSION_FLAG) ?? legacy) || legacy
   if (from >= STEPS.length) return
-  const names = ['Player', 'MatchEvent', 'MatchTeamStats', 'Award', 'TeamOfWeek', 'Lineup', 'Page', 'Team', 'Settings', 'Rulebook', 'Season', 'Competition', 'Match', 'Division'] as const
+  const names = ['Player', 'MatchEvent', 'MatchTeamStats', 'Award', 'TeamOfWeek', 'Lineup', 'Page', 'Team', 'Settings', 'Rulebook', 'Season', 'Competition', 'Match', 'Division', 'Club'] as const
   const db = Object.fromEntries(names.map((n) => [n, store.all(n)])) as Rules6Data
   const changed = migrate(db, from)
   store.batch(() => { for (const [name, rows] of Object.entries(changed)) store.replace(name as (typeof names)[number], rows as never) })

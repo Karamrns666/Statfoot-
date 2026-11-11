@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
 import { FileCheck2, Grid2x2, List, ImageUp, Scissors } from 'lucide-react'
+import { teamSeasonId } from '@/lib/clubs'
+import { SeasonLinkControl } from '@/components/admin/SeasonLinkControl'
 import { BulkCutoutDialog } from '@/components/admin/BulkCutoutDialog'
 import { base44 } from '@/api/base44Client'
 import { useData, useLookup } from '@/hooks/useData'
@@ -32,19 +34,20 @@ export default function PlayersAdmin() {
   const [docs, setDocs] = useState<Player | null>(null)
   const [bulkCut, setBulkCut] = useState(false)
   const comp = db.Competition.find((c) => c.id === competitionId)
+  // un joueur est inscrit dans UNE saison : listes et équipes limitées à la saison choisie en haut de l'admin
+  const seasonTeams = useMemo(() => db.Team.filter((t) => teamSeasonId(t, db.Competition) === seasonId), [db.Team, db.Competition, seasonId])
   const filter = useMemo(() => (p: Player) => (!team || p.team_id === team) && (!comp || !!comp.team_ids?.includes(p.team_id)) && (!seasonId || !!p.season_ids?.includes(seasonId))
     && (!docFilter || (docFilter === 'ok' ? DOCS.every((d) => p.documents?.[d.key]?.status === 'valid') : DOCS.some((d) => p.documents?.[d.key]?.status !== 'valid'))), [team, comp, seasonId, docFilter])
   const fields: Field[] = [
     { key: 'first_name', label: 'Prénom', required: true }, { key: 'last_name', label: 'Nom', required: true },
     { key: 'number', label: 'Numéro', type: 'number' },
-    { key: 'team_id', label: 'Équipe', type: 'select', required: true, options: db.Team.map((t) => ({ value: t.id, label: t.name })) },
+    { key: 'team_id', label: 'Équipe', type: 'select', required: true, options: seasonTeams.map((t) => ({ value: t.id, label: t.name })) },
     // 6 contre 6 : pas de postes, seulement deux rôles
     { key: 'is_goalkeeper', label: 'Gardien', type: 'boolean' },
     { key: 'is_captain', label: 'Capitaine', type: 'boolean', help: 'Un seul capitaine par équipe : l’ancien capitaine perd le brassard.' },
     { key: 'birth_date', label: 'Date de naissance', type: 'date' }, { key: 'photo_url', label: 'Photo du joueur', type: 'custom', full: true, render: (v, patch) => <PlayerPhotoField value={v} patch={patch} /> },
     { key: 'status', label: 'Statut', type: 'select', options: [{ value: 'active', label: 'Actif' }, { value: 'injured', label: 'Blessé' }, { value: 'inactive', label: 'Inactif' }] },
     { key: 'email', label: 'Email du compte joueur (accès à sa carte)', type: 'email', full: true },
-    { key: 'season_ids', label: 'Saisons jouées', type: 'multiselect', options: db.Season.map((s) => ({ value: s.id, label: s.name })) },
   ]
   const docBadge = (p: Player) => {
     const bad = DOCS.filter((d) => p.documents?.[d.key]?.status !== 'valid')
@@ -69,20 +72,20 @@ export default function PlayersAdmin() {
   const toolbar = (
     <>
       <Button variant="outline" size="sm" className="h-9" onClick={() => setBulkCut(true)}><Scissors />Détourer toutes les photos existantes</Button>
-      <FilterSelect value={team} onChange={setTeam} allLabel="Toutes équipes" options={db.Team.map((t) => ({ value: t.id, label: t.name })).sort((a, b) => a.label.localeCompare(b.label))} />
+      <FilterSelect value={team} onChange={setTeam} allLabel="Toutes équipes" options={seasonTeams.map((t) => ({ value: t.id, label: t.name })).sort((a, b) => a.label.localeCompare(b.label))} />
       <FilterSelect value={docFilter} onChange={setDocFilter} allLabel="Tous dossiers" options={[{ value: 'ok', label: 'Dossier complet' }, { value: 'ko', label: 'Documents à traiter' }]} />
       <label className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-input px-3 text-xs hover:bg-white/5" title="Nom de fichier : prenom-nom.jpg (ou numéro.jpg si une équipe est filtrée)"><ImageUp className="size-4" />Photos en masse<input type="file" accept="image/*" multiple className="hidden" onChange={(e) => bulkPhotos(e.target.files)} /></label>
       <div className="flex rounded-lg border border-input p-0.5">{(['list', 'grid'] as const).map((v) => <button key={v} onClick={() => setView(v)} className={`rounded-md p-1.5 cursor-pointer ${view === v ? 'bg-neon/20 text-neon' : 'text-muted-foreground'}`} title={v === 'list' ? 'Liste' : 'Trombinoscope'}>{v === 'list' ? <List className="size-4" /> : <Grid2x2 className="size-4" />}</button>)}</div>
     </>
   )
   return (
-    <AdminPage title="Joueurs" subtitle="Effectifs, photos et documents">
+    <AdminPage title="Joueurs" subtitle={`${db.Season.find((s) => s.id === seasonId)?.name ?? ''} — effectifs, photos et documents. Un joueur qui revient est lié à sa saison précédente après votre approbation.`}>
       {view === 'list' ? (
         <EntityCrud entity="Player" title="Joueur" dialogClassName="max-w-4xl" fields={fields} filter={filter} toolbar={toolbar} searchText={(p) => `${p.first_name} ${p.last_name} ${L.team.get(p.team_id)?.name}`}
           sort={(a, b) => (L.team.get(a.team_id)?.name ?? '').localeCompare(L.team.get(b.team_id)?.name ?? '') || (a.number ?? 0) - (b.number ?? 0)}
           defaults={() => ({ status: 'active', position: 'FIELD', is_captain: false, team_id: team || undefined, season_ids: [seasonId] })}
           prepare={(v) => ({ ...v, is_goalkeeper: v.position === 'GK' })}
-          transform={(v) => { const { is_goalkeeper, ...rest } = v; return { ...rest, position: is_goalkeeper ? 'GK' : 'FIELD', is_captain: !!v.is_captain } }}
+          transform={(v) => { const { is_goalkeeper, ...rest } = v; return { ...rest, position: is_goalkeeper ? 'GK' : 'FIELD', is_captain: !!v.is_captain, season_ids: (v.season_ids as string[] | undefined)?.length ? v.season_ids : [seasonId] } }}
           afterSave={(v) => syncCaptain(v.id as string, v.team_id as string, !!v.is_captain)}
           rowActions={(p) => <Button size="sm" variant="ghost" className="h-8" onClick={() => setDocs(p)}><FileCheck2 />Documents</Button>}
           columns={[
@@ -91,6 +94,7 @@ export default function PlayersAdmin() {
             { label: 'Rôle', render: (p) => <RoleBadge position={p.position} captain={p.is_captain} /> },
             { label: 'Équipe', render: (p) => <span className="flex items-center gap-1.5"><TeamLogo team={L.team.get(p.team_id)} size={18} />{L.team.get(p.team_id)?.short_name}</span>, className: 'hidden md:table-cell' },
             { label: 'Documents', render: docBadge },
+            { label: 'Saison précédente', render: (p) => <SeasonLinkControl kind="player" item={p} />, className: 'hidden md:table-cell' },
             { label: 'Compte', render: (p) => p.email ? <span className="text-xs text-muted-foreground">{p.email}</span> : '—', className: 'hidden lg:table-cell' },
           ]} />
       ) : (

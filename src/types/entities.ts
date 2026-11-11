@@ -58,7 +58,27 @@ export interface Division extends BaseEntity { name: string; level: number; prom
 export interface Group extends BaseEntity { competition_id: string; name: string; team_ids?: string[]; order?: number }
 export interface Venue extends BaseEntity { name: string; address?: string; pitches?: string[] }
 
+/** Lien validé par l'admin entre une équipe (ou un joueur) et sa version d'une saison précédente */
+export interface SeasonLink { previous_id: string; approved_by?: string; approved_at: string }
+
+/** Identité permanente d'un club MBL (nom, logo, historique) — une « équipe de saison » par saison y est rattachée */
+export interface Club extends BaseEntity {
+  name: string
+  logo_url?: string
+  history?: string
+  /** correction manuelle du nombre de saisons MBL (badge d'ancienneté), journalisée */
+  seasons_override?: number
+}
+
 export interface Team extends BaseEntity {
+  /** saison de cette équipe (une équipe = une saison ; le club fait le lien entre les saisons) */
+  season_id?: string
+  /** club permanent ; une nouvelle équipe a son propre club tant que le lien n'est pas approuvé */
+  club_id?: string
+  /** lien approuvé vers l'équipe de la saison précédente */
+  link?: SeasonLink
+  /** suggestions de lien écartées par l'admin */
+  link_dismissed?: string[]
   name: string
   short_name: string
   company?: string
@@ -107,6 +127,10 @@ export interface Player extends BaseEntity {
   status?: 'active' | 'injured' | 'inactive'
   is_captain?: boolean
   season_ids?: string[]
+  /** identité permanente du joueur (commune à ses saisons une fois le lien approuvé) */
+  person_id?: string
+  link?: SeasonLink
+  link_dismissed?: string[]
   /** recrue (1re saison dans la ligue) ; à défaut, déduit du nombre de saisons jouées */
   rookie?: boolean
   email?: string
@@ -428,9 +452,10 @@ export interface EntityMap {
   AuditLog: AuditLog
   AdminUser: AdminUser
   Rulebook: Rulebook
+  Club: Club
 }
 export type EntityName = keyof EntityMap
 export const ENTITY_NAMES: EntityName[] = [
   'Season', 'Competition', 'Division', 'Group', 'Venue', 'Team', 'Player', 'Match', 'MatchEvent', 'Lineup', 'LiveState',
-  'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser', 'Rulebook',
+  'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser', 'Rulebook', 'Club',
 ]

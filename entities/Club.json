@@ -1,0 +1,22 @@
+{
+  "name": "Club",
+  "type": "object",
+  "description": "Identité permanente d'un club MBL",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "logo_url": {
+      "type": "string"
+    },
+    "history": {
+      "type": "string"
+    },
+    "seasons_override": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

@@ -101,6 +101,33 @@
     "cover_media_id": {
       "type": "string",
       "description": "Image affichée en en-tête de la page équipe"
+    },
+    "season_id": {
+      "type": "string"
+    },
+    "club_id": {
+      "type": "string"
+    },
+    "link": {
+      "type": "object",
+      "description": "lien approuvé vers la saison précédente",
+      "properties": {
+        "previous_id": {
+          "type": "string"
+        },
+        "approved_by": {
+          "type": "string"
+        },
+        "approved_at": {
+          "type": "string"
+        }
+      }
+    },
+    "link_dismissed": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "required": [

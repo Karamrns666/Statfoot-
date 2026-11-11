@@ -1,0 +1,7 @@
+total 40
+drwxr-xr-x 2 runner runner 4096 Nov 11 10:50 .
+drwxr-xr-x 3 runner runner 4096 Nov 11 10:50 ..
+-rw-r--r-- 1 runner runner 4314 Nov 11 10:50 LICENSE
+-rw-r--r-- 1 runner runner 9024 Nov 11 10:50 tajawal-arabic-700-normal.woff2
+-rw-r--r-- 1 runner runner 9448 Nov 11 10:50 tajawal-arabic-800-normal.woff2
+exit=0

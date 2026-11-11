@@ -1,6 +1,6 @@
 {
   "_doc": "Mise en page des visuels réseaux sociaux (1080 × 1080). Coordonnées en px sur le modèle. Chaque zone : x, y, w, h ; texte : font (display = Anton, text = Oswald), size (taille max), min (taille min avant coupure « … »), color, align. Modifiable aussi dans Admin → Visuels réseaux sociaux → Mise en page (sans toucher au code).",
-  "version": 1,
+  "version": 2,
   "colors": {
     "blue": "#173E95",
     "navy": "#0E3179",
@@ -10,7 +10,10 @@
     "white": "#FFFFFF",
     "halo": "#8EC2FF"
   },
-  "fonts": { "display": "MBL Anton", "text": "MBL Oswald" },
+  "fonts": {
+    "display": "MBL Anton",
+    "text": "MBL Oswald"
+  },
   "templates": {
     "resultat": "/templates/template-resultat.png",
     "mvp": "/templates/template-mvp.png",
@@ -18,49 +21,332 @@
   },
   "resultat": {
     "zones": {
-      "competition": { "x": 432, "y": 386, "w": 218, "h": 43, "font": "display", "size": 30, "min": 14, "color": "white", "align": "center" },
-      "homeLogo": { "x": 140, "y": 470, "w": 128, "h": 146, "pad": 4 },
-      "awayLogo": { "x": 817, "y": 470, "w": 128, "h": 146, "pad": 4 },
-      "homeScore": { "x": 306, "y": 462, "w": 198, "h": 160, "font": "display", "size": 160, "min": 60, "color": "navy", "align": "center" },
-      "awayScore": { "x": 586, "y": 462, "w": 194, "h": 160, "font": "display", "size": 160, "min": 60, "color": "navy", "align": "center" },
-      "scoreWithSub": { "y": 458, "h": 138 },
-      "subLine": { "x": 330, "y": 598, "w": 420, "h": 32, "font": "text", "weight": 700, "size": 28, "min": 16, "color": "navy", "align": "center" },
-      "homeName": { "x": 40, "y": 664, "w": 330, "h": 48, "font": "display", "size": 40, "min": 20, "color": "white", "align": "center" },
-      "awayName": { "x": 710, "y": 664, "w": 330, "h": 48, "font": "display", "size": 40, "min": 20, "color": "white", "align": "center" },
-      "homeScorers": { "x": 40, "y": 720, "w": 330, "h": 204, "font": "text", "weight": 500, "size": 27, "min": 16, "lineHeight": 34, "maxLines": 5, "color": "white", "align": "center" },
-      "awayScorers": { "x": 710, "y": 720, "w": 330, "h": 204, "font": "text", "weight": 500, "size": 27, "min": 16, "lineHeight": 34, "maxLines": 5, "color": "white", "align": "center" },
-      "footer": { "x": 150, "y": 952, "w": 780, "h": 40, "font": "text", "weight": 500, "size": 30, "min": 16, "color": "white", "align": "center" },
-      "leagueLogo": { "x": 509, "y": 1000, "w": 62, "h": 62, "opacity": 0.85 }
+      "competition": {
+        "x": 432,
+        "y": 386,
+        "w": 218,
+        "h": 43,
+        "font": "display",
+        "size": 30,
+        "min": 14,
+        "color": "white",
+        "align": "center"
+      },
+      "homeLogo": {
+        "x": 300,
+        "y": 466,
+        "w": 206,
+        "h": 156,
+        "pad": 10
+      },
+      "awayLogo": {
+        "x": 586,
+        "y": 466,
+        "w": 206,
+        "h": 156,
+        "pad": 10
+      },
+      "homeScore": {
+        "x": 126,
+        "y": 454,
+        "w": 156,
+        "h": 179,
+        "font": "display",
+        "size": 150,
+        "min": 60,
+        "color": "white",
+        "align": "center"
+      },
+      "awayScore": {
+        "x": 803,
+        "y": 454,
+        "w": 156,
+        "h": 179,
+        "font": "display",
+        "size": 150,
+        "min": 60,
+        "color": "white",
+        "align": "center"
+      },
+      "scoreWithSub": {
+        "y": 456,
+        "h": 118
+      },
+      "subLine": {
+        "x": 330,
+        "y": 598,
+        "w": 420,
+        "h": 32,
+        "font": "text",
+        "weight": 700,
+        "size": 28,
+        "min": 16,
+        "color": "navy",
+        "align": "center"
+      },
+      "footer": {
+        "x": 150,
+        "y": 952,
+        "w": 780,
+        "h": 40,
+        "font": "text",
+        "weight": 500,
+        "size": 30,
+        "min": 16,
+        "color": "white",
+        "align": "center"
+      },
+      "leagueLogo": {
+        "x": 509,
+        "y": 1000,
+        "w": 62,
+        "h": 62,
+        "opacity": 0.85
+      },
+      "homePens": {
+        "x": 126,
+        "y": 574,
+        "w": 156,
+        "h": 56,
+        "font": "display",
+        "size": 54,
+        "min": 24,
+        "color": "white",
+        "align": "center"
+      },
+      "awayPens": {
+        "x": 803,
+        "y": 574,
+        "w": 156,
+        "h": 56,
+        "font": "display",
+        "size": 54,
+        "min": 24,
+        "color": "white",
+        "align": "center"
+      },
+      "homeRows": {
+        "x": 64,
+        "y": 664,
+        "w": 456,
+        "h": 276,
+        "font": "display",
+        "size": 40,
+        "min": 18,
+        "lineHeight": 48,
+        "color": "white",
+        "align": "left",
+        "gap": 6
+      },
+      "awayRows": {
+        "x": 560,
+        "y": 664,
+        "w": 456,
+        "h": 276,
+        "font": "display",
+        "size": 40,
+        "min": 18,
+        "lineHeight": 48,
+        "color": "white",
+        "align": "left",
+        "gap": 6
+      }
     },
     "decor": {
-      "triangleHaut": { "x": 530, "y": 144, "w": 24, "h": 22 },
-      "bandeOrangeHaut": { "x": 422, "y": 383, "w": 238, "h": 49 },
-      "bande": { "x": 122, "y": 450, "w": 841, "h": 187 },
-      "encocheV": { "x": 512, "y": 450, "w": 68, "h": 130 }
+      "triangleHaut": {
+        "x": 530,
+        "y": 144,
+        "w": 24,
+        "h": 22
+      },
+      "bandeOrangeHaut": {
+        "x": 422,
+        "y": 383,
+        "w": 238,
+        "h": 49
+      },
+      "bande": {
+        "x": 122,
+        "y": 450,
+        "w": 841,
+        "h": 187
+      },
+      "encocheV": {
+        "x": 512,
+        "y": 450,
+        "w": 68,
+        "h": 130
+      },
+      "blocGauche": {
+        "x": 122,
+        "y": 450,
+        "w": 164,
+        "h": 187
+      },
+      "blocDroit": {
+        "x": 799,
+        "y": 450,
+        "w": 164,
+        "h": 187
+      }
     }
   },
   "mvp": {
     "zones": {
-      "competition": { "x": 240, "y": 150, "w": 600, "h": 42, "font": "display", "size": 32, "min": 16, "color": "white", "align": "center" },
-      "scoreLine": { "x": 170, "y": 204, "w": 740, "h": 74, "font": "display", "size": 44, "min": 20, "color": "white", "align": "center", "logo": 58, "gap": 14 },
-      "barLabel": { "x": 446, "y": 309, "w": 192, "h": 36, "font": "display", "size": 30, "min": 16, "color": "white", "align": "center", "text": "HOMME DU MATCH" },
-      "photo": { "x": 250, "y": 362, "w": 580, "h": 470 },
-      "captain": { "x": 724, "y": 380, "w": 64, "h": 64 },
-      "firstName": { "x": 230, "y": 772, "w": 620, "h": 40, "font": "text", "weight": 700, "size": 36, "min": 18, "color": "white", "align": "center" },
-      "lastName": { "x": 230, "y": 808, "w": 620, "h": 84, "font": "display", "size": 86, "min": 34, "color": "white", "align": "center" },
-      "team": { "x": 290, "y": 896, "w": 500, "h": 40, "font": "text", "weight": 500, "size": 30, "min": 16, "color": "white", "align": "center", "logo": 38, "gap": 10 },
-      "stats": { "x": 236, "y": 942, "w": 608, "h": 52, "gap": 12, "font": "display", "size": 28, "labelFont": "text", "labelSize": 17, "color": "white", "fill": "orange" }
+      "competition": {
+        "x": 240,
+        "y": 150,
+        "w": 600,
+        "h": 42,
+        "font": "display",
+        "size": 32,
+        "min": 16,
+        "color": "white",
+        "align": "center"
+      },
+      "scoreLine": {
+        "x": 170,
+        "y": 204,
+        "w": 740,
+        "h": 74,
+        "font": "display",
+        "size": 44,
+        "min": 20,
+        "color": "white",
+        "align": "center",
+        "logo": 58,
+        "gap": 14
+      },
+      "barLabel": {
+        "x": 446,
+        "y": 309,
+        "w": 192,
+        "h": 36,
+        "font": "display",
+        "size": 30,
+        "min": 16,
+        "color": "white",
+        "align": "center",
+        "text": "HOMME DU MATCH"
+      },
+      "photo": {
+        "x": 250,
+        "y": 362,
+        "w": 580,
+        "h": 470
+      },
+      "captain": {
+        "x": 724,
+        "y": 380,
+        "w": 64,
+        "h": 64
+      },
+      "firstName": {
+        "x": 230,
+        "y": 772,
+        "w": 620,
+        "h": 40,
+        "font": "text",
+        "weight": 700,
+        "size": 36,
+        "min": 18,
+        "color": "white",
+        "align": "center"
+      },
+      "lastName": {
+        "x": 230,
+        "y": 808,
+        "w": 620,
+        "h": 84,
+        "font": "display",
+        "size": 86,
+        "min": 34,
+        "color": "white",
+        "align": "center"
+      },
+      "team": {
+        "x": 290,
+        "y": 896,
+        "w": 500,
+        "h": 40,
+        "font": "text",
+        "weight": 500,
+        "size": 30,
+        "min": 16,
+        "color": "white",
+        "align": "center",
+        "logo": 38,
+        "gap": 10
+      },
+      "stats": {
+        "x": 236,
+        "y": 942,
+        "w": 608,
+        "h": 52,
+        "gap": 12,
+        "font": "display",
+        "size": 28,
+        "labelFont": "text",
+        "labelSize": 17,
+        "color": "white",
+        "fill": "orange"
+      }
     },
     "decor": {
-      "triangleHautGauche": { "x": 64, "y": 92, "w": 62, "h": 46 },
-      "triangleHautDroit": { "x": 966, "y": 92, "w": 64, "h": 46 },
-      "triangleCentre": { "x": 532, "y": 96, "w": 18, "h": 14 },
-      "barreOrange": { "x": 436, "y": 305, "w": 212, "h": 44 },
-      "triangleMilieuGauche": { "x": 158, "y": 442, "w": 50, "h": 50 },
-      "triangleMilieuDroit": { "x": 862, "y": 442, "w": 50, "h": 50 },
-      "triangleBasGauche": { "x": 158, "y": 882, "w": 50, "h": 50 },
-      "triangleBasDroit": { "x": 862, "y": 882, "w": 50, "h": 50 },
-      "logoArdentia": { "x": 470, "y": 996, "w": 140, "h": 46 }
+      "triangleHautGauche": {
+        "x": 64,
+        "y": 92,
+        "w": 62,
+        "h": 46
+      },
+      "triangleHautDroit": {
+        "x": 966,
+        "y": 92,
+        "w": 64,
+        "h": 46
+      },
+      "triangleCentre": {
+        "x": 532,
+        "y": 96,
+        "w": 18,
+        "h": 14
+      },
+      "barreOrange": {
+        "x": 436,
+        "y": 305,
+        "w": 212,
+        "h": 44
+      },
+      "triangleMilieuGauche": {
+        "x": 158,
+        "y": 442,
+        "w": 50,
+        "h": 50
+      },
+      "triangleMilieuDroit": {
+        "x": 862,
+        "y": 442,
+        "w": 50,
+        "h": 50
+      },
+      "triangleBasGauche": {
+        "x": 158,
+        "y": 882,
+        "w": 50,
+        "h": 50
+      },
+      "triangleBasDroit": {
+        "x": 862,
+        "y": 882,
+        "w": 50,
+        "h": 50
+      },
+      "logoArdentia": {
+        "x": 470,
+        "y": 996,
+        "w": 140,
+        "h": 46
+      }
     }
   }
 }

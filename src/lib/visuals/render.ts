@@ -2,7 +2,7 @@
 // Polices embarquées (Anton + Oswald, /public/fonts) chargées avant le dessin : rendu identique partout.
 // Textes : taille réduite automatiquement jusqu'à tenir dans leur zone, puis « … » en dernier recours.
 import { colorOf, VISUAL_SIZE, type VisualsConfig, type Zone } from './config'
-import type { MvpModel, ResultModel } from './model'
+import type { MvpModel, ResultModel, ResultRow } from './model'
 
 // ---------------------------------------------------------------------------
 //  Polices
@@ -95,29 +95,92 @@ function drawText(ctx: CanvasRenderingContext2D, cfg: VisualsConfig, text: strin
   return size
 }
 
-/** Liste de lignes (buteurs) : une taille commune pour que tout tienne en largeur et en hauteur. */
-function linesSize(ctx: CanvasRenderingContext2D, cfg: VisualsConfig, lines: string[], z: Zone) {
-  const max = z.size ?? 26, min = z.min ?? 14
-  for (let s = max; s >= min; s--) {
-    ctx.font = fontOf(cfg, z, s)
-    const lh = Math.round(((z.lineHeight ?? s * 1.25) * s) / max)
-    if (lines.every((l) => ctx.measureText(l).width <= z.w) && lines.length * lh <= z.h) return { size: s, lh }
-  }
-  return { size: min, lh: Math.round(((z.lineHeight ?? min * 1.25) * min) / max) }
-}
-function drawLines(ctx: CanvasRenderingContext2D, cfg: VisualsConfig, lines: string[], z: Zone, size: number, lh: number) {
+// ---------------------------------------------------------------------------
+//  Lignes du résultat : nom + cartons + ballons
+// ---------------------------------------------------------------------------
+/** Ballon de foot vectoriel (rendu identique sur tous les appareils, sans dépendre des emoji). */
+export function drawBall(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
   ctx.save()
-  ctx.font = fontOf(cfg, z, size)
-  ctx.fillStyle = colorOf(cfg, z.color)
-  ctx.textAlign = z.align ?? 'center'
-  ctx.textBaseline = 'middle'
-  ctx.shadowColor = 'rgba(0, 12, 48, .45)'; ctx.shadowBlur = 6; ctx.shadowOffsetY = 1
-  const x = z.align === 'left' ? z.x : z.align === 'right' ? z.x + z.w : z.x + z.w / 2
-  lines.forEach((l, i) => {
-    let t = l
-    while (t.length > 1 && ctx.measureText(t).width > z.w) t = `${t.slice(0, -2)}…`
-    ctx.globalAlpha = l.startsWith('+') ? 0.8 : 1
-    ctx.fillText(t, x, z.y + lh * i + lh / 2)
+  ctx.shadowColor = 'rgba(0, 12, 48, .45)'; ctx.shadowBlur = r * 0.35; ctx.shadowOffsetY = r * 0.08
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = '#FFFFFF'; ctx.fill()
+  ctx.restore()
+  ctx.save()
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.clip()
+  const pent = (x: number, y: number, rr: number, rot: number) => {
+    ctx.beginPath()
+    for (let k = 0; k < 5; k++) { const a = rot + (k * 2 * Math.PI) / 5; const px = x + rr * Math.cos(a), py = y + rr * Math.sin(a); if (k) ctx.lineTo(px, py); else ctx.moveTo(px, py) }
+    ctx.closePath(); ctx.fill()
+  }
+  ctx.fillStyle = '#151B2E'; ctx.strokeStyle = '#151B2E'; ctx.lineWidth = Math.max(1, r * 0.07)
+  pent(cx, cy, r * 0.36, -Math.PI / 2)
+  for (let k = 0; k < 5; k++) {
+    const a = -Math.PI / 2 + (k * 2 * Math.PI) / 5
+    const ox = cx + Math.cos(a) * r * 0.98, oy = cy + Math.sin(a) * r * 0.98
+    pent(ox, oy, r * 0.3, a + Math.PI / 5)
+    ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * r * 0.36, cy + Math.sin(a) * r * 0.36); ctx.lineTo(cx + Math.cos(a) * r * 0.72, cy + Math.sin(a) * r * 0.72); ctx.stroke()
+  }
+  ctx.restore()
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.lineWidth = Math.max(1, r * 0.08); ctx.strokeStyle = '#151B2E'; ctx.stroke()
+}
+function drawCard(ctx: CanvasRenderingContext2D, x: number, cy: number, h: number, color: string) {
+  const w = h * 0.68
+  ctx.save(); ctx.shadowColor = 'rgba(0, 12, 48, .4)'; ctx.shadowBlur = 4; ctx.shadowOffsetY = 1
+  ctx.beginPath(); ctx.roundRect(x, cy - h / 2, w, h, Math.max(2, h * 0.08)); ctx.fillStyle = color; ctx.fill(); ctx.restore()
+  return w
+}
+interface RowsLayout { size: number; lh: number; ball: number }
+/**
+ * Taille commune : jusqu'à 6 lignes à la taille max ; au-delà la hauteur de ligne se réduit pour tout faire tenir
+ * (interligne resserré au-delà de 10 lignes). Les ballons rapetissent si un joueur a beaucoup de buts.
+ */
+export function rowsLayout(ctx: CanvasRenderingContext2D, cfg: VisualsConfig, cols: ResultRow[][], z: Zone): RowsLayout {
+  const n = Math.max(1, ...cols.map((c) => c.length))
+  const maxLh = z.lineHeight ?? 48
+  const lh = Math.min(maxLh, z.h / n)
+  const tight = n > 10 ? 0.92 : 0.8 // police plus grande par rapport à l'interligne quand il est resserré
+  let size = Math.max(z.min ?? 16, Math.min(z.size ?? 40, Math.floor(lh * tight)))
+  // largeur : le nom doit laisser la place aux icônes de la ligne la plus chargée
+  const ball = Math.min(lh * 0.74, (z.size ?? 40) * 0.95)
+  for (; size > (z.min ?? 16); size--) {
+    ctx.font = fontOf(cfg, z, size)
+    const ok = cols.every((c) => c.every((r) => ctx.measureText(r.name).width + iconsWidth(r, ball, z.w, z.gap ?? 6).w + 14 <= z.w))
+    if (ok) break
+  }
+  return { size, lh, ball }
+}
+/** Largeur des icônes (cartons + ballons) ; diamètre des ballons réduit si la place manque (≤ 55 % de la colonne). */
+function iconsWidth(r: ResultRow, ball: number, colW: number, gap: number) {
+  const cards = r.yellow + r.red
+  const cardW = ball * 0.92 * 0.68
+  const max = colW * 0.55
+  let d = ball
+  const width = (dd: number) => cards * (cardW + gap) + r.goals * dd + Math.max(0, r.goals - 1) * gap * 0.5
+  while (r.goals && width(d) > max && d > 12) d -= 1
+  return { w: width(d), d, cardW }
+}
+function drawRows(ctx: CanvasRenderingContext2D, cfg: VisualsConfig, rows: ResultRow[], z: Zone, L: RowsLayout) {
+  const gap = z.gap ?? 6
+  ctx.save()
+  ctx.font = fontOf(cfg, z, L.size)
+  ctx.textBaseline = 'middle'; ctx.textAlign = 'left'
+  rows.forEach((r, i) => {
+    const cy = z.y + L.lh * i + L.lh / 2
+    const ic = iconsWidth(r, L.ball, z.w, gap)
+    // icônes alignées à droite de la colonne : cartons d'abord, puis les ballons
+    let x = z.x + z.w - ic.w
+    const cardH = L.ball * 0.92
+    for (let k = 0; k < r.yellow; k++) x += drawCard(ctx, x, cy, cardH, '#FFD400') + gap
+    for (let k = 0; k < r.red; k++) x += drawCard(ctx, x, cy, cardH, '#E5252A') + gap
+    for (let k = 0; k < r.goals; k++) { drawBall(ctx, x + ic.d / 2, cy, ic.d / 2); x += ic.d + gap * 0.5 }
+    // nom, raccourci s'il touche les icônes
+    const maxW = z.w - ic.w - 14
+    let t = r.name
+    while (t.length > 2 && ctx.measureText(t).width > maxW) t = `${t.slice(0, -2)}…`
+    ctx.save()
+    ctx.shadowColor = 'rgba(0, 12, 48, .5)'; ctx.shadowBlur = 6; ctx.shadowOffsetY = 1
+    ctx.fillStyle = colorOf(cfg, z.color); ctx.globalAlpha = r.og ? 0.9 : 1
+    ctx.fillText(t, z.x, cy + L.size * 0.04)
+    ctx.restore()
   })
   ctx.restore()
 }
@@ -163,23 +226,26 @@ export async function renderResult(model: ResultModel, cfg: VisualsConfig, opts:
     if (img) drawContain(ctx, img, z)
     else drawText(ctx, cfg, short, { ...z, font: 'display', size: 64, min: 24, color: 'white' })
   }
-  const sz = model.sub ? { ...Z.scoreWithSub } : {}
+  // score très grand dans les blocs orange latéraux (« 07 »), tirs au but entre parenthèses dessous (« (14) »)
+  const pens = model.homePens != null && model.awayPens != null
+  const fmt = (n: number) => String(n).padStart(2, '0')
+  const sz = pens ? { ...Z.scoreWithSub } : {}
   const scoreSize = Math.min(
-    fitText(ctx, cfg, String(model.homeScore), { ...Z.homeScore, ...sz }).size,
-    fitText(ctx, cfg, String(model.awayScore), { ...Z.awayScore, ...sz }).size,
+    fitText(ctx, cfg, fmt(model.homeScore), { ...Z.homeScore, ...sz }).size,
+    fitText(ctx, cfg, fmt(model.awayScore), { ...Z.awayScore, ...sz }).size,
   )
-  drawText(ctx, cfg, String(model.homeScore), { ...Z.homeScore, ...sz, size: scoreSize })
-  drawText(ctx, cfg, String(model.awayScore), { ...Z.awayScore, ...sz, size: scoreSize })
-  if (model.sub) drawText(ctx, cfg, model.sub, Z.subLine)
-  // noms : même taille des deux côtés
-  const nameSize = Math.min(fitText(ctx, cfg, model.home.name, Z.homeName).size, fitText(ctx, cfg, model.away.name, Z.awayName).size)
-  drawText(ctx, cfg, model.home.name, { ...Z.homeName, size: nameSize }, { shadow: true })
-  drawText(ctx, cfg, model.away.name, { ...Z.awayName, size: nameSize }, { shadow: true })
-  // buteurs : taille commune aux deux colonnes
-  const a = linesSize(ctx, cfg, model.homeScorers, Z.homeScorers), b = linesSize(ctx, cfg, model.awayScorers, Z.awayScorers)
-  const sc = a.size <= b.size ? a : b
-  drawLines(ctx, cfg, model.homeScorers, Z.homeScorers, sc.size, sc.lh)
-  drawLines(ctx, cfg, model.awayScorers, Z.awayScorers, sc.size, sc.lh)
+  drawText(ctx, cfg, fmt(model.homeScore), { ...Z.homeScore, ...sz, size: scoreSize }, { shadow: true })
+  drawText(ctx, cfg, fmt(model.awayScore), { ...Z.awayScore, ...sz, size: scoreSize }, { shadow: true })
+  if (pens) {
+    const ps = Math.min(fitText(ctx, cfg, `(${fmt(model.homePens!)})`, Z.homePens).size, fitText(ctx, cfg, `(${fmt(model.awayPens!)})`, Z.awayPens).size)
+    drawText(ctx, cfg, `(${fmt(model.homePens!)})`, { ...Z.homePens, size: ps }, { shadow: true })
+    drawText(ctx, cfg, `(${fmt(model.awayPens!)})`, { ...Z.awayPens, size: ps }, { shadow: true })
+  }
+  if (model.sub && !pens) drawText(ctx, cfg, model.sub, Z.subLine)
+  // une colonne par équipe : nom « A.MAZRHI », cartons puis un ballon par but ; taille commune aux deux colonnes
+  const layout = rowsLayout(ctx, cfg, [model.homeRows, model.awayRows], Z.homeRows)
+  drawRows(ctx, cfg, model.homeRows, Z.homeRows, layout)
+  drawRows(ctx, cfg, model.awayRows, Z.awayRows, layout)
   drawText(ctx, cfg, model.footer, Z.footer, { shadow: true })
   if (lg) { ctx.save(); ctx.globalAlpha = Z.leagueLogo.opacity ?? 0.85; drawContain(ctx, lg, Z.leagueLogo); ctx.restore() }
   if (opts.showZones) drawZones(ctx, Z, cfg.resultat.decor)

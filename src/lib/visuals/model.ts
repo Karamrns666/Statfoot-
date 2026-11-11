@@ -8,6 +8,8 @@ import { fmtMinute } from '@/lib/matchEngine'
 import { fmtDate, fmtTime } from '@/lib/format'
 
 export interface ScorerLine { text: string }
+/** Ligne du visuel résultat : « A.MAZRHI » + cartons + un ballon par but ; ligne « (C.S.C) » côté bénéficiaire. */
+export interface ResultRow { name: string; goals: number; yellow: number; red: number; og?: boolean }
 export interface ResultModel {
   competition: string
   home: { name: string; short: string; logo?: string }
@@ -17,6 +19,10 @@ export interface ResultModel {
   sub?: string
   forfeit: boolean
   homeScorers: string[]; awayScorers: string[]
+  /** une colonne par équipe (refonte : ballons, cartons, C.S.C) */
+  homeRows: ResultRow[]; awayRows: ResultRow[]
+  /** tirs au but, affichés entre parenthèses sous le score */
+  homePens?: number; awayPens?: number
   footer: string
 }
 export interface MvpModel {
@@ -66,6 +72,40 @@ export function scorerLines(m: Match, events: MatchEvent[], teamId: string, play
   return [...lines.slice(0, max - 1), `+${rest} autre${rest > 1 ? 's' : ''}`]
 }
 
+/** « A.MAZRHI » : initiale du prénom + nom en capitales */
+export function shortName(p?: Pick<Player, 'first_name' | 'last_name'> | null, free?: string) {
+  if (!p) return upper(free ?? '?')
+  const first = p.first_name.trim().charAt(0)
+  return upper(`${first ? `${first}.` : ''}${p.last_name.trim()}`)
+}
+
+/**
+ * Lignes d'une équipe : un joueur par ligne avec ses buts (hors t.a.b.) et ses cartons ; les buts contre son camp
+ * de l'adversaire sont regroupés sur une ligne « (C.S.C) » du côté de l'équipe qui en profite.
+ * Tri : buteurs (plus de buts d'abord), puis la ligne C.S.C, puis les joueurs seulement avertis / exclus.
+ */
+export function resultRows(m: Match, events: MatchEvent[], teamId: string, players: Map<string, Player>): ResultRow[] {
+  if (isForfeit(m)) return []
+  const evs = events.filter((e) => e.match_id === m.id && e.period !== 'PENS')
+  const rows = new Map<string, ResultRow & { order: number }>()
+  const row = (key: string, name: string, order: number) => { if (!rows.has(key)) rows.set(key, { name, goals: 0, yellow: 0, red: 0, order }); return rows.get(key)! }
+  let i = 0
+  for (const e of evs.filter((x) => x.team_id === teamId)) {
+    const key = e.player_id ?? `free:${e.player_name_free ?? e.id}`
+    const name = shortName(e.player_id ? players.get(e.player_id) : undefined, e.player_name_free)
+    if (e.type === 'goal') row(key, name, i++).goals++
+    else if (e.type === 'yellow_card') row(key, name, i++).yellow++
+    else if (e.type === 'second_yellow') { const r = row(key, name, i++); r.yellow++; r.red++ }
+    else if (e.type === 'red_card') row(key, name, i++).red++
+  }
+  const og = evs.filter((e) => e.type === 'own_goal' && e.team_id !== teamId).length
+  const list = [...rows.values()]
+  const scorers = list.filter((r) => r.goals > 0).sort((a, b) => b.goals - a.goals || a.order - b.order)
+  const carded = list.filter((r) => r.goals === 0).sort((a, b) => a.order - b.order)
+  const strip = (r: ResultRow): ResultRow => ({ name: r.name, goals: r.goals, yellow: r.yellow, red: r.red })
+  return [...scorers.map(strip), ...(og ? [{ name: '(C.S.C)', goals: og, yellow: 0, red: 0, og: true }] : []), ...carded.map(strip)]
+}
+
 export function footerLine(m: Match) {
   return upper([fmtDate(m.date, 'EEE d MMM'), fmtTime(m.date), m.pitch].filter(Boolean).join(' · '))
 }
@@ -93,6 +133,9 @@ export function buildResultModel({ match: m, teams, players, competition, events
     forfeit,
     homeScorers: scorerLines(m, events, m.home_team_id, players),
     awayScorers: scorerLines(m, events, m.away_team_id, players),
+    homeRows: resultRows(m, events, m.home_team_id, players),
+    awayRows: resultRows(m, events, m.away_team_id, players),
+    ...(pens && !forfeit ? { homePens: m.home_pens!, awayPens: m.away_pens! } : {}),
     footer: footerLine(m),
   }
 }

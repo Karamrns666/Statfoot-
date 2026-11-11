@@ -23,7 +23,7 @@ async function override(name, n) {
   await d.getByRole('button', { name: 'Enregistrer' }).click(); await p.waitForTimeout(400)
   return (await row.innerText()).match(/(PLATINUM|GOLD|SILVER)[^\n]*/i)?.[0]
 }
-console.log('CORRECTION Atelier Vert Rabat →', await override('Atelier Vert Rabat', 3), '| Dar Sakane →', await override('Dar Sakane', 2))
+console.log('CORRECTION Atelier Vert Rabat →', await override('Atelier Vert Rabat', 3), '| Distra →', await override('Distra', 2))
 console.log('JOURNAL', JSON.stringify(await p.evaluate(() => JSON.parse(localStorage.getItem('statfoot:v1:AuditLog') || '[]').filter((x) => x.action === 'seniority').map((x) => `${x.name ?? x.entity_name ?? ''} ${JSON.stringify(x.details)}`))))
 // public, saison 2025-2026
 await p.evaluate(() => localStorage.setItem('statfoot:ui:season', 'season_2025'))

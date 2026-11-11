@@ -6,12 +6,11 @@ import { isPlayed, competitionStandings, type StandingRow } from '@/lib/standing
 import { matchXPLines, xpConfig, type XPData } from '@/lib/xp'
 import { keeperMatchStats } from '@/lib/matchEngine'
 import type { LeagueData } from '@/lib/stats'
-import { phaseName } from '@/lib/competitionNames'
 import { shortName } from './model'
 
 const upper = (s: string) => s.toLocaleUpperCase('fr-FR')
 
-export const competitionTitle = (c?: Competition) => upper(c ? (c.phase === 'gold' || c.phase === 'silver' || c.phase === 'league_phase' ? phaseName(c.phase) : c.name) : '')
+export const competitionTitle = (c?: Competition) => upper(c?.name ?? '')
 
 /** Journées disponibles (matchs joués) d'une compétition, de la plus récente à la plus ancienne. */
 export function playedRounds(league: Pick<LeagueData, 'matches'>, competitionId: string) {

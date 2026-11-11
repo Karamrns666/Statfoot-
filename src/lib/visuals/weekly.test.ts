@@ -33,7 +33,7 @@ describe('visuels de la semaine', () => {
     }
     const before = JSON.stringify(weeklyTop(league, comp.id, last, 'xp'))
     db.CaptainMatch.push({ id: 'cm', date: '2026-01-01T18:00', status: 'finished', lines: [{ side: 'orange', player_id: db.Player[0].id, played: true, goals: 9, og: 0, assists: 9, yc: 0, rc: 0, saves: 0 }] })
-    expect(JSON.stringify(weeklyTop(leagueFromDb(db, league.settings), comp.id, last, 'xp'))).toBe(before)
+    expect(JSON.stringify(weeklyTop(leagueFromDb(db, league.settings as Settings), comp.id, last, 'xp'))).toBe(before)
   })
   it('contraste automatique du texte sur la couleur du club', () => {
     expect(contrastText('#000000')).toBe('#FFFFFF')

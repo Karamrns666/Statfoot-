@@ -2,53 +2,39 @@ import { chromium } from 'playwright'
 import fs from 'node:fs'
 const B = 'http://localhost:4173', out = 'e2e-out'; fs.mkdirSync(out, { recursive: true })
 const b = await chromium.launch(); const logs = []
-const p = await (await b.newContext({ viewport: { width: 1440, height: 1000 } })).newPage()
+const ctx = await b.newContext({ viewport: { width: 1366, height: 900 }, acceptDownloads: true }); const p = await ctx.newPage()
 p.on('pageerror', (e) => logs.push(e.message))
 await p.goto(B + '/', { waitUntil: 'networkidle' })
-// MASTER 2026 : J1 et J2 jouées (scores seulement) pour le visuel classement
-const info = await p.evaluate(() => {
-  const M = JSON.parse(localStorage.getItem('statfoot:v1:Match')); const C = JSON.parse(localStorage.getItem('statfoot:v1:Competition')); const T = JSON.parse(localStorage.getItem('statfoot:v1:Team'))
-  const ids = T.filter((t) => t.season_id === 'season_2026').slice(0, 10).map((t) => t.id)
-  C.push({ id: 'comp_e2e_master', season_id: 'season_2026', name: 'MASTER', phase: 'gold', format: 'round_robin', status: 'active', team_ids: ids, order: 2 })
-  let k = 0
-  for (const round of [1, 2]) for (let i = 0; i < 5; i++) { k++; const h = ids[(i + round) % 10], a = ids[(9 - i + round * 3) % 10] === h ? ids[(i + 5) % 10] : ids[(9 - i + round * 3) % 10]
-    M.push({ id: `m_e2e_${k}`, season_id: 'season_2026', competition_id: 'comp_e2e_master', round, date: `2026-10-${String(3 + round * 7).padStart(2, '0')}T${String(17 + (i % 3)).padStart(2, '0')}:00`, pitch: `Terrain ${1 + (i % 3)}`, home_team_id: h, away_team_id: a, status: 'finished', home_score: (k * 7) % 6, away_score: (k * 3) % 5, published: true }) }
-  localStorage.setItem('statfoot:v1:Match', JSON.stringify(M)); localStorage.setItem('statfoot:v1:Competition', JSON.stringify(C))
-  return { n: k }
+// état « ancien » d'un navigateur admin
+await p.evaluate(() => {
+  const g = (n) => JSON.parse(localStorage.getItem('statfoot:v1:' + n)); const s = (n, v) => localStorage.setItem('statfoot:v1:' + n, JSON.stringify(v))
+  let T = g('Team'); T = T.filter((t) => !['t26_ald', 't26_g3c', 't26_pbe', 't26_ctr'].includes(t.id))
+  T.find((t) => t.id === 't26_arw').name = 'Arrow'; T.find((t) => t.id === 't26_mid').name = 'Midea'; T.find((t) => t.id === 't26_lhj').name = 'L’Heure Joyeuse'
+  T.push({ id: 't26_sim', name: 'Simulation FC', short_name: 'SIM', season_id: 'season_2026', club_id: 'club_t26_sim', status: 'active' }); s('Team', T)
+  const C = g('Competition'); const c = C.find((x) => x.id === 'comp_2026_selection'); c.team_ids = T.filter((t) => t.season_id === 'season_2026').map((t) => t.id); s('Competition', C)
+  const P = g('Player'); P.push({ id: 'p_sim', first_name: 'Joueur', last_name: 'Test', team_id: 't26_sim', position: 'FIELD', status: 'active', season_ids: ['season_2026'] }); s('Player', P)
+  const M = g('Match'); M.push({ id: 'm_sim', season_id: 'season_2026', competition_id: 'comp_2026_selection', round: 1, home_team_id: 't26_sim', away_team_id: 't26_cob', status: 'scheduled' }); s('Match', M)
 })
-console.log('MASTER injecté', JSON.stringify(info))
 await p.goto(B + '/admin/login', { waitUntil: 'networkidle' })
 await p.fill('#email', 'superadmin@mbl.ma'); await p.fill('#pw', 'mbl2026'); await p.getByRole('button', { name: /Se connecter/ }).click(); await p.waitForTimeout(1200)
-async function tiles(prefix) {
-  await p.waitForTimeout(2500)
-  const figs = p.locator('main figure')
-  const n = await figs.count()
-  for (let i = 0; i < n; i++) {
-    const f = figs.nth(i); const label = (await f.locator('figcaption').innerText()).trim()
-    const img = f.locator('img'); await img.waitFor({ timeout: 60000 })
-    const data = await img.evaluate(async (el) => { const r = await fetch(el.src); const bl = await r.blob(); return await new Promise((res) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(bl) }) })
-    const name = `${prefix}-${label.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}`
-    if (i < 6) fs.writeFileSync(`${out}/${name}.png`, Buffer.from(data.split(',')[1], 'base64'))
-    if (i < 6) console.log('TUILE', name)
-  }
-  console.log(prefix, 'tuiles', n, '| textes', (await p.locator('main textarea').first().inputValue()).replace(/\n/g, ' / ').slice(0, 160))
-}
-// 2026 MASTER
 await p.evaluate(() => localStorage.setItem('statfoot:admin:season', 'season_2026'))
-await p.goto(B + '/admin/visuels-semaine', { waitUntil: 'networkidle' }); await p.waitForTimeout(800)
-console.log('COMPÉTITIONS', await p.locator('main select, main [role=combobox]').first().innerText().catch(() => '?'))
-await tiles('master')
-// 2025 Championnat (vraies données)
-await p.evaluate(() => localStorage.setItem('statfoot:admin:season', 'season_2025'))
-await p.goto(B + '/admin/visuels-semaine', { waitUntil: 'networkidle' })
-await tiles('championnat')
-await p.screenshot({ path: `${out}/admin-visuels-semaine.png` })
-await p.getByRole('switch', { name: 'Aperçu des zones' }).click(); await tiles('zones')
-// ZIP
-await p.getByRole('switch', { name: 'Aperçu des zones' }).click(); await p.waitForTimeout(500)
-const [dl] = await Promise.all([p.waitForEvent('download', { timeout: 180000 }), p.getByRole('button', { name: /Télécharger tout/ }).click()])
-await dl.saveAs(`${out}/semaine.zip`); console.log('ZIP', dl.suggestedFilename(), fs.statSync(`${out}/semaine.zip`).size)
-// accueil 360
-await p.setViewportSize({ width: 360, height: 780 }); await p.goto(B + '/', { waitUntil: 'networkidle' }); await p.waitForTimeout(1200)
-await p.screenshot({ path: `${out}/accueil-360.png`, fullPage: true }); console.log('ACCUEIL 360 débordement', await p.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1))
+await p.goto(B + '/admin/equipes', { waitUntil: 'networkidle' }); await p.waitForTimeout(800)
+console.log('AVANT lignes', await p.locator('tbody tr').count())
+await p.getByRole('button', { name: /Liste officielle/ }).click(); await p.waitForTimeout(500)
+const d = p.getByRole('dialog'); console.log('APERÇU', (await d.innerText()).replace(/\n+/g, ' | ').slice(0, 900))
+await d.screenshot({ path: `${out}/liste-apercu.png` })
+console.log('Appliquer désactivé avant sauvegarde :', await d.getByRole('button', { name: /Confirmer et appliquer/ }).isDisabled())
+const [dl] = await Promise.all([p.waitForEvent('download'), d.getByRole('button', { name: /sauvegarde/ }).click()])
+await dl.saveAs(`${out}/sauvegarde.json`); const bk = JSON.parse(fs.readFileSync(`${out}/sauvegarde.json`, 'utf8')); console.log('SAUVEGARDE', dl.suggestedFilename(), 'équipes', bk.data.Team.length, 'entités', Object.keys(bk.data).length)
+await d.getByRole('button', { name: /Confirmer et appliquer/ }).click(); await p.waitForTimeout(800)
+console.log('RAPPORT', (await d.innerText()).replace(/\n+/g, ' | ').slice(0, 900)); await d.screenshot({ path: `${out}/liste-rapport.png` })
+await p.keyboard.press('Escape'); await p.waitForTimeout(400)
+console.log('APRÈS lignes', await p.locator('tbody tr').count(), '| suggestions de lien', await p.getByRole('button', { name: /suggestion/ }).count())
+console.log('DONNÉES', JSON.stringify(await p.evaluate(() => { const T = JSON.parse(localStorage.getItem('statfoot:v1:Team')); const s26 = T.filter((t) => t.season_id === 'season_2026'); return { n26: s26.length, n25: T.filter((t) => t.season_id === 'season_2025').length, sim: T.some((t) => t.id === 't26_sim'), pSim: JSON.parse(localStorage.getItem('statfoot:v1:Player')).some((x) => x.id === 'p_sim'), mSim: JSON.parse(localStorage.getItem('statfoot:v1:Match')).some((x) => x.id === 'm_sim'), noms: s26.map((t) => t.name).sort() } })))
+await p.getByRole('button', { name: /Liste officielle/ }).click(); await p.waitForTimeout(400)
+console.log('2E PASSAGE', (await p.getByRole('dialog').getByRole('paragraph').first().innerText()).slice(0, 120)); await p.keyboard.press('Escape')
+console.log('JOURNAL', await p.evaluate(() => JSON.parse(localStorage.getItem('statfoot:v1:AuditLog') || '[]').filter((x) => x.action === 'official_list').length))
+await p.screenshot({ path: `${out}/admin-equipes-2026.png` })
+await p.evaluate(() => localStorage.setItem('statfoot:ui:season', 'season_2026'))
+for (const [w, h] of [[1366, 900], [360, 800]]) { await p.setViewportSize({ width: w, height: h }); await p.goto(B + '/equipes', { waitUntil: 'networkidle' }); await p.waitForTimeout(900); await p.screenshot({ path: `${out}/equipes-${w}.png`, fullPage: true }); console.log('ÉQUIPES', w, 'débordement', await p.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), 'cartes', await p.locator('main a[href^="/equipes/"]').count()) }
 console.log('LOGS', JSON.stringify(logs)); await b.close()

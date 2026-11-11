@@ -92,10 +92,9 @@ export function weeklyTop(league: LeagueData & XPData, competitionId: string, ro
     .sort((a, b) => b.v - a.v || b.t - a.t || b.x - a.x || a.name.localeCompare(b.name, 'fr'))
     .slice(0, n)
   const [one, many] = TOP_UNIT[kind]
-  let prev: (typeof list)[number] | undefined, rank = 0
+  // départage complet (XP de la journée puis ordre alphabétique) : rangs distincts
   return list.map((e, i) => {
-    if (!prev || prev.v !== e.v || prev.t !== e.t) rank = i + 1
-    prev = e
+    const rank = i + 1
     const p = P.get(e.pid)!
     const team = T.get(teamOf.get(e.pid) ?? p.team_id) ?? T.get(p.team_id)
     const value = e.v

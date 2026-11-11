@@ -14,10 +14,15 @@ export interface VisualsConfig {
   version: number
   colors: Record<string, string>
   fonts: { display: string; text: string }
-  templates: { resultat: string; mvp: string; mvp2: string }
+  templates: { resultat: string; mvp: string; mvp2: string; semaine: string; top10: string }
   resultat: TemplateLayout
   mvp: TemplateLayout
+  /** visuels de la semaine 1080 × 1350 : classement / résultats (16 pastilles, barre orange) */
+  semaine: TemplateLayout & { options: { hideUnusedPills: boolean; maxRows: number; step: number } }
+  /** Top 10 1080 × 1350 : podium (3 cartes) + bandes 4 à 10 */
+  top10: TemplateLayout & { bands: number[] }
 }
+export const WEEKLY_W = 1080, WEEKLY_H = 1350
 
 export const DEFAULT_VISUALS_CONFIG = DEFAULTS as unknown as VisualsConfig
 export const VISUAL_SIZE = 1080
@@ -40,6 +45,8 @@ export function resolveVisualsConfig(override?: unknown): VisualsConfig {
     templates: { ...b.templates, ...(o.templates ?? {}) },
     resultat: mergeLayout(b.resultat, o.resultat),
     mvp: mergeLayout(b.mvp, o.mvp),
+    semaine: { ...mergeLayout(b.semaine, o.semaine), options: { ...b.semaine.options, ...(o.semaine?.options ?? {}) } },
+    top10: { ...mergeLayout(b.top10, o.top10), bands: o.top10?.bands ?? b.top10.bands },
   }
 }
 

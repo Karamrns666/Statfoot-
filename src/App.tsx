@@ -30,6 +30,7 @@ const sport = () => import('@/pages/admin/SportPages')
 const content = () => import('@/pages/admin/ContentPages')
 const misc = () => import('@/pages/admin/AdminMisc')
 const A = {
+  WeeklyVisuals: lazy(() => import('@/pages/admin/WeeklyVisualsAdmin')),
   Captains: lazy(() => import('@/pages/admin/CaptainsAdmin')),
   CaptainMatch: lazy(() => import('@/pages/admin/CaptainsAdmin').then((m) => ({ default: m.CaptainMatchEditor }))),
   Login: lazy(() => import('@/pages/admin/Login')),
@@ -78,6 +79,7 @@ export default function App() {
           <Route path="xp" element={guard('xp', <A.XP />)} />
           <Route path="discipline" element={guard('sport', <A.Discipline />)} />
           <Route path="visuels" element={guard('media', <A.Visuels />)} />
+          <Route path="visuels-semaine" element={guard('media', <A.WeeklyVisuals />)} />
           <Route path="equipe-type" element={guard('sport', <A.TeamOfWeek />)} />
           <Route path="statistiques" element={guard('sport', <A.Stats />)} />
           <Route path="trophees" element={guard('awards', <A.Awards />)} />

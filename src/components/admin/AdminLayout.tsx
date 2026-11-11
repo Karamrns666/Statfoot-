@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Image as ImageIcon, Gavel, Swords, CalendarRange,
+import { Image as ImageIcon, Gavel, Swords,
   LayoutDashboard, CalendarRange, Trophy, Layers, Shield, Users, Grid3x3, Shuffle, CalendarDays, Radio, Zap, BarChart3, Award, Image, Upload,
   ScrollText, UserCog, Settings, BookOpen, LogOut, Menu, X, ExternalLink, QrCode, Star, Scissors, Loader2 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'

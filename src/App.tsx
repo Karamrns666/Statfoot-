@@ -98,9 +98,9 @@ export default function App() {
           <Route path="equipes/:id" element={<P.TeamDetail />} />
           <Route path="joueurs" element={<P.Players />} />
           <Route path="joueurs/:id" element={<P.PlayerDetail />} />
-          <Route path="meilleure-performance" element={<P.Awards />} />
-          <Route path="trophees" element={<Navigate to="/meilleure-performance" replace />} />
-          <Route path="recompenses" element={<Navigate to="/meilleure-performance" replace />} />
+          <Route path="trophees" element={<P.Awards />} />
+          <Route path="meilleure-performance" element={<Navigate to="/trophees" replace />} />
+          <Route path="recompenses" element={<Navigate to="/trophees" replace />} />
           <Route path="statistiques" element={<P.Stats />} />
           <Route path="equipe-type" element={<P.TeamOfRound />} />
           <Route path="equipe-de-la-journee" element={<Navigate to="/equipe-type" replace />} />

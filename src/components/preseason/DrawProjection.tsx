@@ -143,7 +143,7 @@ export function DrawProjection({ comp, seasonName, onClose }: { comp: Competitio
     return (
       <div className={cn('flex min-w-0 flex-1 items-center gap-[0.6vw]', right && 'flex-row-reverse text-right')}>
         {t ? <TeamLogo team={t} size={40} className="!size-[clamp(22px,3.6vh,44px)]" /> : <span className="size-[clamp(22px,3.6vh,44px)] shrink-0 rounded-[22%] border border-dashed border-white/20" />}
-        <span className={cn('truncate font-display text-[clamp(12px,1.25vw,24px)] font-black uppercase', !t && 'text-white/25')}>{t?.name ?? '· · ·'}</span>
+        <span className={cn('line-clamp-2 min-w-0 break-words font-display text-[clamp(11px,1.12vw,22px)] font-black uppercase leading-[1.02]', !t && 'text-white/25')}>{t?.name ?? '· · ·'}</span>
       </div>
     )
   }

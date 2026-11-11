@@ -1,3 +1,4 @@
+import { divisionLogo } from '@/lib/divisionLogo'
 import type { ReactNode } from 'react'
 import { ArrowDown, ArrowUp, Minus, Sparkle } from 'lucide-react'
 import type { Result } from '@/lib/stats'
@@ -81,7 +82,8 @@ export function LiveDot({ label = 'Live' }: { label?: string }) {
 export function CompetitionBadge({ competition, className }: { competition?: Competition | null; className?: string }) {
   if (!competition) return null
   const c = competition.color ?? '#F85A00'
-  return <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 font-display text-[11px] font-extrabold uppercase tracking-wider', className)} style={{ color: c, background: `${c}1f`, boxShadow: `inset 0 0 0 1px ${c}44` }}>{competition.name}</span>
+  const logo = divisionLogo(competition)
+  return <span className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-display text-[11px] font-extrabold uppercase tracking-wider', logo && 'pl-0.5', className)} style={{ color: c, background: `${c}1f`, boxShadow: `inset 0 0 0 1px ${c}44` }}>{logo && <img src={logo} alt="" className="size-[1.6em] shrink-0 object-contain" />}{competition.name}</span>
 }
 
 export function Spinner() {

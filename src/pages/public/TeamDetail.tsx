@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ClubHistory } from '@/components/league/ClubHistory'
+import { usePreseason } from '@/hooks/usePreseason'
+import { TeamPathCard } from '@/pages/public/Preseason'
 import { SeniorityBadge } from '@/components/league/SeniorityBadge'
 import { SuspendedBadge } from '@/components/reglement/PlayerDisciplineCard'
 import { useSeasonDiscipline } from '@/hooks/useDiscipline'
@@ -32,6 +34,7 @@ export default function TeamDetail() {
   const { scopeSeasonId } = useSeason()
   const comps = useSeasonCompetitions()
   const team = L.team.get(id ?? '')
+  const pre = usePreseason(team?.season_id ?? scopeSeasonId)
   const ts = useTeamStats({ seasonId: scopeSeasonId }).get(id ?? '')
   const xp = usePlayerXP({ seasonId: scopeSeasonId })
   const effSeason = useEffectiveSeason()
@@ -52,6 +55,12 @@ export default function TeamDetail() {
         <div className="mt-3"><FormPills form={teamForm(matches, team.id)} size="md" /></div>
         <ClubHistory team={team} />
       </TeamBanner>
+      {pre && pre.teamIds.includes(team.id) && pre.matches.length > 0 && (
+        <section>
+          <SectionTitle title="Parcours en pré-saison" action={<Link to="/pre-saison?onglet=parcours" className="text-sm font-semibold text-neon hover:underline">Toutes les équipes</Link>} />
+          <div className="max-w-xl"><TeamPathCard v={pre} teamId={team.id} /></div>
+        </section>
+      )}
       <div className="grid grid-cols-3 gap-2 sm:gap-3">
         <StatTile label="Matchs joués" value={ts?.played ?? 0} sub={`${ts?.won ?? 0}V · ${ts?.drawn ?? 0}N · ${ts?.lost ?? 0}D`} />
         <StatTile label="Buts marqués" value={ts?.gf ?? 0} color="#E04E00" sub={`${ts?.gf_avg ?? 0} / match`} />

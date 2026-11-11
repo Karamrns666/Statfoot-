@@ -7,6 +7,7 @@ import { AdminLayout, RequireArea } from '@/components/admin/AdminLayout'
 import type { Area } from '@/lib/permissions'
 
 const P = {
+  Preseason: lazy(() => import('@/pages/public/Preseason')),
   Captains: lazy(() => import('@/pages/public/Captains')),
   Home: lazy(() => import('@/pages/public/Home')),
   Matches: lazy(() => import('@/pages/public/Matches')),
@@ -112,6 +113,7 @@ export default function App() {
           <Route path="recompenses" element={<Navigate to="/trophees" replace />} />
           <Route path="statistiques" element={<P.Stats />} />
           <Route path="match-des-capitaines" element={<P.Captains />} />
+          <Route path="pre-saison" element={<P.Preseason />} />
           <Route path="capitaines" element={<Navigate to="/match-des-capitaines" replace />} />
           <Route path="equipe-type" element={<P.TeamOfRound />} />
           <Route path="equipe-de-la-journee" element={<Navigate to="/equipe-type" replace />} />

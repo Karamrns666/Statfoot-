@@ -9,6 +9,7 @@ import { competitionTitle, roundMatches, TOP_LABEL, weeklyCaption, weeklyResults
 import { renderTop10, renderWeeklyResults, renderWeeklyStandings } from './weeklyRender'
 import type { SeniorityTier } from '@/lib/seniority'
 import { isPlayed } from '@/lib/standings'
+import { divisionLogo } from '@/lib/divisionLogo'
 
 export function visualData(league: LeagueData, match: Match): VisualData {
   return {
@@ -73,10 +74,10 @@ export function weeklyPlan(league: LeagueData, competitionId: string, round: num
   const out: WeeklyVisual[] = [
     { key: 'resultats', label: 'Résultats de la journée', aspect: '4 / 5', fileName: `mbl-${slug}-j${round}-resultats.png`,
       caption: weeklyCaption('resultats', title, round, results.map((r) => `${r.home.name} ${r.score} ${r.away.name}${r.sub ? ` (${r.sub})` : ''}`)),
-      render: (o) => renderWeeklyResults(results, cfg, { title: 'RÉSULTATS', subtitle: `${title} · J${round}`, barLabel: `RÉSULTATS · J${round}`, showZones: o?.showZones }) },
+      render: (o) => renderWeeklyResults(results, cfg, { title: 'RÉSULTATS', subtitle: `${title} · J${round}`, barLabel: `RÉSULTATS · J${round}`, showZones: o?.showZones, logo: divisionLogo(comp) }) },
     { key: 'classement', label: 'Classement', aspect: '4 / 5', fileName: `mbl-${slug}-j${round}-classement.png`,
       caption: weeklyCaption('classement', title, round, standings.slice(0, 3).map((r) => `${r.rank}. ${r.name} — ${r.points} pts`)),
-      render: (o) => renderWeeklyStandings(standings, cfg, { title: 'CLASSEMENT', subtitle: `${title} · APRÈS LA J${round}`, showZones: o?.showZones }) },
+      render: (o) => renderWeeklyStandings(standings, cfg, { title: 'CLASSEMENT', subtitle: `${title} · APRÈS LA J${round}`, showZones: o?.showZones, logo: divisionLogo(comp) }) },
   ]
   for (const kind of ['xp', 'assists', 'keepers'] as TopKind[]) {
     const top = weeklyTop(league, competitionId, round, kind)

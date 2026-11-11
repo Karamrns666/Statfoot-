@@ -5,6 +5,7 @@ import { CalendarDays, CheckCircle2, ChevronRight, Flag, UserCheck, Users } from
 import { StatTile } from '@/components/league/Bits'
 import type { PhaseState, SeasonStrip as Strip } from '@/lib/seasonStrip'
 import { cn } from '@/lib/utils'
+import { divisionLogo } from '@/lib/divisionLogo'
 
 const GOLD = '#E8B931', SILVER = '#C9D3DD'
 
@@ -26,7 +27,7 @@ export function SeasonStrip({ s }: { s: Strip }) {
 function StateLine({ p, color }: { p: PhaseState; color: string }) {
   if (p.status === 'done') return <span className="inline-flex items-center gap-1 whitespace-nowrap" style={{ color }}><CheckCircle2 className="size-[.9em]" aria-hidden />Terminée</span>
   if (p.status === 'upcoming') return <span className="whitespace-nowrap text-muted-foreground">À venir</span>
-  return <span className="whitespace-nowrap" style={{ color }}>{p.round ? `J${p.round}` : 'En cours'}</span>
+  return <span className="whitespace-nowrap" style={{ color }}>{p.roundLabel ?? (p.round ? `J${p.round}` : 'En cours')}</span>
 }
 
 function PhaseTile({ p, color }: { p: PhaseState; color: string }) {
@@ -44,7 +45,7 @@ function PhaseHalf({ p, color, className }: { p: PhaseState; color: string; clas
   return (
     <Link to={p.href} className={cn('group relative min-w-0 p-4 outline-none transition-colors hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-neon', className)} aria-label={`${p.name} : ${p.label}. Voir le classement`}>
       <div className="absolute inset-x-0 top-0 h-1" style={{ background: color }} />
-      <div className="flex items-center justify-between gap-1 text-[11px] font-extrabold uppercase tracking-wider" style={{ color }}><span className="truncate">{p.name}</span><ChevronRight className="size-3.5 shrink-0 opacity-60 transition-transform group-hover:translate-x-0.5" aria-hidden /></div>
+      <div className="flex items-center justify-between gap-1 text-[11px] font-extrabold uppercase tracking-wider" style={{ color }}><span className="flex min-w-0 items-center gap-1.5">{divisionLogo(p.competition ?? { phase: color === GOLD ? 'gold' : 'silver' }) && <img src={divisionLogo(p.competition ?? { phase: color === GOLD ? 'gold' : 'silver' })} alt="" className="size-6 shrink-0 object-contain" />}<span className="truncate">{p.name}</span></span><ChevronRight className="size-3.5 shrink-0 opacity-60 transition-transform group-hover:translate-x-0.5" aria-hidden /></div>
       <div className="num mt-1 text-2xl sm:text-3xl"><StateLine p={p} color={color} /></div>
       <div className="whitespace-nowrap text-xs text-muted-foreground">{p.status === 'running' ? `${p.played}/${p.total} matchs` : p.status === 'done' ? `${p.total} matchs joués` : 'Après la pré-saison'}</div>
     </Link>

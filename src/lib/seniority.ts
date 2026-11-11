@@ -45,7 +45,7 @@ export const SENIORITY_STYLE: Record<SeniorityTier, SeniorityStyle> = {
   platinum: {
     frame: 'linear-gradient(150deg, #FFFFFF 0%, #DCE8F5 22%, #9FB7D2 45%, #F4F8FF 62%, #B9CDE4 80%, #FFFFFF 100%)',
     bg: 'linear-gradient(180deg, #FFFFFF 0%, #EEF3FA 38%, #D5E1EF 70%, #BCCDE2 100%)',
-    sheen: 'conic-gradient(from 200deg at 70% 30%, rgb(255 255 255 / 0), rgb(199 225 255 / .55), rgb(255 236 246 / .45), rgb(214 255 247 / .45), rgb(255 255 255 / 0) 70%)',
+    sheen: 'linear-gradient(125deg, rgb(190 220 255 / .55) 0%, rgb(255 226 242 / .45) 30%, rgb(206 255 244 / .45) 55%, rgb(214 226 255 / .55) 80%, rgb(255 255 255 / .2) 100%)',
     fg: '#0B2E73', fgSoft: '#3D5A8A', chip: 'linear-gradient(180deg, #0B2E73, #061A47)', chipText: '#FFFFFF', solid: '#DCE8F5', glow: 'rgb(170 200 235 / .55)',
   },
   gold: {
@@ -56,7 +56,7 @@ export const SENIORITY_STYLE: Record<SeniorityTier, SeniorityStyle> = {
   },
   silver: {
     frame: 'linear-gradient(150deg, #FFFFFF 0%, #C9D3DD 28%, #7D8A99 52%, #E6EBF0 74%, #FFFFFF 100%)',
-    bg: 'linear-gradient(180deg, #EEF1F4 0%, #CBD3DC 42%, #9EAAB8 78%, #8592A2 100%)',
+    bg: 'linear-gradient(180deg, #DDE3E9 0%, #B4BFCB 42%, #8C99A9 78%, #75839A 100%)',
     sheen: 'radial-gradient(90% 55% at 50% 0%, rgb(255 255 255 / .6), transparent 65%)',
     fg: '#0E1E3A', fgSoft: '#3A4A62', chip: 'linear-gradient(180deg, #0B2E73, #061A47)', chipText: '#FFFFFF', solid: '#C9D3DD', glow: 'rgb(201 211 221 / .45)',
   },

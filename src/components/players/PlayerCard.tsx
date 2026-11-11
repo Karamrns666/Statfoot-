@@ -143,7 +143,7 @@ function CardFront({ p }: { p: PlayerCardProps }) {
   return (
     <div className="pcard-face pcard-shape overflow-hidden rounded-b-2xl group-focus-visible:outline-2 group-focus-visible:outline-neon" data-tier={tier} style={{ background: st.frame, padding: 3, filter: `drop-shadow(0 14px 22px ${st.glow})` }}>
       <div className="pcard-shape relative flex h-full flex-col overflow-hidden rounded-b-[13px]" style={{ background: st.bg, color: st.fg }}>
-        <div className="pointer-events-none absolute inset-0 mix-blend-soft-light" style={{ background: st.sheen }} />
+        <div className={cn('pointer-events-none absolute inset-0', tier === 'platinum' ? 'opacity-70' : 'mix-blend-soft-light')} style={{ background: st.sheen }} />
         {tier === 'platinum' && <div className="pointer-events-none absolute inset-0 opacity-60 mix-blend-overlay" style={{ background: 'repeating-linear-gradient(125deg, transparent 0 14px, rgb(255 255 255 / .35) 14px 16px)' }} />}
         <div className="pcard-sheen pointer-events-none absolute inset-0" />
         {/* liseré orange MBL sous le chapeau de la carte */}

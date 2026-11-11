@@ -7,12 +7,14 @@ p.on('pageerror', (e) => logs.push(e.message))
 await p.goto(B + '/', { waitUntil: 'networkidle' })
 // MASTER 2026 : J1 et J2 jouées (scores seulement) pour le visuel classement
 const info = await p.evaluate(() => {
-  const M = JSON.parse(localStorage.getItem('statfoot:v1:Match')); const C = JSON.parse(localStorage.getItem('statfoot:v1:Competition'))
-  const gold = C.find((c) => c.season_id === 'season_2026' && c.phase === 'gold')
+  const M = JSON.parse(localStorage.getItem('statfoot:v1:Match')); const C = JSON.parse(localStorage.getItem('statfoot:v1:Competition')); const T = JSON.parse(localStorage.getItem('statfoot:v1:Team'))
+  const ids = T.filter((t) => t.season_id === 'season_2026').slice(0, 10).map((t) => t.id)
+  C.push({ id: 'comp_e2e_master', season_id: 'season_2026', name: 'MASTER', phase: 'gold', format: 'round_robin', status: 'active', team_ids: ids, order: 2 })
   let k = 0
-  for (const m of M.filter((x) => x.competition_id === gold.id && (x.round === 1 || x.round === 2))) { k++; Object.assign(m, { status: 'finished', home_score: (k * 7) % 6, away_score: (k * 3) % 5, published: true }) }
-  localStorage.setItem('statfoot:v1:Match', JSON.stringify(M))
-  return { gold: gold.id, n: k }
+  for (const round of [1, 2]) for (let i = 0; i < 5; i++) { k++; const h = ids[(i + round) % 10], a = ids[(9 - i + round * 3) % 10] === h ? ids[(i + 5) % 10] : ids[(9 - i + round * 3) % 10]
+    M.push({ id: `m_e2e_${k}`, season_id: 'season_2026', competition_id: 'comp_e2e_master', round, date: `2026-10-${String(3 + round * 7).padStart(2, '0')}T${String(17 + (i % 3)).padStart(2, '0')}:00`, pitch: `Terrain ${1 + (i % 3)}`, home_team_id: h, away_team_id: a, status: 'finished', home_score: (k * 7) % 6, away_score: (k * 3) % 5, published: true }) }
+  localStorage.setItem('statfoot:v1:Match', JSON.stringify(M)); localStorage.setItem('statfoot:v1:Competition', JSON.stringify(C))
+  return { n: k }
 })
 console.log('MASTER injecté', JSON.stringify(info))
 await p.goto(B + '/admin/login', { waitUntil: 'networkidle' })

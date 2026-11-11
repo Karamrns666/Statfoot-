@@ -149,6 +149,12 @@
     "visuals": {
       "type": "object",
       "description": "cache des visuels réseaux sociaux (hash, version, urls)"
+    },
+    "pairing_reason": {
+      "type": "string"
+    },
+    "pairing_manual": {
+      "type": "object"
     }
   },
   "required": [

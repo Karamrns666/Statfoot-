@@ -79,6 +79,24 @@ describe('mise à jour automatique des navigateurs (migration)', () => {
     const out2 = applyOfficialTeams2026(withPlayer as never)
     expect(out2.Team!.some((t) => t.id === 't26_sim')).toBe(true)
     expect(out2.Team!.filter((t) => t.season_id === 'season_2026')).toHaveLength(24)
+    // la pré-saison ne contient que les 23 équipes officielles, même si une équipe hors liste est conservée
+    expect(out2.Competition!.find((c) => c.id === 'comp_2026_selection')!.team_ids).toHaveLength(23)
     expect(applyOfficialTeams2026({ ...db, ...out } as never)).toEqual({})
+  })
+  it('Simulation FC retirée même avec des joueurs : 23 équipes, pré-saison à 23, tirage incluant l’équipe annulé (idempotent)', async () => {
+    const { applyOfficialTeams2026, applyRemoveSimulation2026 } = await import('@/api/seed/migrations')
+    const db = oldDb()
+    const step1 = { ...db, ...applyOfficialTeams2026(db as never) } as typeof db
+    const comp = step1.Competition.find((c) => c.id === 'comp_2026_selection')!
+    comp.team_ids = [...comp.team_ids!, 't26_sim']
+    comp.preseason = { seed: 'x', draw_order: comp.team_ids, revealed: 3 }
+    const out = applyRemoveSimulation2026(step1 as never)
+    expect(out.Team!.filter((t) => t.season_id === 'season_2026')).toHaveLength(23)
+    expect(out.Player!.some((p) => p.id === 'p_sim')).toBe(false)
+    expect(out.Match!.some((m) => m.id === 'm_sim')).toBe(false)
+    const c = out.Competition!.find((x) => x.id === 'comp_2026_selection')!
+    expect(c.team_ids).toHaveLength(23)
+    expect(c.preseason?.draw_order).toBeUndefined()
+    expect(applyRemoveSimulation2026({ ...step1, ...out } as never)).toEqual({})
   })
 })

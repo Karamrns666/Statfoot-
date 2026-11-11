@@ -264,7 +264,33 @@ export function applyReglementV9(db: Rules6Data): Rules6Data {
   return out
 }
 
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9]
+/**
+ * « Simulation FC » (équipe de test des anciennes données 2026-2027) : retirée même si elle a des joueurs ou des matchs,
+ * et la pré-saison ne garde que les 23 équipes officielles (un tirage non publié qui l'incluait est annulé).
+ */
+export function applyRemoveSimulation2026(db: Rules6Data & { Club?: Club[] }): Rules6Data & { Club?: Club[] } {
+  if (!db.Team || !db.Club || !db.Competition || !db.Season?.some((s) => s.id === SEASON_2026_ID)) return {}
+  const full = { Team: db.Team, Player: db.Player ?? [], Match: db.Match ?? [], MatchEvent: db.MatchEvent ?? [], Lineup: db.Lineup ?? [], MatchTeamStats: db.MatchTeamStats ?? [], Competition: db.Competition, Club: db.Club }
+  const plan = planOfficialTeams(full, SEASON_2026_ID)
+  const isSim = (t: Team) => t.id === 't26_sim' || /^simulation fc$/i.test(t.name.trim())
+  plan.removed = plan.removed.filter((r) => isSim(r.team))
+  plan.created = []
+  const official = new Set(plan.kept.map((k) => k.team.id))
+  const extra = db.Competition.some((c) => c.season_id === SEASON_2026_ID && c.phase === 'league_phase' && (c.team_ids ?? []).some((id) => !official.has(id)))
+  if (!plan.removed.length && !extra) return {}
+  const out = applyOfficialPlan(full, { ...plan, kept: plan.kept.map((k) => ({ ...k, rename: undefined, logo: false })) }) as Rules6Data & { Club?: Club[] }
+  out.Competition = out.Competition!.map((c) => {
+    const ps = c.preseason
+    if (c.season_id !== SEASON_2026_ID || c.phase !== 'league_phase' || !ps?.draw_order || ps.published_rounds?.length) return c
+    if (ps.draw_order.every((id) => official.has(id)) && ps.draw_order.length === official.size) return c
+    const rest = { ...ps }
+    for (const k of ['seed', 'draw_order', 'drawn_at', 'drawn_by', 'revealed', 'pending', 'rests'] as const) delete rest[k]
+    return { ...c, preseason: rest }
+  })
+  return out
+}
+
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */

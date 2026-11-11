@@ -113,11 +113,11 @@ export function applyOfficialPlan(db: OfficialDb, plan: OfficialPlan, opts: { id
   }
   const newIds = Team.filter((t) => !db.Team.some((x) => x.id === t.id)).map((t) => t.id)
   const official = new Set([...plan.kept.map((k) => k.team.id), ...newIds])
-  // compétitions de la saison : retire les équipes retirées ; la pré-saison contient toutes les équipes officielles
+  // compétitions de la saison : retire les équipes retirées ; la pré-saison contient les équipes officielles, et elles seules
   const Competition = db.Competition.map((c) => {
     if (c.season_id !== plan.seasonId) return c
     const ids = (c.team_ids ?? []).filter((id) => !removedIds.has(id))
-    return c.phase === 'league_phase' ? { ...c, team_ids: [...new Set([...ids, ...official])].sort() } : { ...c, team_ids: ids }
+    return c.phase === 'league_phase' ? { ...c, team_ids: [...official].sort() } : { ...c, team_ids: ids }
   })
   const removedPlayers = new Set(plan.removed.flatMap((r) => r.players.map((p) => p.id)))
   return {

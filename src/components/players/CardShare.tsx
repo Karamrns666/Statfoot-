@@ -10,6 +10,31 @@ import { VisualFrame } from '@/components/share/VisualFrame'
 
 const W = 1080, H = 1350, CARD_W = 660
 
+// Polices du site (Google Fonts) intégrées en data: — html-to-image ne peut pas lire une feuille de style
+// d'un autre domaine ; sans ça l'image sortirait en police système.
+let fontCss: Promise<string> | null = null
+const toDataUrl = (b: Blob) => new Promise<string>((res) => { const r = new FileReader(); r.onload = () => res(r.result as string); r.readAsDataURL(b) })
+export function embeddedFontCss(): Promise<string> {
+  fontCss ??= (async () => {
+    const links = [...document.querySelectorAll<HTMLLinkElement>('link[rel=stylesheet][href*="fonts.googleapis"]')].map((l) => l.href)
+    let out = ''
+    for (const href of links) {
+      try {
+        const css = await (await fetch(href)).text()
+        // sous-ensembles latins uniquement (le texte de la carte est en alphabet latin)
+        const blocks = css.split('/*').filter((b) => /^\s*latin \*\//.test(b)).map((b) => b.slice(b.indexOf('*/') + 2))
+        for (const b of blocks.length ? blocks : [css]) {
+          let block = b
+          for (const m of b.matchAll(/url\((https:[^)]+)\)/g)) block = block.replace(m[1], await toDataUrl(await (await fetch(m[1])).blob()))
+          out += block
+        }
+      } catch { /* hors ligne : police système */ }
+    }
+    return out
+  })()
+  return fontCss
+}
+
 /** Liens de partage de secours (sans fichier : lien vers la fiche du joueur) */
 export function shareLinks(url: string, text: string) {
   const u = encodeURIComponent(url), t = encodeURIComponent(text)
@@ -30,7 +55,7 @@ export function CardShareActions({ card, fileName, url, text, subtitle }: { card
   const render = async () => {
     if (!ref.current) throw new Error('Carte indisponible')
     await document.fonts?.ready
-    const b = await toBlob(ref.current, { width: W, height: H, pixelRatio: 1, cacheBust: true })
+    const b = await toBlob(ref.current, { width: W, height: H, pixelRatio: 1, cacheBust: true, fontEmbedCSS: await embeddedFontCss() })
     if (!b) throw new Error('Image impossible à générer')
     return new File([b], fileName, { type: 'image/png' })
   }
@@ -52,9 +77,9 @@ export function CardShareActions({ card, fileName, url, text, subtitle }: { card
   }
   return (
     <>
-      <div className="flex w-full flex-wrap justify-center gap-2">
-        <Button size="sm" onClick={download} disabled={!!busy} className="min-w-0 flex-1 sm:flex-none">{busy === 'dl' ? <Loader2 className="animate-spin" /> : <Download />}Télécharger ma carte</Button>
-        <Button size="sm" variant="outline" onClick={share} disabled={!!busy} className="min-w-0 flex-1 border-white/30 bg-white/10 text-white hover:bg-white/20 sm:flex-none">{busy === 'share' ? <Loader2 className="animate-spin" /> : <Share2 />}Partager</Button>
+      <div className="grid w-full gap-2">
+        <Button size="sm" onClick={download} disabled={!!busy} className="w-full">{busy === 'dl' ? <Loader2 className="animate-spin" /> : <Download />}Télécharger ma carte</Button>
+        <Button size="sm" variant="outline" onClick={share} disabled={!!busy} className="w-full border-white/30 bg-white/10 text-white hover:bg-white/20">{busy === 'share' ? <Loader2 className="animate-spin" /> : <Share2 />}Partager</Button>
       </div>
       {/* composition 1080 × 1350 rendue hors écran pour l'export */}
       <div aria-hidden className="pointer-events-none fixed left-[-20000px] top-0" style={{ width: W, height: H }}>

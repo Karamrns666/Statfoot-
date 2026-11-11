@@ -16,10 +16,18 @@ export function SeniorityChip({ tier, seasons, size = 'sm', className }: { tier:
   )
 }
 
+/** Pastille ronde (P / G / S) pour les listes serrées sur mobile */
+export function SeniorityDot({ tier, className }: { tier: SeniorityTier; className?: string }) {
+  const st = SENIORITY_STYLE[tier]
+  return <span className={cn('inline-flex size-[15px] shrink-0 items-center justify-center rounded-full text-[8px] font-black leading-none ring-1 ring-black/15', className)} style={{ background: st.frame, color: st.fg }}>{SENIORITY_LABEL[tier][0]}</span>
+}
+
 /** Badge d'une équipe (calcul automatique + correction admin). `showSeasons` affiche le nombre de saisons. */
-export function SeniorityBadge({ teamId, size = 'sm', showSeasons = false, className }: { teamId?: string; size?: 'xs' | 'sm' | 'md'; showSeasons?: boolean; className?: string }) {
+export function SeniorityBadge({ teamId, size = 'sm', showSeasons = false, responsive = false, className }: { teamId?: string; size?: 'xs' | 'sm' | 'md'; showSeasons?: boolean; responsive?: boolean; className?: string }) {
   const s = useTeamSeniority(teamId)
   if (!s) return null
+  // responsive : pastille ronde sur mobile, badge complet à partir de 640 px
+  if (responsive) return <span title={tip(s)} aria-label={tip(s)} className="inline-flex shrink-0"><SeniorityDot tier={s.tier} className="sm:hidden" /><SeniorityChip tier={s.tier} size={size} className="hidden sm:inline-flex" /></span>
   return <span title={tip(s)} aria-label={tip(s)} className="inline-flex"><SeniorityChip tier={s.tier} seasons={showSeasons ? s.seasons : undefined} size={size} className={className} /></span>
 }
 

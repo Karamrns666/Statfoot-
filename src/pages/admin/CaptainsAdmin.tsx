@@ -157,7 +157,7 @@ export function CaptainMatchEditor() {
         </div>
       </CardContent></Card>
 
-      <div className="mt-4 grid gap-4 xl:grid-cols-2">
+      <div className="mt-4 grid gap-4 2xl:grid-cols-2">
         {CAPTAIN_SIDES.map((side) => {
           const lines = cur.lines.filter((l) => l.side === side)
           const c = teams[side].color ?? CAPTAIN_COLORS[side]

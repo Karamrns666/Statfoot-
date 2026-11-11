@@ -82,7 +82,7 @@ function StatList({ title, rows, teams, value, unit, sub }: { title: string; row
                 <span className="num w-5 text-right text-muted-foreground">{i + 1}</span>
                 <PlayerAvatar player={p} team={p ? L.team.get(p.team_id) : undefined} size={32} />
                 <span className="min-w-0 flex-1"><Link to={p ? `/joueurs/${p.id}` : '#'} className="block truncate font-semibold hover:text-neon">{playerName(p)}</Link><span className="text-xs" style={{ color: teams[s.side].color ?? CAPTAIN_COLORS[s.side] }}>{teams[s.side].name}{sub ? ` · ${sub(s)}` : ''}</span></span>
-                <span className="num text-xl font-black">{value(s)}<span className="ml-1 text-[10px] font-bold text-muted-foreground">{unit}</span></span>
+                <span className="num text-xl font-black">{value(s)}<span className="ml-1 text-[10px] font-bold text-muted-foreground">{value(s) > 1 ? unit : unit.replace(/s$/, '')}</span></span>
               </li>
             )
           })}

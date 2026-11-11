@@ -23,12 +23,12 @@ export function CaptainScoreLine({ m, teams, big }: { m: CaptainMatch; teams: Re
   const done = isFinished(m)
   return (
     <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4">
-      <div className="flex min-w-0 items-center justify-end gap-2 text-right"><span className={cn('truncate font-display font-black uppercase', big ? 'text-2xl sm:text-4xl' : 'text-base sm:text-xl')} style={{ color: sideColor(teams.orange) }}>{teams.orange.name}</span><CaptainCrest team={teams.orange} size={big ? 64 : 36} /></div>
+      <div className="flex min-w-0 flex-col-reverse items-center gap-1 text-center sm:flex-row sm:justify-end sm:gap-2 sm:text-right"><span className={cn('max-w-full font-display font-black uppercase leading-none [overflow-wrap:anywhere] sm:truncate', big ? 'text-lg sm:text-4xl' : 'text-sm sm:text-xl')} style={{ color: sideColor(teams.orange) }}>{teams.orange.name}</span><CaptainCrest team={teams.orange} size={big ? 64 : 36} /></div>
       <div className="text-center">
         <div className={cn('num font-black leading-none', big ? 'text-5xl sm:text-6xl' : 'text-2xl sm:text-3xl')}>{done ? `${s.orange} - ${s.bleue}` : 'vs'}</div>
         {done && m.orange_pens != null && m.bleue_pens != null && <div className="mt-0.5 text-xs font-bold text-muted-foreground">t.a.b. {m.orange_pens}-{m.bleue_pens}{so && ` · ${teams[so].name}`}</div>}
       </div>
-      <div className="flex min-w-0 items-center gap-2"><CaptainCrest team={teams.bleue} size={big ? 64 : 36} /><span className={cn('truncate font-display font-black uppercase', big ? 'text-2xl sm:text-4xl' : 'text-base sm:text-xl')} style={{ color: sideColor(teams.bleue) }}>{teams.bleue.name}</span></div>
+      <div className="flex min-w-0 flex-col items-center gap-1 text-center sm:flex-row sm:gap-2 sm:text-left"><CaptainCrest team={teams.bleue} size={big ? 64 : 36} /><span className={cn('max-w-full font-display font-black uppercase leading-none [overflow-wrap:anywhere] sm:truncate', big ? 'text-lg sm:text-4xl' : 'text-sm sm:text-xl')} style={{ color: sideColor(teams.bleue) }}>{teams.bleue.name}</span></div>
     </div>
   )
 }

@@ -15,7 +15,7 @@ export function seasonDivisions(comps: Pick<Competition, 'season_id' | 'phase' |
 }
 
 /** Capitaine d'une équipe : capitaine désigné sur la fiche équipe, sinon le joueur marqué capitaine. */
-export function captainOf(team: Pick<Team, 'id' | 'captain_player_id'>, players: Pick<Player, 'id' | 'team_id' | 'is_captain'>[]) {
+export function captainOf<P extends Pick<Player, 'id' | 'team_id' | 'is_captain'>>(team: Pick<Team, 'id' | 'captain_player_id'>, players: P[]): P | undefined {
   return players.find((p) => p.id === team.captain_player_id) ?? players.find((p) => p.team_id === team.id && p.is_captain)
 }
 

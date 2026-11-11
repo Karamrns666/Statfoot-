@@ -5,10 +5,11 @@ import { useData } from './useData'
 import { computeDiscipline, rulesForSeason, suspendedFor, type DisciplineData, type PlayerDiscipline } from '@/lib/reglement'
 import { isPlayed } from '@/lib/standings'
 import type { Match, Suspension } from '@/types/entities'
+import { disciplineFromDb } from '@/lib/leagueData'
 
 export function useDisciplineData(): DisciplineData {
   const { db } = useData()
-  return useMemo(() => ({ matches: db.Match, events: db.MatchEvent, lineups: db.Lineup, players: db.Player, extras: db.Suspension.filter((s) => s.kind === 'extra') }), [db.Match, db.MatchEvent, db.Lineup, db.Player, db.Suspension])
+  return useMemo(() => disciplineFromDb(db), [db.Match, db.MatchEvent, db.Lineup, db.Player, db.Suspension])
 }
 
 export function useSeasonRules(seasonId?: string | null) {

@@ -10,6 +10,7 @@ import { buildRulebooks } from './rulebook'
 import { LEAGUE } from '@/config/league'
 import { buildSeason2025 } from './season2025'
 import { buildSeason2026 } from './season2026'
+import { defaultCaptainTeams } from '@/lib/captains'
 
 type DB = { [N in EntityName]: EntityMap[N][] }
 
@@ -18,7 +19,7 @@ const id = (p: string) => `${p}_${(++c).toString(36)}`
 
 export function generateLeagueData(now = new Date()): DB {
   c = 0
-  const db = Object.fromEntries((['Season', 'Competition', 'Division', 'Group', 'Venue', 'Team', 'Player', 'Match', 'MatchEvent', 'Lineup', 'LiveState', 'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser', 'Rulebook', 'Club'] as EntityName[]).map((n) => [n, []])) as unknown as DB
+  const db = Object.fromEntries((['Season', 'Competition', 'Division', 'Group', 'Venue', 'Team', 'Player', 'Match', 'MatchEvent', 'Lineup', 'LiveState', 'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser', 'Rulebook', 'Club', 'CaptainTeam', 'CaptainMatch'] as EntityName[]).map((n) => [n, []])) as unknown as DB
 
   const settings: Settings = {
     id: 'settings', league_name: LEAGUE.name, short_name: LEAGUE.shortName, tagline: LEAGUE.tagline,
@@ -57,6 +58,7 @@ export function generateLeagueData(now = new Date()): DB {
   // 2026-2027 : équipes inscrites et phase de sélection (un seul groupe)
   db.Team.push(...s26.teams.map((t) => ({ ...t, season_id: s26.season.id, club_id: `club_${t.id}` }))); db.Competition.push(...s26.competitions)
   // un club permanent par équipe ; les liens entre saisons sont approuvés par l'admin (aucun lien automatique)
+  db.CaptainTeam.push(...defaultCaptainTeams())
   db.Club.push(...db.Team.map((t) => ({ id: t.club_id!, name: t.name, logo_url: t.logo_url })))
 
   // ---- administrateurs (à remplacer par les vrais comptes au lancement) -----------

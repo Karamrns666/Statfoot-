@@ -18,6 +18,7 @@ export const PUBLIC_NAV = [
   { to: '/joueurs', label: 'Joueurs' },
   { to: '/equipe-type', label: 'Équipe type' },
   { to: '/trophees', label: 'Trophées' },
+  { to: '/match-des-capitaines', label: 'Capitaines' },
   { to: '/statistiques', label: 'Stats', wide: true },
   { to: '/media', label: 'Média' },
   { to: '/historique', label: 'Historique', wide: true },

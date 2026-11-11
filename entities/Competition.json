@@ -108,6 +108,10 @@
         "type": "string"
       },
       "description": "Art. 17.3 : ordre fixé par tirage au sort"
+    },
+    "preseason": {
+      "type": "object",
+      "description": "Pré-saison (système suisse) : tirage J1, repos, journée en préparation, clôture, répartition"
     }
   },
   "required": [

@@ -52,6 +52,32 @@ export interface Competition extends BaseEntity {
   parent_id?: string
   /** Art. 17.3 : ordre fixé par tirage au sort par Ardentia (égalité parfaite) */
   draw_order?: string[]
+  /** pré-saison en système suisse (compétition phase « league_phase », format « swiss ») */
+  preseason?: PreseasonData
+}
+
+/** Pré-saison : paramètres, tirage de la J1 (graine), repos, journée en préparation, clôture et répartition */
+export interface PreseasonData {
+  /** paramètres modifiables (journées, points, taille MASTER, ordres de départage) */
+  config?: { rounds?: number; masterSize?: number; points?: { win: number; draw: number; loss: number } }
+  /** tirage de la J1 : graine (rejouable) et ordre obtenu */
+  seed?: number
+  draw_order?: string[]
+  drawn_at?: string
+  drawn_by?: string
+  /** révélation du tirage en projection (nombre d'équipes dévoilées) */
+  revealed?: number
+  /** critère 5 « tirage au sort par Ardentia » : ordre fixé par l'admin (sinon l'ordre du tirage de la J1) */
+  tiebreak_order?: string[]
+  /** équipe au repos par journée */
+  rests?: Record<string, string>
+  /** journée générée, en attente de publication (aperçu, modifiable) */
+  pending?: { round: number; rest?: string; pairs: { home: string; away: string; reason: string; manual?: { motif: string; by?: string; at: string } }[] }
+  published_rounds?: number[]
+  closed_at?: string
+  /** classement final figé à la clôture */
+  final_ranking?: string[]
+  split?: { master_size: number; master_id?: string; challenger_id?: string; at?: string }
 }
 
 export interface Division extends BaseEntity { name: string; level: number; promotion_count?: number; relegation_count?: number; color?: string }
@@ -180,6 +206,9 @@ export interface Match extends BaseEntity {
   motm_vote_closes_at?: string
   /** forfait (tapis vert, Art. 14) : équipe forfait — score officiel 3-0 pour l'adversaire */
   forfeit_team_id?: string
+  /** pré-saison : « Pourquoi ce match ? » (Tirage au sort, Même total de points…) et modification manuelle */
+  pairing_reason?: string
+  pairing_manual?: { motif: string; by?: string; at: string }
   /** modèle du visuel homme du match : variante 1 ou 2 */
   visual_mvp_template?: 'mvp' | 'mvp2'
   /** visuels réseaux sociaux générés (cache, version dans l'URL) */

@@ -25,7 +25,7 @@ export function buildSeason2026() {
   // Phase de sélection : un seul groupe, un seul classement. Le tirage (Admin → Tirage & divisions) crée les matchs ;
   // Gold Cup et Silver Cup sont constituées ensuite à partir du classement.
   const competitions: Competition[] = [
-    { id: 'comp_2026_selection', season_id: season.id, name: 'Phase de sélection', phase: 'league_phase', format: 'swiss', status: 'draft', team_ids: teams.map((t) => t.id).sort(), half_duration_min: REGLEMENT.duration.halfMin, foul_alert_threshold: 5, color: '#F85A00', order: 1, description: 'Un seul groupe · matchs tirés au sort' },
+    { id: 'comp_2026_selection', season_id: season.id, name: 'Pré-saison', phase: 'league_phase', format: 'swiss', status: 'draft', team_ids: teams.map((t) => t.id).sort(), half_duration_min: REGLEMENT.duration.halfMin, foul_alert_threshold: 5, color: '#F85A00', order: 1, description: 'Un seul groupe · matchs tirés au sort' },
   ]
   return { season, teams, competitions }
 }

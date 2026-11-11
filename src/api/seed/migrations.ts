@@ -9,6 +9,7 @@ import { SEASON_2026_ID } from './season2026'
 import { toRole } from '@/lib/format'
 import { capStarters } from '@/lib/lineup'
 import { defaultCaptainTeams } from '@/lib/captains'
+import { applyOfficialPlan, planIsEmpty, planOfficialTeams } from '@/lib/officialTeams'
 import { store } from '../localStore'
 
 /** copie sans la clé donnée */
@@ -226,7 +227,25 @@ export function applyCaptains(db: Rules6Data): Rules6Data {
   return { CaptainTeam: defaultCaptainTeams() }
 }
 
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains]
+/**
+ * Liste officielle 2026-2027 (23 équipes) appliquée dans tous les navigateurs : création et renommage ;
+ * une équipe hors liste n'est retirée automatiquement que si elle n'a NI joueur NI match joué (ex. « Simulation FC »).
+ * Toute autre équipe hors liste reste en place : l'admin décide dans « Liste officielle » (sauvegarde + confirmation).
+ */
+export function applyOfficialTeams2026(db: Rules6Data & { Club?: Club[] }): Rules6Data & { Club?: Club[] } {
+  if (!db.Team || !db.Club || !db.Competition || !db.Season?.some((s) => s.id === SEASON_2026_ID)) return {}
+  const full = { Team: db.Team, Player: db.Player ?? [], Match: db.Match ?? [], MatchEvent: db.MatchEvent ?? [], Lineup: db.Lineup ?? [], MatchTeamStats: db.MatchTeamStats ?? [], Competition: db.Competition, Club: db.Club }
+  const plan = planOfficialTeams(full, SEASON_2026_ID)
+  plan.removed = plan.removed.filter((r) => !r.players.length && !r.matches.some((m) => m.status === 'finished'))
+  // la phase de sélection 2026-2027 devient la « Pré-saison » (nom par défaut seulement)
+  const renameComp = db.Competition.some((c) => c.id === 'comp_2026_selection' && c.name === 'Phase de sélection')
+  if (planIsEmpty(plan) && !renameComp) return {}
+  const out = (planIsEmpty(plan) ? {} : applyOfficialPlan(full, plan)) as Rules6Data & { Club?: Club[] }
+  if (renameComp) out.Competition = (out.Competition ?? db.Competition).map((c) => (c.id === 'comp_2026_selection' && c.name === 'Phase de sélection' ? { ...c, name: 'Pré-saison' } : c))
+  return out
+}
+
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */

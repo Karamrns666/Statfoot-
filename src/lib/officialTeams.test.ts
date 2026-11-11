@@ -66,3 +66,19 @@ describe('liste officielle 2026-2027', () => {
     expect(out.Team!.some((t) => t.id === t25.id)).toBe(true)
   })
 })
+
+describe('mise à jour automatique des navigateurs (migration)', () => {
+  it('crée et renomme ; retire Simulation FC seulement si elle n’a ni joueur ni match joué', async () => {
+    const { applyOfficialTeams2026 } = await import('@/api/seed/migrations')
+    const db = oldDb()
+    db.Player = db.Player.filter((p) => p.id !== 'p_sim') // sans joueur, match seulement programmé
+    const out = applyOfficialTeams2026(db as never)
+    expect(out.Team!.filter((t) => t.season_id === 'season_2026')).toHaveLength(23)
+    expect(out.Team!.some((t) => t.id === 't26_sim')).toBe(false)
+    const withPlayer = oldDb() // Simulation FC a un joueur → laissée à la décision de l’admin
+    const out2 = applyOfficialTeams2026(withPlayer as never)
+    expect(out2.Team!.some((t) => t.id === 't26_sim')).toBe(true)
+    expect(out2.Team!.filter((t) => t.season_id === 'season_2026')).toHaveLength(24)
+    expect(applyOfficialTeams2026({ ...db, ...out } as never)).toEqual({})
+  })
+})

@@ -3,6 +3,8 @@
 //  2. Après la sélection : constitution des deux divisions (1re → Xe place, Ye place → dernier), noms modifiables.
 //  3. Le même tirage sert ensuite à créer les matchs de chaque division.
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { isPreseasonComp } from '@/hooks/usePreseason'
 import { phaseName } from '@/lib/competitionNames'
 import { Check, Lock, Maximize2, RotateCcw, Search, Send, Shuffle, Sparkles, Split, X } from 'lucide-react'
 import { base44 } from '@/api/base44Client'
@@ -47,8 +49,10 @@ export default function DrawSwiss() {
               </button>
             ))}
           </div>
-          {comp && <DrawPanel key={comp.id} comp={comp} />}
-          {selection && <DivisionsPanel selection={selection} />}
+          {comp && (isPreseasonComp(comp)
+            ? <Card><CardContent className="flex flex-wrap items-center gap-3 pt-5 text-sm"><Sparkles className="size-5 text-neon" /><span className="flex-1">« {comp.name} » se joue en système suisse : tirage de la J1, journées appariées par points, rattrapage, clôture et répartition se font sur la page Pré-saison.</span><Button asChild><Link to="/admin/pre-saison">Ouvrir la pré-saison</Link></Button></CardContent></Card>
+            : <DrawPanel key={comp.id} comp={comp} />)}
+          {selection && !isPreseasonComp(selection) && <DivisionsPanel selection={selection} />}
           <DrawHistory />
         </div>
       )}

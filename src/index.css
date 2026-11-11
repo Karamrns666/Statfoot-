@@ -222,8 +222,8 @@
 @media (prefers-reduced-motion: reduce) { .rule-section:target { animation: none; outline: 2px solid var(--color-neon); outline-offset: 6px; } }
 
 /* Accroche FR + AR : une ligne chacune, taille adaptée à la largeur du bloc (jusqu'à 320 px d'écran) */
-@font-face { font-family: 'Cairo'; font-style: normal; font-weight: 700; font-display: swap; src: url('/fonts/cairo-arabic-700-normal.woff2') format('woff2'); unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
+@font-face { font-family: 'Tajawal'; font-style: normal; font-weight: 700; font-display: swap; src: url('/fonts/tajawal-arabic-700-normal.woff2') format('woff2'); unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
 .tagline { container-type: inline-size; width: 100%; min-width: 0; }
 .tagline p { margin: 0; white-space: nowrap; overflow: hidden; line-height: 1.25; }
 .tagline-fr { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; letter-spacing: .02em; color: #fff; font-size: clamp(10px, 4.3cqi, 26px); }
-.tagline-ar { font-family: 'Cairo', 'Noto Kufi Arabic', 'Segoe UI', Tahoma, sans-serif; font-weight: 700; color: var(--color-sky-soft, #9cc7f5); font-size: clamp(11px, 5cqi, 24px); margin-top: .1em; }
+.tagline-ar { font-family: 'Tajawal', 'Noto Kufi Arabic', 'Segoe UI', Tahoma, sans-serif; font-weight: 700; color: var(--color-sky-soft, #9cc7f5); font-size: clamp(11px, 5cqi, 24px); margin-top: .1em; }

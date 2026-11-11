@@ -134,8 +134,7 @@ function BrandView({ logo, leagueName, seasonLabel, phase }: { logo: string; lea
         <img src={logo} alt="" className="bb-logo relative h-28 w-auto sm:h-36" />
       </div>
       <div className="bb-text bb-d2 mt-4 font-display text-[clamp(1.8rem,5vw,3.4rem)] font-black uppercase leading-none tracking-wide text-white">{leagueName}</div>
-      <div className="bb-text bb-d3 mt-3 w-full max-w-2xl px-2"><Tagline /></div>
-      <div className="bb-text bb-d3 mt-2 text-xs font-semibold uppercase tracking-[.2em] text-sky-soft">{seasonLabel}</div>
+      <div className="bb-text bb-d3 mt-2 text-sm font-semibold uppercase tracking-[.2em] text-sky-soft">{seasonLabel}</div>
     </div>
   )
 }

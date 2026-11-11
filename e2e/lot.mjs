@@ -9,7 +9,7 @@ for (const w of [320, 360, 1366]) {
   await p.goto(B + '/', { waitUntil: 'networkidle' }); await p.waitForTimeout(1200)
   const tg = await p.evaluate(() => [...document.querySelectorAll('.tagline p')].map((el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return { t: el.textContent.slice(0, 22), lang: el.lang, dir: el.dir, font: Math.round(parseFloat(cs.fontSize) * 10) / 10, lines: Math.round(r.height / parseFloat(cs.lineHeight)), clipped: el.scrollWidth > el.clientWidth + 1, right: Math.round(r.right), fam: cs.fontFamily.slice(0, 18) } }))
   console.log(w, 'ACCROCHE', JSON.stringify(tg))
-  console.log(w, 'débordement page', await p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth), 'police arabe chargée', await p.evaluate(() => document.fonts.check('700 16px Cairo', 'الدوري')))
+  console.log(w, 'débordement page', await p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth), 'police arabe chargée', await p.evaluate(() => document.fonts.check('700 16px Tajawal', 'الدوري')))
   await p.screenshot({ path: `${out}/accueil-${w}.png` })
   if (w === 360) { await p.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await p.waitForTimeout(400); await p.screenshot({ path: `${out}/footer-360.png` }) }
   if (w !== 320) {

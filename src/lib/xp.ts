@@ -2,8 +2,8 @@
 //  XP — barème MBL. Fonctions PURES, recalcul intégral depuis les événements de match.
 //  Source unique pour : fiche joueur, Trophées, accueil (podium, top gardiens), admin, Match Center (XP en direct).
 // ============================================================================
-import type {
 import { phaseName } from './competitionNames'
+import type {
   Competition, Lineup, Match, MatchEvent, MonthlyAward, Player, Season, Settings, Suspension, Team, XPKey, XPRule,
 } from '@/types/entities'
 import { competitionStandings, isKnockout, isPlayed } from './standings'

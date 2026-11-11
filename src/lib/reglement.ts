@@ -35,13 +35,10 @@ export const REGLEMENT = {
   points: { win: 3, draw: 1, loss: 0, art: '17.2' },
   forfeit: { score: [3, 0] as const, graceMin: 15, art: '14.1', artUnderMin: '14.2', artGeneral: '14.3', artAbandon: '18.1' },
   cards: {
-    /** 3 jaunes cumulés sur la compétition = 1 match de suspension */
-    yellowsForSuspension: 3,
-    accumulationSuspension: 1,
-    /** tout rouge (direct ou 2e jaune) = au moins 1 match */
-    redMinSuspension: 1,
-    /** les 2 jaunes d'une expulsion ne comptent pas dans le cumul */
-    expulsionYellowsCount: false,
+    /** 2 jaunes dans le même match = rouge ; pas de cumul d'un match à l'autre (v8) */
+    yellowsForRed: 2,
+    /** aucune suspension automatique après un rouge : seul le conseil de discipline suspend (v8) */
+    autoSuspension: false,
     artYellow: '11.5', artRed: '11.6', artBench: '2.5', artCorrection: '11.7',
   },
   inferiority: { ms: 2 * 60_000, art: '2.7' },
@@ -74,7 +71,8 @@ export const ESSENTIALS: { text: string; art: string }[] = [
   { text: 'Victoire 3 pts · Nul 1 pt · Défaite 0 pt', art: '17.2' },
   { text: 'Forfait = défaite 3-0', art: '14.1' },
   { text: 'Départage : points, confrontation directe, différence de buts, buts marqués, moins de jaunes, moins de rouges, tirage au sort', art: '17.3' },
-  { text: '3 jaunes cumulés = 1 match de suspension · Rouge = au moins 1 match de suspension', art: '11.5' },
+  { text: '2 jaunes dans le même match = rouge · Pas de cumul de jaunes d’un match à l’autre', art: '11.5' },
+  { text: 'Pas de suspension automatique : seul le conseil de discipline suspend un joueur', art: '19' },
   { text: 'Réclamation sous 24 h après le coup de sifflet final', art: '17.4' },
 ]
 
@@ -82,17 +80,20 @@ export const ESSENTIALS: { text: string; art: string }[] = [
 //  Versions du règlement (une saison = une version)
 // ---------------------------------------------------------------------------
 export interface RulebookRules {
-  /** cumul des jaunes d'un match à l'autre + suspensions automatiques (v4) */
-  cumulativeCards: boolean
+  /** v8+ : pas de cumul de jaunes ni de suspension automatique ; seul le conseil de discipline suspend (Art. 11.5, 11.6, 19).
+   *  Sinon (anciennes saisons) : suspensions saisies à la main. Le cumul automatique de la v4 a été abandonné. */
+  council: boolean
 }
 export const RULEBOOK_RULES: Record<string, RulebookRules> = {
-  v3: { cumulativeCards: false },
-  v4: { cumulativeCards: true },
+  v3: { council: false },
+  v4: { council: false },
+  v8: { council: true },
+  v9: { council: true },
 }
-export const CURRENT_RULEBOOK = 'v4'
+export const CURRENT_RULEBOOK = 'v8'
 /** Règles de cartons d'une saison : celles de sa version du règlement (les saisons sans version gardent l'ancien régime manuel). */
 export function rulesForSeason(season?: Pick<Season, 'rulebook_version'> | null): RulebookRules {
-  return RULEBOOK_RULES[season?.rulebook_version ?? ''] ?? { cumulativeCards: false }
+  return RULEBOOK_RULES[season?.rulebook_version ?? ''] ?? { council: false }
 }
 
 /** Contrôle de cohérence texte ↔ constantes (avertissement dans l'admin). */
@@ -102,8 +103,9 @@ export function coherenceWarnings(text: string): string[] {
     [/deux \(2\) périodes de vingt \(20\) minutes/.test(t), `Durée : le texte ne mentionne plus « deux (2) périodes de vingt (20) minutes » (constante : ${REGLEMENT.duration.halves} × ${REGLEMENT.duration.halfMin} min).`],
     [/victoire : 3 points/.test(t) && /match nul : 1 point/.test(t), `Points : le texte ne mentionne plus « Victoire : 3 points » / « Match nul : 1 point » (constantes : ${REGLEMENT.points.win}/${REGLEMENT.points.draw}/${REGLEMENT.points.loss}).`],
     [/3-0/.test(t), 'Forfait : le score « 3-0 » n’apparaît plus dans le texte.'],
-    [/trois \(3\) cartons jaunes cumulés/.test(t), `Cartons : le texte ne mentionne plus « Trois (3) cartons jaunes cumulés » (constante : ${REGLEMENT.cards.yellowsForSuspension}).`],
-    [/au minimum un \(1\) match de suspension/.test(t), 'Cartons : la suspension minimale après un rouge n’apparaît plus dans le texte.'],
+    [/ne se cumulent pas d'un match à l'autre|ne se cumulent pas d’un match à l’autre/.test(t), 'Cartons : le texte ne dit plus que les jaunes ne se cumulent pas d’un match à l’autre (Art. 11.5).'],
+    [/n'entraîne pas de suspension automatique|n’entraîne pas de suspension automatique/.test(t), 'Cartons : le texte ne dit plus qu’un rouge n’entraîne pas de suspension automatique (Art. 11.6).'],
+    [/seuls les capitaines de la ligue qui n'est pas concernée|seuls les capitaines de la ligue qui n’est pas concernée/.test(t), 'Conseil de discipline : le texte ne précise plus quels capitaines votent (Art. 19.3).'],
     [/confrontation directe/.test(t) && t.indexOf('confrontation directe') < t.indexOf('différence de buts :'), 'Départage : la confrontation directe doit précéder la différence de buts (Art. 17.3).'],
     [/hors-jeu ne s'applique pas|hors-jeu ne s’applique pas/.test(t), 'Hors-jeu : le texte ne dit plus que le hors-jeu ne s’applique pas.'],
     [/pas de prolongation/.test(t), 'Prolongation : le texte ne dit plus qu’il n’y a pas de prolongation.'],
@@ -188,29 +190,35 @@ export function rankTable<R extends TableRow>(rows: R[], mini: MiniFn, drawOrder
 }
 
 // ---------------------------------------------------------------------------
-//  Discipline : cumul des jaunes et suspensions (Art. 11.5, 11.6, 2.5, 2.7)
+//  Discipline (règlement v8 — Art. 11.5, 11.6, 19)
+//  · les jaunes ne se cumulent PAS d'un match à l'autre ; 2 jaunes dans le même match = rouge (moteur de match) ;
+//  · un rouge n'entraîne AUCUNE suspension automatique ;
+//  · seul le conseil de discipline suspend : chaque décision crée une ligne Suspension (kind 'council'),
+//    purgée par les matchs disputés par l'équipe APRÈS la date de la décision.
+//  Les anciennes saisons gardent leurs suspensions saisies à la main (purgées après le match d'origine).
 // ---------------------------------------------------------------------------
-export type SuspensionKind = 'accumulation' | 'red' | 'second_yellow' | 'extra'
+export type SuspensionKind = 'council' | 'manual' | 'extra'
 export const SUSPENSION_LABEL: Record<SuspensionKind, string> = {
-  accumulation: '3 cartons jaunes cumulés', red: 'Carton rouge', second_yellow: 'Expulsion (2e avertissement)', extra: 'Suspension supplémentaire (Ardentia)',
+  council: 'Décision du conseil de discipline', manual: 'Suspension', extra: 'Suspension supplémentaire (Ardentia)',
 }
+export const suspensionKind = (s: Pick<Suspension, 'kind'>): SuspensionKind => (s.kind === 'council' ? 'council' : s.kind === 'extra' ? 'extra' : 'manual')
+
 export interface SuspensionRecord {
   id: string
   kind: SuspensionKind
   matches: number
   origin_match_id?: string
-  origin_event_id?: string
+  case_id?: string
+  /** date à partir de laquelle la suspension se purge */
+  start: string
   reason?: string
-  referee_report?: string
-  notified_at?: string
   served: string[]
   art: string
 }
 export interface PlayerDiscipline {
   player_id: string
   team_id: string
-  /** jaunes au compteur du cumul (0–2 avant suspension) */
-  counter: number
+  /** cartons de la saison (information : aucun effet automatique) */
   yellowsTotal: number
   redsTotal: number
   suspensions: SuspensionRecord[]
@@ -219,101 +227,117 @@ export interface PlayerDiscipline {
   /** matchs où le joueur a été aligné alors qu'il purgeait une suspension */
   violations: string[]
 }
-export interface OfficialSuspension { team_id: string; name: string; record: SuspensionRecord }
 
 export interface DisciplineData {
   matches: Match[]
   events: MatchEvent[]
   lineups?: Lineup[]
   players: Pick<Player, 'id' | 'team_id'>[]
-  /** suspensions supplémentaires saisies par Ardentia (entité Suspension) */
-  extras?: Suspension[]
+  /** suspensions (décisions du conseil, ou saisies à la main sur les anciennes saisons) */
+  suspensions?: Suspension[]
 }
 
-const isCard = (e: MatchEvent) => e.type === 'yellow_card' || e.type === 'second_yellow' || e.type === 'red_card'
-
-/** A joué (titulaire, entré en jeu ou action enregistrée) — utile pour détecter un suspendu aligné. */
+/** A joué (titulaire, remplaçant inscrit ou action enregistrée) — sert à détecter un suspendu aligné. */
 function appeared(m: Match, playerId: string, data: DisciplineData) {
   const lu = data.lineups?.find((l) => l.match_id === m.id && (l.starter_ids?.includes(playerId) || l.substitute_ids?.includes(playerId)))
   if (lu) return true
   return data.events.some((e) => e.match_id === m.id && (e.player_id === playerId || (e.type === 'goal' && e.related_player_id === playerId)) && e.card_target !== 'official')
 }
 
+/** Point de départ de la purge : date de la décision (conseil) ; sinon le match d'origine. */
+function suspensionStart(s: Suspension, matches: Map<string, Match>) {
+  if (s.kind === 'council') return s.date ?? ''
+  return matches.get(s.origin_match_id ?? '')?.date ?? s.date ?? ''
+}
+
 /**
- * Discipline d'une compétition, recalculée intégralement depuis les événements (une réattribution de carton
- * met donc à jour les deux joueurs). `before` : n'utilise que les matchs disputés AVANT ce match (état à la veille).
+ * Discipline d'une saison : suspensions purgées dans l'ordre (la plus ancienne d'abord), un match disputé par l'équipe
+ * (toutes compétitions de la saison) = un match purgé. `before` : état à la veille de ce match (feuille de match).
  */
-export function computeDiscipline(competitionId: string, data: DisciplineData, opts: { before?: Pick<Match, 'id' | 'date'> } = {}) {
-  const ms = data.matches.filter((m) => m.competition_id === competitionId && isDisputed(m) && (!opts.before || (m.id !== opts.before.id && (m.date ?? '') < (opts.before.date ?? '￿')))).sort(byDate)
+export function computeDiscipline(seasonId: string, data: DisciplineData, opts: { before?: Pick<Match, 'id' | 'date'> } = {}) {
+  const byId = new Map(data.matches.map((m) => [m.id, m]))
+  const ms = data.matches.filter((m) => m.season_id === seasonId && isDisputed(m) && (!opts.before || (m.id !== opts.before.id && (m.date ?? '') < (opts.before.date ?? '\uffff')))).sort(byDate)
   const msIds = new Set(ms.map((m) => m.id))
-  const evByMatch = new Map<string, MatchEvent[]>()
-  for (const e of data.events) if (msIds.has(e.match_id) && isCard(e)) { if (!evByMatch.has(e.match_id)) evByMatch.set(e.match_id, []); evByMatch.get(e.match_id)!.push(e) }
-  const extrasByMatch = new Map<string, Suspension[]>()
-  for (const s of data.extras ?? []) if (s.origin_match_id && msIds.has(s.origin_match_id)) { if (!extrasByMatch.has(s.origin_match_id)) extrasByMatch.set(s.origin_match_id, []); extrasByMatch.get(s.origin_match_id)!.push(s) }
-
-  // joueurs concernés : tous ceux qui ont un carton ou une suspension dans la compétition
   const teamOf = new Map(data.players.map((p) => [p.id, p.team_id]))
-  const involved = new Map<string, string>()
-  for (const evs of evByMatch.values()) for (const e of evs) if (e.player_id && e.card_target !== 'official') involved.set(e.player_id, teamOf.get(e.player_id) ?? e.team_id)
-  for (const ss of extrasByMatch.values()) for (const s of ss) if (s.player_id) involved.set(s.player_id, teamOf.get(s.player_id) ?? s.team_id ?? '')
-
   const players = new Map<string, PlayerDiscipline>()
-  for (const [pid, team] of involved) {
-    const d: PlayerDiscipline = { player_id: pid, team_id: team, counter: 0, yellowsTotal: 0, redsTotal: 0, suspensions: [], remaining: 0, violations: [] }
-    const pending = () => d.suspensions.filter((s) => s.served.length < s.matches)
-    for (const m of ms.filter((x) => x.home_team_id === team || x.away_team_id === team)) {
-      // 1. purge : ce match disputé par l'équipe sert la première suspension en cours
-      const cur = pending()[0]
-      if (cur) {
-        cur.served.push(m.id)
-        if (appeared(m, pid, data)) d.violations.push(m.id)
-        if (cur.kind === 'accumulation' && cur.served.length === cur.matches) d.counter = Math.max(0, d.counter - REGLEMENT.cards.yellowsForSuspension)
+  const get = (pid: string, team?: string) => {
+    let d = players.get(pid)
+    if (!d) { d = { player_id: pid, team_id: teamOf.get(pid) ?? team ?? '', yellowsTotal: 0, redsTotal: 0, suspensions: [], remaining: 0, violations: [] }; players.set(pid, d) }
+    return d
+  }
+  for (const e of data.events) {
+    if (!msIds.has(e.match_id) || !e.player_id || e.card_target === 'official') continue
+    if (e.type === 'yellow_card' || e.type === 'second_yellow') get(e.player_id, e.team_id).yellowsTotal++
+    if (e.type === 'red_card' || e.type === 'second_yellow') get(e.player_id, e.team_id).redsTotal++
+  }
+  const sus = (data.suspensions ?? []).filter((s) => s.season_id === seasonId && s.player_id && s.matches > 0)
+    .map((s) => ({ s, start: suspensionStart(s, byId) }))
+    .sort((a, b) => a.start.localeCompare(b.start) || a.s.id.localeCompare(b.s.id))
+  for (const { s, start } of sus) {
+    const d = get(s.player_id, s.team_id)
+    d.suspensions.push({ id: s.id, kind: suspensionKind(s), matches: s.matches, origin_match_id: s.origin_match_id, case_id: s.case_id, start, reason: s.reason, served: [], art: s.kind === 'council' ? '19' : REGLEMENT.cards.artRed })
+  }
+  for (const d of players.values()) {
+    const used = new Set<string>()
+    const teamMs = ms.filter((m) => m.home_team_id === d.team_id || m.away_team_id === d.team_id)
+    for (const r of d.suspensions) {
+      for (const m of teamMs) {
+        if (r.served.length >= r.matches) break
+        // seuls les matchs disputés APRÈS la décision (ou après le match d'origine) purgent la suspension
+        if (used.has(m.id) || m.id === r.origin_match_id || (r.start && (m.date ?? '') <= r.start)) continue
+        r.served.push(m.id); used.add(m.id)
+        if (appeared(m, d.player_id, data)) d.violations.push(m.id)
       }
-      // 2. cartons du match
-      const evs = (evByMatch.get(m.id) ?? []).filter((e) => e.player_id === pid && e.card_target !== 'official')
-      const yellows = evs.filter((e) => e.type === 'yellow_card')
-      const second = evs.find((e) => e.type === 'second_yellow')
-      const reds = evs.filter((e) => e.type === 'red_card')
-      d.yellowsTotal += yellows.length + (second ? 1 : 0)
-      d.redsTotal += reds.length + (second ? 1 : 0)
-      if (second) {
-        // les 2 jaunes de l'expulsion ne comptent pas dans le cumul (Art. 11.5) ; un 3e jaune distinct compterait
-        const counted = Math.max(0, yellows.length - 1)
-        d.counter += counted
-        d.suspensions.push({ id: `${pid}:${second.id}`, kind: 'second_yellow', matches: REGLEMENT.cards.redMinSuspension, origin_match_id: m.id, origin_event_id: second.id, served: [], art: REGLEMENT.cards.artRed })
-      } else d.counter += yellows.length
-      for (const r of reds) d.suspensions.push({ id: `${pid}:${r.id}`, kind: 'red', matches: REGLEMENT.cards.redMinSuspension, origin_match_id: m.id, origin_event_id: r.id, served: [], art: REGLEMENT.cards.artRed })
-      if (d.counter >= REGLEMENT.cards.yellowsForSuspension && !pending().some((s) => s.kind === 'accumulation'))
-        d.suspensions.push({ id: `${pid}:acc:${m.id}`, kind: 'accumulation', matches: REGLEMENT.cards.accumulationSuspension, origin_match_id: m.id, served: [], art: REGLEMENT.cards.artYellow })
-      // 3. suspension supplémentaire décidée par Ardentia (s'ajoute au match automatique)
-      for (const s of extrasByMatch.get(m.id) ?? []) if (s.player_id === pid && s.matches > 0)
-        d.suspensions.push({ id: s.id, kind: 'extra', matches: s.matches, origin_match_id: m.id, origin_event_id: s.origin_event_id, reason: s.reason, referee_report: s.referee_report, notified_at: s.notified_at, served: [], art: REGLEMENT.cards.artRed })
     }
-    d.remaining = pending().reduce((a, s) => a + s.matches - s.served.length, 0)
-    players.set(pid, d)
+    d.remaining = d.suspensions.reduce((a, r) => a + r.matches - r.served.length, 0)
   }
-
-  // officiels d'équipe : rouge = suspension aussi (Art. 2.5), sans cumul de jaunes
-  const officials: OfficialSuspension[] = []
-  for (const m of ms) for (const e of evByMatch.get(m.id) ?? []) {
-    if (e.card_target !== 'official' || (e.type !== 'red_card' && e.type !== 'second_yellow')) continue
-    const rec: SuspensionRecord = { id: `off:${e.id}`, kind: e.type === 'red_card' ? 'red' : 'second_yellow', matches: REGLEMENT.cards.redMinSuspension, origin_match_id: m.id, origin_event_id: e.id, served: [], art: REGLEMENT.cards.artBench }
-    for (const n of ms.filter((x) => byDate(x, m) > 0 && (x.home_team_id === e.team_id || x.away_team_id === e.team_id)).slice(0, rec.matches)) rec.served.push(n.id)
-    officials.push({ team_id: e.team_id, name: e.player_name_free || 'Officiel', record: rec })
-  }
-  return { players, officials }
+  return { players }
 }
 
 /** Joueurs suspendus pour un match donné (état à la veille du match). */
-export function suspendedFor(match: Pick<Match, 'id' | 'date' | 'competition_id' | 'home_team_id' | 'away_team_id'>, data: DisciplineData) {
-  const { players } = computeDiscipline(match.competition_id, data, { before: match })
+export function suspendedFor(match: Pick<Match, 'id' | 'date' | 'season_id' | 'home_team_id' | 'away_team_id'>, data: DisciplineData) {
+  const { players } = computeDiscipline(match.season_id, data, { before: match })
   const out = new Map<string, PlayerDiscipline>()
   for (const d of players.values()) if (d.remaining > 0 && (d.team_id === match.home_team_id || d.team_id === match.away_team_id)) out.set(d.player_id, d)
   return out
 }
 
-export const counterLabel = (d?: Pick<PlayerDiscipline, 'counter'>) => `${Math.min(d?.counter ?? 0, REGLEMENT.cards.yellowsForSuspension)}/${REGLEMENT.cards.yellowsForSuspension}`
-export const isThreatened = (d?: Pick<PlayerDiscipline, 'counter' | 'remaining'>) => !!d && d.remaining === 0 && d.counter === REGLEMENT.cards.yellowsForSuspension - 1
+// ---------------------------------------------------------------------------
+//  Conseil de discipline (Art. 19)
+// ---------------------------------------------------------------------------
+export type Sanction = 'warning' | 'suspension'
+export const COUNCIL = { voteHours: 8, art: '19', artVoters: '19.3', artSanctions: '19.4', artVote: '19.5', artDecision: '19.8', artCommunication: '19.9', artPv: '17.7' } as const
+export const sanctionLabel = (s: Sanction, matches = 0) => (s === 'warning' ? 'Avertissement' : `Suspension de ${matches} match${matches > 1 ? 's' : ''}`)
+
+export interface CouncilVoices {
+  ardentia?: Sanction
+  siffle_or?: Sanction
+  /** décompte des votes des capitaines reçus dans le délai de 8 h (jamais publié) */
+  captains_warning?: number
+  captains_suspension?: number
+}
+/** Art. 19.7 : la voix des capitaines va à la sanction la plus votée ; égalité ou aucun vote → avertissement. */
+export function captainsVoice(v: Pick<CouncilVoices, 'captains_warning' | 'captains_suspension'>): Sanction {
+  return (v.captains_suspension ?? 0) > (v.captains_warning ?? 0) ? 'suspension' : 'warning'
+}
+/** Art. 19.8 : la sanction qui obtient le plus de voix (sur 3) est retenue ; égalité entre voix exprimées → avertissement. */
+export function councilDecision(v: CouncilVoices): { decision: Sanction; voices: { warning: number; suspension: number } } {
+  const all = [v.ardentia, v.siffle_or, captainsVoice(v)].filter(Boolean) as Sanction[]
+  const voices = { warning: all.filter((x) => x === 'warning').length, suspension: all.filter((x) => x === 'suspension').length }
+  return { decision: voices.suspension > voices.warning ? 'suspension' : 'warning', voices }
+}
+/** Fin du vote : 8 h après la publication du lien (Art. 19.5). */
+export const voteClosesAt = (openedAt: string) => new Date(new Date(openedAt).getTime() + COUNCIL.voteHours * 3_600_000).toISOString()
+
+/**
+ * Art. 19.3 : votent les capitaines de la ligue non concernée (MASTER ↔ CHALLENGER).
+ * `divisions` : équipes de chaque division de la saison (vide tant que la pré-saison n'est pas scindée).
+ */
+export function votingTeams(teamId: string, allTeams: string[], divisions: { master?: string[]; challenger?: string[] }): { teams: string[]; division?: 'master' | 'challenger'; voters?: 'master' | 'challenger' } {
+  if (divisions.master?.includes(teamId)) return { teams: divisions.challenger ?? [], division: 'master', voters: 'challenger' }
+  if (divisions.challenger?.includes(teamId)) return { teams: divisions.master ?? [], division: 'challenger', voters: 'master' }
+  return { teams: allTeams.filter((t) => t !== teamId) }
+}
 
 // ---------------------------------------------------------------------------
 //  Infériorité numérique (Art. 2.7, 2.5)

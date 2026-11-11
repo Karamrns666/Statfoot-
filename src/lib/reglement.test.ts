@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Lineup, Match, MatchEvent, Suspension } from '@/types/entities'
-import { REGLEMENT, coherenceWarnings, computeDiscipline, counterLabel, fmtInferiority, inferiorityAt, isThreatened, suspendedFor } from './reglement'
+import { REGLEMENT, captainsVoice, coherenceWarnings, computeDiscipline, councilDecision, fmtInferiority, inferiorityAt, rulesForSeason, suspendedFor, voteClosesAt, votingTeams } from './reglement'
 import { computeStandings } from './standings'
 import V4 from '@/api/seed/reglement-v4.md?raw'
 import V3 from '@/api/seed/reglement-v3.md?raw'
@@ -92,87 +92,88 @@ describe('Art. 17.3 — départage', () => {
 })
 
 // ---------------------------------------------------------------------------
-describe('Art. 11.5 / 11.6 — cumul des jaunes et suspensions', () => {
+describe('Art. 11.5 / 11.6 / 19 — discipline v8 : pas de cumul, pas de suspension automatique', () => {
   const P = [{ id: 'A_1', team_id: 'A' }, { id: 'A_2', team_id: 'A' }, { id: 'B_1', team_id: 'B' }]
-  const season = (rounds: number, o: Record<number, Partial<Match>> = {}) =>
-    Array.from({ length: rounds }, (_, i) => mk('A', 'B', i + 1 <= rounds ? 1 : null, 0, i + 1, { id: `r${i + 1}`, ...o[i + 1] }))
+  const played = (rounds: number) => Array.from({ length: rounds }, (_, i) => mk('A', 'B', 1, 0, i + 1, { id: `r${i + 1}` }))
+  const council = (o: Partial<Suspension>): Suspension => ({ id: o.id ?? 'sc', season_id: 's', player_id: 'A_1', team_id: 'A', kind: 'council', matches: 1, ...o })
 
-  it('3 jaunes sur 3 matchs → suspendu au 4e, compteur remis à 0 après la purge', () => {
-    const ms = [...season(3), mk('A', 'B', null, null, 4, { id: 'r4' }), mk('A', 'B', null, null, 5, { id: 'r5' })]
+  it('3 jaunes sur 3 matchs → aucune suspension (les jaunes ne se cumulent pas)', () => {
+    const ms = [...played(3), mk('A', 'B', null, null, 4, { id: 'r4' })]
     const evs = [card('r1', 'A_1', 'yellow_card'), card('r2', 'A_1', 'yellow_card'), card('r3', 'A_1', 'yellow_card')]
-    const d3 = computeDiscipline('c', { matches: ms, events: evs, players: P }).players.get('A_1')!
-    expect(d3).toMatchObject({ counter: 3, remaining: 1, yellowsTotal: 3 })
-    expect(d3.suspensions[0]).toMatchObject({ kind: 'accumulation', matches: 1, origin_match_id: 'r3' })
-    expect(suspendedFor(ms[3], { matches: ms, events: evs, players: P }).has('A_1')).toBe(true)
-    // J4 disputé : suspension purgée, compteur à 0, plus suspendu en J5
-    ms[3] = { ...ms[3], home_score: 2, away_score: 0, status: 'finished' }
-    const d4 = computeDiscipline('c', { matches: ms, events: evs, players: P }).players.get('A_1')!
-    expect(d4).toMatchObject({ counter: 0, remaining: 0 })
-    expect(d4.suspensions[0].served).toEqual(['r4'])
-    expect(suspendedFor(ms[4], { matches: ms, events: evs, players: P }).has('A_1')).toBe(false)
-    expect(counterLabel(d4)).toBe('0/3')
+    const d = computeDiscipline('s', { matches: ms, events: evs, players: P }).players.get('A_1')!
+    expect(d).toMatchObject({ yellowsTotal: 3, redsTotal: 0, remaining: 0, suspensions: [] })
+    expect(suspendedFor(ms[3], { matches: ms, events: evs, players: P }).has('A_1')).toBe(false)
   })
-  it('2 jaunes dans un même match → rouge, pas comptés dans le cumul, 1 match de suspension', () => {
-    const ms = season(3)
-    const evs = [card('r1', 'A_1', 'yellow_card'), card('r2', 'A_1', 'yellow_card'), card('r3', 'A_1', 'yellow_card'), card('r3', 'A_1', 'second_yellow')]
-    const d = computeDiscipline('c', { matches: ms, events: evs, players: P }).players.get('A_1')!
-    // exemple du règlement : 2 jaunes au compteur, double jaune en J3 → reste à 2, suspendu au titre du rouge
-    expect(d.counter).toBe(2)
-    expect(d.suspensions.map((s) => s.kind)).toEqual(['second_yellow'])
-    expect(d.remaining).toBe(1)
-    expect(isThreatened(d)).toBe(false) // suspendu, pas « menacé »
-    expect(d).toMatchObject({ yellowsTotal: 4, redsTotal: 1 })
+  it('rouge direct ou 2e avertissement → aucune suspension automatique : le joueur peut jouer le match suivant', () => {
+    const ms = [...played(1), mk('A', 'B', null, null, 2, { id: 'r2' })]
+    const evs = [card('r1', 'A_1', 'red_card'), card('r1', 'B_1', 'yellow_card'), card('r1', 'B_1', 'second_yellow')]
+    const data = { matches: ms, events: evs, players: P }
+    expect(computeDiscipline('s', data).players.get('A_1')).toMatchObject({ redsTotal: 1, remaining: 0 })
+    expect(computeDiscipline('s', data).players.get('B_1')).toMatchObject({ yellowsTotal: 2, redsTotal: 1, remaining: 0 })
+    expect(suspendedFor(ms[1], data).size).toBe(0)
   })
-  it('rouge direct + suspension supplémentaire de 2 matchs → 3 matchs au total', () => {
-    const ms = season(1)
-    const red = card('r1', 'B_1', 'red_card')
-    const extra: Suspension = { id: 'sx', season_id: 's', player_id: 'B_1', origin_match_id: 'r1', origin_event_id: red.id, matches: 2, kind: 'extra', reason: 'Insultes envers l’arbitre', referee_report: 'Rapport n°12', notified_at: '2026-09-03' }
-    const d = computeDiscipline('c', { matches: ms, events: [red], players: P, extras: [extra] }).players.get('B_1')!
-    expect(d.remaining).toBe(3)
-    expect(d.suspensions.map((s) => [s.kind, s.matches])).toEqual([['red', 1], ['extra', 2]])
-    expect(d.suspensions[1]).toMatchObject({ reason: 'Insultes envers l’arbitre', notified_at: '2026-09-03' })
-  })
-  it('3e jaune et rouge : les suspensions s’additionnent (2 matchs)', () => {
-    const ms = season(3)
-    const evs = [card('r1', 'A_1', 'yellow_card'), card('r2', 'A_1', 'yellow_card'), card('r3', 'A_1', 'yellow_card'), card('r3', 'A_1', 'red_card', { minute: 30 })]
-    expect(computeDiscipline('c', { matches: ms, events: evs, players: P }).players.get('A_1')!.remaining).toBe(2)
-  })
-  it('match suivant reporté → la suspension passe au match réellement disputé suivant', () => {
-    const ms = [mk('A', 'B', 1, 0, 1, { id: 'r1' }), mk('A', 'B', 2, 0, 2, { id: 'r2', status: 'postponed' }), mk('A', 'B', 2, 2, 3, { id: 'r3' }), mk('A', 'B', 3, 1, 4, { id: 'r4', status: 'cancelled' })]
-    const d = computeDiscipline('c', { matches: ms, events: [card('r1', 'A_1', 'red_card')], players: P }).players.get('A_1')!
-    expect(d.suspensions[0].served).toEqual(['r3'])
+  it('suspension décidée par le conseil : bloque le joueur, purgée par les matchs disputés APRÈS la décision', () => {
+    const ms = [mk('A', 'B', 1, 0, 1, { id: 'r1' }), mk('A', 'B', 1, 0, 3, { id: 'r2' }), mk('A', 'B', null, null, 5, { id: 'r3' }), mk('A', 'B', null, null, 7, { id: 'r4' })]
+    // rouge en J1 (1er sept.), décision le 4 : le match du 3 a été joué AVANT la décision → ne purge rien
+    const s = council({ origin_match_id: 'r1', date: '2026-09-04T12:00', matches: 2 })
+    const data = { matches: ms, events: [card('r1', 'A_1', 'red_card')], players: P, suspensions: [s] }
+    expect(computeDiscipline('s', data).players.get('A_1')).toMatchObject({ remaining: 2 })
+    expect(suspendedFor(ms[2], data).get('A_1')?.remaining).toBe(2)
+    ms[2] = { ...ms[2], home_score: 0, away_score: 0, status: 'finished' }
+    expect(suspendedFor(ms[3], data).get('A_1')?.remaining).toBe(1)
+    ms[3] = { ...ms[3], home_score: 2, away_score: 2, status: 'finished' }
+    const d = computeDiscipline('s', data).players.get('A_1')!
+    expect(d.suspensions[0]).toMatchObject({ kind: 'council', served: ['r3', 'r4'] })
     expect(d.remaining).toBe(0)
   })
-  it('les cartons ne servent que dans la même compétition', () => {
-    const ms = [mk('A', 'B', 1, 0, 1, { id: 'r1' }), mk('A', 'B', 1, 0, 2, { id: 'o2', competition_id: 'autre' })]
-    const d = computeDiscipline('c', { matches: ms, events: [card('r1', 'A_1', 'red_card')], players: P }).players.get('A_1')!
-    expect(d.remaining).toBe(1)
+  it('match reporté ou annulé : ne purge pas ; la suspension passe au match réellement disputé suivant', () => {
+    const ms = [mk('A', 'B', 2, 0, 2, { id: 'r2', status: 'postponed' }), mk('A', 'B', 2, 2, 3, { id: 'r3' }), mk('A', 'B', 3, 1, 4, { id: 'r4', status: 'cancelled' })]
+    const d = computeDiscipline('s', { matches: ms, events: [], players: P, suspensions: [council({ date: '2026-09-01T20:00' })] }).players.get('A_1')!
+    expect(d.suspensions[0].served).toEqual(['r3'])
   })
-  it('un joueur suspendu aligné quand même est signalé', () => {
-    const ms = [mk('A', 'B', 1, 0, 1, { id: 'r1' }), mk('A', 'B', 1, 0, 2, { id: 'r2' })]
+  it('la suspension vaut pour la saison : un match de pré-saison puis de MASTER la purgent', () => {
+    const ms = [mk('A', 'B', 1, 0, 2, { id: 'p1', competition_id: 'pre' }), mk('A', 'B', 1, 0, 9, { id: 'm1', competition_id: 'master' })]
+    const d = computeDiscipline('s', { matches: ms, events: [], players: P, suspensions: [council({ date: '2026-09-01', matches: 2 })] }).players.get('A_1')!
+    expect(d.suspensions[0].served).toEqual(['p1', 'm1'])
+  })
+  it('deux décisions : purgées l’une après l’autre ; joueur suspendu aligné quand même → signalé', () => {
+    const ms = played(3).map((m, i) => ({ ...m, date: `2026-09-1${i}T19:00:00` }))
     const lineups: Lineup[] = [{ id: 'l', match_id: 'r2', team_id: 'A', starter_ids: ['A_1'] }]
-    const d = computeDiscipline('c', { matches: ms, events: [card('r1', 'A_1', 'red_card')], players: P, lineups }).players.get('A_1')!
+    const d = computeDiscipline('s', { matches: ms, events: [], players: P, lineups, suspensions: [council({ id: 'a', date: '2026-09-01' }), council({ id: 'b', date: '2026-09-02', matches: 2 })] }).players.get('A_1')!
+    expect(d.suspensions.map((x) => x.served)).toEqual([['r1'], ['r2', 'r3']])
     expect(d.violations).toEqual(['r2'])
   })
-  it('réattribution d’un carton (Art. 11.7) → compteurs recalculés pour les deux joueurs', () => {
-    const ms = season(3)
-    const evs = [card('r1', 'A_1', 'yellow_card'), card('r2', 'A_1', 'yellow_card'), card('r3', 'A_1', 'yellow_card')]
-    const before = computeDiscipline('c', { matches: ms, events: evs, players: P }).players
-    expect(before.get('A_1')!.remaining).toBe(1)
-    const fixed = evs.map((e, i) => (i === 2 ? { ...e, player_id: 'A_2' } : e))
-    const after = computeDiscipline('c', { matches: ms, events: fixed, players: P }).players
-    expect(after.get('A_1')).toMatchObject({ counter: 2, remaining: 0 })
-    expect(after.get('A_2')).toMatchObject({ counter: 1, remaining: 0 })
-    expect(isThreatened(after.get('A_1'))).toBe(true)
+  it('ancienne saison : suspension saisie à la main, purgée après le match d’origine', () => {
+    const ms = played(3)
+    const d = computeDiscipline('s', { matches: ms, events: [], players: P, suspensions: [{ id: 'm', season_id: 's', player_id: 'A_1', origin_match_id: 'r1', matches: 1 }] }).players.get('A_1')!
+    expect(d.suspensions[0]).toMatchObject({ kind: 'manual', served: ['r2'] })
   })
-  it('jaune reçu sur le banc : compte dans le cumul ; rouge d’un officiel : suspension de l’officiel', () => {
-    const ms = [mk('A', 'B', 1, 0, 1, { id: 'r1' }), mk('A', 'B', 1, 0, 2, { id: 'r2' })]
-    const evs = [card('r1', 'A_1', 'yellow_card', { card_target: 'substitute' }), card('r1', 'A_x', 'red_card', { card_target: 'official', player_id: undefined, team_id: 'A', player_name_free: 'Coach Karim' })]
-    const r = computeDiscipline('c', { matches: ms, events: evs, players: P })
-    expect(r.players.get('A_1')!.counter).toBe(1)
-    expect(r.officials).toHaveLength(1)
-    expect(r.officials[0]).toMatchObject({ name: 'Coach Karim', team_id: 'A' })
-    expect(r.officials[0].record.served).toEqual(['r2'])
+})
+
+describe('Art. 19 — conseil de discipline', () => {
+  it('voix des capitaines : la sanction la plus votée ; égalité ou aucun vote → avertissement (19.7)', () => {
+    expect(captainsVoice({ captains_warning: 2, captains_suspension: 5 })).toBe('suspension')
+    expect(captainsVoice({ captains_warning: 3, captains_suspension: 3 })).toBe('warning')
+    expect(captainsVoice({})).toBe('warning')
+  })
+  it('décision finale : la sanction qui obtient le plus de voix sur 3 ; égalité entre voix exprimées → avertissement (19.8)', () => {
+    expect(councilDecision({ ardentia: 'suspension', siffle_or: 'suspension', captains_warning: 4, captains_suspension: 1 }).decision).toBe('suspension')
+    expect(councilDecision({ ardentia: 'suspension', siffle_or: 'warning', captains_warning: 1, captains_suspension: 1 }).decision).toBe('warning')
+    expect(councilDecision({ ardentia: 'suspension', captains_warning: 0, captains_suspension: 0 })).toEqual({ decision: 'warning', voices: { warning: 1, suspension: 1 } })
+  })
+  it('le vote dure 8 heures à partir de la publication du lien (19.5)', () => {
+    expect(voteClosesAt('2026-09-04T10:00:00.000Z')).toBe('2026-09-04T18:00:00.000Z')
+  })
+  it('votent les capitaines de l’autre division (19.3) ; avant la scission, tous les autres capitaines', () => {
+    const div = { master: ['a', 'b'], challenger: ['c', 'd'] }
+    expect(votingTeams('a', ['a', 'b', 'c', 'd'], div)).toEqual({ teams: ['c', 'd'], division: 'master', voters: 'challenger' })
+    expect(votingTeams('d', ['a', 'b', 'c', 'd'], div)).toEqual({ teams: ['a', 'b'], division: 'challenger', voters: 'master' })
+    expect(votingTeams('a', ['a', 'b', 'c'], {})).toEqual({ teams: ['b', 'c'] })
+  })
+  it('saison 2026-2027 au règlement v8 : régime « conseil » ; anciennes versions : saisie manuelle', () => {
+    expect(rulesForSeason({ rulebook_version: 'v8' }).council).toBe(true)
+    expect(rulesForSeason({ rulebook_version: 'v4' }).council).toBe(false)
+    expect(REGLEMENT.cards.autoSuspension).toBe(false)
   })
 })
 
@@ -205,11 +206,13 @@ describe('Art. 2.7 — infériorité numérique de 2 minutes', () => {
 })
 
 describe('texte du règlement', () => {
-  it('v4 cohérente avec les constantes ; v3 signalée (pas de cumul de jaunes)', () => {
-    expect(coherenceWarnings(V4)).toEqual([])
-    expect(coherenceWarnings(V3).join(' ')).toMatch(/Trois \(3\) cartons jaunes cumulés/)
+  it('v3 et v4 signalées : elles ne disent pas que les jaunes ne se cumulent pas ni qui vote au conseil (v8)', () => {
+    for (const t of [V3, V4]) {
+      const w = coherenceWarnings(t).join(' ')
+      expect(w).toMatch(/ne se cumulent pas/)
+      expect(w).toMatch(/Art\. 19\.3/)
+    }
     expect(V4).toMatch(/## 17\.3 Critères de classement des équipes/)
-    expect(V4).toMatch(/Trois \(3\) cartons jaunes cumulés entraînent automatiquement un \(1\) match de suspension/)
   })
 })
 

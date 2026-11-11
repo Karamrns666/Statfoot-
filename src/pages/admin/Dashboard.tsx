@@ -43,13 +43,16 @@ export default function Dashboard() {
   const docsKo = players.filter((p) => (['id_card', 'medical', 'license'] as const).some((d) => p.documents?.[d]?.status !== 'valid'))
   const pastOpen = ms.filter((m) => (m.status === 'scheduled' || m.status === 'live') && (m.date ?? '') < new Date(Date.now() - 3 * 3600_000).toISOString())
   const unsigned = ms.filter((m) => m.status === 'finished' && m.sheet?.status !== 'signed')
-  const cumulative = rulesForSeason(db.Season.find((s) => s.id === seasonId)).cumulativeCards
-  const exclusions = db.MatchEvent.filter((e) => (e.type === 'red_card' || e.type === 'second_yellow') && e.card_target !== 'official' && ms.some((m) => m.id === e.match_id) && !db.Suspension.some((s) => s.origin_event_id === e.id && (!cumulative || !!s.notified_at)))
-  const violations = discipline.flatMap((c) => [...c.players.values()].flatMap((d) => d.violations))
+  const council = rulesForSeason(db.Season.find((s) => s.id === seasonId)).council
+  // v8 : une expulsion n'entraîne aucune suspension automatique — on signale celles dont le conseil n'a pas été saisi
+  const exclusions = db.MatchEvent.filter((e) => (e.type === 'red_card' || e.type === 'second_yellow') && e.card_target !== 'official' && ms.some((m) => m.id === e.match_id) && (council ? !db.DisciplineCase.some((c) => c.event_id === e.id) : !db.Suspension.some((s) => s.origin_event_id === e.id)))
+  const openCases = council ? db.DisciplineCase.filter((c) => c.season_id === seasonId && c.status === 'open') : []
+  const violations = [...discipline.values()].flatMap((d) => d.violations)
   const alerts = [
     pastOpen.length && { icon: CalendarClock, text: `${pastOpen.length} match(s) passé(s) non clôturé(s)`, to: '/admin/matchs?statut=scheduled' },
     violations.length && { icon: Gavel, text: `${violations.length} joueur(s) suspendu(s) aligné(s) quand même`, to: '/admin/discipline' },
-    exclusions.length && { icon: Gavel, text: cumulative ? `${exclusions.length} expulsion(s) sans décision notifiée au capitaine` : `${exclusions.length} exclusion(s) sans suspension saisie`, to: cumulative ? '/admin/discipline' : '/admin/xp' },
+    exclusions.length && { icon: Gavel, text: council ? `${exclusions.length} expulsion(s) : conseil de discipline à saisir ou classer` : `${exclusions.length} exclusion(s) sans suspension saisie`, to: council ? '/admin/discipline' : '/admin/xp' },
+    openCases.length && { icon: Gavel, text: `${openCases.length} affaire(s) en cours au conseil de discipline`, to: '/admin/discipline' },
     docsKo.length && { icon: FileWarning, text: `${docsKo.length} joueur(s) avec documents à traiter`, to: '/admin/joueurs' },
     unsigned.length && { icon: AlertTriangle, text: `${unsigned.length} feuille(s) de match non signée(s)`, to: '/admin/matchs' },
   ].filter(Boolean) as { icon: typeof Goal; text: string; to: string }[]

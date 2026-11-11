@@ -39,7 +39,7 @@ export default function TeamDetail() {
   const xp = usePlayerXP({ seasonId: scopeSeasonId })
   const effSeason = useEffectiveSeason()
   const discipline = useSeasonDiscipline(scopeSeasonId ?? effSeason?.id)
-  const suspended = useMemo(() => { const m = new Map<string, number>(); for (const c of discipline) for (const d of c.players.values()) if (d.remaining > 0) m.set(d.player_id, (m.get(d.player_id) ?? 0) + d.remaining); return m }, [discipline])
+  const suspended = useMemo(() => { const m = new Map<string, number>(); for (const d of discipline.values()) if (d.remaining > 0) m.set(d.player_id, d.remaining); return m }, [discipline])
   const squad = useMemo(() => db.Player.filter((p) => p.team_id === id && (!scopeSeasonId || p.season_ids?.includes(scopeSeasonId))).sort((a, b) => (POS_ORDER[a.position] ?? 1) - (POS_ORDER[b.position] ?? 1) || (a.number ?? 0) - (b.number ?? 0)), [db.Player, id, scopeSeasonId])
   const matches = db.Match.filter((m) => (m.home_team_id === id || m.away_team_id === id) && (!scopeSeasonId || m.season_id === scopeSeasonId)).sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''))
   if (!team) return <EmptyState title="Équipe introuvable" />

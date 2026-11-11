@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Ban } from 'lucide-react'
 import { useLookup } from '@/hooks/useData'
 import { useSuspendedFor } from '@/hooks/useDiscipline'
-import { REGLEMENT, SUSPENSION_LABEL } from '@/lib/reglement'
+import { SUSPENSION_LABEL } from '@/lib/reglement'
 import type { Match } from '@/types/entities'
 import { ArtLink } from './ArtLink'
 
@@ -20,7 +20,7 @@ export function SuspendedAbsents({ match, teamId }: { match: Match; teamId: stri
         const kinds = s.discipline?.suspensions.filter((x) => x.served.length < x.matches).map((x) => SUSPENSION_LABEL[x.kind].toLowerCase()).join(', ')
         return <span key={pid}><Link to={`/joueurs/${pid}`} className="hover:text-neon">{p?.first_name} {p?.last_name}</Link>{kinds ? <span className="text-xs text-muted-foreground"> ({kinds})</span> : null}{i < list.length - 1 ? ',' : ''}</span>
       })}
-      <span className="ml-auto flex gap-2"><ArtLink art={REGLEMENT.cards.artYellow} /><ArtLink art={REGLEMENT.cards.artRed} /></span>
+      <span className="ml-auto flex gap-2"><ArtLink art="19" /></span>
     </p>
   )
 }

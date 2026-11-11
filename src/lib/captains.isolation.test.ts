@@ -22,7 +22,7 @@ function snapshot(db: ReturnType<typeof generateLeagueData>) {
     xp: seasons.map((s) => [...computePlayerXP(league, { seasonId: s }).entries()]),
     teams: seasons.map((s) => [...computeTeamStats(league, { seasonId: s }).entries()]),
     kpis: seasons.map((s) => kpis(league, { seasonId: s })),
-    discipline: db.Competition.map((c) => { const d = computeDiscipline(c.id, disciplineFromDb(db)); return [...d.players.values()] }),
+    discipline: db.Season.map((s) => [...computeDiscipline(s.id, disciplineFromDb(db)).players.values()]),
     strip: seasons.map((s) => seasonStrip(league, s)),
     ipg: IPG_RANKING,
   })

@@ -9,7 +9,7 @@ import type {
 import { competitionStandings, isKnockout, isPlayed } from './standings'
 import { keeperMatchStats, participants } from './matchEngine'
 import { addShots, emptyShots, playerMatchShots, type ShotTotals } from './shots'
-import { SUSPENSION_LABEL, computeDiscipline, rulesForSeason } from './reglement'
+import { SUSPENSION_LABEL, suspensionKind } from './reglement'
 
 // ---------------------------------------------------------------------------
 //  Barème
@@ -265,19 +265,12 @@ export function xpExamples(cfg: XPConfig): XPExample[] {
 }
 
 /**
- * Suspensions comptées dans l'XP (« par match de suspension ») :
- *  - saisons au règlement avec cumul (v4) : suspensions automatiques (3 jaunes, rouge) + supplémentaires d'Ardentia ;
- *  - anciennes saisons : suspensions saisies à la main.
+ * Suspensions comptées dans l'XP (« par match de suspension ») : chaque ligne Suspension —
+ * décision du conseil de discipline (v8, Art. 19) ou suspension saisie à la main (anciennes saisons).
+ * Pas de suspension automatique : un carton rouge seul ne coûte que son malus de carton.
  */
-export function xpSuspensions(data: Pick<XPData, 'suspensions' | 'seasons' | 'competitions' | 'matches' | 'events' | 'lineups' | 'players'>) {
-  const out: { season_id: string; player_id: string; origin_match_id?: string; matches: number; label?: string }[] = []
-  const cumulative = new Set(data.seasons.filter((x) => rulesForSeason(x).cumulativeCards).map((x) => x.id))
-  for (const s of data.suspensions) if (!cumulative.has(s.season_id) && s.kind !== 'extra') out.push(s)
-  for (const c of data.competitions.filter((x) => cumulative.has(x.season_id))) {
-    const { players } = computeDiscipline(c.id, { matches: data.matches, events: data.events, lineups: data.lineups, players: data.players, extras: data.suspensions.filter((s) => s.kind === 'extra') })
-    for (const d of players.values()) for (const r of d.suspensions) out.push({ season_id: c.season_id, player_id: d.player_id, origin_match_id: r.origin_match_id, matches: r.matches, label: SUSPENSION_LABEL[r.kind] })
-  }
-  return out
+export function xpSuspensions(data: Pick<XPData, 'suspensions'>) {
+  return data.suspensions.filter((s) => s.matches > 0).map((s) => ({ season_id: s.season_id, player_id: s.player_id, origin_match_id: s.origin_match_id, matches: s.matches, label: SUSPENSION_LABEL[suspensionKind(s)] }))
 }
 
 /** Lignes hors match : suspensions et récompenses mensuelles. */

@@ -1,0 +1,43 @@
+{
+  "name": "ProcesVerbal",
+  "type": "object",
+  "description": "Procès-verbal (Art. 17.7) : discipline, réclamation, forfait…",
+  "properties": {
+    "season_id": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "discipline",
+        "reclamation",
+        "forfait",
+        "autre"
+      ]
+    },
+    "title": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string"
+    },
+    "text": {
+      "type": "string"
+    },
+    "pdf_url": {
+      "type": "string"
+    },
+    "case_id": {
+      "type": "string"
+    },
+    "match_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "season_id",
+    "kind",
+    "title",
+    "date"
+  ]
+}

@@ -15,5 +15,5 @@ export function leagueFromDb(db: DBLike, settings: Settings): LeagueData {
   }
 }
 export function disciplineFromDb(db: Pick<DBLike, 'Match' | 'MatchEvent' | 'Lineup' | 'Player' | 'Suspension'>): DisciplineData {
-  return { matches: db.Match, events: db.MatchEvent, lineups: db.Lineup, players: db.Player, extras: db.Suspension.filter((s) => s.kind === 'extra') }
+  return { matches: db.Match, events: db.MatchEvent, lineups: db.Lineup, players: db.Player, suspensions: db.Suspension }
 }

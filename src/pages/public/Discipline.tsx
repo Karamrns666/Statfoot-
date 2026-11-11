@@ -1,8 +1,9 @@
-// Discipline : joueurs suspendus pour la prochaine journée, joueurs à 2 jaunes (menacés), officiels suspendus,
-// classement fair-play des équipes. Calculé depuis les événements de match (Art. 11.5, 11.6, 2.5 ; Art. 17.3 critères 5 et 6).
+// Discipline (règlement v8) : joueurs suspendus par le conseil de discipline, décisions rendues (seule la sanction
+// retenue est publiée, jamais le détail des votes — Art. 19.9), classement fair-play (Art. 17.3 critères 5 et 6).
+// Pas de cumul de jaunes d'un match à l'autre, pas de suspension automatique après un rouge (Art. 11.5, 11.6).
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, Ban, ShieldCheck, UserX } from 'lucide-react'
+import { Ban, Gavel, ShieldCheck } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
 import { useEffectiveSeason, useSeasonCompetitions } from '@/hooks/useStats'
 import { useSeasonDiscipline, useSeasonRules } from '@/hooks/useDiscipline'
@@ -10,9 +11,9 @@ import { PageHeader } from '@/components/league/Bits'
 import { TeamLogo, PlayerAvatar } from '@/components/league/Identity'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArtLink } from '@/components/reglement/ArtLink'
-import { REGLEMENT, SUSPENSION_LABEL, isDisputed, isThreatened, type PlayerDiscipline } from '@/lib/reglement'
+import { REGLEMENT, SUSPENSION_LABEL, isDisputed, sanctionLabel, type PlayerDiscipline } from '@/lib/reglement'
 import { phaseLabel } from '@/lib/disciplineLabels'
-import { YellowCounter } from '@/components/reglement/YellowCounter'
+import { fmtDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
 export default function Discipline() {
@@ -21,13 +22,10 @@ export default function Discipline() {
   const season = useEffectiveSeason()
   const comps = useSeasonCompetitions()
   const rules = useSeasonRules(season?.id)
-  const all = useSeasonDiscipline(season?.id)
+  const discipline = useSeasonDiscipline(season?.id)
   const [compId, setCompId] = useState<string>('all')
-  const scoped = all.filter((c) => compId === 'all' || c.competition.id === compId)
-  const players = scoped.flatMap((c) => [...c.players.values()].map((d) => ({ d, comp: c.competition })))
-  const suspended = players.filter((x) => x.d.remaining > 0).sort((a, b) => b.d.remaining - a.d.remaining)
-  const threatened = players.filter((x) => isThreatened(x.d))
-  const officials = scoped.flatMap((c) => c.officials.filter((o) => o.record.served.length < o.record.matches).map((o) => ({ o, comp: c.competition })))
+  const suspended = [...discipline.values()].filter((d) => d.remaining > 0).sort((a, b) => b.remaining - a.remaining)
+  const decisions = db.DisciplineCase.filter((c) => c.season_id === season?.id && c.status === 'decided').sort((a, b) => (b.decided_at ?? '').localeCompare(a.decided_at ?? ''))
 
   // classement fair-play : moins de jaunes puis moins de rouges (critères 5 et 6 de l'Art. 17.3)
   const fair = useMemo(() => {
@@ -55,43 +53,30 @@ export default function Discipline() {
       </PageHeader>
 
       <p className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-white/10 bg-night-900/50 px-4 py-3 text-sm">
-        {rules.cumulativeCards
-          ? <><span><b>{REGLEMENT.cards.yellowsForSuspension} jaunes cumulés</b> sur la compétition = <b>1 match</b> de suspension</span><ArtLink art={REGLEMENT.cards.artYellow} /><span><b>Rouge</b> = au moins 1 match (Ardentia peut alourdir)</span><ArtLink art={REGLEMENT.cards.artRed} /><span className="text-muted-foreground">Les 2 jaunes d’une expulsion ne comptent pas dans le cumul.</span></>
-          : <span className="text-muted-foreground">Cette saison suivait l’ancien règlement : pas de cumul automatique des jaunes, suspensions décidées au cas par cas.</span>}
+        {rules.council
+          ? <><span><b>Pas de cumul</b> de jaunes d’un match à l’autre · <b>2 jaunes</b> dans le même match = rouge</span><ArtLink art={REGLEMENT.cards.artYellow} /><span>Un rouge <b>n’entraîne pas de suspension automatique</b> : seul le conseil de discipline peut suspendre</span><ArtLink art={REGLEMENT.cards.artRed} /><ArtLink art="19" /></>
+          : <span className="text-muted-foreground">Cette saison suivait un ancien règlement : suspensions décidées au cas par cas par Ardentia.</span>}
       </p>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card><CardHeader><CardTitle className="flex items-center gap-2"><Ban className="size-5 text-red-400" />Suspendus pour la prochaine journée</CardTitle></CardHeader><CardContent>
-          {suspended.length || officials.length ? (
-            <ul className="divide-y divide-white/5">
-              {suspended.map(({ d, comp }) => <SuspendedRow key={`${comp.id}:${d.player_id}`} d={d} compName={compId === 'all' && comps.length > 1 ? phaseLabel(comp) : undefined} />)}
-              {officials.map(({ o, comp }) => (
-                <li key={o.record.id} className="flex items-center gap-3 py-2.5 text-sm">
-                  <UserX className="size-8 rounded-full bg-white/5 p-1.5 text-muted-foreground" aria-hidden />
-                  <div className="min-w-0 flex-1"><p className="font-semibold">{o.name} <span className="font-normal text-muted-foreground">· officiel · {L.team.get(o.team_id)?.short_name}</span></p><p className="text-xs text-muted-foreground">{SUSPENSION_LABEL[o.record.kind]}{compId === 'all' && comps.length > 1 ? ` · ${phaseLabel(comp)}` : ''}</p></div>
-                  <ArtLink art={REGLEMENT.cards.artBench} />
-                </li>
-              ))}
-            </ul>
-          ) : <p className="py-6 text-center text-sm text-muted-foreground">Aucun joueur suspendu.</p>}
+          {suspended.length ? <ul className="divide-y divide-white/5">{suspended.map((d) => <SuspendedRow key={d.player_id} d={d} />)}</ul> : <p className="py-6 text-center text-sm text-muted-foreground">Aucun joueur suspendu.</p>}
         </CardContent></Card>
 
-        <Card><CardHeader><CardTitle className="flex items-center gap-2"><AlertTriangle className="size-5 text-amber-300" />Menacés de suspension ({REGLEMENT.cards.yellowsForSuspension - 1} jaunes)</CardTitle></CardHeader><CardContent>
-          {threatened.length ? (
-            <ul className="divide-y divide-white/5">
-              {threatened.map(({ d, comp }) => {
-                const p = L.player.get(d.player_id), t = L.team.get(d.team_id)
-                return (
-                  <li key={`${comp.id}:${d.player_id}`} className="flex items-center gap-3 py-2.5 text-sm">
-                    <PlayerAvatar player={p} team={t} size={34} />
-                    <Link to={`/joueurs/${d.player_id}`} className="min-w-0 flex-1 truncate font-semibold hover:text-neon">{p?.first_name} {p?.last_name} <span className="font-normal text-muted-foreground">· {t?.short_name}{compId === 'all' && comps.length > 1 ? ` · ${phaseLabel(comp)}` : ''}</span></Link>
-                    <YellowCounter d={d} />
-                  </li>
-                )
-              })}
-            </ul>
-          ) : <p className="py-6 text-center text-sm text-muted-foreground">Aucun joueur à {REGLEMENT.cards.yellowsForSuspension - 1} jaunes.</p>}
-          {rules.cumulativeCards && <ArtLink art={REGLEMENT.cards.artYellow} className="mt-2" />}
+        <Card><CardHeader><CardTitle className="flex items-center gap-2"><Gavel className="size-5 text-neon" />Décisions du conseil de discipline</CardTitle></CardHeader><CardContent>
+          {decisions.length ? (
+            <ul className="divide-y divide-white/5">{decisions.map((c) => {
+              const p = L.player.get(c.player_id), t = L.team.get(c.team_id)
+              return (
+                <li key={c.id} className="flex items-center gap-3 py-2.5 text-sm">
+                  <PlayerAvatar player={p} team={t} size={34} />
+                  <div className="min-w-0 flex-1"><Link to={`/joueurs/${c.player_id}`} className="block truncate font-semibold hover:text-neon">{p?.first_name} {p?.last_name} <span className="font-normal text-muted-foreground">· {t?.short_name}</span></Link><p className="text-xs text-muted-foreground">Décision du {fmtDate(c.decided_at, 'd MMMM')}</p></div>
+                  <span className={cn('shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold', c.decision === 'suspension' ? 'bg-red-500/15 text-red-200' : 'bg-white/10 text-foreground')}>{sanctionLabel(c.decision ?? 'warning', c.decision_matches ?? 0)}</span>
+                </li>
+              )
+            })}</ul>
+          ) : <p className="py-6 text-center text-sm text-muted-foreground">Aucune décision cette saison.</p>}
+          <p className="mt-2 text-xs text-muted-foreground">Seule la sanction retenue est communiquée, sans le détail des votes. <ArtLink art="19.9" /></p>
         </CardContent></Card>
       </div>
 
@@ -116,7 +101,7 @@ export default function Discipline() {
   )
 }
 
-function SuspendedRow({ d, compName }: { d: PlayerDiscipline; compName?: string }) {
+function SuspendedRow({ d }: { d: PlayerDiscipline }) {
   const L = useLookup()
   const p = L.player.get(d.player_id), t = L.team.get(d.team_id)
   const open = d.suspensions.filter((s) => s.served.length < s.matches)
@@ -124,8 +109,8 @@ function SuspendedRow({ d, compName }: { d: PlayerDiscipline; compName?: string 
     <li className="flex items-center gap-3 py-2.5 text-sm">
       <PlayerAvatar player={p} team={t} size={34} />
       <div className="min-w-0 flex-1">
-        <Link to={`/joueurs/${d.player_id}`} className="block truncate font-semibold hover:text-neon">{p?.first_name} {p?.last_name} <span className="font-normal text-muted-foreground">· {t?.short_name}{compName ? ` · ${compName}` : ''}</span></Link>
-        <p className="text-xs text-muted-foreground">{open.map((s) => `${SUSPENSION_LABEL[s.kind]}${s.reason ? ` (${s.reason})` : ''}`).join(' + ')}</p>
+        <Link to={`/joueurs/${d.player_id}`} className="block truncate font-semibold hover:text-neon">{p?.first_name} {p?.last_name} <span className="font-normal text-muted-foreground">· {t?.short_name}</span></Link>
+        <p className="text-xs text-muted-foreground">{open.map((s) => (s.kind === 'council' ? `${SUSPENSION_LABEL.council} du ${fmtDate(s.start, 'd MMM')}` : SUSPENSION_LABEL[s.kind])).join(' + ')}</p>
       </div>
       <span className="shrink-0 rounded-full bg-red-500/15 px-2.5 py-0.5 text-xs font-bold text-red-200">{d.remaining} match{d.remaining > 1 ? 's' : ''}</span>
     </li>

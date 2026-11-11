@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { applyLot1, applyReglementV4, applyRules6v6, migrate } from './migrations'
+import { applyLot1, applyReglementV4, applyDisciplineV8, applyRules6v6, migrate } from './migrations'
 import { captainUpdates } from '@/lib/captain'
 import { generateLeagueData } from './generate'
 import type { Player, Team } from '@/types/entities'
@@ -59,7 +59,7 @@ describe('règlement Ardentia v4', () => {
   it('données neuves : v4 en vigueur (saison 2026-2027), v3 dans l’historique, saison rattachée, mi-temps 20 min', () => {
     const db = generateLeagueData(new Date('2026-11-09T10:00:00'))
     expect(db.Rulebook.map((r) => [r.version, r.status])).toEqual([['v4', 'current'], ['v3', 'archived']])
-    expect(db.Season.find((s) => s.id === 'season_2026')!.rulebook_version).toBe('v4')
+    expect(db.Season.find((s) => s.id === 'season_2026')!.rulebook_version).toBe('v8')
     expect(db.Competition.filter((c) => c.season_id === 'season_2026').every((c) => c.half_duration_min === 20)).toBe(true)
     expect(db.Settings[0]).not.toHaveProperty('tiebreakers')
   })
@@ -71,10 +71,19 @@ describe('règlement Ardentia v4', () => {
       Settings: [{ id: 'settings', points_win: 3, tiebreakers: ['points'] } as never],
     })
     expect(out.Rulebook!.map((r) => r.version)).toEqual(['v4', 'v3'])
-    expect(out.Season![0].rulebook_version).toBe('v4')
+    expect(out.Season![0].rulebook_version).toBe('v8')
     expect(out.Competition![0].half_duration_min).toBe(20)
     expect(out.Match![0].half_duration_min).toBe(20)
     expect(out.Settings![0]).toEqual({ id: 'settings' })
     expect(applyReglementV4({ ...out })).toEqual({})
+  })
+})
+
+describe('règlement v8 — discipline', () => {
+  it('la saison 2026-2027 déjà rattachée à la v4 passe en v8 (idempotent) ; les autres saisons ne bougent pas', () => {
+    const db = { Season: [{ id: 'season_2026', name: 'S', start_date: '2026-08-22', rulebook_version: 'v4' }, { id: 'season_2025', name: 'A', start_date: '2025-08-22', rulebook_version: 'v3' }] }
+    const out = applyDisciplineV8(db)
+    expect(out.Season!.map((x) => x.rulebook_version)).toEqual(['v8', 'v3'])
+    expect(applyDisciplineV8({ ...db, ...out })).toEqual({})
   })
 })

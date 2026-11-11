@@ -456,21 +456,19 @@ function onPitch(match: Match, events: MatchEvent[], teamId: string, pid: string
   return on
 }
 
-/** Après un rouge : 1 match automatique (Art. 11.6) + suspension supplémentaire éventuelle décidée par Ardentia. */
-function ExtraSuspensionForm({ player, xpPer, onSave, onCancel }: { player?: Player; xpPer: number; onSave: (x: { matches: number; reason: string; report: string; notified: string }) => void; onCancel: () => void }) {
-  const [v, setV] = useState({ matches: 0, reason: '', report: '', notified: '' })
+/** Après un rouge (règlement v8) : aucune suspension automatique ; Ardentia peut saisir le conseil de discipline (Art. 11.6, 19). */
+function CouncilReferralForm({ player, defaultIncident, onSave, onCancel }: { player?: Player; defaultIncident: string; onSave: (x: { incident: string; matches: number }) => void; onCancel: () => void }) {
+  const [v, setV] = useState({ incident: defaultIncident, matches: 1 })
   return (
     <form className="space-y-3 text-sm" onSubmit={(e) => { e.preventDefault(); onSave(v) }}>
-      <p><b>{player?.first_name} {player?.last_name}</b> est expulsé : <b>1 match de suspension automatique</b>, à purger au prochain match disputé de son équipe. <ArtLink art={REGLEMENT.cards.artRed} /></p>
+      <p><b>{player?.first_name} {player?.last_name}</b> est expulsé. <b>Pas de suspension automatique</b> : il peut jouer le match suivant, sauf si le conseil de discipline le suspend. <ArtLink art={REGLEMENT.cards.artRed} /></p>
       <fieldset className="space-y-2 rounded-xl border border-white/10 p-3">
-        <legend className="px-1 text-xs font-semibold">Suspension supplémentaire (décision Ardentia, selon la gravité)</legend>
-        <label className="flex items-center gap-2 text-xs">Matchs en plus<Input type="number" min={0} max={20} value={v.matches} onChange={(e) => setV({ ...v, matches: Math.max(0, +e.target.value) })} className="h-8 w-20" /></label>
-        <Input value={v.reason} onChange={(e) => setV({ ...v, reason: e.target.value })} placeholder="Motif (violence, insultes, menaces, refus de quitter le terrain…)" aria-label="Motif" />
-        <textarea value={v.report} onChange={(e) => setV({ ...v, report: e.target.value })} placeholder="Rapport de l’arbitre" aria-label="Rapport de l’arbitre" className="min-h-16 w-full rounded-lg border border-input bg-night-950/40 p-2 text-sm" />
-        <label className="flex flex-wrap items-center gap-2 text-xs">Décision notifiée au capitaine le<Input type="date" value={v.notified} onChange={(e) => setV({ ...v, notified: e.target.value })} className="h-8 w-40" /></label>
-        <p className="text-[11px] text-muted-foreground">La décision doit être communiquée au capitaine avant le match suivant. Modifiable ensuite dans Admin → Discipline. −{xpPer} XP par match de suspension.</p>
+        <legend className="px-1 text-xs font-semibold">Saisir le conseil de discipline <ArtLink art="19" /></legend>
+        <textarea value={v.incident} onChange={(e) => setV({ ...v, incident: e.target.value })} aria-label="Faits" className="min-h-16 w-full rounded-lg border border-input bg-night-950/40 p-2 text-sm" />
+        <label className="flex items-center gap-2 text-xs">Suspension soumise au vote<Input type="number" min={1} max={20} value={v.matches} onChange={(e) => setV({ ...v, matches: Math.max(1, +e.target.value || 1) })} className="h-8 w-20" />match(s), contre un avertissement</label>
+        <p className="text-[11px] text-muted-foreground">Le vote, la décision et le PV se gèrent ensuite dans Admin → Discipline.</p>
       </fieldset>
-      <div className="flex gap-2"><Button type="submit" disabled={v.matches > 0 && !v.reason.trim()}>{v.matches > 0 ? `Enregistrer (${1 + v.matches} matchs au total)` : 'Valider (1 match)'}</Button><Button type="button" variant="ghost" onClick={onCancel}>Plus tard</Button></div>
+      <div className="flex gap-2"><Button type="submit" disabled={!v.incident.trim()}>Ouvrir l’affaire</Button><Button type="button" variant="ghost" onClick={onCancel}>Plus tard</Button></div>
     </form>
   )
 }
@@ -530,7 +528,7 @@ function FlowDialog({ flow, setFlow, match, events, act, ls }: { flow: Flow; set
     case 'card':
       title = `${flow.type === 'yellow_card' ? 'Carton jaune' : 'Carton rouge'} — ${teamName(flow.team)}`
       body = <div className="space-y-3">
-        <p className="text-xs text-muted-foreground">Joueur sur le terrain ou remplaçant (un jaune reçu sur le banc compte dans le cumul) — {flow.type === 'yellow_card' ? <>2e jaune du match = rouge automatique « 2e avertissement ». <ArtLink art={REGLEMENT.cards.artYellow} /></> : <>au moins 1 match de suspension et 2 min d’infériorité. <ArtLink art={REGLEMENT.cards.artRed} /></>}</p>
+        <p className="text-xs text-muted-foreground">Joueur sur le terrain ou remplaçant — {flow.type === 'yellow_card' ? <>2e jaune du match = rouge automatique « 2e avertissement » ; pas de cumul d’un match à l’autre. <ArtLink art={REGLEMENT.cards.artYellow} /></> : <>2 min d’infériorité ; pas de suspension automatique, le conseil de discipline peut être saisi. <ArtLink art={REGLEMENT.cards.artRed} /></>}</p>
         <PlayerGrid match={match} teamId={flow.team} events={events} onPick={async (p) => { setFlow(null); await act(flow.team, flow.type, { player_id: p, card_target: onPitch(match, events, flow.team, p, db.Lineup) ? 'player' : 'substitute' }) }} />
         <form className="flex gap-2" onSubmit={async (e) => { e.preventDefault(); const name = official.trim(); setFlow(null); await act(flow.team, flow.type, { card_target: 'official', player_name_free: name || 'Officiel d’équipe' }) }}>
           <Input value={official} onChange={(e) => setOfficial(e.target.value)} placeholder="Officiel d’équipe (nom)" aria-label="Nom de l’officiel d’équipe" />
@@ -597,11 +595,12 @@ function FlowDialog({ flow, setFlow, match, events, act, ls }: { flow: Flow; set
     case 'suspension': {
       const p = L.player.get(flow.player)
       const xpPer = Math.abs(xpConfig(db.XPRule, match.season_id).per_suspension_match)
-      if (rulesForSeason(db.Season.find((s) => s.id === match.season_id)).cumulativeCards) {
-        title = 'Expulsion — suspension'
-        body = <ExtraSuspensionForm player={p} xpPer={xpPer} onCancel={close} onSave={async (x) => {
-          if (x.matches > 0) await base44.entities.Suspension.create({ kind: 'extra', season_id: match.season_id, player_id: flow.player, team_id: p?.team_id, origin_match_id: match.id, origin_event_id: flow.event, date: match.date?.slice(0, 10), matches: x.matches, reason: x.reason, referee_report: x.report, notified_at: x.notified || undefined, created_by: user?.email })
-          toast.success(x.matches > 0 ? `Suspension : 1 match automatique + ${x.matches} supplémentaire(s)` : 'Suspension automatique : 1 match'); close()
+      if (rulesForSeason(db.Season.find((s) => s.id === match.season_id)).council) {
+        const ev = events.find((e) => e.id === flow.event)
+        title = 'Expulsion — conseil de discipline'
+        body = <CouncilReferralForm player={p} defaultIncident={`${ev?.type === 'second_yellow' ? 'Expulsion (2e avertissement)' : 'Carton rouge direct'}${ev?.minute ? ` à la ${ev.minute}e minute` : ''} lors de ${teamName(match.home_team_id)} – ${teamName(match.away_team_id)}.`} onCancel={close} onSave={async (x) => {
+          await base44.entities.DisciplineCase.create({ season_id: match.season_id, player_id: flow.player, team_id: p?.team_id ?? '', match_id: match.id, event_id: flow.event, incident: x.incident.trim(), proposed_matches: x.matches, status: 'open', created_by: user?.email })
+          toast.success('Affaire ouverte au conseil de discipline'); close()
         }} />
         break
       }

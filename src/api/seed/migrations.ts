@@ -245,7 +245,13 @@ export function applyOfficialTeams2026(db: Rules6Data & { Club?: Club[] }): Rule
   return out
 }
 
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026]
+/** Règlement v8 (2026-2027) : la saison passe au régime « conseil de discipline » (pas de cumul, pas de suspension automatique). */
+export function applyDisciplineV8(db: Rules6Data): Rules6Data {
+  if (!db.Season?.some((x) => x.id === SEASON_2026_ID && x.rulebook_version !== CURRENT_RULEBOOK && (!x.rulebook_version || x.rulebook_version === 'v4'))) return {}
+  return { Season: db.Season.map((x) => (x.id === SEASON_2026_ID && (!x.rulebook_version || x.rulebook_version === 'v4') ? { ...x, rulebook_version: CURRENT_RULEBOOK } : x)) }
+}
+
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */

@@ -34,7 +34,7 @@ export const ADMIN_NAV: { group: string; items: { to: string; label: string; ico
     { to: '/admin/import', label: 'Import CSV', icon: Upload, area: 'import' },
   ] },
   { group: 'XP & trophées', items: [
-    { to: '/admin/discipline', label: 'Discipline', icon: Gavel, area: 'sport' },
+    { to: '/admin/discipline', label: 'Conseil de discipline', icon: Gavel, area: 'sport' },
     { to: '/admin/visuels', label: 'Visuels réseaux', icon: ImageIcon, area: 'media' },
     { to: '/admin/visuels-semaine', label: 'Visuels de la semaine', icon: CalendarRange, area: 'media' },
     { to: '/admin/xp', label: 'Règles XP', icon: Zap, area: 'xp' },

@@ -112,7 +112,7 @@ export function LineupEditor({ match, teamId, onValidated, readOnly }: { match: 
           )
         })}
       </div>
-      {[...elig.values()].some((e) => e.reasons.some((r) => r.reason === 'suspended')) && <p className="mt-2 text-xs text-muted-foreground">Joueurs suspendus bloqués : 3 jaunes cumulés = 1 match, rouge = au moins 1 match. <ArtLink art={REGLEMENT.cards.artYellow} /> <ArtLink art={REGLEMENT.cards.artRed} /></p>}
+      {[...elig.values()].some((e) => e.reasons.some((r) => r.reason === 'suspended')) && <p className="mt-2 text-xs text-muted-foreground">Joueurs suspendus bloqués : seules les suspensions décidées par le conseil de discipline comptent (pas de cumul de jaunes, pas de suspension automatique). <ArtLink art="19" /></p>}
       {!readOnly && <Button className="mt-3 w-full" size="lg" onClick={validate}><CheckCircle2 />Valider la composition</Button>}
     </div>
   )

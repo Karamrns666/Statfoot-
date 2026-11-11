@@ -308,6 +308,43 @@ export type XPKey =
   | 'motm'
 export interface XPRule extends BaseEntity { season_id: string; key: XPKey; value: number }
 
+/** Art. 19 — affaire du conseil de discipline (seule la décision retenue est publiée, jamais le détail des votes). */
+export interface DisciplineCase extends BaseEntity {
+  season_id: string
+  player_id: string
+  team_id: string
+  match_id?: string
+  /** carton rouge à l'origine de l'affaire (Art. 11.6) */
+  event_id?: string
+  incident: string
+  /** sanctions mises au vote (Art. 19.4) : avertissement, ou suspension de N matchs fixé avant le vote */
+  proposed_matches: number
+  /** publication du lien de vote dans le groupe WhatsApp du conseil (le vote dure 8 h, Art. 19.5) */
+  vote_opened_at?: string
+  /** voix du conseil (Art. 19.2, 19.7) — usage interne, JAMAIS publiées (Art. 19.6, 19.9) */
+  voices?: { ardentia?: 'warning' | 'suspension'; siffle_or?: 'warning' | 'suspension'; captains_warning?: number; captains_suspension?: number }
+  status: 'open' | 'decided'
+  decision?: 'warning' | 'suspension'
+  decision_matches?: number
+  decided_at?: string
+  /** suspension créée par la décision (bloque le joueur sur les feuilles de match) */
+  suspension_id?: string
+  pv_id?: string
+  created_by?: string
+}
+/** Art. 17.7 — procès-verbal d'une décision (discipline, réclamation, forfait…), texte et / ou PDF. */
+export interface ProcesVerbal extends BaseEntity {
+  season_id: string
+  kind: 'discipline' | 'reclamation' | 'forfait' | 'autre'
+  title: string
+  date: string
+  text?: string
+  pdf_url?: string
+  case_id?: string
+  match_id?: string
+  created_by?: string
+}
+
 export interface Suspension extends BaseEntity {
   season_id: string
   player_id: string
@@ -317,8 +354,10 @@ export interface Suspension extends BaseEntity {
   matches: number
   served_match_ids?: string[]
   created_by?: string
-  /** 'extra' = suspension supplémentaire décidée par Ardentia (s'ajoute au match automatique, Art. 11.6) */
-  kind?: 'extra'
+  /** 'extra' = suspension supplémentaire (règlement v4) · 'council' = décision du conseil de discipline (v8, Art. 19) :
+   *  les matchs se purgent à partir de la date de la décision (`date`) */
+  kind?: 'extra' | 'council'
+  case_id?: string
   team_id?: string
   reason?: string
   referee_report?: string
@@ -497,6 +536,8 @@ export interface AdminUser extends BaseEntity {
 }
 
 export interface EntityMap {
+  DisciplineCase: DisciplineCase
+  ProcesVerbal: ProcesVerbal
   CaptainTeam: CaptainTeam
   CaptainMatch: CaptainMatch
   Season: Season
@@ -529,5 +570,5 @@ export interface EntityMap {
 export type EntityName = keyof EntityMap
 export const ENTITY_NAMES: EntityName[] = [
   'Season', 'Competition', 'Division', 'Group', 'Venue', 'Team', 'Player', 'Match', 'MatchEvent', 'Lineup', 'LiveState',
-  'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser', 'Rulebook', 'Club', 'CaptainTeam', 'CaptainMatch',
+  'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser', 'Rulebook', 'Club', 'CaptainTeam', 'CaptainMatch', 'DisciplineCase', 'ProcesVerbal',
 ]

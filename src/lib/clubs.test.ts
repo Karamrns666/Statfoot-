@@ -15,7 +15,7 @@ describe('saisons séparées : clubs et équipes de saison', () => {
     expect(new Set(db.Team.map(clubKey)).size).toBe(db.Team.length)
     expect(db.Club.length).toBe(db.Team.length)
     const s25 = db.Team.filter((t) => t.season_id === 'season_2025'), s26 = db.Team.filter((t) => t.season_id === 'season_2026')
-    expect(s25.length).toBe(16); expect(s26.length).toBe(20)
+    expect(s25.length).toBe(16); expect(s26.length).toBe(23)
     expect(s25.every((t) => teamSeasonId(t, db.Competition) === 'season_2025')).toBe(true)
   })
   it('migration d’une base existante (équipes sans saison) : saison déduite des compétitions, idempotente', () => {

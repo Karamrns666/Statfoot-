@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Lock, CheckCircle2, AlertTriangle, Images } from 'lucide-react'
 import { teamSeasonId } from '@/lib/clubs'
+import { OfficialTeamsButton } from '@/components/admin/OfficialTeamsDialog'
 import { SeniorityControl } from '@/components/admin/SeniorityControl'
 import { SeasonLinkControl } from '@/components/admin/SeasonLinkControl'
 import { phaseName } from '@/lib/competitionNames'
@@ -143,7 +144,7 @@ export function Teams() {
         filter={(t) => teamSeasonId(t, db.Competition) === seasonId && (!comp || !!comp.team_ids?.includes(t.id)) && (!div || t.division_id === div)}
         searchText={(t) => `${t.name} ${t.company} ${t.short_name}`}
         transform={(v) => ({ ...v, short_name: String(v.short_name ?? '').toUpperCase().slice(0, 3) })}
-        toolbar={<FilterSelect value={div} onChange={setDiv} allLabel="Toutes séries" options={db.Division.map((d) => ({ value: d.id, label: d.name }))} />}
+        toolbar={<><FilterSelect value={div} onChange={setDiv} allLabel="Toutes séries" options={db.Division.map((d) => ({ value: d.id, label: d.name }))} /><OfficialTeamsButton seasonId={seasonId} /></>}
         defaults={() => ({ status: 'active', primary_color: '#F85A00', secondary_color: '#04163D', season_id: seasonId })}
         afterSave={async (v) => { const id = v.id as string; const t = db.Team.find((x) => x.id === id); if (!v.club_id && !t?.club_id) { const club = `club_${id}`; await base44.entities.Team.update(id, { club_id: club, season_id: (v.season_id as string) ?? seasonId }); if (!db.Club.some((c) => c.id === club)) await base44.entities.Club.create({ id: club, name: v.name as string, logo_url: v.logo_url as string | undefined } as never) } }}
         rowActions={(t) => <Button size="sm" variant="outline" className="h-8" onClick={() => setMediaFor(t.id)}><Images />Photos & poster{t.media?.length ? ` (${t.media.length})` : ''}</Button>}

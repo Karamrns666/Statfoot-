@@ -50,7 +50,7 @@ const inter = (a: Zone, b: Zone) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < 
 export function layoutProblems(cfg: VisualsConfig) {
   const out: string[] = []
   const inside: Record<string, string[]> = {
-    resultat: ['competition:bandeOrangeHaut', 'homeLogo:bande', 'awayLogo:bande', 'homeScore:bande', 'awayScore:bande', 'subLine:bande', 'subLine:encocheV'],
+    resultat: ['competition:bandeOrangeHaut', 'homeLogo:bande', 'awayLogo:bande', 'homeScore:bande', 'awayScore:bande', 'homeScore:blocGauche', 'awayScore:blocDroit', 'homePens:bande', 'awayPens:bande', 'homePens:blocGauche', 'awayPens:blocDroit', 'subLine:bande', 'subLine:encocheV', 'homeLogo:encocheV', 'awayLogo:encocheV'],
     mvp: ['barLabel:barreOrange'],
   }
   for (const kind of ['resultat', 'mvp'] as const) {

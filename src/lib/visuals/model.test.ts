@@ -7,7 +7,7 @@ import { crc32, makeZip } from './zip'
 
 const T = new Map(teams.map((t) => [t.id, t]))
 const P = new Map(players.map((p) => [p.id, p]))
-const data = (m: Match, evs: MatchEvent[] = events): VisualData => ({ match: m, teams: T, players: P, competition: { id: 'lp', season_id: 's1', name: 'Gold Cup', phase: 'gold' }, events: evs.filter((e) => e.match_id === m.id) })
+const data = (m: Match, evs: MatchEvent[] = events): VisualData => ({ match: m, teams: T, players: P, competition: { id: 'lp', season_id: 's1', name: 'MASTER', phase: 'gold' }, events: evs.filter((e) => e.match_id === m.id) })
 
 describe('visuel Résultat', () => {
   it('buteurs groupés par joueur avec les minutes, penalty et csc', () => {
@@ -26,7 +26,7 @@ describe('visuel Résultat', () => {
   })
   it('modèle : compétition + journée, score, pied de page date · heure · terrain', () => {
     const r = buildResultModel(data({ ...matches[0], pitch: 'Terrain 1' }))
-    expect(r.competition).toBe('GOLD CUP · J1')
+    expect(r.competition).toBe('MASTER · J1')
     expect([r.homeScore, r.awayScore, r.sub]).toEqual([2, 0, undefined])
     expect(r.home.name).toBe('ÉQUIPE A')
     expect(r.footer).toMatch(/^[A-ZÉÛ]+\. \d+ [A-ZÉÛ]+\.? · 19:00 · TERRAIN 1$/)
@@ -38,12 +38,12 @@ describe('visuel Résultat', () => {
     expect([ff.homeScore, ff.awayScore, ff.sub, ff.forfeit]).toEqual([0, 3, 'TAPIS VERT', true])
     expect(ff.homeScorers.concat(ff.awayScorers)).toEqual([])
     const knock = buildResultModel(data({ ...matches[0], stage: 'semi' }))
-    expect(knock.competition).toBe('GOLD CUP · DEMI-FINALE')
+    expect(knock.competition).toBe('MASTER · DEMI-FINALE')
   })
   it('texte de publication prêt à copier', () => {
     const txt = captionText(data(matches[0]), P.get('A_FWD'))
     expect(txt).toBe([
-      '🔥 RÉSULTAT | Gold Cup · J1', 'Équipe A 2 - 0 Équipe B', '⚽ EQA : A-FWD ×2', '🏆 Homme du match : FWD A-FWD (EQA)', '',
+      '🔥 RÉSULTAT | MASTER · J1', 'Équipe A 2 - 0 Équipe B', '⚽ EQA : A-FWD ×2', '🏆 Homme du match : FWD A-FWD (EQA)', '',
       '#MoroccoBusinessLeague #MBL #Ardentia #FootEntreprise',
     ].join('\n'))
   })

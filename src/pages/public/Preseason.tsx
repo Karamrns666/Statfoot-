@@ -124,9 +124,9 @@ function Rounds({ v }: { v: PreseasonView }) {
             return (
               <li key={m.id} className="glass rounded-xl p-3">
                 <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-                  <div className="min-w-0 text-right"><div className="truncate text-sm font-semibold">{L.team.get(m.home_team_id)?.name}</div><div className="text-[11px] text-muted-foreground">{before.get(m.home_team_id) ?? 0} pts avant</div></div>
+                  <div className="min-w-0 text-right"><div className="break-words text-[13px] font-semibold leading-tight">{L.team.get(m.home_team_id)?.name}</div><div className="text-[11px] text-muted-foreground">{before.get(m.home_team_id) ?? 0} pts avant</div></div>
                   <Link to={`/matchs/${m.id}`} className={cn('num rounded-lg px-2 py-1 text-center text-lg font-black', p.played ? 'bg-white text-[#0B2E73]' : 'text-muted-foreground')}>{p.played ? `${p.hs} - ${p.as}` : m.date ? fmtDate(m.date, 'HH:mm') : 'vs'}</Link>
-                  <div className="min-w-0"><div className="truncate text-sm font-semibold">{L.team.get(m.away_team_id)?.name}</div><div className="text-[11px] text-muted-foreground">{before.get(m.away_team_id) ?? 0} pts avant</div></div>
+                  <div className="min-w-0"><div className="break-words text-[13px] font-semibold leading-tight">{L.team.get(m.away_team_id)?.name}</div><div className="text-[11px] text-muted-foreground">{before.get(m.away_team_id) ?? 0} pts avant</div></div>
                 </div>
                 <p className="mt-1.5 text-center text-[11px] text-muted-foreground">{m.pairing_reason}</p>
               </li>

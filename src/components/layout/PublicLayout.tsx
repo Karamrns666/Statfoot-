@@ -13,6 +13,7 @@ import { useEffect } from 'react'
 export const PUBLIC_NAV = [
   { to: '/', label: 'Accueil', end: true },
   { to: '/matchs', label: 'Matchs' },
+  { to: '/pre-saison', label: 'Pré-saison' },
   { to: '/classement', label: 'Classement' },
   { to: '/equipes', label: 'Équipes' },
   { to: '/joueurs', label: 'Joueurs' },

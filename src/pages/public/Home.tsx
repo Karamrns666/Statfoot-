@@ -4,6 +4,9 @@ import { previousSeasons } from '@/lib/clubs'
 import { returningHighlights } from '@/lib/heritage'
 import { SeasonStrip } from '@/components/home/SeasonStrip'
 import { NextCaptainBlock } from '@/components/captains/CaptainBits'
+import { usePreseason } from '@/hooks/usePreseason'
+import { PreseasonTable } from '@/components/preseason/PreseasonTable'
+import { displayRanking } from '@/pages/public/Preseason'
 import { seasonStrip } from '@/lib/seasonStrip'
 import { IPGCard, XPCard } from '@/components/players/Cards'
 import { IPG_RANKING } from '@/lib/ipg'
@@ -36,6 +39,7 @@ export default function Home() {
   const comps = useSeasonCompetitions(season?.id)
   const sid = season?.id
   const prevSid = previousSeasons(sid, seasons)[0]
+  const preHome = usePreseason(sid)
   const heritage = useMemo(() => (sid && prevSid ? returningHighlights(league, prevSid, sid) : []), [league, sid, prevSid])
 
   const { lastRound, live, next } = useMemo(() => {
@@ -163,6 +167,12 @@ export default function Home() {
         <div className="grid gap-4 lg:grid-cols-2">
           {comps.filter((c) => c.phase === 'gold' || c.phase === 'silver').concat(comps.some((c) => c.phase === 'gold') ? [] : comps.filter((c) => c.phase === 'league_phase')).map((c) => {
             const rows = competitionStandings(league, c.id)
+            if (preHome && c.id === preHome.comp.id) return (
+              <Card key={c.id} className="lg:col-span-2">
+                <CardHeader className="flex-row items-center justify-between"><CardTitle className="flex items-center gap-2"><CompetitionBadge competition={c} className="text-sm" /></CardTitle><Link to="/pre-saison" className="text-xs font-semibold text-neon hover:underline">Journées et parcours</Link></CardHeader>
+                <CardContent className="px-1 sm:px-3"><PreseasonTable rows={displayRanking(preHome)} masterSize={preHome.ps.split?.master_size ?? preHome.cfg.masterSize} final={!!preHome.ps.final_ranking} compact /></CardContent>
+              </Card>
+            )
             return (
               <Card key={c.id}>
                 <CardHeader className="flex-row items-center justify-between"><CardTitle className="flex items-center gap-2"><CompetitionBadge competition={c} className="text-sm" /></CardTitle><span className="text-xs text-muted-foreground">{c.default_pitch ?? c.description}</span></CardHeader>

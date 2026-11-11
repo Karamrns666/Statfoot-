@@ -24,6 +24,11 @@ async function base(cfg: VisualsConfig, url: string) {
   return { c, ctx, bg }
 }
 
+async function drawDivisionLogo(ctx: CanvasRenderingContext2D, Z: Record<string, Zone>, url?: string) {
+  if (!url || !Z.divisionLogo) return
+  const img = await loadImage(url)
+  if (img) { ctx.save(); ctx.shadowColor = 'rgba(0, 12, 48, .45)'; ctx.shadowBlur = 14; drawContain(ctx, img, Z.divisionLogo); ctx.restore() }
+}
 function drawHeader(ctx: CanvasRenderingContext2D, cfg: VisualsConfig, Z: Record<string, Zone>, title: string, subtitle: string) {
   drawText(ctx, cfg, title, Z.title, { shadow: true })
   withAlpha(ctx, Z.subtitle.opacity, () => drawText(ctx, cfg, subtitle, Z.subtitle, { shadow: true }))
@@ -56,10 +61,11 @@ function tierCoin(ctx: CanvasRenderingContext2D, cfg: VisualsConfig, tier: Senio
 // ---------------------------------------------------------------------------
 //  Classement de la semaine
 // ---------------------------------------------------------------------------
-export async function renderWeeklyStandings(rows: (WeeklyStandingRow & { tier?: SeniorityTier })[], cfg: VisualsConfig, opts: { title: string; subtitle: string; showZones?: boolean }) {
+export async function renderWeeklyStandings(rows: (WeeklyStandingRow & { tier?: SeniorityTier })[], cfg: VisualsConfig, opts: { title: string; subtitle: string; showZones?: boolean; logo?: string }) {
   const L = cfg.semaine, Z = L.zones
   const { c, ctx, bg } = await base(cfg, cfg.templates.semaine)
   drawHeader(ctx, cfg, Z, opts.title, opts.subtitle)
+  await drawDivisionLogo(ctx, Z, opts.logo)
   const list = rows.slice(0, L.options.maxRows)
   if (bg && L.options.hideUnusedPills) for (let i = list.length; i < L.options.maxRows; i++) hidePill(ctx, bg, rowY(cfg, Z.pill, i))
   drawText(ctx, cfg, 'PTS', Z.barHead)
@@ -89,10 +95,11 @@ export async function renderWeeklyStandings(rows: (WeeklyStandingRow & { tier?: 
 // ---------------------------------------------------------------------------
 //  Résultats de la semaine
 // ---------------------------------------------------------------------------
-export async function renderWeeklyResults(rows: WeeklyResultRow[], cfg: VisualsConfig, opts: { title: string; subtitle: string; barLabel: string; showZones?: boolean }) {
+export async function renderWeeklyResults(rows: WeeklyResultRow[], cfg: VisualsConfig, opts: { title: string; subtitle: string; barLabel: string; showZones?: boolean; logo?: string }) {
   const L = cfg.semaine, Z = L.zones
   const { c, ctx, bg } = await base(cfg, cfg.templates.semaine)
   drawHeader(ctx, cfg, Z, opts.title, opts.subtitle)
+  await drawDivisionLogo(ctx, Z, opts.logo)
   const list = rows.slice(0, L.options.maxRows)
   if (bg && L.options.hideUnusedPills) for (let i = list.length; i < L.options.maxRows; i++) hidePill(ctx, bg, rowY(cfg, Z.pill, i))
   // libellé vertical dans la barre orange

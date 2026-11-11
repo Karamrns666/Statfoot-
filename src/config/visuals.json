@@ -1,6 +1,6 @@
 {
   "_doc": "Mise en page des visuels réseaux sociaux (1080 × 1080). Coordonnées en px sur le modèle. Chaque zone : x, y, w, h ; texte : font (display = Anton, text = Oswald), size (taille max), min (taille min avant coupure « … »), color, align. Modifiable aussi dans Admin → Visuels réseaux sociaux → Mise en page (sans toucher au code).",
-  "version": 3,
+  "version": 4,
   "colors": {
     "blue": "#173E95",
     "navy": "#0E3179",
@@ -361,7 +361,7 @@
       "title": {
         "x": 100,
         "y": 62,
-        "w": 800,
+        "w": 750,
         "h": 96,
         "font": "display",
         "size": 96,
@@ -372,7 +372,7 @@
       "subtitle": {
         "x": 100,
         "y": 160,
-        "w": 800,
+        "w": 750,
         "h": 52,
         "font": "display",
         "size": 46,
@@ -451,6 +451,12 @@
         "min": 18,
         "color": "white",
         "align": "center"
+      },
+      "divisionLogo": {
+        "x": 870,
+        "y": 60,
+        "w": 124,
+        "h": 124
       }
     },
     "decor": {

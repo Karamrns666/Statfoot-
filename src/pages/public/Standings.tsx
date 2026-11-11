@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { FileDown } from 'lucide-react'
 import { competitionSlug, legacySlugPhase, phaseName, slugify } from '@/lib/competitionNames'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { usePreseason } from '@/hooks/usePreseason'
+import { PreseasonTable } from '@/components/preseason/PreseasonTable'
+import { displayRanking } from '@/pages/public/Preseason'
 import { useData, useLookup } from '@/hooks/useData'
 import { useEffectiveSeason, useSeasonCompetitions } from '@/hooks/useStats'
 import { PageHeader, EmptyState } from '@/components/league/Bits'
@@ -35,9 +38,11 @@ export default function Standings() {
   const [picked, setTab] = useState<string | undefined>(undefined)
   const tab = picked ?? defaultTab
   const general = useMemo(() => (season ? generalStandings(league, season.id) : []), [league, season])
+  const pre = usePreseason(season?.id)
   if (!comps.length) return <EmptyState title="Aucune compétition pour cette saison" />
   const pc = REGLEMENT.points
-  const tabs = [...comps.map((c) => ({ id: c.id, label: c.name, rows: competitionStandings(league, c.id), comp: c })), ...(comps.length > 1 ? [{ id: 'general', label: 'Général', rows: general, comp: undefined }] : [])]
+  const preRows = pre ? displayRanking(pre).map((r) => ({ ...r, gd: r.diff, yellow: 0, red: 0, form: [] })) : []
+  const tabs = [...comps.map((c) => ({ id: c.id, label: c.name, rows: pre && c.id === pre.comp.id ? preRows : competitionStandings(league, c.id), comp: c })), ...(comps.length > 1 ? [{ id: 'general', label: 'Général', rows: general, comp: undefined }] : [])]
   const current = tabs.find((t) => t.id === tab) ?? tabs[0]
   return (
     <div>
@@ -48,10 +53,17 @@ export default function Standings() {
         <TabsList>{tabs.map((t) => <TabsTrigger key={t.id} value={t.id}>{t.label}</TabsTrigger>)}</TabsList>
         {tabs.map((t) => (
           <TabsContent key={t.id} value={t.id}>
+            {pre && t.comp?.id === pre.comp.id ? (
+              <div className="space-y-2">
+                <PreseasonTable rows={displayRanking(pre)} masterSize={pre.ps.split?.master_size ?? pre.cfg.masterSize} final={!!pre.ps.final_ranking} />
+                <p className="px-1 text-xs text-muted-foreground">Départage de la pré-saison : points, différence de buts, buts marqués, force des adversaires, tirage au sort. <Link to="/pre-saison" className="text-neon underline">Journées, explications et parcours</Link></p>
+              </div>
+            ) : <>
             <Card><CardContent className="px-1 pt-4 sm:px-4">
               <StandingsTable rows={t.rows} zones={t.comp ? competitionZones(t.comp, t.rows.length, season?.gold_size ?? 10) : [{ from: 1, to: 10, color: '#facc15', label: phaseName('gold') }, { from: 11, to: 20, color: '#94a3b8', label: phaseName('silver') }]} />
             </CardContent></Card>
             <TiebreakNote rows={t.rows} />
+            </>}
             {t.id === 'general' && <p className="mt-2 px-1 text-xs text-muted-foreground">Classement général : {phaseName('gold')} (1–10) puis {phaseName('silver')} (11–20).</p>}
           </TabsContent>
         ))}

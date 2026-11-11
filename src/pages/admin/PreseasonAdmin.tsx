@@ -26,7 +26,7 @@ import { TeamLogo } from '@/components/league/Identity'
 import { toast } from '@/components/ui/toast'
 import { DivisionMark, PreseasonTable } from '@/components/preseason/PreseasonTable'
 import { DrawProjection } from '@/components/preseason/DrawProjection'
-import { CRITERION_LABEL, divisionSplit, drawRound1, generateNextRound, preseasonFormat, preseasonRanking, validateRound, type RoundPlan } from '@/lib/preseason'
+import { CRITERION_LABEL, divisionSplit, drawRound1, generateNextRound, preseasonFormat, preseasonRanking, validateRound, type PMatch } from '@/lib/preseason'
 import { competitionNames } from '@/lib/competitionNames'
 import { addDays } from '@/lib/schedule'
 import { cn } from '@/lib/utils'
@@ -269,11 +269,12 @@ function SwapDialog({ v, onClose }: { v: PreseasonView; onClose: () => void }) {
   const opts = inRound.map((id) => ({ value: id, label: `${L.team.get(id)?.name ?? id}${id === pending.rest ? ' (au repos)' : ''}` }))
   const swapIn = (id: string) => (id === a ? b : id === b ? a : id)
   const now = new Date().toISOString()
-  const candidate: RoundPlan & { pairs: { home: string; away: string; reason?: string; round: number; played: boolean; manual?: { motif: string; by?: string; at: string } }[] } = {
+  type Manual = { motif: string; by?: string; at: string }
+  const candidate: { round: number; rest?: string; pairs: (PMatch & { manual?: Manual })[] } = {
     round: pending.round, rest: pending.rest ? swapIn(pending.rest) : undefined,
     pairs: pending.pairs.map((p) => {
       const h = swapIn(p.home), w = swapIn(p.away), changed = h !== p.home || w !== p.away
-      return { round: pending.round, played: false, home: h, away: w, reason: changed ? 'Modifié par Ardentia' : p.reason, manual: changed ? { motif, by: user?.email, at: now } : (p as { manual?: { motif: string; by?: string; at: string } }).manual }
+      return { round: pending.round, played: false, home: h, away: w, reason: changed ? 'Modifié par Ardentia' : p.reason, manual: changed ? { motif, by: user?.email, at: now } : p.manual }
     }),
   }
   const errs = a && b && a !== b ? validateRound(candidate, v.pm, pending.round > v.cfg.rounds ? Object.values(v.rests).filter(Boolean) as string[] : v.teamIds) : []

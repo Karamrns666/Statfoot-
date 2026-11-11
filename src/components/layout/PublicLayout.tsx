@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Menu, X, Lock, Tv, Mail, Phone, MapPin, Globe } from 'lucide-react'
+import { ChevronDown, Menu, X, Lock, Tv, Mail, Phone, MapPin, Globe } from 'lucide-react'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { IconInstagram, IconLinkedin, IconWhatsapp } from './SocialIcons'
 import { useLeague } from '@/hooks/useLeague'
 import { mapsHref, telHref, whatsappHref } from '@/config/league'
@@ -17,14 +18,14 @@ export const PUBLIC_NAV = [
   { to: '/classement', label: 'Classement' },
   { to: '/equipes', label: 'Équipes' },
   { to: '/joueurs', label: 'Joueurs' },
-  { to: '/equipe-type', label: 'Équipe type', wide: true },
+  { to: '/equipe-type', label: 'Équipe type', more: true },
   { to: '/trophees', label: 'Trophées' },
-  { to: '/match-des-capitaines', label: 'Capitaines', wide: true },
-  { to: '/statistiques', label: 'Stats', wide: true },
-  { to: '/media', label: 'Média', wide: true },
-  { to: '/historique', label: 'Historique', wide: true },
+  { to: '/match-des-capitaines', label: 'Capitaines', more: true },
+  { to: '/statistiques', label: 'Stats', more: true },
+  { to: '/media', label: 'Média', more: true },
+  { to: '/historique', label: 'Historique', more: true },
   { to: '/reglement', label: 'Règlement' },
-] as { to: string; label: string; end?: boolean; wide?: boolean }[]
+] as { to: string; label: string; end?: boolean; more?: boolean }[]
 
 export function PublicLayout() {
   const [open, setOpen] = useState(false)

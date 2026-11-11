@@ -37,10 +37,10 @@ for (const w of [320, 360, 1366]) {
     const grid = p.locator('div.grid', { hasText: 'Joueurs participants' }).first()
     await grid.scrollIntoViewIfNeeded(); await grid.screenshot({ path: `${out}/bandeau-${w}-etat${state}.png` })
     if (state === 3 && w !== 320) {
-      await p.getByRole('link', { name: /^MASTER/ }).click(); await p.waitForTimeout(600)
+      await p.getByRole('link', { name: /^MASTER : .*Voir le classement/ }).click(); await p.waitForTimeout(600)
       const u1 = new URL(p.url()).pathname, tab1 = await p.locator('[role=tab][aria-selected=true]').innerText().catch(() => '?')
       await p.goBack(); await p.waitForTimeout(400)
-      await p.getByRole('link', { name: /^CHALLENGER/ }).click(); await p.waitForTimeout(600)
+      await p.getByRole('link', { name: /^CHALLENGER : .*Voir le classement/ }).click(); await p.waitForTimeout(600)
       console.log(w, 'CLIC MASTER →', u1, tab1, '| CHALLENGER →', new URL(p.url()).pathname, await p.locator('[role=tab][aria-selected=true]').innerText().catch(() => '?'))
     }
   }

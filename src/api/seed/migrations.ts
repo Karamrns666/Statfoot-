@@ -1,6 +1,6 @@
 // Migrations NON destructives des données déjà enregistrées dans le navigateur.
 // Elles adaptent les anciennes données aux règles en vigueur sans effacer ce que l'admin a saisi.
-import type { Award, Club, Competition, Lineup, Match, Page, Position, MatchEvent, MatchTeamStats, Player, Rulebook, Season, Settings, Team, TeamOfWeek } from '@/types/entities'
+import type { Award, Club, Draw, Suspension, Competition, Lineup, Match, Page, Position, MatchEvent, MatchTeamStats, Player, Rulebook, Season, Settings, Team, TeamOfWeek } from '@/types/entities'
 import { CURRENT_RULEBOOK, REGLEMENT, isDisputed } from '@/lib/reglement'
 import { buildRulebooks } from './rulebook'
 import { DEFAULT_COMPETITION_NAMES, LEGACY_COMPETITION_NAMES } from '@/lib/competitionNames'
@@ -16,6 +16,8 @@ function omit<T extends object>(o: T, key: string): T { const c = { ...o } as Re
 const REMOVED_AWARDS = new Set(['best_defender', 'best_midfielder', 'best_forward'])
 
 export interface Rules6Data {
+  Suspension?: Suspension[]
+  Draw?: Draw[]
   Player?: Player[]
   MatchEvent?: MatchEvent[]
   MatchTeamStats?: MatchTeamStats[]
@@ -149,12 +151,56 @@ export function applyRenameCompetitions(db: Rules6Data & { Division?: { id: stri
 }
 
 /**
+ * Lot 3 — une équipe = une saison. Une fiche utilisée par des compétitions de plusieurs saisons (anciennes données :
+ * les équipes revenues en 2026-2027 réutilisaient leur fiche 2025-2026) est dupliquée : la fiche d'origine garde la
+ * saison la plus ancienne et son historique ; la copie reprend tout ce qui concerne la saison suivante (compétitions,
+ * matchs, événements, compositions, effectifs, suspensions, tirages). Aucun lien n'est créé : l'admin l'approuve.
+ */
+export function applySplitSharedTeams(db: Rules6Data): Rules6Data {
+  if (!db.Team || !db.Competition) return {}
+  const order = [...(db.Season ?? [])].sort((a, b) => (a.start_date ?? '').localeCompare(b.start_date ?? '')).map((s) => s.id)
+  const seasonsOf = new Map<string, string[]>()
+  for (const c of db.Competition) for (const t of c.team_ids ?? []) { const l = seasonsOf.get(t) ?? []; if (!l.includes(c.season_id)) l.push(c.season_id); seasonsOf.set(t, l) }
+  const ids = new Set(db.Team.map((t) => t.id))
+  const map = new Map<string, Map<string, string>>() // saison → (ancienne id → nouvelle id)
+  const clones: Team[] = []
+  for (const t of db.Team) {
+    const ss = (seasonsOf.get(t.id) ?? []).sort((a, b) => order.indexOf(a) - order.indexOf(b))
+    if (ss.length < 2) continue
+    for (const sid of ss.slice(1)) {
+      const suffix = (db.Season ?? []).find((s) => s.id === sid)?.start_date?.slice(0, 4) ?? sid
+      let nid = `t${suffix.slice(2)}_${(t.short_name || t.id).toLowerCase()}`
+      if (ids.has(nid)) nid = `${t.id}_${suffix}`
+      ids.add(nid)
+      clones.push({ ...t, id: nid, season_id: sid, club_id: undefined, link: undefined, link_dismissed: undefined, captain_player_id: undefined })
+      if (!map.has(sid)) map.set(sid, new Map())
+      map.get(sid)!.set(t.id, nid)
+    }
+  }
+  if (!clones.length) return {}
+  const out: Rules6Data = {}
+  const re = (sid: string | undefined, id: string) => (sid && map.get(sid)?.get(id)) || id
+  const matchSeason = new Map((db.Match ?? []).map((m) => [m.id, m.season_id]))
+  out.Team = [...db.Team.map((t) => (seasonsOf.get(t.id)?.length ?? 0) > 1 ? { ...t, season_id: [...seasonsOf.get(t.id)!].sort((a, b) => order.indexOf(a) - order.indexOf(b))[0] } : t), ...clones]
+  out.Competition = db.Competition.map((c) => (map.has(c.season_id) ? { ...c, team_ids: c.team_ids?.map((x) => re(c.season_id, x)) } : c))
+  if (db.Match) out.Match = db.Match.map((m) => (map.has(m.season_id) ? { ...m, home_team_id: re(m.season_id, m.home_team_id), away_team_id: re(m.season_id, m.away_team_id), forfeit_team_id: m.forfeit_team_id ? re(m.season_id, m.forfeit_team_id) : m.forfeit_team_id } : m))
+  if (db.MatchEvent) out.MatchEvent = db.MatchEvent.map((e) => { const sid = matchSeason.get(e.match_id); return sid && map.has(sid) ? { ...e, team_id: re(sid, e.team_id) } : e })
+  if (db.Lineup) out.Lineup = db.Lineup.map((l) => { const sid = matchSeason.get(l.match_id); return sid && map.has(sid) ? { ...l, team_id: re(sid, l.team_id) } : l })
+  if (db.MatchTeamStats) out.MatchTeamStats = db.MatchTeamStats.map((x) => { const sid = matchSeason.get(x.match_id); return sid && map.has(sid) ? { ...x, team_id: re(sid, x.team_id) } : x })
+  if (db.Suspension) out.Suspension = db.Suspension.map((x) => (x.team_id && map.has(x.season_id) ? { ...x, team_id: re(x.season_id, x.team_id) } : x))
+  if (db.Draw) out.Draw = db.Draw.map((d) => { const sid = db.Competition!.find((c) => c.id === d.competition_id)?.season_id; return sid && map.has(sid) ? { ...d, pots: d.pots?.map((p) => ({ ...p, team_ids: p.team_ids.map((x) => re(sid, x)) })), groups: d.groups?.map((g) => ({ ...g, team_ids: g.team_ids.map((x) => re(sid, x)) })) } : d })
+  // joueurs inscrits dans la saison suivante sous l'ancienne fiche → la fiche de cette saison
+  if (db.Player) out.Player = db.Player.map((p) => { const sid = p.season_ids?.find((x) => map.get(x)?.has(p.team_id)); return sid && (p.season_ids?.length ?? 0) === 1 ? { ...p, team_id: re(sid, p.team_id) } : p })
+  return out
+}
+
+/**
  * Lot 3 — saisons séparées : chaque équipe est rattachée à UNE saison (déduite des compétitions) et à son
  * propre club permanent. Aucun lien entre saisons n'est créé automatiquement : c'est l'admin qui les approuve.
  */
 export function applyClubs(db: Rules6Data & { Club?: Club[] }): Rules6Data & { Club?: Club[] } {
   const out: Rules6Data & { Club?: Club[] } = {}
-  if (!db.Team) return out
+  if (!db.Team || !db.Club) return out // n'agit que sur une base complète (entité Club présente)
   const comps = db.Competition ?? []
   const clubs = new Map((db.Club ?? []).map((c) => [c.id, c]))
   let teamsChanged = false
@@ -172,7 +218,7 @@ export function applyClubs(db: Rules6Data & { Club?: Club[] }): Rules6Data & { C
 }
 
 /** Étapes de migration, dans l'ordre. Le numéro atteint est mémorisé dans le navigateur. */
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applyClubs]
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */
@@ -191,7 +237,7 @@ export function migrateStoredData() {
   const legacy = store.getFlag('migrated-6v6') ? 1 : 0
   const from = Number(store.getFlag(VERSION_FLAG) ?? legacy) || legacy
   if (from >= STEPS.length) return
-  const names = ['Player', 'MatchEvent', 'MatchTeamStats', 'Award', 'TeamOfWeek', 'Lineup', 'Page', 'Team', 'Settings', 'Rulebook', 'Season', 'Competition', 'Match', 'Division', 'Club'] as const
+  const names = ['Player', 'MatchEvent', 'MatchTeamStats', 'Award', 'TeamOfWeek', 'Lineup', 'Page', 'Team', 'Settings', 'Rulebook', 'Season', 'Competition', 'Match', 'Division', 'Club', 'Suspension', 'Draw'] as const
   const db = Object.fromEntries(names.map((n) => [n, store.all(n)])) as Rules6Data
   const changed = migrate(db, from)
   store.batch(() => { for (const [name, rows] of Object.entries(changed)) store.replace(name as (typeof names)[number], rows as never) })

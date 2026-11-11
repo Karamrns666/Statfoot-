@@ -1,6 +1,7 @@
 // Carte joueur à collectionner façon « Ultimate Team » : photo détourée en grand posée sur la carte,
-// note (XP ou IPG), rôle, logo du club, nom et stats principales. La couleur suit la matière du meilleur
-// badge (bronze → black), bleu MBL sans badge. Verso blanc, retournement 3D au clic (ou Entrée / Espace).
+// note (XP ou IPG), rôle, logo du club, nom et stats principales. La couleur suit le badge d'ancienneté
+// du club (Platinum nacré · Gold · Silver) ; en haut à droite, jusqu'à 3 badges de performance, du plus
+// rare au plus courant. Verso blanc, retournement 3D au clic (ou Entrée / Espace).
 import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { RotateCw } from 'lucide-react'
@@ -9,7 +10,8 @@ import { isBrandLogo, teamLogoSvg } from '@/lib/logos'
 import { cn } from '@/lib/utils'
 import { RankDelta } from '@/components/league/Bits'
 import { BADGE_ICONS } from './BadgeMedal'
-import { TIER_LABEL, TIER_STYLE, type BadgeState, type BadgeTier } from '@/lib/badges'
+import { TIER_LABEL, TIER_STYLE, type BadgeState } from '@/lib/badges'
+import { SENIORITY_LABEL, SENIORITY_STYLE, type SeniorityTier } from '@/lib/seniority'
 
 export interface CardStat { label: string; value: ReactNode; hint?: string }
 
@@ -38,32 +40,24 @@ export interface PlayerCardProps {
   back: CardStat[]
   backNote?: ReactNode
   href?: string
-  /** matière de la carte = meilleur badge débloqué ; null/undefined = carte bleue MBL */
-  material?: BadgeTier | null
+  /** couleur de la carte = ancienneté du club (Platinum / Gold / Silver) ; Silver par défaut */
+  tier?: SeniorityTier | null
   /** badges débloqués, du plus rare au plus courant */
   medals?: BadgeState[]
   badgeTotal?: number
   className?: string
+  /** recto seul, sans retournement (export PNG) */
+  faceOnly?: boolean
 }
 
-interface Theme { frame: string; edge: string; glow: string; text: string; bg: string; chip: string; chipText: string }
-function themeFor(m?: BadgeTier | null): Theme {
-  if (!m) return { frame: 'linear-gradient(160deg, #6CB4CC, #6CB4CC55 40%, #6CB4CC)', edge: '#6CB4CC', glow: 'rgb(108 180 204 / .35)', text: '#BFE3EF', bg: 'linear-gradient(180deg, #0D3380 0%, #061A47 55%, #031033 100%)', chip: '#6CB4CC', chipText: '#0A0F33' }
-  const t = TIER_STYLE[m]
-  return {
-    frame: `linear-gradient(155deg, ${t.light} 0%, ${t.edge} 30%, ${t.dark} 55%, ${t.edge} 80%, ${t.light} 100%)`,
-    edge: t.edge, glow: `${t.edge}80`, text: t.text,
-    bg: `radial-gradient(110% 60% at 50% 0%, ${t.light}40, transparent 62%), linear-gradient(180deg, ${t.dark} 0%, ${t.deep} 78%)`,
-    chip: `linear-gradient(180deg, ${t.light}, ${t.edge})`, chipText: m === 'black' ? '#FFFFFF' : '#0A0F33',
-  }
-}
 const HEX = 'polygon(50% 0, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)'
 
-function MiniMedal({ b }: { b: BadgeState }) {
+export const medalTip = (b: BadgeState) => `${b.def.name} · ${TIER_LABEL[b.def.tier]} — ${b.def.description}`
+function MiniMedal({ b, big }: { b: BadgeState; big?: boolean }) {
   const t = TIER_STYLE[b.def.tier]
   const Icon = BADGE_ICONS[b.def.icon]
   return (
-    <span className="relative inline-block h-[2.15em] w-[2em] shrink-0" title={`${b.def.name} · ${TIER_LABEL[b.def.tier]}`}>
+    <span className={cn('relative inline-block shrink-0', big ? 'h-[2.75em] w-[2.55em] drop-shadow-[0_2px_3px_rgb(0_0_0/.35)]' : 'h-[2.15em] w-[2em]')} title={medalTip(b)} aria-label={medalTip(b)} role="img">
       <span className="absolute inset-0" style={{ clipPath: HEX, background: `linear-gradient(160deg, ${t.light}, ${t.edge} 45%, ${t.dark})` }} />
       <span className="absolute inset-[1.5px] flex items-center justify-center" style={{ clipPath: HEX, background: `radial-gradient(circle at 35% 25%, ${t.edge}, ${t.deep} 80%)` }}>
         <Icon className="size-[1em] text-white" />
@@ -114,12 +108,8 @@ function CardPhoto({ cutout, photo, initials, color }: { cutout?: string; photo?
 
 export function PlayerCard(p: PlayerCardProps) {
   const [flipped, setFlipped] = useState(false)
-  const tier = themeFor(p.material)
-  const medals = p.medals ?? []
-  const color = p.team?.primary_color ?? '#6CB4CC'
-  const logo = p.team?.logo_url || (p.teamName ? teamLogoSvg(p.teamName.replace(/[^A-Za-zÀ-ÿ ]/g, '').split(/\s+/).map((w) => w[0]).join('').slice(0, 3).toUpperCase(), '#6CB4CC', '#0B2E73') : undefined)
-  const teamLabel = p.team?.name ?? p.teamName ?? ''
   const toggle = () => setFlipped((f) => !f)
+  if (p.faceOnly) return <div className={cn('pcard aspect-[63/92] w-full', p.className)}><div className="pcard-inner text-[clamp(8.5px,4.6cqw,40px)]"><CardFront p={p} /></div></div>
   return (
     <div
       className={cn('pcard group aspect-[63/92] w-full cursor-pointer select-none outline-none', p.className)}
@@ -132,82 +122,115 @@ export function PlayerCard(p: PlayerCardProps) {
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle() } }}
     >
       <div className="pcard-inner text-[clamp(8.5px,4.6cqw,13px)]">
-        {/* ---------- RECTO ---------- */}
-        <div className="pcard-face pcard-shape overflow-hidden rounded-b-2xl group-focus-visible:outline-2 group-focus-visible:outline-neon" style={{ background: tier.frame, padding: 2, filter: `drop-shadow(0 14px 22px ${tier.glow})` }}>
-          <div className="pcard-shape relative flex h-full flex-col overflow-hidden rounded-b-[14px]" style={{ background: tier.bg }}>
-            <div className="pcard-sheen pointer-events-none absolute inset-0" />
-            {p.material && <div className="absolute inset-x-0 top-[2.6%] text-center text-[.7em] font-extrabold tracking-[.2em]" style={{ color: tier.text }}>{TIER_LABEL[p.material].toUpperCase()}</div>}
-            {/* zone photo : le joueur détouré est posé sur le fond de la carte */}
-            <div className="relative h-[60%] shrink-0">
-              <div className="pointer-events-none absolute inset-0" style={{ background: `radial-gradient(60% 55% at 62% 58%, ${color}55, transparent 70%)` }} />
-              <div className="pointer-events-none absolute right-[-6%] top-[14%] font-display text-[9em] font-black leading-none opacity-[.07]" aria-hidden>{(p.lastName[0] ?? '').toUpperCase()}</div>
-              <CardPhoto cutout={p.cutoutUrl} photo={p.photoUrl} initials={(p.firstName.replace('.', '')[0] ?? '') + (p.lastName[0] ?? '')} color={color} />
-              {/* colonne gauche : note, rôle, club, IPG */}
-              <div className="absolute left-[7%] top-[13%] z-10 flex flex-col items-center leading-none">
-                <div className={cn('font-display font-black leading-[.85] text-white', String(p.rating).length > 3 ? 'text-[2.7em]' : 'text-[3.6em]')} style={{ textShadow: `0 2px 0 rgb(0 0 0 / .35), 0 0 18px ${tier.glow}` }}>{p.rating}</div>
-                <div className="mt-[.25em] text-[.85em] font-extrabold tracking-wider" style={{ color: tier.text }}>{p.ratingLabel}</div>
-                {(p.position === 'GK' || p.captain) && <div className="mt-[.35em] font-display text-[1.35em] font-extrabold leading-none text-white/90" title={[p.position === 'GK' && 'Gardien', p.captain && 'Capitaine'].filter(Boolean).join(' · ')}>{[p.position === 'GK' && 'GB', p.captain && 'C'].filter(Boolean).join(' · ')}</div>}
-                <div className="my-[.45em] h-px w-[2.2em] bg-white/25" />
-                {logo && <img src={logo} alt="" className={cn('size-[2.6em] object-contain', isBrandLogo(logo) ? 'rounded-[22%] bg-white shadow-[0_3px_10px_rgba(0,0,0,.45)]' : 'drop-shadow-[0_3px_6px_rgba(0,0,0,.5)]')} />}
-                {p.ipg != null && <div className="mt-[.45em] rounded-md px-[.4em] py-[.15em] text-center font-display text-[.95em] font-black leading-none" style={{ background: tier.chip, color: tier.chipText }} title="Indice de performance globale">{Math.round(p.ipg)}<span className="block text-[.6em] font-extrabold tracking-wider">IPG</span></div>}
-              </div>
-              {p.rank != null && <div className="absolute right-[6%] top-[10%] z-10 rounded-full px-[.6em] py-[.1em] font-display text-[1.05em] font-black shadow-lg" style={{ background: tier.chip, color: tier.chipText }}>N°{p.rank}</div>}
+        <CardFront p={p} />
+        <CardBack p={p} />
+      </div>
+    </div>
+  )
+}
+
+function cardLogo(p: PlayerCardProps) {
+  return p.team?.logo_url || (p.teamName ? teamLogoSvg(p.teamName.replace(/[^A-Za-zÀ-ÿ ]/g, '').split(/\s+/).map((w) => w[0]).join('').slice(0, 3).toUpperCase(), '#6CB4CC', '#0B2E73') : undefined)
+}
+
+function CardFront({ p }: { p: PlayerCardProps }) {
+  const tier = p.tier ?? 'silver'
+  const st = SENIORITY_STYLE[tier]
+  const medals = (p.medals ?? []).slice(0, 3)
+  const color = p.team?.primary_color ?? '#0B2E73'
+  const logo = cardLogo(p)
+  const teamLabel = p.team?.name ?? p.teamName ?? ''
+  return (
+    <div className="pcard-face pcard-shape overflow-hidden rounded-b-2xl group-focus-visible:outline-2 group-focus-visible:outline-neon" data-tier={tier} style={{ background: st.frame, padding: 3, filter: `drop-shadow(0 14px 22px ${st.glow})` }}>
+      <div className="pcard-shape relative flex h-full flex-col overflow-hidden rounded-b-[13px]" style={{ background: st.bg, color: st.fg }}>
+        <div className="pointer-events-none absolute inset-0 mix-blend-soft-light" style={{ background: st.sheen }} />
+        {tier === 'platinum' && <div className="pointer-events-none absolute inset-0 opacity-60 mix-blend-overlay" style={{ background: 'repeating-linear-gradient(125deg, transparent 0 14px, rgb(255 255 255 / .35) 14px 16px)' }} />}
+        <div className="pcard-sheen pointer-events-none absolute inset-0" />
+        {/* liseré orange MBL sous le chapeau de la carte */}
+        <div className="absolute inset-x-[30%] top-[1.2%] h-[.22em] rounded-full bg-[#F05A22]" />
+        <div className="absolute inset-x-0 top-[2.9%] text-center text-[.68em] font-black tracking-[.24em]" style={{ color: st.fgSoft }}>
+          {SENIORITY_LABEL[tier].toUpperCase()}{p.rank != null && <span className="ml-[.5em] rounded-full px-[.55em] py-[.1em] tracking-normal" style={{ background: st.chip, color: st.chipText }}>N°{p.rank}</span>}
+        </div>
+        {/* zone photo : le joueur détouré est posé sur le fond de la carte */}
+        <div className="relative h-[61%] shrink-0">
+          <div className="pointer-events-none absolute inset-0" style={{ background: `radial-gradient(58% 52% at 60% 60%, ${color}44, transparent 70%)` }} />
+          <div className="pointer-events-none absolute right-[-6%] top-[14%] font-display text-[9em] font-black leading-none opacity-[.08]" aria-hidden>{(p.lastName[0] ?? '').toUpperCase()}</div>
+          <CardPhoto cutout={p.cutoutUrl} photo={p.photoUrl} initials={(p.firstName.replace('.', '')[0] ?? '') + (p.lastName[0] ?? '')} color={color} />
+          {/* colonne gauche : note, rôle, club, IPG */}
+          <div className="absolute left-[7%] top-[13%] z-10 flex flex-col items-center leading-none">
+            <div className={cn('font-display font-black leading-[.85]', String(p.rating).length > 3 ? 'text-[2.7em]' : 'text-[3.6em]')} style={{ textShadow: '0 1px 0 rgb(255 255 255 / .45)' }}>{p.rating}</div>
+            <div className="mt-[.25em] text-[.85em] font-extrabold tracking-wider" style={{ color: st.fgSoft }}>{p.ratingLabel}</div>
+            {(p.position === 'GK' || p.captain) && <div className="mt-[.35em] font-display text-[1.35em] font-extrabold leading-none" title={[p.position === 'GK' && 'Gardien', p.captain && 'Capitaine'].filter(Boolean).join(' · ')}>{[p.position === 'GK' && 'GB', p.captain && 'C'].filter(Boolean).join(' · ')}</div>}
+            <div className="my-[.45em] h-[2px] w-[2.2em] rounded-full bg-[#F05A22]" />
+            {logo && <img src={logo} alt="" className={cn('size-[2.6em] object-contain', isBrandLogo(logo) ? 'rounded-[22%] bg-white shadow-[0_3px_10px_rgba(0,0,0,.3)] ring-1 ring-black/5' : 'drop-shadow-[0_3px_6px_rgba(0,0,0,.35)]')} />}
+            {p.ipg != null && <div className="mt-[.45em] rounded-md px-[.4em] py-[.15em] text-center font-display text-[.95em] font-black leading-none" style={{ background: st.chip, color: st.chipText }} title="Indice de performance globale">{Math.round(p.ipg)}<span className="block text-[.6em] font-extrabold tracking-wider">IPG</span></div>}
+          </div>
+          {/* coin haut droit : 3 meilleurs badges de performance (plus rare d'abord) */}
+          {medals.length > 0 && (
+            <div className="absolute right-[5.5%] top-[11%] z-10 flex flex-col items-center gap-[.25em]" aria-label={`Meilleurs badges : ${medals.map((b) => b.def.name).join(', ')}`}>
+              {medals.map((b) => <MiniMedal key={b.def.id} b={b} big />)}
             </div>
-            <div className="relative z-10 -mt-[1.6em] px-[6%] text-center">
-              <div className="truncate text-[.9em] font-semibold text-sky-soft">{p.firstName}</div>
-              <div className="truncate font-display text-[2.15em] font-black uppercase leading-[.92] text-white" style={{ textShadow: '0 2px 8px rgb(0 0 0 / .6)' }}>{p.lastName}</div>
-              <div className="mt-[.15em] flex items-center justify-center gap-1.5 text-[.9em] text-white/70"><span className="truncate">{teamLabel}</span>{p.delta !== undefined && <RankDelta delta={p.delta} />}</div>
-              {medals.length > 0
-                ? <div className="mt-[.35em] flex items-center justify-center gap-[.2em]" aria-label={`${medals.length} badges débloqués`}>{medals.slice(0, 5).map((b) => <MiniMedal key={b.def.id} b={b} />)}{medals.length > 5 && <span className="ml-[.2em] text-[.85em] font-bold text-white/70">+{medals.length - 5}</span>}</div>
-                : p.badge && <div className="mt-[.3em] flex justify-center">{p.badge}</div>}
+          )}
+        </div>
+        <div className="relative z-10 -mt-[1.5em] px-[6%] text-center">
+          <div className="truncate text-[.9em] font-bold" style={{ color: st.fgSoft }}>{p.firstName}</div>
+          <div className="truncate font-display text-[2.15em] font-black uppercase leading-[.92]" style={{ textShadow: '0 1px 0 rgb(255 255 255 / .5), 0 0 14px rgb(255 255 255 / .35)' }}>{p.lastName}</div>
+          <div className="mt-[.15em] flex items-center justify-center gap-1.5 text-[.9em] font-semibold" style={{ color: st.fgSoft }}><span className="truncate">{teamLabel}</span>{p.delta !== undefined && <RankDelta delta={p.delta} />}</div>
+          {!medals.length && p.badge && <div className="mt-[.3em] flex justify-center">{p.badge}</div>}
+        </div>
+        <div className="relative mt-auto grid grid-cols-4 divide-x divide-white/15 border-t-[.22em] border-[#F05A22] bg-[#0B2E73] text-white">
+          {p.front.slice(0, 4).map((s) => (
+            <div key={s.label} className="py-[.6em] text-center" title={s.hint}>
+              <div className="font-display text-[1.85em] font-extrabold leading-none">{s.value}</div>
+              <div className="mt-[.15em] text-[.75em] font-bold text-white/65">{s.label}</div>
             </div>
-            <div className="relative mt-auto grid grid-cols-4 divide-x divide-white/10 border-t border-white/10 bg-black/25">
-              {p.front.slice(0, 4).map((s) => (
-                <div key={s.label} className="py-[.6em] text-center" title={s.hint}>
-                  <div className="font-display text-[1.85em] font-extrabold leading-none text-white">{s.value}</div>
-                  <div className="mt-[.15em] text-[.75em] font-bold text-white/55">{s.label}</div>
-                </div>
-              ))}
-            </div>
-            <RotateCw className="absolute bottom-[17%] right-[5%] size-[1.1em] text-white/30 transition group-hover:text-white/70" aria-hidden />
+          ))}
+        </div>
+        {!p.faceOnly && <RotateCw className="absolute bottom-[17%] right-[5%] size-[1.1em] opacity-40 transition group-hover:opacity-80" aria-hidden />}
+      </div>
+    </div>
+  )
+}
+
+function CardBack({ p }: { p: PlayerCardProps }) {
+  const st = SENIORITY_STYLE[p.tier ?? 'silver']
+  const medals = p.medals ?? []
+  const logo = cardLogo(p)
+  const teamLabel = p.team?.name ?? p.teamName ?? ''
+  return (
+    <div className="pcard-face pcard-back pcard-shape overflow-hidden rounded-b-2xl" style={{ background: st.frame, padding: 3 }}>
+      <div className="pcard-shape flex h-full flex-col rounded-b-[13px] bg-white px-[8%] pb-[6%] pt-[12%] text-ink">
+        <div className="flex items-center gap-[.6em]">
+          {logo && <img src={logo} alt="" className={cn('size-[2.8em] object-contain', isBrandLogo(logo) && 'rounded-[22%] ring-1 ring-black/10')} />}
+          <div className="min-w-0">
+            <div className="truncate font-display text-[1.8em] font-black uppercase leading-none">{p.lastName}</div>
+            <div className="truncate text-[.95em] text-ink/60">{p.firstName} · {teamLabel}</div>
           </div>
         </div>
-        {/* ---------- VERSO ---------- */}
-        <div className="pcard-face pcard-back pcard-shape overflow-hidden rounded-b-2xl" style={{ background: tier.frame, padding: 2 }}>
-          <div className="pcard-shape flex h-full flex-col rounded-b-[14px] bg-white px-[8%] pb-[6%] pt-[12%] text-ink">
-            <div className="flex items-center gap-[.6em]">
-              {logo && <img src={logo} alt="" className={cn('size-[2.8em] object-contain', isBrandLogo(logo) && 'rounded-[22%] ring-1 ring-black/10')} />}
-              <div className="min-w-0">
-                <div className="truncate font-display text-[1.8em] font-black uppercase leading-none">{p.lastName}</div>
-                <div className="truncate text-[.95em] text-ink/60">{p.firstName} · {teamLabel}</div>
-              </div>
-            </div>
-            <div className="mt-[.8em] flex items-end justify-between gap-2 border-b-2 pb-[.4em]" style={{ borderColor: tier.edge }}>
-              <span className="min-w-0 text-[.95em] font-bold leading-tight text-ink/65">{p.backTitle}</span>
-              <span className="shrink-0 font-display text-[2.2em] font-black leading-none text-mbl">{p.rating}<span className="ml-0.5 text-[.4em] text-ink/50">{p.ratingLabel}</span></span>
-            </div>
-            <dl className="mt-[.2em] min-h-0 flex-1 divide-y divide-ink/10 overflow-hidden">
-              {p.back.map((s) => (
-                <div key={s.label} className="flex items-center justify-between gap-2 py-[.32em] text-[.98em] leading-tight" title={s.hint}>
-                  <dt className="truncate text-ink/70">{s.label}</dt>
-                  <dd className="shrink-0 font-display text-[1.35em] font-extrabold leading-none">{s.value}</dd>
-                </div>
-              ))}
-            </dl>
-            {medals.length > 0 && (
-              <div className="mt-[.4em] flex flex-wrap items-center gap-[.2em]" aria-label="Badges débloqués">
-                {medals.slice(0, 8).map((b) => <MiniMedal key={b.def.id} b={b} />)}
-                <span className="ml-auto text-[.9em] font-bold text-ink/60">{medals.length}{p.badgeTotal ? ` / ${p.badgeTotal}` : ''} badges</span>
-              </div>
-            )}
-            {p.backNote && <p className="mt-[.3em] text-[.85em] leading-snug text-ink/55">{p.backNote}</p>}
-            {p.href && (
-              <Link to={p.href} onClick={(e) => e.stopPropagation()} className="mt-[.6em] rounded-lg bg-[#0B2E73] py-[.65em] text-center text-[1em] font-bold text-white transition hover:bg-neon">
-                Voir la fiche
-              </Link>
-            )}
-          </div>
+        <div className="mt-[.8em] flex items-end justify-between gap-2 border-b-2 border-[#F05A22] pb-[.4em]">
+          <span className="min-w-0 text-[.95em] font-bold leading-tight text-ink/65">{p.backTitle}</span>
+          <span className="shrink-0 font-display text-[2.2em] font-black leading-none text-mbl">{p.rating}<span className="ml-0.5 text-[.4em] text-ink/50">{p.ratingLabel}</span></span>
         </div>
+        <dl className="mt-[.2em] min-h-0 flex-1 divide-y divide-ink/10 overflow-hidden">
+          {p.back.map((s) => (
+            <div key={s.label} className="flex items-center justify-between gap-2 py-[.32em] text-[.98em] leading-tight" title={s.hint}>
+              <dt className="truncate text-ink/70">{s.label}</dt>
+              <dd className="shrink-0 font-display text-[1.35em] font-extrabold leading-none">{s.value}</dd>
+            </div>
+          ))}
+        </dl>
+        {medals.length > 0 && (
+          <div className="mt-[.4em] flex flex-wrap items-center gap-[.2em]" aria-label="Badges débloqués">
+            {medals.slice(0, 8).map((b) => <MiniMedal key={b.def.id} b={b} />)}
+            <span className="ml-auto text-[.9em] font-bold text-ink/60">{medals.length}{p.badgeTotal ? ` / ${p.badgeTotal}` : ''} badges</span>
+          </div>
+        )}
+        {p.backNote && <p className="mt-[.3em] text-[.85em] leading-snug text-ink/55">{p.backNote}</p>}
+        {p.href && (
+          <Link to={p.href} onClick={(e) => e.stopPropagation()} className="mt-[.6em] rounded-lg bg-[#0B2E73] py-[.65em] text-center text-[1em] font-bold text-white transition hover:bg-neon">
+            Voir la fiche
+          </Link>
+        )}
       </div>
     </div>
   )

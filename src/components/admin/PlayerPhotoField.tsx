@@ -10,6 +10,7 @@ import { useLookup } from '@/hooks/useData'
 import { useAdminScope } from '@/hooks/useAdminScope'
 import { usePlayerXP } from '@/hooks/useStats'
 import { cutoutFromFile, cutoutFromUrl, releaseCutoutLock, takeCutoutLock } from '@/lib/playerCutout'
+import { useTeamSeniority } from '@/hooks/useSeniority'
 import { PlayerCard } from '@/components/players/PlayerCard'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -114,10 +115,11 @@ function CardPreview({ value: v }: { value: Partial<Player> }) {
   const { seasonId } = useAdminScope()
   const s = usePlayerXP({ seasonId }).get(v.id ?? '')
   const team = v.team_id ? L.team.get(v.team_id) : undefined
+  const tier = useTeamSeniority(team?.id)?.tier
   return (
     <figure className="rounded-xl border border-white/10 bg-night-950/40 p-2">
       <div className="mx-auto w-full max-w-[200px]">
-        <PlayerCard firstName={v.first_name || 'Prénom'} lastName={v.last_name || 'NOM'} position={v.position} captain={v.is_captain} team={team}
+        <PlayerCard tier={tier} firstName={v.first_name || 'Prénom'} lastName={v.last_name || 'NOM'} position={v.position} captain={v.is_captain} team={team}
           photoUrl={v.photo_url} cutoutUrl={(v.photo_card_mode ?? 'cutout') === 'cutout' ? v.photo_cutout_url : undefined}
           rating={s?.xp ?? 0} ratingLabel="XP"
           front={[{ label: 'MJ', value: s?.matches ?? 0 }, { label: 'BUT', value: s?.goals ?? 0 }, { label: 'PAS', value: s?.assists ?? 0 }, { label: 'CJ', value: s?.yellow ?? 0 }]}

@@ -7,21 +7,22 @@ import { isRookie, type PlayerXP, type Ranked } from '@/lib/stats'
 import { IPG_RANKING, splitName, type IPGEntry } from '@/lib/ipg'
 import { useSeason } from '@/hooks/useSeason'
 import type { Player, Team } from '@/types/entities'
-import { TIER_LABEL, TIER_ORDER, TIER_STYLE } from '@/lib/badges'
-import { cn } from '@/lib/utils'
+import { useTeamSeniority } from '@/hooks/useSeniority'
+import { SeniorityLegend } from '@/components/league/SeniorityBadge'
 
 /** Carte d'un joueur au classement XP */
-export function XPCard({ r, player: p, team: t, className }: { r: Ranked<PlayerXP>; player: Player; team?: Team | null; className?: string }) {
+export function XPCard({ r, player: p, team: t, className, faceOnly }: { r: Ranked<PlayerXP>; player: Player; team?: Team | null; className?: string; faceOnly?: boolean }) {
   const s = r.item
   const gk = p.position === 'GK'
   const bs = usePlayerBadges().get(p.id)
   const { scopeSeasonId } = useSeason()
+  const tier = useTeamSeniority(t?.id)?.tier
   // l'IPG n'existe que pour la saison 2025-2026 (fichier de la ligue)
   const ipg = scopeSeasonId === SEASON_2025_ID ? IPG_RANKING.find((e) => e.player_id === p.id)?.ipg : undefined
   return (
     <PlayerCard
-      className={className}
-      material={bs?.material} medals={bs?.unlocked} badgeTotal={bs?.total}
+      className={className} faceOnly={faceOnly}
+      tier={tier} medals={bs?.unlocked} badgeTotal={bs?.total}
       firstName={p.first_name} lastName={p.last_name} position={p.position} captain={p.is_captain || t?.captain_player_id === p.id} team={t} photoUrl={p.photo_url} cutoutUrl={p.photo_card_mode === 'original' ? undefined : p.photo_cutout_url} ipg={ipg}
       rating={s.xp} ratingLabel="XP" rank={r.rank} delta={r.delta}
       badge={isRookie(p) ? <RookieBadge /> : undefined}
@@ -46,10 +47,11 @@ export function IPGCard({ e, className }: { e: IPGEntry; className?: string }) {
   const { player, team } = useIPGLinks(e)
   const n = splitName(e.name)
   const bs = usePlayerBadges(SEASON_2025_ID).get(player?.id ?? '')
+  const tier = useTeamSeniority(team?.id)?.tier
   return (
     <PlayerCard
       className={className}
-      material={bs?.material} medals={bs?.unlocked} badgeTotal={bs?.total}
+      tier={tier} medals={bs?.unlocked} badgeTotal={bs?.total}
       firstName={player?.first_name ?? n.first} lastName={player?.last_name ?? n.last} position={player?.position}
       team={team} teamName={e.team.toLowerCase().replace(/(^|\s)\S/g, (x) => x.toUpperCase())} photoUrl={player?.photo_url} cutoutUrl={player?.photo_card_mode === 'original' ? undefined : player?.photo_cutout_url}
       rating={e.ipg.toFixed(1)} ratingLabel="IPG" rank={e.rank}
@@ -77,18 +79,7 @@ function useIPGLinks(e: IPGEntry) {
 }
 
 
-/** Légende des couleurs de carte */
+/** Légende des couleurs de carte : ancienneté du club */
 export function MaterialLegend({ className }: { className?: string }) {
-  return (
-    <div className={cn('flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-muted-foreground', className)}>
-      <span>Couleur de la carte = meilleur badge obtenu :</span>
-      {TIER_ORDER.map((t) => (
-        <span key={t} className="inline-flex items-center gap-1.5">
-          <span className="h-3.5 w-5 rounded-sm" style={{ background: `linear-gradient(135deg, ${TIER_STYLE[t].light}, ${TIER_STYLE[t].edge} 50%, ${TIER_STYLE[t].dark})` }} />
-          <span className="font-semibold text-white/85">{TIER_LABEL[t]}</span>
-        </span>
-      ))}
-      <span className="inline-flex items-center gap-1.5"><span className="h-3.5 w-5 rounded-sm bg-gradient-to-br from-sky to-mbl" />Bleu MBL : pas encore de badge</span>
-    </div>
-  )
+  return <SeniorityLegend cards className={className} />
 }

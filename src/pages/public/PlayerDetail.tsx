@@ -11,15 +11,19 @@ import { useEffectiveSeason, useRace } from '@/hooks/useStats'
 import { EmptyState, RankDelta, RookieBadge, SectionTitle } from '@/components/league/Bits'
 import { PlayerAvatar, RoleBadge, TeamLogo } from '@/components/league/Identity'
 import { MaterialLegend, XPCard } from '@/components/players/Cards'
+import { SeniorityBadge } from '@/components/league/SeniorityBadge'
+import { CardShareActions } from '@/components/players/CardShare'
 import { BadgeMedal, BadgeTile } from '@/components/players/BadgeMedal'
 import { SortableTable } from '@/components/league/SortableTable'
 import { shotColumns } from '@/components/league/shotColumns'
 import { fmtAccuracy, fmtShots, fmtShotsPerGoal } from '@/lib/shots'
 import { AXIS, ChartBox, GRID, Legend, SERIES, TOOLTIP } from '@/components/charts/theme'
 import { AWARD_LABELS, computePlayerXP, isPlayed, isRookie, ageAt, type XPLine } from '@/lib/stats'
-import { BADGES, RATING_RULES, TIER_LABEL, TIER_STYLE, cardMaterial, challengeResult, challengeTargets, decisiveStreak, nextBadges, playerBadges, playerMatchLog, type BadgeGroup } from '@/lib/badges'
+import { BADGES, RATING_RULES, TIER_LABEL, challengeResult, challengeTargets, decisiveStreak, nextBadges, playerBadges, playerMatchLog, type BadgeGroup } from '@/lib/badges'
 import { fmtDate, ordinal, playerName, playerShort } from '@/lib/format'
 import { cn } from '@/lib/utils'
+
+const slugName = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 
 const GROUPS: BadgeGroup[] = ['Buts', 'Passes', 'Polyvalence', 'Régularité', 'Exploits', 'Défis', 'Gardien']
 const monthLabel = (m: string) => format(new Date(`${m}-01T12:00:00`), 'MMMM yyyy', { locale: fr })
@@ -51,7 +55,6 @@ export default function PlayerDetail() {
   const keeper = p.position === 'GK' || (s?.gk_matches ?? 0) > 0
   const badges = playerBadges(log, { keeper })
   const unlocked = badges.filter((b) => b.unlocked).length
-  const material = cardMaterial(badges)
   const next = nextBadges(badges)
   const streak = decisiveStreak(log)
   const scorerRank = scorers.find((r) => r.item.player_id === id)
@@ -98,11 +101,17 @@ export default function PlayerDetail() {
       {/* EN-TÊTE */}
       <section className="relative overflow-hidden rounded-3xl border border-white/10 p-6 sm:p-8" style={{ background: `radial-gradient(ellipse 60% 100% at 100% 0%, ${t?.primary_color}40, transparent 70%), linear-gradient(180deg,#0D2B66,#04163D)` }}>
         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center">
-          {me ? <XPCard r={me} player={p} team={t} className="w-56 shrink-0" /> : <PlayerAvatar player={p} team={t} size={132} />}
+          {me ? (
+            <div className="flex w-56 shrink-0 flex-col items-center gap-3">
+              <XPCard r={me} player={p} team={t} className="w-56" />
+              <CardShareActions card={<XPCard r={me} player={p} team={t} faceOnly />} fileName={`carte-${slugName(`${p.first_name}-${p.last_name}`)}.png`}
+                url={`${location.origin}/joueurs/${p.id}`} text={`Ma carte ${p.first_name} ${p.last_name} · Morocco Business League`} subtitle={[t?.name, season?.name].filter(Boolean).join(' · ')} />
+            </div>
+          ) : <PlayerAvatar player={p} team={t} size={132} />}
           <div className="min-w-0 flex-1 text-center sm:text-left">
             <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
               <RoleBadge long position={p.position} captain={p.is_captain || t?.captain_player_id === p.id} />{isRookie(p) && <RookieBadge />}<SuspendedBadge remaining={suspendedLeft} />{motmCount > 0 && <span className="inline-flex items-center gap-1 rounded-full bg-neon/15 px-2.5 py-0.5 text-[11px] font-extrabold uppercase text-neon" title="Nombre de fois homme du match (toutes saisons)"><Trophy className="size-3" aria-hidden />Homme du match ×{motmCount}</span>}
-              {material && <span className="rounded-full px-2.5 py-0.5 text-[11px] font-extrabold" style={{ background: `linear-gradient(135deg, ${TIER_STYLE[material].light}, ${TIER_STYLE[material].edge})`, color: material === 'black' ? '#fff' : '#0A0F33' }}>Carte {TIER_LABEL[material]}</span>}
+              <SeniorityBadge teamId={t?.id} showSeasons />
             </div>
             <h1 className="title-caps mt-2 text-4xl sm:text-6xl">{p.first_name} <span className="text-neon">{p.last_name}</span></h1>
             <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-sm text-muted-foreground sm:justify-start">

@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ClubHistory } from '@/components/league/ClubHistory'
+import { SeniorityBadge } from '@/components/league/SeniorityBadge'
 import { SuspendedBadge } from '@/components/reglement/PlayerDisciplineCard'
 import { useSeasonDiscipline } from '@/hooks/useDiscipline'
 import { useEffectiveSeason } from '@/hooks/useStats'
@@ -46,7 +47,7 @@ export default function TeamDetail() {
     <div className="space-y-8">
       <TeamBanner team={team}>
         <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-white/85">
-          {team.company_logo_url && <img src={team.company_logo_url} alt={team.company ?? ''} className={team.company_logo_url.startsWith('/logos/') ? 'h-9 w-auto rounded-lg bg-white' : 'size-6 rounded'} />}<span>{team.company}</span><CompetitionBadge competition={cup} />{row && <span className="font-semibold">{row.rank}e · {row.points} pts</span>}
+          {team.company_logo_url && <img src={team.company_logo_url} alt={team.company ?? ''} className={team.company_logo_url.startsWith('/logos/') ? 'h-9 w-auto rounded-lg bg-white' : 'size-6 rounded'} />}<span>{team.company}</span><SeniorityBadge teamId={team.id} size="md" showSeasons /><CompetitionBadge competition={cup} />{row && <span className="font-semibold">{row.rank}e · {row.points} pts</span>}
         </div>
         <div className="mt-3"><FormPills form={teamForm(matches, team.id)} size="md" /></div>
         <ClubHistory team={team} />

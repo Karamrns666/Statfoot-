@@ -89,7 +89,7 @@ describe('mise à jour automatique des navigateurs (migration)', () => {
     const step1 = { ...db, ...applyOfficialTeams2026(db as never) } as typeof db
     const comp = step1.Competition.find((c) => c.id === 'comp_2026_selection')!
     comp.team_ids = [...comp.team_ids!, 't26_sim']
-    comp.preseason = { seed: 'x', draw_order: comp.team_ids, revealed: 3 }
+    comp.preseason = { seed: 42, draw_order: comp.team_ids, revealed: 3 }
     const out = applyRemoveSimulation2026(step1 as never)
     expect(out.Team!.filter((t) => t.season_id === 'season_2026')).toHaveLength(23)
     expect(out.Player!.some((p) => p.id === 'p_sim')).toBe(false)

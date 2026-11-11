@@ -55,7 +55,7 @@ for (const [w, h] of [[1366, 900], [360, 800]]) {
   await p.goto(B + '/match-des-capitaines', { waitUntil: 'networkidle' }); await p.waitForTimeout(700)
   if (w === 1366) console.log('PUBLIC', (await p.locator('main').innerText()).replace(/\n+/g, ' | ').slice(0, 700))
   await p.screenshot({ path: `${out}/capitaines-${w}.png`, fullPage: true }); console.log('PUBLIC', w, 'débordement', await overflow())
-  if (w === 1366) { await p.getByRole('tab', { name: 'Statistiques' }).click(); await p.waitForTimeout(300); console.log('STATS', (await p.locator('[role=tabpanel]').innerText()).replace(/\n+/g, ' | ').slice(0, 400)); await p.screenshot({ path: `${out}/capitaines-stats.png` }) }
+  if (w === 1366) { await p.getByRole('tab', { name: 'Statistiques' }).click(); await p.waitForTimeout(300); console.log('STATS', (await p.locator('[role=tabpanel][data-state=active]').innerText()).replace(/\n+/g, ' | ').slice(0, 400)); await p.screenshot({ path: `${out}/capitaines-stats.png` }) }
   await p.goto(B + '/', { waitUntil: 'networkidle' }); await p.waitForTimeout(700)
   const blk = p.locator('section[aria-labelledby="capitaines-titre"]'); await blk.scrollIntoViewIfNeeded()
   console.log('ACCUEIL', w, (await blk.innerText()).replace(/\n+/g, ' | ').slice(0, 300)); await blk.screenshot({ path: `${out}/accueil-capitaines-${w}.png` })

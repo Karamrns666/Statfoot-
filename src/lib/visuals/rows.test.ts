@@ -35,6 +35,6 @@ describe('visuel Résultat — refonte (référence)', () => {
     const r = captainResultModel({ id: 'c', date: '2026-11-07T18:00', status: 'finished', lines, orange_pens: 4, bleue_pens: 5 }, { orange: { id: 'o', side: 'orange', name: 'Orange', player_ids: [] }, bleue: { id: 'b', side: 'bleue', name: 'Bleue', player_ids: [] } }, P)
     expect([r.homeScore, r.awayScore, r.homePens, r.awayPens]).toEqual([3, 2, undefined, undefined])
     expect(r.homeRows.map((x) => x.name)).toContain('(C.S.C)')
-    expect(r.competition).toMatch(/MATCH DES CAPITAINES/)
+    expect(r.competition).toMatch(/^CAPITAINES · /)
   })
 })

@@ -137,10 +137,10 @@ export function rowsLayout(ctx: CanvasRenderingContext2D, cfg: VisualsConfig, co
   const n = Math.max(1, ...cols.map((c) => c.length))
   const maxLh = z.lineHeight ?? 48
   const lh = Math.min(maxLh, z.h / n)
-  const tight = n > 10 ? 0.92 : 0.8 // police plus grande par rapport à l'interligne quand il est resserré
+  const tight = n > 10 ? 1.12 : n > 6 ? 0.95 : 0.8 // au-delà de 10 lignes : interligne resserré (capitales Anton, sans jambage)
   let size = Math.max(z.min ?? 16, Math.min(z.size ?? 40, Math.floor(lh * tight)))
   // largeur : le nom doit laisser la place aux icônes de la ligne la plus chargée
-  const ball = Math.min(lh * 0.74, (z.size ?? 40) * 0.95)
+  const ball = Math.min(lh * (n > 10 ? 0.86 : 0.74), (z.size ?? 40) * 0.95)
   for (; size > (z.min ?? 16); size--) {
     ctx.font = fontOf(cfg, z, size)
     const ok = cols.every((c) => c.every((r) => ctx.measureText(r.name).width + iconsWidth(r, ball, z.w, z.gap ?? 6).w + 14 <= z.w))

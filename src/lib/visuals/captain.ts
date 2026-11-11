@@ -17,9 +17,9 @@ function rows(m: CaptainMatch, side: CaptainSide, players: Map<string, Player>):
 export function captainResultModel(m: CaptainMatch, teams: Record<CaptainSide, CaptainTeam>, players: Map<string, Player>): ResultModel {
   const s = captainScore(m)
   const pens = s.orange === s.bleue && m.orange_pens != null && m.bleue_pens != null
-  const month = upper(fmtDate(m.date, 'MMMM yyyy'))
+  const month = upper(fmtDate(m.date, 'MMM yyyy'))
   return {
-    competition: `MATCH DES CAPITAINES · ${month}`,
+    competition: `CAPITAINES · ${month}`,
     home: { name: upper(teams.orange.name), short: 'ORA', logo: captainLogo(teams.orange) },
     away: { name: upper(teams.bleue.name), short: 'BLE', logo: captainLogo(teams.bleue) },
     homeScore: s.orange, awayScore: s.bleue,

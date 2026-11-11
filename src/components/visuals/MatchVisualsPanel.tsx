@@ -37,22 +37,22 @@ export function MatchVisualsPanel({ match, compact }: { match: Match; compact?: 
     <div className="space-y-3">
       <div className={cn('grid gap-3', compact ? 'grid-cols-2' : 'sm:grid-cols-2')}>
         <Preview title="Résultat" url={res.url} busy={res.busy} error={res.error}>
-          <Button size="sm" onClick={() => download('resultat')} disabled={!!busy}>{busy === 'resultatfalse' ? <Loader2 className="animate-spin" /> : <Download />}Télécharger PNG</Button>
-          <Button size="sm" variant="outline" onClick={() => download('resultat', true)} disabled={!!busy} title="Format story 1080 × 1920"><Smartphone />Story</Button>
+          <Button onClick={() => download('resultat')} disabled={!!busy || !res.url} className="w-full">{busy === 'resultatfalse' ? <><Loader2 className="animate-spin" />Génération…</> : <><Download />Télécharger</>}</Button>
+          <Button variant="contrast" onClick={() => download('resultat', true)} disabled={!!busy || !res.url} title="Format story 1080 × 1920" className="w-full">{busy === 'resultattrue' ? <><Loader2 className="animate-spin" />Génération…</> : <><Smartphone />Story</>}</Button>
         </Preview>
         <Preview title="Homme du match" url={mvp.url} busy={mvp.busy} error={mvp.error} empty={!match.motm_player_id ? 'Désignez l’homme du match pour générer ce visuel.' : undefined}>
-          <Button size="sm" onClick={() => download('mvp')} disabled={!!busy || !match.motm_player_id}>{busy === 'mvpfalse' ? <Loader2 className="animate-spin" /> : <Download />}Télécharger PNG</Button>
-          <Button size="sm" variant="outline" onClick={() => download('mvp', true)} disabled={!!busy || !match.motm_player_id}><Smartphone />Story</Button>
-          <div className="flex rounded-lg border border-input p-0.5" role="radiogroup" aria-label="Modèle homme du match">
+          <Button onClick={() => download('mvp')} disabled={!!busy || !match.motm_player_id || !mvp.url} className="w-full">{busy === 'mvpfalse' ? <><Loader2 className="animate-spin" />Génération…</> : <><Download />Télécharger</>}</Button>
+          <Button variant="contrast" onClick={() => download('mvp', true)} disabled={!!busy || !match.motm_player_id || !mvp.url} className="w-full">{busy === 'mvptrue' ? <><Loader2 className="animate-spin" />Génération…</> : <><Smartphone />Story</>}</Button>
+          <div className="col-span-2 flex rounded-lg border border-input p-0.5" role="radiogroup" aria-label="Modèle homme du match">
             {(['mvp', 'mvp2'] as const).map((v, i) => (
               <button key={v} role="radio" aria-checked={(match.visual_mvp_template ?? 'mvp') === v} onClick={() => base44.entities.Match.update(match.id, { visual_mvp_template: v })}
-                className={cn('cursor-pointer rounded-md px-2 py-1 text-xs font-semibold', (match.visual_mvp_template ?? 'mvp') === v ? 'bg-neon/20 text-neon' : 'text-muted-foreground')}>Modèle {i + 1}</button>
+                className={cn('flex-1 cursor-pointer rounded-md px-2 py-1 text-xs font-semibold', (match.visual_mvp_template ?? 'mvp') === v ? 'bg-neon/20 text-neon' : 'text-muted-foreground')}>Modèle {i + 1}</button>
             ))}
           </div>
         </Preview>
       </div>
       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-        <Button size="sm" variant="outline" onClick={regenerate} disabled={!!busy}>{busy === 'regen' ? <Loader2 className="animate-spin" /> : <RefreshCw />}Régénérer</Button>
+        <Button size="sm" variant="outline" onClick={regenerate} disabled={!!busy}>{busy === 'regen' ? <><Loader2 className="animate-spin" />Génération…</> : <><RefreshCw />Régénérer</>}</Button>
         <span>{match.visuals ? (upToDate ? `Version ${match.visuals.version} à jour` : `Version ${match.visuals.version} — mise à jour automatique en cours…`) : 'Générés à la demande pour ce match.'}</span>
       </div>
       <div className="rounded-xl border border-white/10 bg-night-950/40 p-3">
@@ -70,10 +70,11 @@ function Preview({ title, url, busy, error, empty, children }: { title: string; 
       <figcaption className="mb-1.5 flex items-center gap-1.5 text-sm font-semibold"><ImageIcon className="size-4 text-neon" />{title}</figcaption>
       <div className="relative aspect-square overflow-hidden rounded-lg bg-white/5">
         {url && <img src={url} alt={`Visuel ${title}`} className="size-full object-contain" />}
-        {busy && <div className="absolute inset-0 flex items-center justify-center bg-night-950/50"><Loader2 className="size-6 animate-spin text-neon" /></div>}
+        {busy && <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-night-950/50 text-xs text-white/85"><Loader2 className="size-6 animate-spin text-neon" />Préparation…</div>}
         {!url && !busy && <p className="absolute inset-0 flex items-center justify-center p-4 text-center text-xs text-muted-foreground">{error ? `Erreur : ${error}` : empty ?? '—'}</p>}
       </div>
-      <div className="mt-2 flex flex-wrap items-center gap-1.5">{children}</div>
+      {/* deux boutons pleine largeur : jamais rognés, même en colonne étroite */}
+      <div className="mt-2 grid grid-cols-2 gap-1.5 [&>button]:min-w-0 [&>button]:px-2" aria-busy={busy}>{children}</div>
     </figure>
   )
 }

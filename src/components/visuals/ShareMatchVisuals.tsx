@@ -55,16 +55,18 @@ function ShareDialog({ match, open, onOpenChange }: { match: Match; open: boolea
             <button key={k} role="radio" aria-checked={kind === k} disabled={k === 'mvp' && !match.motm_player_id} onClick={() => setKind(k)} className={cn('flex-1 cursor-pointer rounded-md px-3 py-1.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40', kind === k ? 'bg-neon/20 text-neon' : 'text-muted-foreground')}>{l}</button>
           ))}
         </div>
-        <div className="relative aspect-square overflow-hidden rounded-xl bg-white/5">
+        {/* aperçu limité en hauteur : les boutons restent visibles même sur un petit écran */}
+        <div className="relative mx-auto aspect-square w-full max-w-[min(100%,40dvh)] overflow-hidden rounded-xl bg-white/5">
           {prev.url && <img src={prev.url} alt={kind === 'resultat' ? 'Visuel du résultat' : 'Visuel homme du match'} className="size-full" />}
-          {(prev.busy || !prev.url) && <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="size-6 animate-spin text-neon" /></div>}
+          {(prev.busy || !prev.url) && <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-xs text-white/80"><Loader2 className="size-6 animate-spin text-neon" />Préparation de l’image…</div>}
         </div>
-        <div className="grid gap-2 sm:grid-cols-2">
-          <Button onClick={() => share()} disabled={!!busy}>{busy === 'share' ? <Loader2 className="animate-spin" /> : canShareFiles ? <Share2 /> : <Download />}{canShareFiles ? 'Partager' : 'Télécharger l’image'}</Button>
-          {canShareFiles ? <Button variant="outline" onClick={() => share(true)} disabled={!!busy}>{busy === 'story' ? <Loader2 className="animate-spin" /> : <Smartphone />}Partager en story</Button>
-            : <Button variant="outline" onClick={() => download(true)} disabled={!!busy}>{busy === 'dls' ? <Loader2 className="animate-spin" /> : <Smartphone />}Format story</Button>}
+        <div className="sticky bottom-0 -mx-5 -mb-5 grid gap-2 border-t border-white/10 bg-night-800 px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3 sm:grid-cols-2" aria-busy={!!busy}>
+          <Button size="lg" onClick={() => share()} disabled={!!busy || !prev.url} className="w-full">{busy === 'share' ? <><Loader2 className="animate-spin" />Génération…</> : <>{canShareFiles ? <Share2 /> : <Download />}{canShareFiles ? 'Partager' : 'Télécharger l’image'}</>}</Button>
+          {canShareFiles
+            ? <Button size="lg" variant="contrast" onClick={() => share(true)} disabled={!!busy || !prev.url} className="w-full">{busy === 'story' ? <><Loader2 className="animate-spin" />Génération…</> : <><Smartphone />Partager en story</>}</Button>
+            : <Button size="lg" variant="contrast" onClick={() => download(true)} disabled={!!busy || !prev.url} className="w-full">{busy === 'dls' ? <><Loader2 className="animate-spin" />Génération…</> : <><Smartphone />Format story</>}</Button>}
+          {canShareFiles && <Button variant="ghost" size="sm" onClick={() => download()} disabled={!!busy} className="text-white/85 sm:col-span-2">{busy === 'dl' ? <><Loader2 className="animate-spin" />Génération…</> : <><Download />Télécharger l’image</>}</Button>}
         </div>
-        {canShareFiles && <button onClick={() => download()} className="mx-auto flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground hover:text-neon"><Download className="size-3.5" />Télécharger l’image</button>}
       </DialogContent>
     </Dialog>
   )

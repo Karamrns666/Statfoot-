@@ -14,6 +14,8 @@ const buttonVariants = cva(
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'hover:bg-white/10',
         link: 'text-primary underline-offset-4 hover:underline',
+        /** action secondaire bien visible sur fond sombre (blanc plein, texte bleu MBL) */
+        contrast: 'bg-white text-[#0B2E73] shadow-[0_2px_10px_-2px_rgb(0_0_0/.5)] hover:bg-white/90',
         gold: 'bg-award-gold text-night-950 shadow-[0_0_22px_-4px_rgb(250_204_21/.7)] hover:brightness-110',
       },
       size: { default: 'h-10 px-4 py-2', sm: 'h-8 rounded-md px-3 text-xs', lg: 'h-12 rounded-xl px-6 text-base', icon: 'size-10', xl: 'h-16 rounded-2xl px-6 text-lg' },

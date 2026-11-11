@@ -1,6 +1,6 @@
 {
   "_doc": "Mise en page des visuels réseaux sociaux (1080 × 1080). Coordonnées en px sur le modèle. Chaque zone : x, y, w, h ; texte : font (display = Anton, text = Oswald), size (taille max), min (taille min avant coupure « … »), color, align. Modifiable aussi dans Admin → Visuels réseaux sociaux → Mise en page (sans toucher au code).",
-  "version": 2,
+  "version": 3,
   "colors": {
     "blue": "#173E95",
     "navy": "#0E3179",
@@ -17,7 +17,9 @@
   "templates": {
     "resultat": "/templates/template-resultat.png",
     "mvp": "/templates/template-mvp.png",
-    "mvp2": "/templates/template-mvp-2.png"
+    "mvp2": "/templates/template-mvp-2.png",
+    "semaine": "/templates/template-semaine-resultats-classement.png",
+    "top10": "/templates/template-top10.png"
   },
   "resultat": {
     "zones": {
@@ -346,6 +348,312 @@
         "y": 996,
         "w": 140,
         "h": 46
+      }
+    }
+  },
+  "semaine": {
+    "options": {
+      "hideUnusedPills": true,
+      "maxRows": 16,
+      "step": 59
+    },
+    "zones": {
+      "title": {
+        "x": 100,
+        "y": 62,
+        "w": 800,
+        "h": 96,
+        "font": "display",
+        "size": 96,
+        "min": 40,
+        "color": "white",
+        "align": "left"
+      },
+      "subtitle": {
+        "x": 100,
+        "y": 160,
+        "w": 800,
+        "h": 52,
+        "font": "display",
+        "size": 46,
+        "min": 22,
+        "color": "white",
+        "align": "left",
+        "opacity": 0.9
+      },
+      "pill": {
+        "x": 110,
+        "y": 274,
+        "w": 105,
+        "h": 35,
+        "font": "display",
+        "size": 28,
+        "min": 14,
+        "color": "navy",
+        "align": "center"
+      },
+      "row": {
+        "x": 240,
+        "y": 274,
+        "w": 650,
+        "h": 35,
+        "font": "display",
+        "size": 30,
+        "min": 14,
+        "color": "white",
+        "align": "left",
+        "logo": 40,
+        "gap": 12
+      },
+      "rowStats": {
+        "x": 240,
+        "y": 274,
+        "w": 650,
+        "h": 35,
+        "font": "text",
+        "weight": 500,
+        "size": 22,
+        "min": 12,
+        "color": "white",
+        "align": "right",
+        "opacity": 0.85
+      },
+      "points": {
+        "x": 910,
+        "y": 274,
+        "w": 52,
+        "h": 35,
+        "font": "display",
+        "size": 30,
+        "min": 14,
+        "color": "white",
+        "align": "center"
+      },
+      "barHead": {
+        "x": 910,
+        "y": 238,
+        "w": 52,
+        "h": 30,
+        "font": "text",
+        "weight": 700,
+        "size": 18,
+        "min": 10,
+        "color": "white",
+        "align": "center"
+      },
+      "barLabel": {
+        "x": 910,
+        "y": 240,
+        "w": 52,
+        "h": 980,
+        "font": "display",
+        "size": 40,
+        "min": 18,
+        "color": "white",
+        "align": "center"
+      }
+    },
+    "decor": {
+      "pastilles": {
+        "x": 109,
+        "y": 274,
+        "w": 108,
+        "h": 922
+      },
+      "barreOrange": {
+        "x": 910,
+        "y": 235,
+        "w": 52,
+        "h": 992
+      },
+      "cadreGauche": {
+        "x": 0,
+        "y": 0,
+        "w": 82,
+        "h": 1350
+      },
+      "cadreDroit": {
+        "x": 1000,
+        "y": 0,
+        "w": 80,
+        "h": 1350
+      },
+      "chapeau": {
+        "x": 0,
+        "y": 0,
+        "w": 1080,
+        "h": 45
+      }
+    }
+  },
+  "top10": {
+    "zones": {
+      "title": {
+        "x": 150,
+        "y": 60,
+        "w": 780,
+        "h": 100,
+        "font": "display",
+        "size": 92,
+        "min": 40,
+        "color": "white",
+        "align": "center"
+      },
+      "subtitle": {
+        "x": 150,
+        "y": 162,
+        "w": 780,
+        "h": 60,
+        "font": "display",
+        "size": 48,
+        "min": 22,
+        "color": "white",
+        "align": "center"
+      },
+      "card2": {
+        "x": 70,
+        "y": 288,
+        "w": 307,
+        "h": 338
+      },
+      "card1": {
+        "x": 388,
+        "y": 255,
+        "w": 306,
+        "h": 372
+      },
+      "card3": {
+        "x": 705,
+        "y": 288,
+        "w": 306,
+        "h": 338
+      },
+      "pill2": {
+        "x": 83,
+        "y": 500,
+        "w": 192,
+        "h": 54,
+        "font": "display",
+        "size": 30,
+        "min": 14,
+        "color": "navy",
+        "align": "center"
+      },
+      "pill1": {
+        "x": 397,
+        "y": 500,
+        "w": 163,
+        "h": 54,
+        "font": "display",
+        "size": 30,
+        "min": 14,
+        "color": "navy",
+        "align": "center"
+      },
+      "pill3": {
+        "x": 731,
+        "y": 500,
+        "w": 163,
+        "h": 54,
+        "font": "display",
+        "size": 30,
+        "min": 14,
+        "color": "navy",
+        "align": "center"
+      },
+      "podiumValue": {
+        "x": 0,
+        "y": 560,
+        "w": 0,
+        "h": 56,
+        "font": "display",
+        "size": 40,
+        "min": 18,
+        "color": "white",
+        "align": "left",
+        "logo": 46
+      },
+      "podiumRank": {
+        "x": 0,
+        "y": 0,
+        "w": 70,
+        "h": 70,
+        "font": "display",
+        "size": 64,
+        "min": 30,
+        "color": "white",
+        "align": "center"
+      },
+      "band": {
+        "x": 69,
+        "y": 655,
+        "w": 942,
+        "h": 83,
+        "font": "display",
+        "size": 44,
+        "min": 18,
+        "color": "white",
+        "align": "left",
+        "logo": 56,
+        "gap": 14
+      },
+      "bandRank": {
+        "x": 69,
+        "y": 655,
+        "w": 95,
+        "h": 83,
+        "font": "display",
+        "size": 52,
+        "min": 22,
+        "color": "white",
+        "align": "center"
+      },
+      "bandValue": {
+        "x": 164,
+        "y": 655,
+        "w": 221,
+        "h": 83,
+        "font": "display",
+        "size": 44,
+        "min": 18,
+        "color": "navy",
+        "align": "center"
+      },
+      "bandTeam": {
+        "x": 386,
+        "y": 655,
+        "w": 625,
+        "h": 83,
+        "font": "text",
+        "weight": 500,
+        "size": 22,
+        "min": 12,
+        "color": "white",
+        "align": "left",
+        "opacity": 0.85
+      }
+    },
+    "bands": [
+      655,
+      747,
+      840,
+      932,
+      1025,
+      1117,
+      1207
+    ],
+    "decor": {
+      "cartes": {
+        "x": 70,
+        "y": 255,
+        "w": 941,
+        "h": 372
+      },
+      "bandes": {
+        "x": 69,
+        "y": 655,
+        "w": 942,
+        "h": 635
       }
     }
   }

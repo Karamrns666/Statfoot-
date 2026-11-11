@@ -45,7 +45,7 @@ export function loadImage(url?: string): Promise<HTMLImageElement | null> {
 }
 const natural = (i: HTMLImageElement) => ({ w: i.naturalWidth || i.width || 512, h: i.naturalHeight || i.height || 512 })
 
-function drawContain(ctx: CanvasRenderingContext2D, img: HTMLImageElement, z: Zone, valign: 'center' | 'bottom' = 'center') {
+export function drawContain(ctx: CanvasRenderingContext2D, img: HTMLImageElement, z: Zone, valign: 'center' | 'bottom' = 'center') {
   const pad = z.pad ?? 0
   const { w, h } = natural(img)
   const s = Math.min((z.w - pad * 2) / w, (z.h - pad * 2) / h)
@@ -59,7 +59,7 @@ function drawContain(ctx: CanvasRenderingContext2D, img: HTMLImageElement, z: Zo
 // ---------------------------------------------------------------------------
 //  Texte
 // ---------------------------------------------------------------------------
-const fontOf = (cfg: VisualsConfig, z: Zone, size: number) => `${z.font === 'text' ? z.weight ?? 500 : 400} ${size}px "${z.font === 'text' ? cfg.fonts.text : cfg.fonts.display}"`
+export const fontOf = (cfg: VisualsConfig, z: Zone, size: number) => `${z.font === 'text' ? z.weight ?? 500 : 400} ${size}px "${z.font === 'text' ? cfg.fonts.text : cfg.fonts.display}"`
 
 /** Plus grande taille (≤ z.size, ≥ z.min) pour laquelle le texte tient dans la zone ; sinon taille min + texte raccourci. */
 export function fitText(ctx: CanvasRenderingContext2D, cfg: VisualsConfig, text: string, z: Zone, maxH = z.h) {
@@ -77,7 +77,7 @@ export function fitText(ctx: CanvasRenderingContext2D, cfg: VisualsConfig, text:
 }
 
 /** Texte centré verticalement sur ses vraies dimensions (majuscules), aligné selon la zone. */
-function drawText(ctx: CanvasRenderingContext2D, cfg: VisualsConfig, text: string, z: Zone, opts: { shadow?: boolean } = {}) {
+export function drawText(ctx: CanvasRenderingContext2D, cfg: VisualsConfig, text: string, z: Zone, opts: { shadow?: boolean } = {}) {
   if (!text) return 0
   const { size, text: t } = fitText(ctx, cfg, text, z)
   ctx.font = fontOf(cfg, z, size)
@@ -188,7 +188,7 @@ function drawRows(ctx: CanvasRenderingContext2D, cfg: VisualsConfig, rows: Resul
 // ---------------------------------------------------------------------------
 //  Aperçu des zones (admin)
 // ---------------------------------------------------------------------------
-function drawZones(ctx: CanvasRenderingContext2D, zones: Record<string, Zone>, decor: Record<string, Zone>) {
+export function drawZones(ctx: CanvasRenderingContext2D, zones: Record<string, Zone>, decor: Record<string, Zone>) {
   ctx.save()
   ctx.font = '600 15px system-ui, sans-serif'; ctx.textBaseline = 'top'
   for (const [k, d] of Object.entries(decor)) {
@@ -205,7 +205,7 @@ function drawZones(ctx: CanvasRenderingContext2D, zones: Record<string, Zone>, d
   ctx.restore()
 }
 
-function newCanvas(w = VISUAL_SIZE, h = VISUAL_SIZE) {
+export function newCanvas(w = VISUAL_SIZE, h = VISUAL_SIZE) {
   const c = document.createElement('canvas'); c.width = w; c.height = h
   const ctx = c.getContext('2d')!
   ctx.imageSmoothingQuality = 'high'

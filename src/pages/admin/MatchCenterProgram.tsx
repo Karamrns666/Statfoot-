@@ -1,5 +1,6 @@
 // Match Center — programme : matchs par jour puis par créneau (heure · terrain · phase), filtres, top buteurs/passeurs en direct.
 import { useMemo, useState } from 'react'
+import { phaseName } from '@/lib/competitionNames'
 import { Link } from 'react-router-dom'
 import { Plus, User } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
@@ -17,7 +18,7 @@ import { fmtDate, fmtTime, playerShort } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import type { Match } from '@/types/entities'
 
-const FILTERS = [{ v: 'all', l: 'Tous' }, { v: 'league_phase', l: 'Phase de ligue' }, { v: 'gold', l: 'Gold Cup' }, { v: 'silver', l: 'Silver Cup' }, { v: 'knockout', l: 'Phase finale' }] as const
+const FILTERS = [{ v: 'all', l: 'Tous' }, { v: 'league_phase', l: 'Phase de ligue' }, { v: 'gold', get l() { return phaseName('gold') } }, { v: 'silver', get l() { return phaseName('silver') } }, { v: 'knockout', l: 'Phase finale' }] as const
 
 export default function MatchCenterProgram() {
   const { db, league } = useData()

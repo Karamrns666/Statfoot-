@@ -9,7 +9,7 @@ export function useLeague(): LeagueInfo {
     const pick = (v: string | undefined | null, d: string) => (v && v.trim() ? v.trim() : d)
     const o = LEAGUE.organizer
     return {
-      name: pick(s.league_name, LEAGUE.name), shortName: pick(s.short_name, LEAGUE.shortName), tagline: pick(s.tagline, LEAGUE.tagline),
+      name: pick(s.league_name, LEAGUE.name), shortName: pick(s.short_name, LEAGUE.shortName), tagline: pick(s.tagline, LEAGUE.tagline), taglineAr: pick(s.tagline_ar, LEAGUE.taglineAr),
       logo: pick(s.logo_url, LEAGUE.logo), founded: LEAGUE.founded, instagram: pick(s.socials?.instagram, LEAGUE.instagram),
       organizer: {
         name: pick(s.organizer, o.name), description: o.description, logo: o.logo, logoDark: o.logoDark,

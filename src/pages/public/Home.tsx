@@ -99,7 +99,7 @@ export default function Home() {
     const lead = generalStandings(league, refSid)[0]
     if (lead && lead.played > 0) pushTeam('leader', season?.status === 'closed' ? `Champion · ${season.name}` : 'Leader du classement', lead.team_id, lead.points, 'PTS', `${lead.won} victoires, ${lead.drawn} nuls, ${lead.lost} défaites · différence ${lead.gd > 0 ? '+' : ''}${lead.gd}`, 'orange')
     const tstats = [...teamStatsAll.values()].filter((t) => t.played > 0)
-    const att = bestAttack(tstats)[0]; if (att && att.team_id !== lead?.team_id) pushTeam('attack', 'Attaque la plus prolifique', att.team_id, att.gf, 'BUTS', `${att.gf_avg} buts par match en ${att.played} matchs`, 'orange')
+    const att = bestAttack(tstats)[0]; if (att && att.team_id !== lead?.team_id) pushTeam('attack', 'Meilleure attaque', att.team_id, att.gf, 'BUTS', `${att.gf_avg} buts par match en ${att.played} matchs`, 'orange')
     const def = bestDefense(tstats)[0]; if (def) pushTeam('defense', 'Meilleure défense', def.team_id, def.ga_avg.toLocaleString('fr-FR'), 'BC / MATCH', `${def.ga} buts encaissés en ${def.played} matchs`, 'sky')
     if (notStarted) {
       const engaged = [...teamsInSeason].map((id) => team(id)).filter((t): t is NonNullable<typeof t> => !!t).sort((a, b) => a.name.localeCompare(b.name)).slice(0, 6)

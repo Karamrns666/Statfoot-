@@ -4,6 +4,7 @@
 // Animations CSS (transform / opacity / clip-path) → 60 fps ; tout est coupé avec prefers-reduced-motion
 // (pas de défilement automatique, changements instantanés). Pause : bouton, survol, focus, onglet masqué.
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { Tagline } from '@/components/league/Tagline'
 import { Link } from 'react-router-dom'
 import { CalendarDays, ChevronLeft, ChevronRight, ListOrdered, Pause, Play } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -133,7 +134,8 @@ function BrandView({ logo, leagueName, seasonLabel, phase }: { logo: string; lea
         <img src={logo} alt="" className="bb-logo relative h-28 w-auto sm:h-36" />
       </div>
       <div className="bb-text bb-d2 mt-4 font-display text-[clamp(1.8rem,5vw,3.4rem)] font-black uppercase leading-none tracking-wide text-white">{leagueName}</div>
-      <div className="bb-text bb-d3 mt-2 text-sm font-semibold uppercase tracking-[.2em] text-sky-soft">Football inter-entreprises · {seasonLabel}</div>
+      <div className="bb-text bb-d3 mt-3 w-full max-w-2xl px-2"><Tagline /></div>
+      <div className="bb-text bb-d3 mt-2 text-xs font-semibold uppercase tracking-[.2em] text-sky-soft">{seasonLabel}</div>
     </div>
   )
 }
@@ -198,10 +200,12 @@ export function Billboard({ slides: content, leagueName, seasonLabel, logoUrl }:
           <img src={logo} alt="" className="h-9 w-auto sm:h-10" />
           <div className="min-w-0 leading-tight">
             <div className="truncate font-display text-lg font-black uppercase text-white sm:text-2xl">{leagueName}</div>
-            <div className="text-xs font-semibold text-sky-soft">Ligue de football inter-entreprises · {seasonLabel}</div>
+            <div className="text-xs font-semibold capitalize text-sky-soft">{seasonLabel}</div>
           </div>
           <OrganizedBy size="sm" className="ml-auto hidden md:inline-flex" />
         </div>
+        {/* accroche sous le titre : français puis arabe, une ligne chacune */}
+        <div className="relative z-10 border-b border-white/10 bg-night-950/40 px-4 py-2 sm:px-6"><Tagline className="mx-auto max-w-3xl" /></div>
 
         {/* panneau */}
         <div className="bb-panel relative z-10 grid min-h-[300px] px-5 py-7 sm:min-h-[330px] sm:px-10 sm:py-9" aria-live={hover || paused ? 'polite' : 'off'}>

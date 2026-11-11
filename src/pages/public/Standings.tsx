@@ -1,5 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { FileDown } from 'lucide-react'
+import { competitionSlug, legacySlugPhase, phaseName, slugify } from '@/lib/competitionNames'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useData, useLookup } from '@/hooks/useData'
 import { useEffectiveSeason, useSeasonCompetitions } from '@/hooks/useStats'
 import { PageHeader, EmptyState } from '@/components/league/Bits'
@@ -19,8 +21,19 @@ export default function Standings() {
   const L = useLookup()
   const season = useEffectiveSeason()
   const comps = useSeasonCompetitions().filter((c) => c.phase !== 'knockout')
-  const defaultTab = comps.find((c) => c.phase === 'gold')?.id ?? comps[0]?.id ?? 'general'
-  const [tab, setTab] = useState(defaultTab)
+  const { slug } = useParams()
+  const navigate = useNavigate()
+  // /classement/master, /classement/challenger… ; anciennes adresses (gold-cup, silver-cup) redirigées
+  const legacy = slug ? legacySlugPhase(slug) : undefined
+  const fromSlug = slug ? comps.find((c) => (legacy ? c.phase === legacy : competitionSlug(c) === slug.toLowerCase())) : undefined
+  useEffect(() => {
+    if (!slug) return
+    const target = legacy ? `/classement/${slugify(phaseName(legacy))}` : undefined
+    if (target && target !== `/classement/${slug}`) navigate(target, { replace: true })
+  }, [slug, legacy, navigate])
+  const defaultTab = fromSlug?.id ?? comps.find((c) => c.phase === 'gold')?.id ?? comps[0]?.id ?? 'general'
+  const [picked, setTab] = useState<string | undefined>(undefined)
+  const tab = picked ?? defaultTab
   const general = useMemo(() => (season ? generalStandings(league, season.id) : []), [league, season])
   if (!comps.length) return <EmptyState title="Aucune compétition pour cette saison" />
   const pc = REGLEMENT.points
@@ -36,10 +49,10 @@ export default function Standings() {
         {tabs.map((t) => (
           <TabsContent key={t.id} value={t.id}>
             <Card><CardContent className="px-1 pt-4 sm:px-4">
-              <StandingsTable rows={t.rows} zones={t.comp ? competitionZones(t.comp, t.rows.length, season?.gold_size ?? 10) : [{ from: 1, to: 10, color: '#facc15', label: 'Gold Cup' }, { from: 11, to: 20, color: '#94a3b8', label: 'Silver Cup' }]} />
+              <StandingsTable rows={t.rows} zones={t.comp ? competitionZones(t.comp, t.rows.length, season?.gold_size ?? 10) : [{ from: 1, to: 10, color: '#facc15', label: phaseName('gold') }, { from: 11, to: 20, color: '#94a3b8', label: phaseName('silver') }]} />
             </CardContent></Card>
             <TiebreakNote rows={t.rows} />
-            {t.id === 'general' && <p className="mt-2 px-1 text-xs text-muted-foreground">Classement général : Gold Cup (1–10) puis Silver Cup (11–20).</p>}
+            {t.id === 'general' && <p className="mt-2 px-1 text-xs text-muted-foreground">Classement général : {phaseName('gold')} (1–10) puis {phaseName('silver')} (11–20).</p>}
           </TabsContent>
         ))}
       </Tabs>

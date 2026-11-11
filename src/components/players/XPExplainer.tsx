@@ -2,6 +2,7 @@
 // valeurs (XP_DEFAULTS + réglages de la saison), critères de classement (RACE_CRITERIA) et exemples
 // calculés par le moteur lui-même (xpExamples → matchXPLines). Modifier le barème met ce texte à jour.
 import { useMemo, type ReactNode } from 'react'
+import { phaseName } from '@/lib/competitionNames'
 import { ArtLink } from '@/components/reglement/ArtLink'
 import { ChevronDown, Calculator } from 'lucide-react'
 import { useData } from '@/hooks/useData'
@@ -83,7 +84,7 @@ export function XPExplainer({ seasonId, className }: { seasonId?: string | null;
           </Block>
           <Block title="Gardien">
             <Item label="Match sans but encaissé (clean sheet)" value={`${pts(cfg, 'clean_sheet_gk')}${impAllOne ? '' : ' × importance'}`} note="gardien ayant joué tout le match" />
-            {!impAllOne && <Item label="Importance" value={`${mult(cfg.importance_league_phase)} · ${mult(cfg.importance_gold)} · ${mult(cfg.importance_silver)} · ${mult(cfg.importance_knockout)}`} note="phase de ligue · Gold · Silver · phases finales" />}
+            {!impAllOne && <Item label="Importance" value={`${mult(cfg.importance_league_phase)} · ${mult(cfg.importance_gold)} · ${mult(cfg.importance_silver)} · ${mult(cfg.importance_knockout)}`} note={`phase de ligue · ${phaseName('gold')} · ${phaseName('silver')} · phases finales`} />}
             <Item label={XP_LABELS.save} value={pts(cfg, 'save')} />
             <Item label={XP_LABELS.penalty_saved} value={pts(cfg, 'penalty_saved')} />
             <Item label={XP_LABELS.shootout_saved} value={pts(cfg, 'shootout_saved')} />

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Lock, CheckCircle2, AlertTriangle, Images } from 'lucide-react'
+import { phaseName } from '@/lib/competitionNames'
 import { TeamMediaManager } from '@/components/admin/TeamMediaManager'
 import { base44 } from '@/api/base44Client'
 import { useData, useLookup } from '@/hooks/useData'
@@ -26,7 +27,7 @@ export function Seasons() {
     { key: 'name', label: 'Nom', required: true }, { key: 'status', label: 'Statut', type: 'select', options: ['upcoming', 'active', 'closed'].map((v) => ({ value: v, label: STATUS_FR[v] })) },
     { key: 'start_date', label: 'Début', type: 'date', required: true }, { key: 'end_date', label: 'Fin', type: 'date' },
     { key: 'league_phase_rounds', label: 'Journées phase de ligue', type: 'number' }, { key: 'cup_rounds', label: 'Journées Gold/Silver', type: 'number' },
-    { key: 'gold_size', label: 'Équipes en Gold Cup', type: 'number' }, { key: 'is_active', label: 'Saison active (affichée par défaut)', type: 'boolean' },
+    { key: 'gold_size', label: `Équipes en ${phaseName('gold')}`, type: 'number' }, { key: 'is_active', label: 'Saison active (affichée par défaut)', type: 'boolean' },
   ]
   return (
     <AdminPage title="Saisons" subtitle="Création, modification et clôture de saison">
@@ -64,7 +65,7 @@ function CloseSeasonDialog({ season, onClose }: { season: Season; onClose: () =>
         <DialogHeader><DialogTitle>Clôturer {season.name}</DialogTitle><DialogDescription>Les trophées de fin de saison seront générés au statut « Généré ».</DialogDescription></DialogHeader>
         <div className={`flex items-center gap-2 rounded-xl p-3 text-sm ${pending.length ? 'bg-amber-400/10 text-amber-200' : 'bg-win/10 text-win'}`}>{pending.length ? <AlertTriangle className="size-4" /> : <CheckCircle2 className="size-4" />}{pending.length ? `${pending.length} match(s) non terminé(s) : ils ne compteront pas.` : 'Tous les matchs sont terminés.'}</div>
         <div>
-          <div className="mb-2 text-xs font-bold uppercase text-muted-foreground">Classement général final → répartition Gold / Silver de la saison suivante</div>
+          <div className="mb-2 text-xs font-bold uppercase text-muted-foreground">Classement général final → répartition {phaseName('gold')} / {phaseName('silver')} de la saison suivante</div>
           <div className="max-h-64 space-y-1 overflow-y-auto">
             {table.map((r) => <div key={r.team_id} className="flex items-center gap-2 text-sm"><span className="num w-6">{r.rank}</span><TeamLogo team={L.team.get(r.team_id)} size={18} /><span className="flex-1">{L.team.get(r.team_id)?.name}</span><span className="num">{r.points} pts</span><Badge variant={r.rank <= (season.gold_size ?? 10) ? 'gold' : 'secondary'}>{r.rank <= (season.gold_size ?? 10) ? 'Chapeaux 1–3' : 'Chapeaux 3–5'}</Badge></div>)}
           </div>
@@ -83,7 +84,7 @@ export function Competitions() {
   const teamOpts = db.Team.map((t) => ({ value: t.id, label: t.short_name }))
   const fields: Field[] = [
     { key: 'name', label: 'Nom', required: true }, { key: 'season_id', label: 'Saison', type: 'select', required: true, options: db.Season.map((s) => ({ value: s.id, label: s.name })) },
-    { key: 'phase', label: 'Phase', type: 'select', required: true, options: [{ value: 'league_phase', label: 'Phase de ligue' }, { value: 'gold', label: 'Gold Cup' }, { value: 'silver', label: 'Silver Cup' }, { value: 'knockout', label: 'Phase finale' }, { value: 'groups', label: 'Groupes' }, { value: 'other', label: 'Autre' }] },
+    { key: 'phase', label: 'Phase', type: 'select', required: true, options: [{ value: 'league_phase', label: 'Phase de ligue' }, { value: 'gold', label: phaseName('gold') }, { value: 'silver', label: phaseName('silver') }, { value: 'knockout', label: 'Phase finale' }, { value: 'groups', label: 'Groupes' }, { value: 'other', label: 'Autre' }] },
     { key: 'format', label: 'Format', type: 'select', options: [{ value: 'swiss', label: 'Système suisse' }, { value: 'league', label: 'Championnat' }, { value: 'groups_knockout', label: 'Groupes + éliminatoires' }, { value: 'knockout', label: 'Élimination directe' }, { value: 'other', label: 'Autre' }] },
     { key: 'status', label: 'Statut', type: 'select', options: ['draft', 'active', 'finished', 'archived'].map((v) => ({ value: v, label: STATUS_FR[v] })) },
     { key: 'default_pitch', label: 'Terrain par défaut', placeholder: 'Terrain 1' }, { key: 'half_duration_min', label: 'Durée d’une mi-temps (min)', type: 'number' },
@@ -92,7 +93,7 @@ export function Competitions() {
     { key: 'team_ids', label: 'Équipes engagées', type: 'multiselect', options: teamOpts },
   ]
   return (
-    <AdminPage title="Compétitions" subtitle="Phase de ligue, Gold Cup, Silver Cup, phases finales">
+    <AdminPage title="Compétitions" subtitle={`Phase de ligue, ${phaseName('gold')}, ${phaseName('silver')}, phases finales`}>
       <EntityCrud entity="Competition" title="Compétition" fields={fields} filter={(c) => c.season_id === seasonId} sort={(a, b) => (a.order ?? 0) - (b.order ?? 0)}
         defaults={() => ({ season_id: seasonId, status: 'draft', phase: 'other', format: 'league', half_duration_min: 15, foul_alert_threshold: 5 } as Partial<Competition>)}
         columns={[

@@ -19,6 +19,7 @@ import { ROLE_LABEL } from '@/lib/permissions'
 import type { Rulebook, Settings } from '@/types/entities'
 import { cn } from '@/lib/utils'
 import { REGLEMENT, TIEBREAKERS, TIEBREAK_ART, coherenceWarnings } from '@/lib/reglement'
+import { DEFAULT_COMPETITION_NAMES, LEGACY_COMPETITION_NAMES, resolveCompetitionNames } from '@/lib/competitionNames'
 import { ArtLink } from '@/components/reglement/ArtLink'
 
 // ---------------------------------------------------------------------------
@@ -146,21 +147,32 @@ export function RulesEditor() {
 
 // ---------------------------------------------------------------------------
 export function SettingsPage() {
-  const { settings } = useData()
-  const [v, setV] = useState<Record<string, unknown>>({ ...settings, ...Object.fromEntries(Object.entries(settings.socials ?? {}).map(([k, x]) => [`social_${k}`, x])) })
+  const { settings, db } = useData()
+  const names = resolveCompetitionNames(settings)
+  const [v, setV] = useState<Record<string, unknown>>({ ...settings, ...Object.fromEntries(Object.entries(settings.socials ?? {}).map(([k, x]) => [`social_${k}`, x])), comp_gold: settings.competition_names?.gold ?? '', comp_silver: settings.competition_names?.silver ?? '', comp_league_phase: settings.competition_names?.league_phase ?? '' })
   const fields: Field[] = [
-    { key: 'league_name', label: 'Nom de la ligue' }, { key: 'short_name', label: 'Nom court' }, { key: 'tagline', label: 'Accroche', full: true },
+    { key: 'league_name', label: 'Nom de la ligue' }, { key: 'short_name', label: 'Nom court' }, { key: 'tagline', label: 'Accroche', full: true }, { key: 'tagline_ar', label: 'Accroche en arabe', full: true },
     { key: 'organizer', label: 'Organisateur' }, { key: 'logo_url', label: 'Logo', type: 'image', full: true },
     { key: 'contact_email', label: 'Email de contact', type: 'email' }, { key: 'contact_phone', label: 'Téléphone / WhatsApp' }, { key: 'address', label: 'Adresse', full: true },
     { key: 'website', label: 'Site de l’organisateur' },
     { key: 'social_instagram', label: 'Instagram MBL' }, { key: 'social_organizer_instagram', label: 'Instagram Ardentia' }, { key: 'social_linkedin', label: 'LinkedIn Ardentia' },
     { key: 'social_facebook', label: 'Facebook (facultatif)' }, { key: 'social_youtube', label: 'YouTube (facultatif)' },
+    { key: 'comp_gold', label: `Nom de la 1re division (par défaut : ${DEFAULT_COMPETITION_NAMES.gold})` }, { key: 'comp_silver', label: `Nom de la 2e division (par défaut : ${DEFAULT_COMPETITION_NAMES.silver})` }, { key: 'comp_league_phase', label: `Nom de la phase de sélection (par défaut : ${DEFAULT_COMPETITION_NAMES.league_phase})` },
     { key: 'motm_vote_minutes_after', label: 'Fermeture du vote HdM (min après la fin)', type: 'number' },
   ]
   const save = async () => {
     const socials = { instagram: v.social_instagram, organizer_instagram: v.social_organizer_instagram, facebook: v.social_facebook, linkedin: v.social_linkedin, youtube: v.social_youtube } as Settings['socials']
-    const clean = Object.fromEntries(Object.entries(v).filter(([k]) => !k.startsWith('social_') && !['id', 'created_date', 'updated_date'].includes(k)))
-    await base44.entities.Settings.update(settings.id, { ...clean, socials })
+    const clean = Object.fromEntries(Object.entries(v).filter(([k]) => !k.startsWith('social_') && !k.startsWith('comp_') && !['id', 'created_date', 'updated_date'].includes(k)))
+    const competition_names = { gold: String(v.comp_gold ?? '').trim() || undefined, silver: String(v.comp_silver ?? '').trim() || undefined, league_phase: String(v.comp_league_phase ?? '').trim() || undefined }
+    await base44.entities.Settings.update(settings.id, { ...clean, socials, competition_names })
+    // les compétitions et divisions déjà créées suivent le nouveau nom (sauf si l'admin leur a donné un nom à part)
+    const next = resolveCompetitionNames({ competition_names })
+    for (const ph of ['gold', 'silver'] as const) {
+      const olds = [names[ph], ...LEGACY_COMPETITION_NAMES[ph]]
+      for (const c of db.Competition) if (c.phase === ph && olds.includes(c.name) && c.name !== next[ph]) await base44.entities.Competition.update(c.id, { name: next[ph] })
+      for (const c of db.Competition) if (c.split) { const k = ph === 'gold' ? 'gold_name' : 'silver_name'; if (c.split[k] && olds.includes(c.split[k]!) && c.split[k] !== next[ph]) await base44.entities.Competition.update(c.id, { split: { ...c.split, [k]: next[ph] } }) }
+      const d = db.Division.find((x) => x.id === `div_${ph}`); if (d && olds.includes(d.name) && d.name !== next[ph]) await base44.entities.Division.update(d.id, { name: next[ph] })
+    }
     toast.success('Paramètres enregistrés — classements recalculés')
   }
   return (

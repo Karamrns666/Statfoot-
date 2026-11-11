@@ -3,6 +3,7 @@
 //  2. Après la sélection : constitution des deux divisions (1re → Xe place, Ye place → dernier), noms modifiables.
 //  3. Le même tirage sert ensuite à créer les matchs de chaque division.
 import { useEffect, useMemo, useState } from 'react'
+import { phaseName } from '@/lib/competitionNames'
 import { Check, Lock, Maximize2, RotateCcw, Search, Send, Shuffle, Sparkles, Split, X } from 'lucide-react'
 import { base44 } from '@/api/base44Client'
 import { useData, useLookup } from '@/hooks/useData'
@@ -221,8 +222,8 @@ function DivisionsPanel({ selection }: { selection: Competition }) {
   const children = db.Competition.filter((c) => c.parent_id === selection.id)
   const [goldTo, setGoldTo] = useState(selection.split?.gold_to ?? Math.ceil(n / 2))
   const [silverFrom, setSilverFrom] = useState(selection.split?.silver_from ?? Math.ceil(n / 2) + 1)
-  const [goldName, setGoldName] = useState(selection.split?.gold_name ?? 'Gold Cup')
-  const [silverName, setSilverName] = useState(selection.split?.silver_name ?? 'Silver Cup')
+  const [goldName, setGoldName] = useState(selection.split?.gold_name ?? phaseName('gold'))
+  const [silverName, setSilverName] = useState(selection.split?.silver_name ?? phaseName('silver'))
   const [goldPitch, setGoldPitch] = useState('Terrain 1')
   const [silverPitch, setSilverPitch] = useState('Terrain 2')
   const valid = goldTo >= 2 && silverFrom > goldTo && silverFrom <= n - 1

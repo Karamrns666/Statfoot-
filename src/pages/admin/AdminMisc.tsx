@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import Papa from 'papaparse'
+import { phaseName } from '@/lib/competitionNames'
 import { toPng } from 'html-to-image'
 import { CheckCircle2, Download, FileSpreadsheet, Lock, Send, Sparkles, Tv, Upload, ImageDown } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -61,7 +62,7 @@ export function StatsAdmin() {
   return (
     <AdminPage title="Statistiques" subtitle="Calculées par le même moteur que le site public">
       <div className="glass mb-4 flex flex-wrap gap-2 rounded-2xl p-3">
-        <FilterSelect value={phase === 'all' ? '' : phase} onChange={(v) => setPhase((v || 'all') as PhaseFilter)} allLabel="Toute la saison" options={[{ value: 'league_phase', label: 'Phase de ligue' }, { value: 'gold', label: 'Gold Cup' }, { value: 'silver', label: 'Silver Cup' }, { value: 'knockout', label: 'Phase finale' }]} />
+        <FilterSelect value={phase === 'all' ? '' : phase} onChange={(v) => setPhase((v || 'all') as PhaseFilter)} allLabel="Toute la saison" options={[{ value: 'league_phase', label: 'Phase de ligue' }, { value: 'gold', label: phaseName('gold') }, { value: 'silver', label: phaseName('silver') }, { value: 'knockout', label: 'Phase finale' }]} />
         <FilterSelect value={division} onChange={setDivision} allLabel="Toutes séries" options={db.Division.map((d) => ({ value: d.id, label: d.name }))} />
         <FilterSelect value={group} onChange={setGroup} allLabel="Tous groupes" options={db.Group.map((g) => ({ value: g.id, label: g.name }))} />
         <FilterSelect value={team} onChange={setTeam} allLabel="Toutes équipes" options={db.Team.map((t) => ({ value: t.id, label: t.name }))} />
@@ -139,7 +140,7 @@ export function AwardsAdmin() {
   }
   return (
     <AdminPage title="Awards de fin de saison" subtitle="Génération automatique → vérification → publication (privé jusqu’à publication)"
-      actions={<><FilterSelect value={scope} onChange={(v) => setScope((v || 'season') as typeof scope)} allLabel={null} options={[{ value: 'season', label: 'Toute la saison' }, { value: 'league_phase', label: 'Phase de ligue' }, { value: 'gold', label: 'Gold Cup' }, { value: 'silver', label: 'Silver Cup' }]} /><Button onClick={generate}><Sparkles />Générer / régénérer</Button></>}>
+      actions={<><FilterSelect value={scope} onChange={(v) => setScope((v || 'season') as typeof scope)} allLabel={null} options={[{ value: 'season', label: 'Toute la saison' }, { value: 'league_phase', label: 'Phase de ligue' }, { value: 'gold', label: phaseName('gold') }, { value: 'silver', label: phaseName('silver') }]} /><Button onClick={generate}><Sparkles />Générer / régénérer</Button></>}>
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {awards.sort((a, b) => Object.keys(AWARD_LABELS).indexOf(a.category) - Object.keys(AWARD_LABELS).indexOf(b.category)).map((a) => {
           const p = a.player_id ? L.player.get(a.player_id) : undefined, t = L.team.get(a.team_id ?? '')

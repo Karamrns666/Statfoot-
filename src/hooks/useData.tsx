@@ -1,6 +1,7 @@
 // Chargement des entités via la couche src/api (mock Base44) + rafraîchissement automatique.
 // Dans Base44 : remplacer par des hooks react-query autour de base44.entities.X.list().
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { applyCompetitionNames } from '@/lib/competitionNames'
 import { base44, store } from '@/api/base44Client'
 import { ensureSeeded } from '@/api/seed'
 import { ENTITY_NAMES, type EntityMap, type EntityName, type Settings } from '@/types/entities'
@@ -31,6 +32,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [])
   const value = useMemo<DataState>(() => {
     const settings = db.Settings[0] ?? ({ id: 'settings' } as Settings)
+    applyCompetitionNames(settings) // noms MASTER / CHALLENGER (config admin) disponibles partout
     const league: LeagueData = {
       seasons: db.Season, competitions: db.Competition, divisions: db.Division, groups: db.Group, teams: db.Team,
       players: db.Player, matches: db.Match, events: db.MatchEvent, lineups: db.Lineup, xpRules: db.XPRule,

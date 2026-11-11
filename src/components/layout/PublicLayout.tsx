@@ -17,7 +17,7 @@ export const PUBLIC_NAV = [
   { to: '/equipes', label: 'Équipes' },
   { to: '/joueurs', label: 'Joueurs' },
   { to: '/equipe-type', label: 'Équipe type' },
-  { to: '/trophees', label: 'Trophées' },
+  { to: '/meilleure-performance', label: 'Meilleure performance' },
   { to: '/statistiques', label: 'Stats', wide: true },
   { to: '/media', label: 'Média' },
   { to: '/historique', label: 'Historique', wide: true },
@@ -81,6 +81,7 @@ function Footer() {
           <div>
             <div className="font-display text-2xl font-black uppercase leading-none">{L.name}</div>
             <p className="mt-2 max-w-xs text-sm text-muted-foreground">{L.tagline}</p>
+            <p className="mt-1 max-w-xs text-sm text-muted-foreground" dir="rtl" lang="ar" style={{ fontFamily: "'Cairo', 'Segoe UI', Tahoma, sans-serif", textAlign: 'left' }}>{L.taglineAr}</p>
             <a href={o.website} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2.5 text-sm text-muted-foreground hover:text-white">Organisé par <img src={o.logo} alt={o.name} className="h-7 w-auto" /></a>
           </div>
         </div>

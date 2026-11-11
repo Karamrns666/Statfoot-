@@ -6,7 +6,8 @@
 export const LEAGUE = {
   name: 'Morocco Business League',
   shortName: 'MBL',
-  tagline: 'Le championnat de football inter-entreprises',
+  tagline: 'Le premier championnat inter-entreprises au Maroc',
+  taglineAr: 'الدوري الوطني للشركات المغربية',
   logo: '/brand/mbl-logo.png',
   founded: 2023,
   instagram: 'https://www.instagram.com/morocco.business.league/',
@@ -29,6 +30,7 @@ export interface LeagueInfo {
   name: string
   shortName: string
   tagline: string
+  taglineAr: string
   logo: string
   founded: number
   instagram: string

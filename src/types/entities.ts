@@ -361,6 +361,10 @@ export interface Settings extends BaseEntity {
   league_name?: string
   short_name?: string
   tagline?: string
+  /** accroche en arabe (accueil) */
+  tagline_ar?: string
+  /** noms des compétitions : gold → MASTER, silver → CHALLENGER (modifiable dans l'admin) */
+  competition_names?: { gold?: string; silver?: string; league_phase?: string }
   organizer?: string
   logo_url?: string
   contact_email?: string

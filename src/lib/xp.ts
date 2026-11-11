@@ -3,6 +3,7 @@
 //  Source unique pour : fiche joueur, Trophées, accueil (podium, top gardiens), admin, Match Center (XP en direct).
 // ============================================================================
 import type {
+import { phaseName } from './competitionNames'
   Competition, Lineup, Match, MatchEvent, MonthlyAward, Player, Season, Settings, Suspension, Team, XPKey, XPRule,
 } from '@/types/entities'
 import { competitionStandings, isKnockout, isPlayed } from './standings'
@@ -33,7 +34,7 @@ export const XP_LABELS: Record<XPKey, string> = {
   per_suspension_match: 'Par match de suspension', clean_sheet_gk: 'Clean sheet gardien (× importance)', save: 'Arrêt', penalty_saved: 'Penalty arrêté',
   shootout_saved: 'Tir au but arrêté', goal_conceded_gk: 'But encaissé (gardien)', motm: 'Homme du match', player_of_month: 'Joueur du mois', team_of_month: 'Équipe du mois',
   goal_of_month: 'But du mois', min_matches_awards: "Matchs minimum (Ballon d'or / Gant d'or)",
-  importance_league_phase: 'Importance — phase de ligue', importance_gold: 'Importance — Gold Cup', importance_silver: 'Importance — Silver Cup', importance_knockout: 'Importance — phases finales',
+  importance_league_phase: 'Importance — phase de ligue', get importance_gold() { return `Importance — ${phaseName('gold')}` }, get importance_silver() { return `Importance — ${phaseName('silver')}` }, importance_knockout: 'Importance — phases finales',
 }
 export const XP_KEYS = Object.keys(XP_DEFAULTS) as XPKey[]
 export const MULTIPLIER_KEYS: XPKey[] = ['mult_top3', 'mult_4_6', 'mult_7plus', 'importance_league_phase', 'importance_gold', 'importance_silver', 'importance_knockout', 'min_matches_awards']

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { phaseName } from '@/lib/competitionNames'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { CompetitionTabs } from '@/components/league/CompetitionTabs'
@@ -20,7 +21,7 @@ import { playerName } from '@/lib/format'
 import type { AwardCategory } from '@/types/entities'
 import { cn } from '@/lib/utils'
 
-const PHASES: { value: PhaseFilter; label: string }[] = [{ value: 'all', label: 'Toute la saison' }, { value: 'league_phase', label: 'Phase de ligue' }, { value: 'gold', label: 'Gold Cup' }, { value: 'silver', label: 'Silver Cup' }]
+const PHASES: { value: PhaseFilter; label: string }[] = [{ value: 'all', label: 'Toute la saison' }, { value: 'league_phase', label: 'Phase de ligue' }, { value: 'gold', get label() { return phaseName('gold') } }, { value: 'silver', get label() { return phaseName('silver') } }]
 
 export default function Awards() {
   const { scopeSeasonId } = useSeason()
@@ -32,7 +33,7 @@ export default function Awards() {
   const hasCups = db.Competition.some((c) => c.season_id === seasonId && (c.phase === 'gold' || c.phase === 'silver'))
   return (
     <div>
-      <PageHeader title="Les Trophées" subtitle="Classements mis à jour automatiquement après chaque match" />
+      <PageHeader title="Meilleure performance" subtitle="Classements mis à jour automatiquement après chaque match" />
       <div className="mb-5 flex flex-wrap gap-2">
         {hasCups && PHASES.filter((x) => x.value === 'all' || db.Competition.some((c) => c.season_id === seasonId && c.phase === x.value)).map((p) => <button key={p.value} onClick={() => setPhase(p.value)} className={cn('rounded-full border px-4 py-1.5 font-display text-sm font-bold uppercase tracking-wide cursor-pointer', phase === p.value ? 'border-neon bg-neon/15 text-neon' : 'border-white/10 text-muted-foreground hover:text-white')}>{p.label}</button>)}
       </div>

@@ -4,6 +4,7 @@
 //    Matchs et effectifs : import du fichier de la ligue ou saisie dans l'admin.
 // Pur : renvoie { Entité: lignes[] }.
 import type { AdminUser, Award, EntityMap, EntityName, Settings, Venue, XPRule } from '@/types/entities'
+import { DEFAULT_COMPETITION_NAMES } from '@/lib/competitionNames'
 import { computeAwards, computePlayerXP, teamRankBefore, XP_DEFAULTS, XP_KEYS, type LeagueData } from '@/lib/stats'
 import { buildRulebooks } from './rulebook'
 import { LEAGUE } from '@/config/league'
@@ -28,7 +29,7 @@ export function generateLeagueData(now = new Date()): DB {
   db.Settings.push(settings)
   db.Rulebook.push(...buildRulebooks())
   db.Venue.push({ id: 'venue_main', name: 'Complexe sportif MBL', address: 'Casablanca', pitches: ['Terrain 1', 'Terrain 2'] } as Venue)
-  db.Division.push({ id: 'div_gold', name: 'Gold', level: 1, color: '#E8B931' }, { id: 'div_silver', name: 'Silver', level: 2, color: '#C9D3DD' })
+  db.Division.push({ id: 'div_gold', name: DEFAULT_COMPETITION_NAMES.gold, level: 1, color: '#E8B931' }, { id: 'div_silver', name: DEFAULT_COMPETITION_NAMES.silver, level: 2, color: '#C9D3DD' })
 
   const league = (): LeagueData => ({ seasons: db.Season, competitions: db.Competition, teams: db.Team, players: db.Player, matches: db.Match, events: db.MatchEvent, lineups: db.Lineup, xpRules: db.XPRule, suspensions: db.Suspension, monthlyAwards: db.MonthlyAward, settings, divisions: db.Division, groups: db.Group })
 

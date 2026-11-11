@@ -91,11 +91,16 @@ export default function App() {
           <Route path="matchs" element={<P.Matches />} />
           <Route path="matchs/:id" element={<P.MatchDetail />} />
           <Route path="classement" element={<P.Standings />} />
+          <Route path="classement/:slug" element={<P.Standings />} />
+          <Route path="gold-cup" element={<Navigate to="/classement/gold-cup" replace />} />
+          <Route path="silver-cup" element={<Navigate to="/classement/silver-cup" replace />} />
           <Route path="equipes" element={<P.Teams />} />
           <Route path="equipes/:id" element={<P.TeamDetail />} />
           <Route path="joueurs" element={<P.Players />} />
           <Route path="joueurs/:id" element={<P.PlayerDetail />} />
-          <Route path="trophees" element={<P.Awards />} />
+          <Route path="meilleure-performance" element={<P.Awards />} />
+          <Route path="trophees" element={<Navigate to="/meilleure-performance" replace />} />
+          <Route path="recompenses" element={<Navigate to="/meilleure-performance" replace />} />
           <Route path="statistiques" element={<P.Stats />} />
           <Route path="equipe-type" element={<P.TeamOfRound />} />
           <Route path="equipe-de-la-journee" element={<Navigate to="/equipe-type" replace />} />

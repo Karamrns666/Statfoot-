@@ -3,6 +3,8 @@
 import type { Award, Competition, Lineup, Match, Page, Position, MatchEvent, MatchTeamStats, Player, Rulebook, Season, Settings, Team, TeamOfWeek } from '@/types/entities'
 import { CURRENT_RULEBOOK, REGLEMENT, isDisputed } from '@/lib/reglement'
 import { buildRulebooks } from './rulebook'
+import { DEFAULT_COMPETITION_NAMES, LEGACY_COMPETITION_NAMES } from '@/lib/competitionNames'
+import { LEAGUE } from '@/config/league'
 import { SEASON_2026_ID } from './season2026'
 import { toRole } from '@/lib/format'
 import { capStarters } from '@/lib/lineup'
@@ -125,8 +127,29 @@ export function applyReglementV4(db: Rules6Data): Rules6Data {
   return out
 }
 
+/**
+ * Renommage des compétitions (Gold Cup → MASTER, Silver Cup → CHALLENGER) et nouvelle accroche :
+ * seuls les anciens noms par défaut sont remplacés (un nom personnalisé par l'admin est conservé).
+ */
+export const OLD_TAGLINE = 'Le championnat de football inter-entreprises'
+export function applyRenameCompetitions(db: Rules6Data & { Division?: { id: string; name: string }[] }): Rules6Data & { Division?: { id: string; name: string }[] } {
+  const out: Rules6Data & { Division?: { id: string; name: string }[] } = {}
+  const ren = (phase: 'gold' | 'silver', name?: string) => (name && LEGACY_COMPETITION_NAMES[phase].includes(name) ? DEFAULT_COMPETITION_NAMES[phase] : name)
+  const fixComp = (c: Competition): Competition => {
+    let x = c
+    if ((c.phase === 'gold' || c.phase === 'silver') && ren(c.phase, c.name) !== c.name) x = { ...x, name: ren(c.phase, c.name)! }
+    if (c.split && (ren('gold', c.split.gold_name) !== c.split.gold_name || ren('silver', c.split.silver_name) !== c.split.silver_name)) x = { ...x, split: { ...c.split, gold_name: ren('gold', c.split.gold_name), silver_name: ren('silver', c.split.silver_name) } }
+    return x
+  }
+  if (db.Competition?.some((c) => fixComp(c) !== c)) out.Competition = db.Competition.map(fixComp)
+  const fixDiv = (d: { id: string; name: string }) => (d.id === 'div_gold' && ren('gold', d.name) !== d.name ? { ...d, name: DEFAULT_COMPETITION_NAMES.gold } : d.id === 'div_silver' && ren('silver', d.name) !== d.name ? { ...d, name: DEFAULT_COMPETITION_NAMES.silver } : d)
+  if (db.Division?.some((d) => fixDiv(d) !== d)) out.Division = db.Division.map(fixDiv)
+  if (db.Settings?.some((x) => x.tagline === OLD_TAGLINE)) out.Settings = db.Settings.map((x) => (x.tagline === OLD_TAGLINE ? { ...x, tagline: LEAGUE.tagline } : x))
+  return out
+}
+
 /** Étapes de migration, dans l'ordre. Le numéro atteint est mémorisé dans le navigateur. */
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4]
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */
@@ -145,7 +168,7 @@ export function migrateStoredData() {
   const legacy = store.getFlag('migrated-6v6') ? 1 : 0
   const from = Number(store.getFlag(VERSION_FLAG) ?? legacy) || legacy
   if (from >= STEPS.length) return
-  const names = ['Player', 'MatchEvent', 'MatchTeamStats', 'Award', 'TeamOfWeek', 'Lineup', 'Page', 'Team', 'Settings', 'Rulebook', 'Season', 'Competition', 'Match'] as const
+  const names = ['Player', 'MatchEvent', 'MatchTeamStats', 'Award', 'TeamOfWeek', 'Lineup', 'Page', 'Team', 'Settings', 'Rulebook', 'Season', 'Competition', 'Match', 'Division'] as const
   const db = Object.fromEntries(names.map((n) => [n, store.all(n)])) as Rules6Data
   const changed = migrate(db, from)
   store.batch(() => { for (const [name, rows] of Object.entries(changed)) store.replace(name as (typeof names)[number], rows as never) })

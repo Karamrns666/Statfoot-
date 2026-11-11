@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { phaseName } from '@/lib/competitionNames'
 import { LayoutGrid, ListOrdered, Search, Sparkles } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
 import { useSeason } from '@/hooks/useSeason'
@@ -79,7 +80,7 @@ export default function Players() {
           <XPExplainer seasonId={scopeSeasonId} className="mb-4" />
           <div className="glass mb-5 flex flex-wrap gap-2 rounded-2xl p-3">
             <div className="relative w-full sm:w-60"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher un joueur" className="h-9 pl-9" aria-label="Rechercher un joueur" /></div>
-            {hasCups && <FilterSelect label="Phase" value={phase === 'all' ? '' : phase} onChange={(v) => setPhase((v || 'all') as PhaseFilter)} allLabel="Toute la saison" options={[{ value: 'league_phase', label: 'Phase de ligue' }, { value: 'gold', label: 'Gold Cup' }, { value: 'silver', label: 'Silver Cup' }].filter((o) => db.Competition.some((c) => (!scopeSeasonId || c.season_id === scopeSeasonId) && c.phase === o.value))} />}
+            {hasCups && <FilterSelect label="Phase" value={phase === 'all' ? '' : phase} onChange={(v) => setPhase((v || 'all') as PhaseFilter)} allLabel="Toute la saison" options={[{ value: 'league_phase', label: 'Phase de ligue' }, { value: 'gold', label: phaseName('gold') }, { value: 'silver', label: phaseName('silver') }].filter((o) => db.Competition.some((c) => (!scopeSeasonId || c.season_id === scopeSeasonId) && c.phase === o.value))} />}
             <FilterSelect label="Équipe" value={team} onChange={setTeam} allLabel="Toutes équipes" options={seasonTeams.map((t) => ({ value: t.id, label: t.name }))} />
             <FilterSelect label="Rôle" value={pos} onChange={setPos} allLabel="Tous les joueurs" options={[{ value: 'GK', label: 'Gardiens' }, { value: 'C', label: 'Capitaines' }]} />
             {view === 'cartes' && <FilterSelect label="Trier par" value={sort === 'xp' ? '' : sort} onChange={(v) => setSort((v || 'xp') as Sort)} allLabel="Rang XP" options={[{ value: 'buts', label: 'Buts' }, { value: 'passes', label: 'Passes décisives' }]} />}

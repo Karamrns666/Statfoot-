@@ -47,7 +47,7 @@ export async function pushSimRows(rows: { entity: string; id: string; data: unkn
 }
 /** Suppression définitive (super-admin) : uniquement les lignes de CETTE simulation, dans la table de simulation. */
 export async function deleteSimRows(): Promise<Record<string, number>> {
-  if (!cloudEnabled) { const c = countBy(memory.filter(isDeletableSimRow)); memory = memory.filter((r) => !isDeletableSimRow(r)); return c }
+  if (!cloudEnabled) { const c = countBy(memory.filter((r) => isDeletableSimRow(r))); memory = memory.filter((r) => !isDeletableSimRow(r)); return c }
   return (await adminRest('/rest/v1/rpc/delete_simulation', { method: 'POST', body: JSON.stringify({ p_sim_id: SIM_ID }) }) ?? {}) as Record<string, number>
 }
 export async function realCounts(local?: () => Record<string, number>): Promise<Record<string, number>> {
@@ -64,7 +64,7 @@ const countBy = (rows: { entity: string }[]) => rows.reduce<Record<string, numbe
  * Règle de suppression (identique à la fonction SQL delete_simulation) : une ligne n'est supprimable que si elle
  * appartient à la simulation demandée ET porte le drapeau is_simulation. Une vraie donnée (sans drapeau) ne l'est jamais.
  */
-export function isDeletableSimRow(r: { data: unknown; sim_id?: string; is_simulation?: boolean }, simId = SIM_ID) {
+export function isDeletableSimRow(r: { entity?: string; id?: string; data: unknown; sim_id?: string; is_simulation?: boolean }, simId = SIM_ID) {
   const d = r.data as { is_simulation?: unknown; simulation_id?: unknown } | null
   return !!d && d.is_simulation === true && d.simulation_id === simId && (r.sim_id === undefined || r.sim_id === simId) && r.is_simulation !== false
 }

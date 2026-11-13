@@ -51,7 +51,7 @@ export function TeamCard(p: TeamCardProps) {
           style={brand && p.tier === 'platinum' ? { boxShadow: '0 0 0 2px rgb(230 236 245 / .9), 0 0 22px rgb(167 139 250 / .55), 0 10px 24px rgb(0 0 0 / .45)' } : undefined} />
       </div>
       <div className="relative z-10 px-[7%] text-center">
-        <div className="line-clamp-2 font-display text-[2em] font-black uppercase leading-[.95]" style={{ textShadow: st.textShadow }}>{p.team.name}</div>
+        <div className="line-clamp-2 pt-[.12em] font-display text-[2em] font-black uppercase leading-[1.02]" style={{ textShadow: st.textShadow }}>{p.team.name}</div>
         <div className="mt-[.55em] flex flex-wrap items-center justify-center gap-[.4em] text-[.82em] font-extrabold">
           {p.division && <span className="rounded-full px-[.7em] py-[.25em] uppercase tracking-wider" style={{ background: st.bar, color: st.barText }}>{p.division}</span>}
           <span style={{ color: st.fgSoft }}>{p.seasons} saison{p.seasons > 1 ? 's' : ''} MBL</span>

@@ -27,12 +27,14 @@ jobs:
           { echo "## tsc"; npx tsc -b; echo "exit=$?"; } > ci-report.txt 2>&1
           { echo "## tests"; npx vitest run; echo "exit=$?"; } >> ci-report.txt 2>&1
           { echo "## build"; npx vite build; echo "exit=$?"; } >> ci-report.txt 2>&1
+          # build de test branché sur un faux Supabase local (http://localhost:54321) — jamais déployé
+          npx vite build --mode e2e --outDir dist-e2e > /dev/null 2>&1 || true
           cat ci-report.txt
           if grep -q "exit=[1-9]" ci-report.txt; then echo "failed=1" >> "$GITHUB_OUTPUT"; fi
       - name: Ranger le rapport
         if: always()
         run: |
-          mkdir -p /tmp/out && cp ci-report.txt /tmp/out/ && { [ -d dist ] && cp -r dist /tmp/out/ || true; }
+          mkdir -p /tmp/out && cp ci-report.txt /tmp/out/ && { [ -d dist ] && cp -r dist /tmp/out/ || true; } && { [ -d dist-e2e ] && cp -r dist-e2e /tmp/out/ || true; }
           cd /tmp/out && git init -q && git config user.name ci && git config user.email ci@users.noreply.github.com
           git add -A && git commit -qm "CI ${GITHUB_SHA}"
           git push -qf "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/ci/${GITHUB_REF_NAME}"

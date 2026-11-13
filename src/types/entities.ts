@@ -211,6 +211,9 @@ export interface Match extends BaseEntity {
   opponent_rank_snapshot?: { home_rank: number | null; away_rank: number | null }
   motm_player_id?: string
   motm_vote_closes_at?: string
+  /** match reporté (intempéries…) : date initialement prévue et motif ; `date` = date où il a été joué */
+  postponed_from?: string
+  postponed_reason?: string
   /** forfait (tapis vert, Art. 14) : équipe forfait — score officiel 3-0 pour l'adversaire */
   forfeit_team_id?: string
   /** numéro officiel du match (« PS-01 »…), jamais réutilisé */

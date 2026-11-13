@@ -9,6 +9,7 @@ import { Logo, MBL_LOGO } from './Logo'
 import { SeasonSelector } from './SeasonSelector'
 import { ScoreTicker } from '@/components/match/ScoreTicker'
 import { cn } from '@/lib/utils'
+import { SimBanner } from '@/components/sim/SimBanner'
 import { useEffect } from 'react'
 
 export const PUBLIC_NAV = [
@@ -33,6 +34,7 @@ export function PublicLayout() {
   useEffect(() => { setOpen(false); window.scrollTo({ top: 0 }) }, [loc.pathname])
   return (
     <div className="flex min-h-screen flex-col overflow-x-clip">
+      <SimBanner />
       <ScoreTicker />
       <header className="sticky top-0 z-40 border-b border-white/5 bg-night-900/80 backdrop-blur-xl no-print">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">

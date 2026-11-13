@@ -33,10 +33,8 @@ import { teamLogoSvg } from '@/lib/logos'
 import { DEFAULT_COMPETITION_NAMES } from '@/lib/competitionNames'
 import { FICTIVE_COMPANIES, FIRST_NAMES, LAST_NAMES } from './names'
 
-export const SIM_ID = 'sim-2026-2027'
-export const SIM_SEED = 20262027
-export const SIM_SEASON_ID = 'sim_season'
-export const SIM_SEASON_NAME = 'SIMULATION 2026/2027'
+import { SIM_ID, SIM_SEED, SIM_SEASON_ID, SIM_SEASON_NAME } from './constants'
+export { SIM_ID, SIM_SEED, SIM_SEASON_ID, SIM_SEASON_NAME }
 
 export type SimRows = { [N in EntityName]?: EntityMap[N][] }
 export type RealDb = { [N in EntityName]: EntityMap[N][] }

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
+import { SimBanner } from '@/components/sim/SimBanner'
 import { Link, Navigate, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { Image as ImageIcon, Gavel, Swords, Sparkles, CalendarClock,
   LayoutDashboard, CalendarRange, Trophy, Layers, Shield, Users, Grid3x3, Shuffle, CalendarDays, Radio, Zap, BarChart3, Award, Image, Upload,
-  ScrollText, UserCog, Settings, BookOpen, LogOut, Menu, X, ExternalLink, QrCode, Star, Scissors, Loader2 } from 'lucide-react'
+  ScrollText, UserCog, Settings, BookOpen, LogOut, Menu, X, ExternalLink, QrCode, Star, Scissors, Loader2, FlaskConical } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useAutoCutouts } from '@/hooks/useAutoCutouts'
 import { useAutoVisuals } from '@/hooks/useMatchVisuals'
@@ -53,6 +54,7 @@ export const ADMIN_NAV: { group: string; items: { to: string; label: string; ico
     { to: '/admin/journal', label: "Journal d'activité", icon: ScrollText, area: 'audit' },
     { to: '/admin/administrateurs', label: 'Administrateurs', icon: UserCog, area: 'admins' },
     { to: '/admin/parametres', label: 'Paramètres', icon: Settings, area: 'settings' },
+    { to: '/admin/simulation', label: 'Simulation', icon: FlaskConical, area: 'dashboard' },
   ] },
 ]
 
@@ -97,6 +99,7 @@ export function AdminLayout() {
   )
   return (
     <AdminScopeProvider>
+      <SimBanner />
       <div className="flex min-h-screen">
         {!live && <aside className="sticky top-0 hidden h-screen w-64 shrink-0 overflow-y-auto border-r border-white/5 bg-night-950/70 p-4 lg:block"><div className="mb-6"><Logo to="/admin" subtitle="Administration" /></div>{nav}</aside>}
         {open && <div className="fixed inset-0 z-50 bg-black/60 lg:hidden" onClick={() => setOpen(false)}><aside className="h-full w-72 overflow-y-auto bg-night-900 p-4" onClick={(e) => e.stopPropagation()}><div className="mb-6 flex items-center justify-between"><Logo to="/admin" subtitle="Admin" /><button onClick={() => setOpen(false)}><X /></button></div>{nav}</aside></div>}

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { toast } from '@/components/ui/toast'
 import { VisualFrame } from '@/components/share/VisualFrame'
+import { isSimActive } from '@/sim/simMode'
 
 const W = 1080, H = 1350, CARD_W = 660
 
@@ -49,6 +50,7 @@ export function shareLinks(url: string, text: string) {
 export function CardShareActions({ card, fileName, url, text, subtitle, downloadLabel = 'Télécharger ma carte' }: { card: ReactNode; fileName: string; url: string; text: string; subtitle?: string; downloadLabel?: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const [busy, setBusy] = useState<'dl' | 'share' | null>(null)
+  const sim = isSimActive()
   const [fallback, setFallback] = useState(false)
   const [copied, setCopied] = useState(false)
 
@@ -79,12 +81,12 @@ export function CardShareActions({ card, fileName, url, text, subtitle, download
     <>
       <div className="grid w-full gap-2">
         <Button size="sm" onClick={download} disabled={!!busy} className="w-full">{busy === 'dl' ? <Loader2 className="animate-spin" /> : <Download />}{downloadLabel}</Button>
-        <Button size="sm" variant="outline" onClick={share} disabled={!!busy} className="w-full border-white/30 bg-white/10 text-white hover:bg-white/20">{busy === 'share' ? <Loader2 className="animate-spin" /> : <Share2 />}Partager</Button>
+        {sim ? <p className="text-center text-xs text-amber-300">Mode simulation : partage désactivé</p> : <Button size="sm" variant="outline" onClick={share} disabled={!!busy} className="w-full border-white/30 bg-white/10 text-white hover:bg-white/20">{busy === 'share' ? <Loader2 className="animate-spin" /> : <Share2 />}Partager</Button>}
       </div>
       {/* composition 1080 × 1350 rendue hors écran pour l'export */}
       <div aria-hidden className="pointer-events-none fixed left-[-20000px] top-0" style={{ width: W, height: H }}>
         <div ref={ref} style={{ width: W, height: H }}>
-          <VisualFrame accent="#F05A22" subtitle={subtitle} height={H}>
+          <VisualFrame accent="#F05A22" subtitle={sim ? `SIMULATION — données fictives${subtitle ? ` · ${subtitle}` : ''}` : subtitle} height={H}>
             <div style={{ width: CARD_W }}>{card}</div>
           </VisualFrame>
         </div>

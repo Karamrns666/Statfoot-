@@ -4,7 +4,8 @@
 // ni dans les vraies données ni ailleurs).
 import { adminRest, cloudAuth, cloudEnabled } from '@/api/cloud'
 import type { BaseEntity } from '@/types/entities'
-import { SIM_ID, type SimReport, type SimRows } from './simulation'
+import { SIM_ID } from './constants'
+import type { SimReport, SimRows } from './simulation'
 
 const FLAG = 'statfoot:sim-mode'
 export interface SimMeta { id: 'info'; generated_at: string; generated_by?: string; seed: number; report: SimReport; baseline?: Record<string, number>; is_simulation: true; simulation_id: string }

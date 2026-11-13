@@ -1,3 +1,4 @@
+import { isSimActive } from '@/sim/simMode'
 // Fiche match publique : « Partager » ouvre le partage natif du téléphone avec l'image (post / story),
 // « Télécharger l'image » en secours. Images générées dans le navigateur du visiteur, à la charte officielle.
 import { useState } from 'react'
@@ -38,7 +39,8 @@ function ShareDialog({ match, open, onOpenChange }: { match: Match; open: boolea
     setBusy(story ? 'story' : 'share')
     try {
       const file = await getFile(story)
-      if (canShareFiles && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], title: 'Morocco Business League', text: prev.plan?.caption })
+      if (isSimActive()) { toast.error('Mode simulation : partage désactivé (téléchargement seulement)'); downloadBlob(file, file.name) }
+      else if (canShareFiles && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], title: 'Morocco Business League', text: prev.plan?.caption })
       else downloadBlob(file, file.name)
     } catch (e) { if ((e as Error).name !== 'AbortError') toast.error('Partage impossible : téléchargez l’image') } finally { setBusy(null) }
   }

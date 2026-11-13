@@ -1,3 +1,4 @@
+import { isSimActive } from '@/sim/simMode'
 // Fenêtre générique : aperçu d'un visuel PNG + « Télécharger » / « Partager » (Web Share avec le fichier),
 // boutons toujours visibles (pied collant) et état de chargement.
 import { useEffect, useState } from 'react'
@@ -26,7 +27,7 @@ export function VisualShareDialog({ open, onOpenChange, title, description, file
   const canShare = typeof navigator !== 'undefined' && !!navigator.canShare && !!blob && navigator.canShare({ files: [file()] })
   const share = async () => {
     setBusy('share')
-    try { if (canShare) await navigator.share({ files: [file()], title, text: caption }); else downloadBlob(blob!, fileName) }
+    try { if (isSimActive()) { toast.error('Mode simulation : partage désactivé (téléchargement seulement)'); downloadBlob(blob!, fileName) } else if (canShare) await navigator.share({ files: [file()], title, text: caption }); else downloadBlob(blob!, fileName) }
     catch (e) { if ((e as Error).name !== 'AbortError') toast.error('Partage impossible : téléchargez l’image') } finally { setBusy(null) }
   }
   return (

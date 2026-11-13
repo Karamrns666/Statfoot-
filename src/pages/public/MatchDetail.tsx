@@ -63,6 +63,7 @@ export default function MatchDetail() {
             {live ? <span className="inline-flex items-center gap-2"><span className="rounded bg-red-500 px-2 py-0.5 text-xs font-black uppercase tracking-wider text-white">En direct</span><LiveBadge match={m} /></span>
               : <span className={cn('rounded-full px-2 py-0.5 text-xs font-bold uppercase', m.status === 'finished' ? 'bg-white/10' : m.status === 'postponed' || m.status === 'cancelled' ? 'bg-amber-400/15 text-amber-300' : 'bg-neon/10 text-neon')}>{STATUS_LABEL[m.status]}</span>}
           </div>
+          {m.postponed_from && <p className="-mt-2 mb-4 text-center text-xs font-semibold text-amber-300">Match reporté — initialement prévu le {fmtDay(m.postponed_from)} à {fmtHour(m.postponed_from)}{m.postponed_reason ? ` (${m.postponed_reason})` : ''}</p>}
           <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-3 sm:gap-8">
             <TeamBlock id={m.home_team_id} />
             <div className="flex flex-col items-center pt-2">

@@ -17,13 +17,16 @@ import { REGLEMENT } from '@/lib/reglement'
 import { TiebreakNote } from '@/components/reglement/TiebreakNote'
 import { competitionZones } from '@/lib/zones'
 import { exportStandingsPdf } from '@/lib/pdf'
+import { TournamentView } from '@/components/standings/TournamentView'
 
 
 export default function Standings() {
   const { league, settings } = useData()
   const L = useLookup()
   const season = useEffectiveSeason()
-  const comps = useSeasonCompetitions().filter((c) => c.phase !== 'knockout')
+  const allComps = useSeasonCompetitions()
+  const comps = allComps.filter((c) => c.phase !== 'knockout')
+  const tournaments = allComps.filter((c) => c.phase === 'knockout' && c.format === 'groups_knockout')
   const { slug } = useParams()
   const navigate = useNavigate()
   // /classement/master, /classement/challenger… ; anciennes adresses (gold-cup, silver-cup) redirigées
@@ -44,13 +47,15 @@ export default function Standings() {
   const preRows = pre ? displayRanking(pre).map((r) => ({ ...r, gd: r.diff, yellow: 0, red: 0, form: [] })) : []
   const tabs = [...comps.map((c) => ({ id: c.id, label: c.name, rows: pre && c.id === pre.comp.id ? preRows : competitionStandings(league, c.id), comp: c })), ...(comps.length > 1 ? [{ id: 'general', label: 'Général', rows: general, comp: undefined }] : [])]
   const current = tabs.find((t) => t.id === tab) ?? tabs[0]
+  const tabValue = tournaments.some((c) => c.id === tab) ? tab : current.id
   return (
     <div>
       <PageHeader title="Classement" subtitle={`${season?.name} · Victoire ${pc.win} pts · Nul ${pc.draw} pt · Défaite ${pc.loss} pt`}>
         <Button variant="outline" size="sm" onClick={() => exportStandingsPdf(`Classement ${current.label}`, `${settings.league_name} · ${season?.name}`, current.rows, (id) => L.team.get(id)?.name ?? id)}><FileDown />PDF</Button>
       </PageHeader>
-      <Tabs value={current.id} onValueChange={setTab}>
-        <TabsList>{tabs.map((t) => <TabsTrigger key={t.id} value={t.id}>{t.label}</TabsTrigger>)}</TabsList>
+      <Tabs value={tabValue} onValueChange={setTab}>
+        <TabsList>{tabs.map((t) => <TabsTrigger key={t.id} value={t.id}>{t.label}</TabsTrigger>)}{tournaments.map((c) => <TabsTrigger key={c.id} value={c.id}>{c.name}</TabsTrigger>)}</TabsList>
+        {tournaments.map((c) => <TabsContent key={c.id} value={c.id}><TournamentView comp={c} /></TabsContent>)}
         {tabs.map((t) => (
           <TabsContent key={t.id} value={t.id}>
             {pre && t.comp?.id === pre.comp.id ? (

@@ -1,3 +1,4 @@
+import { SimBanner } from '@/components/sim/SimBanner'
 // Mode TV / écran géant : /tv (tous les terrains) ou /live/:terrain (un terrain — cible du QR code).
 //  · Plusieurs matchs en même temps → onglets pour passer de l'un à l'autre + rotation automatique (20 s, désactivable).
 //  · Match en direct : score, chrono, buteurs avec minute, cartons, stats live (tirs, tirs cadrés, arrêts, possession).
@@ -69,6 +70,7 @@ export default function TvMode() {
   const url = `${location.origin}/live/${terrain ?? 'tous'}`
   return (
     <div className="tv fixed inset-0 z-50 flex flex-col overflow-y-auto text-white sm:overflow-hidden" style={{ background: 'radial-gradient(ellipse 50% 45% at 8% 0%, rgba(160,210,255,.16), transparent 70%), radial-gradient(ellipse 50% 45% at 92% 0%, rgba(160,210,255,.13), transparent 70%), #020B22' }}>
+      <SimBanner compact />
       {/* barre du haut */}
       <header className="flex items-center gap-4 px-[2vw] pt-[1.6vh]">
         <Logo subtitle={settings.league_name} />

@@ -191,5 +191,12 @@ export async function pushRows(rows: { entity: string; id: string; data: unknown
   }
 }
 export const META = { entity: '__meta', init: 'init', migrations: 'migrations' } as const
+
+/** Appel REST / RPC Supabase avec le jeton de l'admin connecté (simulation : table sim_rows et fonctions dédiées). */
+export async function adminRest(path: string, init: RequestInit = {}) {
+  const token = await accessToken()
+  if (!token) throw new Error('Connexion admin requise')
+  return call(path, { ...init, token })
+}
 export const canWrite = () => !!(session && profile && profile.status === 'active')
 export type { EntityName }

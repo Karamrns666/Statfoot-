@@ -132,6 +132,7 @@ export function buildSimulation(real: RealDb, opts: { seed?: number; generatedAt
   // --- clubs et équipes (vrais noms et logos), niveau d'ancienneté conservé
   const clubs: Club[] = [], teams: Team[] = [], players: Player[] = []
   const strength = new Map<string, number>()
+  const teamById = new Map<string, Team>()
   const weight = new Map<string, number>()
   const realNames = new Set(real.Player.map((p) => norm(`${p.first_name}${p.last_name}`)))
   const usedNames = new Set<string>()
@@ -145,7 +146,7 @@ export function buildSimulation(real: RealDb, opts: { seed?: number; generatedAt
     const k = t.short_name.toLowerCase()
     const club: Club = tag({ id: `sim_club_${k}`, name: t.name, logo_url: t.logo_url, seasons_override: seasonsCount > 1 ? seasonsCount : undefined } as Club)
     const team: Team = tag({ id: `sim_t_${k}`, season_id: SIM_SEASON_ID, club_id: club.id, name: t.name, short_name: t.short_name, company: t.company ?? t.name, logo_url: t.logo_url, company_logo_url: t.company_logo_url, primary_color: t.primary_color, secondary_color: t.secondary_color, status: 'active' } as Team)
-    clubs.push(club); teams.push(team)
+    clubs.push(club); teams.push(team); teamById.set(team.id, team)
     strength.set(team.id, rnd.normal() * 0.42)
     // 10 à 12 joueurs fictifs, 1 ou 2 gardiens, 1 capitaine
     const n = nPlayers ?? rnd.int(10, 12), gks = rnd.chance(0.45) ? 2 : 1
@@ -165,7 +166,6 @@ export function buildSimulation(real: RealDb, opts: { seed?: number; generatedAt
   }
   for (const t of realTeams) addTeam(t, sen.get(t.id)?.seasons ?? 1)
   const teamIds = teams.map((t) => t.id)
-  const teamById = new Map(teams.map((t) => [t.id, t]))
   const rosterOf = (tid: string) => players.filter((p) => p.team_id === tid)
 
   // --- matchs

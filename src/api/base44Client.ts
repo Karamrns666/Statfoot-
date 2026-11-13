@@ -9,6 +9,7 @@
 import { store, newId } from './localStore'
 import { ENTITY_NAMES, type BaseEntity, type EntityMap, type EntityName } from '@/types/entities'
 import { getSessionUser } from './session'
+import { assertWritable, isSimActive } from '@/sim/simMode'
 
 export type Query<T> = { [K in keyof T]?: T[K] | { $in: T[K][] } | { $ne: T[K] } }
 
@@ -78,6 +79,7 @@ export function entityApi<N extends EntityName>(name: N) {
       return clone(row)
     },
     async create(data: Omit<T, 'id'> & { id?: string }): Promise<T> {
+      assertWritable()
       const now = new Date().toISOString()
       const row = { ...data, id: data.id ?? newId(), created_date: now, updated_date: now, created_by: getSessionUser()?.email } as T
       store.replace(name, [...store.all(name), row])
@@ -85,6 +87,7 @@ export function entityApi<N extends EntityName>(name: N) {
       return clone(row)
     },
     async bulkCreate(rows: (Omit<T, 'id'> & { id?: string })[]): Promise<T[]> {
+      assertWritable()
       const now = new Date().toISOString()
       const created = rows.map((d) => ({ ...d, id: d.id ?? newId(), created_date: now, updated_date: now } as T))
       store.replace(name, [...store.all(name), ...created])
@@ -92,6 +95,7 @@ export function entityApi<N extends EntityName>(name: N) {
       return clone(created)
     },
     async update(id: string, patch: Partial<T>): Promise<T> {
+      assertWritable()
       const rows = store.all<T>(name)
       const idx = rows.findIndex((r) => r.id === id)
       if (idx < 0) throw new Error(`${name} ${id} introuvable`)
@@ -106,6 +110,7 @@ export function entityApi<N extends EntityName>(name: N) {
       return clone(next)
     },
     async delete(id: string): Promise<void> {
+      assertWritable()
       const rows = store.all<T>(name)
       const row = rows.find((r) => r.id === id)
       store.replace(name, rows.filter((r) => r.id !== id))
@@ -120,5 +125,5 @@ const entities = Object.fromEntries(ENTITY_NAMES.map((n) => [n, entityApi(n)])) 
 import { auth } from './auth'
 import { integrations } from './integrations'
 
-export const base44 = { entities, auth, integrations, logActivity: (action: string, entity: EntityName, row?: BaseEntity, details?: Record<string, unknown>) => log(action, entity, row, details) }
+export const base44 = { entities, auth, integrations, logActivity: (action: string, entity: EntityName, row?: BaseEntity, details?: Record<string, unknown>) => { if (!isSimActive()) log(action, entity, row, details) } }
 export { store }

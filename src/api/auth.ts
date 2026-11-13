@@ -2,6 +2,7 @@
 // Liste blanche : seuls les comptes créés ou invités par un admin peuvent se connecter.
 import { store, newId } from './localStore'
 import { getSessionUser, setSession } from './session'
+import { cloudAuth, cloudEnabled } from './cloud'
 import type { AdminUser, BaseEntity } from '@/types/entities'
 
 function audit(action: string, u: AdminUser, details?: Record<string, unknown>) {
@@ -19,7 +20,7 @@ function finishLogin(u: AdminUser, extra: Partial<AdminUser> = {}) {
 
 const find = (email: string) => store.all<AdminUser>('AdminUser').find((x) => x.email.toLowerCase() === email.trim().toLowerCase())
 
-export const auth = {
+const localAuth = {
   async me(): Promise<AdminUser | null> {
     const u = getSessionUser()
     if (!u || u.status === 'disabled') return null
@@ -44,3 +45,11 @@ export const auth = {
   },
   async logout() { setSession(null) },
 }
+
+/** Supabase si configuré (comptes réels), sinon simulation locale. */
+export const auth = cloudEnabled ? {
+  async me() { return cloudAuth.me() },
+  login: cloudAuth.login,
+  async loginWithGoogle(): Promise<AdminUser> { throw new Error('Connexion Google non disponible : utilisez votre e-mail et votre mot de passe.') },
+  logout: cloudAuth.logout,
+} : localAuth

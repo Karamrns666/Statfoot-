@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
 import { base44 } from '@/api/base44Client'
+import { cloudAuth, cloudEnabled, onAuthChange } from '@/api/cloud'
 import type { AdminUser } from '@/types/entities'
 import { useData } from './useData'
 
@@ -12,6 +13,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
   const refresh = useCallback(async () => { setUser(await base44.auth.me()); setLoading(false) }, [])
   useEffect(() => { if (ready) refresh() }, [ready, db.AdminUser, refresh])
+  useEffect(() => onAuthChange(() => { refresh() }), [refresh])
+  useEffect(() => { if (ready && cloudEnabled) cloudAuth.refreshProfile() }, [ready])
   const value: AuthCtx = {
     user, loading,
     login: async (e, p) => { await base44.auth.login(e, p); await refresh() },

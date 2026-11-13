@@ -37,6 +37,9 @@ const A = {
   Captains: lazy(() => import('@/pages/admin/CaptainsAdmin')),
   CaptainMatch: lazy(() => import('@/pages/admin/CaptainsAdmin').then((m) => ({ default: m.CaptainMatchEditor }))),
   Login: lazy(() => import('@/pages/admin/Login')),
+  ChangePassword: lazy(() => import('@/pages/admin/AccountPages').then((m) => ({ default: m.ChangePassword }))),
+  ForgotPassword: lazy(() => import('@/pages/admin/AccountPages').then((m) => ({ default: m.ForgotPassword }))),
+  ResetPassword: lazy(() => import('@/pages/admin/AccountPages').then((m) => ({ default: m.ResetPassword }))),
   Dashboard: lazy(() => import('@/pages/admin/Dashboard')),
   Seasons: named(sport, 'Seasons'), Competitions: named(sport, 'Competitions'), Divisions: named(sport, 'Divisions'), Teams: named(sport, 'Teams'),
   Players: lazy(() => import('@/pages/admin/PlayersAdmin')),
@@ -65,6 +68,9 @@ export default function App() {
         <Route path="/tv" element={<P.Tv />} />
         <Route path="/live/:terrain" element={<P.Tv />} />
         <Route path="/admin/login" element={<A.Login />} />
+        <Route path="/admin/mot-de-passe" element={<A.ChangePassword />} />
+        <Route path="/admin/mot-de-passe-oublie" element={<A.ForgotPassword />} />
+        <Route path="/admin/reinitialisation" element={<A.ResetPassword />} />
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={guard('dashboard', <A.Dashboard />)} />
           <Route path="saisons" element={guard('sport', <A.Seasons />)} />

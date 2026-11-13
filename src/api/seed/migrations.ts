@@ -339,14 +339,22 @@ export function migrate(db: Rules6Data, from = 0): Rules6Data {
   return changed
 }
 
+export const MIGRATION_COUNT = STEPS.length
+const MIGRATED = ['Player', 'MatchEvent', 'MatchTeamStats', 'Award', 'TeamOfWeek', 'Lineup', 'Page', 'Team', 'Settings', 'Rulebook', 'Season', 'Competition', 'Match', 'Division', 'Club', 'Suspension', 'Draw', 'CaptainTeam', 'AuditLog'] as const
+
+/** Applique au contenu du store les migrations à partir de l'étape `from` (données du navigateur ou de Supabase). */
+export function migrateStoreFrom(from: number) {
+  if (from >= STEPS.length) return
+  const db = Object.fromEntries(MIGRATED.map((n) => [n, store.all(n)])) as Rules6Data
+  const changed = migrate(db, from)
+  store.batch(() => { for (const [name, rows] of Object.entries(changed)) store.replace(name as (typeof MIGRATED)[number], rows as never) })
+}
+
 /** Applique les migrations manquantes sur les données du navigateur. */
 export function migrateStoredData() {
   const legacy = store.getFlag('migrated-6v6') ? 1 : 0
   const from = Number(store.getFlag(VERSION_FLAG) ?? legacy) || legacy
   if (from >= STEPS.length) return
-  const names = ['Player', 'MatchEvent', 'MatchTeamStats', 'Award', 'TeamOfWeek', 'Lineup', 'Page', 'Team', 'Settings', 'Rulebook', 'Season', 'Competition', 'Match', 'Division', 'Club', 'Suspension', 'Draw', 'CaptainTeam', 'AuditLog'] as const
-  const db = Object.fromEntries(names.map((n) => [n, store.all(n)])) as Rules6Data
-  const changed = migrate(db, from)
-  store.batch(() => { for (const [name, rows] of Object.entries(changed)) store.replace(name as (typeof names)[number], rows as never) })
+  migrateStoreFrom(from)
   store.setFlag(VERSION_FLAG, String(STEPS.length))
 }

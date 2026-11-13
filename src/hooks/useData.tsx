@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import { applyCompetitionNames } from '@/lib/competitionNames'
 import { base44, store } from '@/api/base44Client'
 import { ensureSeeded } from '@/api/seed'
+import { startCloudSync } from '@/api/cloudSync'
 import { ENTITY_NAMES, type EntityMap, type EntityName, type Settings } from '@/types/entities'
 import type { LeagueData } from '@/lib/stats'
 import { leagueFromDb } from '@/lib/leagueData'
@@ -20,7 +21,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     ensureSeeded()
     let alive = true
-    Promise.all(ENTITY_NAMES.map(async (n) => [n, await base44.entities[n].list()] as const)).then((pairs) => {
+    // Supabase : on attend la première copie des données partagées (5 s maximum, sinon données locales)
+    const first = Promise.race([startCloudSync(), new Promise((r) => setTimeout(r, 5000))])
+    first.then(() => Promise.all(ENTITY_NAMES.map(async (n) => [n, await base44.entities[n].list()] as const))).then((pairs) => {
       if (!alive) return
       setDb(Object.fromEntries(pairs) as unknown as DB)
       setReady(true)

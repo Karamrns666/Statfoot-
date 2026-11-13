@@ -74,6 +74,7 @@ export function AdminLayout() {
   useAutoVisuals(!!user && user.role !== 'operator')
   if (loading) return <Spinner />
   if (!user) return <Navigate to={`/admin/login?next=${encodeURIComponent(loc.pathname)}`} replace />
+  if (user.must_change_password) return <Navigate to="/admin/mot-de-passe" replace />
   if (user.role === 'operator' && loc.pathname === '/admin') return <Navigate to="/admin/match-center" replace />
   const live = loc.pathname.startsWith('/admin/match-center/') && loc.pathname.split('/').length > 3
   const nav = (

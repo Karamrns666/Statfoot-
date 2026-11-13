@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
+import { cloudEnabled } from '@/api/cloud'
 import { AlertTriangle, Check, Link2, Plus, RotateCcw, Save, Send, Upload } from 'lucide-react'
 import { base44 } from '@/api/base44Client'
 import { resetLeagueData } from '@/api/seed'
@@ -197,7 +198,12 @@ export function SettingsPage() {
 }
 
 // ---------------------------------------------------------------------------
+const CloudAdmins = lazy(() => import('./CloudAdmins'))
 export function AdminsPage() {
+  if (cloudEnabled) return <Suspense fallback={null}><CloudAdmins /></Suspense>
+  return <LocalAdminsPage />
+}
+function LocalAdminsPage() {
   const { user } = useAuth()
   const [email, setEmail] = useState('')
   const [role, setRole] = useState('operator')

@@ -21,8 +21,15 @@ function read<T extends BaseEntity>(name: EntityName): T[] {
   return memory.get(name) as T[]
 }
 
+/** Appelé à chaque écriture (synchronisation Supabase) avec les lignes avant / après. */
+type WriteHook = (name: EntityName, before: BaseEntity[], after: BaseEntity[]) => void
+let writeHook: WriteHook | null = null
+export function setWriteHook(h: WriteHook | null) { writeHook = h }
+
 function write(name: EntityName, rows: BaseEntity[]) {
+  const before = writeHook ? read(name) : []
   memory.set(name, rows)
+  writeHook?.(name, before, rows)
   if (hasLS) {
     try { window.localStorage.setItem(PREFIX + name, JSON.stringify(rows)) } catch (e) { console.error('localStorage plein ?', e) }
   }

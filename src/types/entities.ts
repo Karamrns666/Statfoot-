@@ -540,8 +540,10 @@ export interface AdminUser extends BaseEntity {
   invited_by?: string
   activated_at?: string
   last_login?: string
-  /** mock local uniquement — dans Base44 l'authentification est gérée par la plateforme */
+  /** mock local uniquement — avec Supabase, les mots de passe sont hachés et gérés par Supabase Auth */
   password?: string
+  /** changement de mot de passe obligatoire à la prochaine connexion (Supabase) */
+  must_change_password?: boolean
 }
 
 export interface EntityMap {

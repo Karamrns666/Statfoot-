@@ -62,10 +62,10 @@ export const SENIORITY_STYLE: Record<SeniorityTier, SeniorityStyle> = {
   platinum: {
     frame: 'linear-gradient(150deg, #FFFFFF 0%, #C9D2DE 18%, #7F8A9C 38%, #F6F9FC 55%, #9AA5B6 75%, #E8EDF4 100%)',
     bg: 'radial-gradient(120% 60% at 50% 0%, #22306B 0%, transparent 62%), linear-gradient(180deg, #121B45 0%, #0A1230 45%, #060A1E 100%)',
-    sheen: 'linear-gradient(115deg, transparent 8%, rgb(168 85 247 / .38) 26%, rgb(34 211 238 / .34) 44%, rgb(244 114 182 / .34) 62%, rgb(129 140 248 / .3) 78%, transparent 94%)',
+    sheen: 'linear-gradient(115deg, transparent 22%, rgb(168 85 247 / .2) 34%, rgb(34 211 238 / .18) 45%, rgb(244 114 182 / .18) 56%, transparent 68%)',
     sheenBlend: 'screen',
     pattern: DIAMONDS,
-    holo: 'linear-gradient(105deg, transparent 20%, rgb(196 181 253 / .55) 36%, rgb(103 232 249 / .5) 48%, rgb(249 168 212 / .5) 60%, transparent 76%)',
+    holo: 'linear-gradient(105deg, transparent 28%, rgb(196 181 253 / .5) 40%, rgb(103 232 249 / .45) 50%, rgb(249 168 212 / .45) 60%, transparent 72%)',
     fg: '#FFFFFF', fgSoft: '#C3CEEA', textShadow: '0 0 14px rgb(140 170 255 / .45)',
     chip: 'linear-gradient(180deg, #F6F9FC, #AEB8C8)', chipText: '#0A1230',
     bar: 'linear-gradient(180deg, #0E1A3F, #070C22)', barText: '#FFFFFF', barLabel: '#AFC0E6',

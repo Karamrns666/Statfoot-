@@ -26,6 +26,8 @@ export interface Season extends BaseEntity {
   cup_rounds?: number
   gold_size?: number
   closed_at?: string
+  /** saison masquée sur le site public (ses stats restent dans l'historique des joueurs) */
+  hidden?: boolean
   /** version du règlement Ardentia applicable (ex. 'v4') */
   rulebook_version?: string
 }

@@ -19,3 +19,13 @@ describe('applyPlayersSeasonTeams', () => {
     expect(applyPlayersSeasonTeams({ Team, Player: out.Player } as never)).toEqual({})
   })
 })
+
+describe('applyHideSeason2025', () => {
+  it('masque la saison 2025 une seule fois', async () => {
+    const { applyHideSeason2025 } = await import('./migrations')
+    const Season = [{ id: 'season_2025', is_active: false }, { id: 'season_2026', is_active: true }]
+    const out = applyHideSeason2025({ Season } as never)
+    expect((out.Season as { id: string; hidden?: boolean }[]).map((s) => `${s.id}:${!!s.hidden}`)).toEqual(['season_2025:true', 'season_2026:false'])
+    expect(applyHideSeason2025({ Season: out.Season } as never)).toEqual({})
+  })
+})

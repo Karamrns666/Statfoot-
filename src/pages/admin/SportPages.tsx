@@ -31,7 +31,7 @@ export function Seasons() {
     { key: 'name', label: 'Nom', required: true }, { key: 'status', label: 'Statut', type: 'select', options: ['upcoming', 'active', 'closed'].map((v) => ({ value: v, label: STATUS_FR[v] })) },
     { key: 'start_date', label: 'Début', type: 'date', required: true }, { key: 'end_date', label: 'Fin', type: 'date' },
     { key: 'league_phase_rounds', label: 'Journées phase de ligue', type: 'number' }, { key: 'cup_rounds', label: 'Journées Gold/Silver', type: 'number' },
-    { key: 'gold_size', label: `Équipes en ${phaseName('gold')}`, type: 'number' }, { key: 'is_active', label: 'Saison active (affichée par défaut)', type: 'boolean' },
+    { key: 'gold_size', label: `Équipes en ${phaseName('gold')}`, type: 'number' }, { key: 'is_active', label: 'Saison active (affichée par défaut)', type: 'boolean' }, { key: 'hidden', label: 'Masquer sur le site public (les stats restent dans l’historique des joueurs)', type: 'boolean' },
   ]
   return (
     <AdminPage title="Saisons" subtitle="Création, modification et clôture de saison">

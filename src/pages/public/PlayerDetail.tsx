@@ -33,17 +33,30 @@ export default function PlayerDetail() {
   const { id } = useParams()
   const { db, league } = useData()
   const L = useLookup()
-  const { scopeSeasonId, seasons } = useSeason()
+  const { scopeSeasonId, seasons, allSeasons, hasHidden } = useSeason()
   const eff = useEffectiveSeason()
   const sid = scopeSeasonId ?? eff?.id ?? null
   const season = sid ? L.season.get(sid) : undefined
-  const p = L.player.get(id ?? '')
+  const raw = L.player.get(id ?? '')
+  // joueur uniquement présent dans des saisons masquées : introuvable sur le site public
+  const p = raw && (!hasHidden || !raw.season_ids?.length || raw.season_ids.some((x) => seasons.some((s) => s.id === x))) ? raw : undefined
   // même fonction que Trophées et l'accueil : raceWithEvolution → computePlayerXP
   const ranking = useRace({ seasonId: sid }, 'xp')
   const scorers = useRace({ seasonId: sid }, 'top_scorer')
   const meIdx = ranking.findIndex((r) => r.item.player_id === id)
   const me = meIdx >= 0 ? ranking[meIdx] : undefined
-  const history = useMemo(() => seasons.filter((s) => p?.season_ids?.includes(s.id)).map((s) => ({ season: s, x: computePlayerXP(league, { seasonId: s.id }).get(id ?? '') })), [seasons, league, id, p])
+  // historique : y compris les saisons masquées et les fiches des saisons précédentes du même joueur
+  // (même personne, ou même nom dans la même entreprise — chaque saison a sa propre fiche joueur)
+  const history = useMemo(() => {
+    if (!p) return []
+    const key = (x: { first_name: string; last_name: string }) => `${x.first_name} ${x.last_name}`.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z]/g, '')
+    const club = L.team.get(p.team_id)?.short_name
+    const same = db.Player.filter((x) => x.id === p.id || (p.person_id && x.person_id === p.person_id) || (key(x) === key(p) && !!club && L.team.get(x.team_id)?.short_name === club))
+    return allSeasons.flatMap((s) => {
+      const rec = same.find((x) => x.id === p.id && x.season_ids?.includes(s.id)) ?? same.find((x) => x.season_ids?.includes(s.id))
+      return rec ? [{ season: s, x: computePlayerXP(league, { seasonId: s.id }).get(rec.id) }] : []
+    })
+  }, [allSeasons, league, db.Player, L.team, p])
   const log = useMemo(() => (id ? playerMatchLog(league, id, sid) : []), [league, id, sid])
   const suspendedLeft = useIsSuspended(id, sid)
   // homme du match : total de carrière (toutes saisons)

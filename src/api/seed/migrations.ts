@@ -349,7 +349,13 @@ export function applyPlayersSeasonTeams(db: Rules6Data): Rules6Data {
   return n ? { Player } : {}
 }
 
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams]
+/** Saison 2025-2026 masquée sur le site public (décision de la ligue) ; les stats restent dans l'historique des joueurs. */
+export function applyHideSeason2025(db: Rules6Data): Rules6Data {
+  if (!db.Season?.some((s) => s.id === 'season_2025' && !s.hidden)) return {}
+  return { Season: db.Season.map((s) => (s.id === 'season_2025' ? { ...s, hidden: true, is_active: false } : s)) }
+}
+
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams, applyHideSeason2025]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */

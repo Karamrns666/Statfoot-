@@ -31,9 +31,12 @@ export default function TeamDetail() {
   const { id } = useParams()
   const { db, league } = useData()
   const L = useLookup()
-  const { scopeSeasonId } = useSeason()
+  const { scopeSeasonId, seasons, hasHidden } = useSeason()
   const comps = useSeasonCompetitions()
-  const team = L.team.get(id ?? '')
+  const raw = L.team.get(id ?? '')
+  const rawSeason = raw ? raw.season_id ?? db.Competition.find((c) => c.team_ids?.includes(raw.id))?.season_id : undefined
+  // équipe d'une saison masquée : introuvable sur le site public
+  const team = raw && (!hasHidden || !rawSeason || seasons.some((s) => s.id === rawSeason)) ? raw : undefined
   const pre = usePreseason(team?.season_id ?? scopeSeasonId)
   const ts = useTeamStats({ seasonId: scopeSeasonId }).get(id ?? '')
   const xp = usePlayerXP({ seasonId: scopeSeasonId })

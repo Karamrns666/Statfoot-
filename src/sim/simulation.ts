@@ -172,7 +172,9 @@ export function buildSimulation(real: RealDb, opts: { seed?: number; generatedAt
   const matches: Match[] = [], events: MatchEvent[] = [], lineups: Lineup[] = []
   const bans = new Map<string, number>() // suspensions du conseil restant à purger (joueur → matchs)
   let mseq = 0, eseq = 0
-  const base = ref.avgGoals / 2
+  // calage : moyenne de buts par match identique à 2025/2026 malgré les écarts de niveau (loi log-normale des forces)
+  const calib = (() => { const r = makeRng(seed + 42); let t = 0; for (let i = 0; i < 4000; i++) { const d = (r.normal() - r.normal()) * 0.42; t += Math.exp(d) + Math.exp(-d) } return t / 4000 })()
+  const base = ref.avgGoals / calib
   const homeAdv = Math.log(Math.max(0.6, Math.min(1.6, (ref.home + 0.01) / (ref.away + 0.01)))) / 2
 
   interface PlayOpts { ko?: boolean; forceDraw?: boolean; forfeit?: string; red?: boolean; doubleYellow?: boolean; ownGoal?: boolean; rng?: Rng; extra?: Partial<Match> }

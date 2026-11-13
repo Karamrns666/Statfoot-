@@ -81,7 +81,7 @@ describe('mise à jour des navigateurs : le tirage J1 enregistré auparavant est
     expect(ms.map((m) => m.number).sort()).toEqual(OFFICIAL_J1_2026.map((r) => r.number).sort())
     expect(out.Match!.some((m) => m.id.startsWith('old_'))).toBe(false)
     expect(out.Competition!.find((c) => c.id === comp.id)!.preseason).toMatchObject({ draw_source: 'manual', number_counter: 11 })
-    const log = (out.AuditLog as { action: string; details: Record<string, unknown> }[])[0]
+    const log = (out.AuditLog as unknown as { action: string; details: Record<string, unknown> }[])[0]
     expect(log.action).toBe('preseason_official_draw')
     expect(log.details.message).toBe('Tirage J1 remplacé par le tirage officiel')
     expect(JSON.parse(log.details.sauvegarde_json as string).matches).toHaveLength(11)
@@ -92,6 +92,6 @@ describe('mise à jour des navigateurs : le tirage J1 enregistré auparavant est
     const d = old(); d.Match.find((m) => m.id === 'old_0')!.status = 'finished'
     const out = applyOfficialJ1(d as never)
     expect(out.Match).toBeUndefined()
-    expect((out.AuditLog as { action: string }[])[0].action).toBe('preseason_official_draw_blocked')
+    expect((out.AuditLog as unknown as { action: string }[])[0].action).toBe('preseason_official_draw_blocked')
   })
 })

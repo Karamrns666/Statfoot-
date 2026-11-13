@@ -5,9 +5,10 @@ import type { Match } from '@/types/entities'
 const m = (id: string, home: string, away: string, day?: string, time?: string, pitch?: string): Match => ({ id, season_id: 's', competition_id: 'c', home_team_id: home, away_team_id: away, status: 'scheduled', date: day && time ? wallToISO(day, time) : undefined, pitch })
 
 describe('horaires (heure du Maroc)', () => {
-  it('lundi 16 novembre 2026 à 21h00 au Maroc = 20h00 UTC ; aller-retour exact', () => {
-    expect(wallToISO('2026-11-16', '21:00')).toBe('2026-11-16T20:00:00.000Z')
-    expect(toWall('2026-11-16T20:00:00.000Z')).toBe('2026-11-16T21:00')
+  it('le Maroc est revenu à GMT le 20 septembre 2026 : 21h00 le 16 novembre 2026 = 21h00 UTC ; en 2025 (GMT+1) 21h00 = 20h00 UTC', () => {
+    expect(wallToISO('2026-11-16', '21:00')).toBe('2026-11-16T21:00:00.000Z')
+    expect(toWall('2026-11-16T21:00:00.000Z')).toBe('2026-11-16T21:00')
+    expect(wallToISO('2025-11-16', '21:00')).toBe('2025-11-16T20:00:00.000Z')
   })
   it('affichage en français : « Lundi 16 novembre · 21h00 · Terrain 1 » ; sans date : « Horaire à définir »', () => {
     expect(fmtWhen(m('a', 'x', 'y', '2026-11-16', '21:00', 'Terrain 1'))).toBe('Lundi 16 novembre · 21h00 · Terrain 1')

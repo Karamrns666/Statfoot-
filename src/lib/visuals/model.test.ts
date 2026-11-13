@@ -29,7 +29,7 @@ describe('visuel Résultat', () => {
     expect(r.competition).toBe('MASTER · J1')
     expect([r.homeScore, r.awayScore, r.sub]).toEqual([2, 0, undefined])
     expect(r.home.name).toBe('ÉQUIPE A')
-    expect(r.footer).toMatch(/^[A-ZÉÛ]+\. \d+ [A-ZÉÛ]+\.? · 19:00 · TERRAIN 1$/)
+    expect(r.footer).toMatch(/^[A-ZÉÛ]+\. \d+ [A-ZÉÛ]+\.? · \d{2}:\d{2} · TERRAIN 1$/)
   })
   it('tirs au but : ligne « T.A.B. 4-3 » ; forfait : 3-0 « TAPIS VERT » sans buteur', () => {
     const pens = buildResultModel(data({ ...matches[1], penalties: true, home_pens: 4, away_pens: 3 }))

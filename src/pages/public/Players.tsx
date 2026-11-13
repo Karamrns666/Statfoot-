@@ -5,6 +5,7 @@ import { LayoutGrid, ListOrdered, Search, Sparkles } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
 import { useSeason } from '@/hooks/useSeason'
 import { useRace } from '@/hooks/useStats'
+import { computePlayerXP } from '@/lib/xp'
 import { PageHeader, RankDelta, RookieBadge } from '@/components/league/Bits'
 import { FilterSelect } from '@/components/league/FilterSelect'
 import { PlayerAvatar, RoleBadge, TeamLogo } from '@/components/league/Identity'
@@ -29,7 +30,7 @@ const VIEWS: { value: View; label: string; icon: typeof LayoutGrid }[] = [
 ]
 
 export default function Players() {
-  const { db } = useData()
+  const { db, league } = useData()
   const L = useLookup()
   const { scopeSeasonId } = useSeason()
   const [params, setParams] = useSearchParams()
@@ -41,7 +42,18 @@ export default function Players() {
   const [phase, setPhase] = useState<PhaseFilter>('all')
   const [sort, setSort] = useState<Sort>('xp')
   const [shown, setShown] = useState(40)
-  const ranking = useRace({ seasonId: scopeSeasonId, phase }, 'xp')
+  const race = useRace({ seasonId: scopeSeasonId, phase }, 'xp')
+  // Les joueurs inscrits à la saison mais n'ayant pas encore joué apparaissent aussi (sans rang, 0 XP) :
+  // l'effectif est visible dès sa saisie, avant le premier match.
+  const ranking = useMemo(() => {
+    if (phase !== 'all') return race
+    const seen = new Set(race.map((r) => r.item.player_id))
+    const rest = [...computePlayerXP(league, { seasonId: scopeSeasonId, phase }).values()]
+      .filter((s) => !seen.has(s.player_id))
+      .sort((a, b) => playerName(L.player.get(a.player_id)).localeCompare(playerName(L.player.get(b.player_id))))
+      .map((item) => ({ item, rank: 0, previousRank: null, delta: null }))
+    return [...race, ...rest]
+  }, [race, league, scopeSeasonId, phase, L.player])
   const hasCups = db.Competition.some((c) => (!scopeSeasonId || c.season_id === scopeSeasonId) && (c.phase === 'gold' || c.phase === 'silver'))
   const seasonTeams = useMemo(() => {
     const ids = new Set(db.Competition.filter((c) => !scopeSeasonId || c.season_id === scopeSeasonId).flatMap((c) => c.team_ids ?? []))
@@ -101,7 +113,7 @@ export default function Players() {
           ) : (
             <div className="glass rounded-2xl p-1 sm:p-3">
               <SortableTable rows={rows.slice(0, 200)} rowKey={(r) => r.item.player_id} initial={{ key: 'rank', dir: 'asc' }} columns={[
-                { key: 'rank', label: 'Rang', headClassName: 'text-center', className: 'text-center', first: 'asc', sort: (r) => r.rank, render: (r) => <><div className="num text-lg">{r.rank}</div><RankDelta delta={r.delta} /></> },
+                { key: 'rank', label: 'Rang', headClassName: 'text-center', className: 'text-center', first: 'asc', sort: (r) => r.rank || 9999, render: (r) => <><div className="num text-lg">{r.rank || '—'}</div><RankDelta delta={r.delta} /></> },
                 { key: 'name', label: 'Joueur', sort: (r) => playerName(L.player.get(r.item.player_id)), render: (r) => { const p = L.player.get(r.item.player_id)!; return (
                   <Link to={`/joueurs/${p.id}`} className="flex items-center gap-3 hover:text-neon">
                     <PlayerAvatar player={p} team={L.team.get(p.team_id)} size={36} />

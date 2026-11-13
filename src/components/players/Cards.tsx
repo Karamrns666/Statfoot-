@@ -24,7 +24,7 @@ export function XPCard({ r, player: p, team: t, className, faceOnly }: { r: Rank
       className={className} faceOnly={faceOnly}
       tier={tier} medals={bs?.unlocked} badgeTotal={bs?.total}
       firstName={p.first_name} lastName={p.last_name} position={p.position} captain={p.is_captain || t?.captain_player_id === p.id} team={t} photoUrl={p.photo_url} cutoutUrl={p.photo_card_mode === 'original' ? undefined : p.photo_cutout_url} ipg={ipg}
-      rating={s.xp} ratingLabel="XP" rank={r.rank} delta={r.delta}
+      rating={s.xp} ratingLabel="XP" rank={r.rank || undefined} delta={r.delta}
       badge={isRookie(p) ? <RookieBadge /> : undefined}
       front={gk
         ? [{ label: 'MJ', value: s.matches }, { label: 'ARR', value: s.saves, hint: 'Arrêts' }, { label: 'CS', value: s.clean_sheets, hint: 'Clean sheets' }, { label: 'BE', value: s.conceded, hint: 'Buts encaissés' }]

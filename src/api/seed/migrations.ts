@@ -325,7 +325,31 @@ export function applyOfficialJ1(db: Rules6Data): Rules6Data {
   return out
 }
 
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1]
+/**
+ * Joueurs importés pour une saison mais rattachés à l'équipe d'une AUTRE saison (l'import CSV prenait la première
+ * équipe portant le nom court, p. ex. ARW 2025 au lieu de ARW 2026) : ils sont replacés dans l'équipe de leur saison
+ * portant le même nom court. Seuls les joueurs d'une seule saison sont concernés (pas les anciens multi-saisons).
+ */
+export function applyPlayersSeasonTeams(db: Rules6Data): Rules6Data {
+  if (!db.Player || !db.Team) return {}
+  const comps = db.Competition ?? []
+  const seasonOf = (t: Team) => t.season_id ?? comps.find((c) => c.team_ids?.includes(t.id))?.season_id
+  const teams = new Map(db.Team.map((t) => [t.id, t]))
+  let n = 0
+  const Player = db.Player.map((p) => {
+    const t = teams.get(p.team_id)
+    if (!t || p.season_ids?.length !== 1) return p
+    const ps = p.season_ids[0], ts = seasonOf(t)
+    if (!ts || ts === ps) return p
+    const target = db.Team!.find((x) => x.short_name === t.short_name && x.id !== t.id && seasonOf(x) === ps)
+    if (!target) return p
+    n++
+    return { ...p, team_id: target.id }
+  })
+  return n ? { Player } : {}
+}
+
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */

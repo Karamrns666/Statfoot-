@@ -29,6 +29,7 @@ import { AWARD_LABELS, computeAwards, computePlayerXP, computeTeamStats, isPlaye
 import { fmtScore } from '@/lib/matchEngine'
 import { fmtDate, playerName, roleLabels, toRole } from '@/lib/format'
 import { teamLogoSvg as teamLogoSvgFn } from '@/lib/logos'
+import { teamSeasonId } from '@/lib/clubs'
 import type { Award } from '@/types/entities'
 
 // ---------------------------------------------------------------------------
@@ -218,19 +219,25 @@ export function ImportCsv() {
   const [kind, setKind] = useState<'teams' | 'players'>('teams')
   const [rows, setRows] = useState<Record<string, string>[]>([])
   const [drag, setDrag] = useState(false)
+  // équipe de la saison sélectionnée (le même nom court existe pour chaque saison : ARW 2025, ARW 2026…)
+  const teamOf = (code?: string) => {
+    const c = (code ?? '').trim().toUpperCase()
+    const same = db.Team.filter((t) => t.short_name === c)
+    return same.find((t) => teamSeasonId(t, db.Competition) === seasonId) ?? (seasonId ? undefined : same[0])
+  }
   const parse = (f: File) => Papa.parse<Record<string, string>>(f, { header: true, skipEmptyLines: true, delimiter: '', complete: (r) => setRows(r.data) })
   const check = (r: Record<string, string>) => {
     if (kind === 'teams') return !r.nom ? 'nom manquant' : !r.nom_court || r.nom_court.length > 3 ? 'nom_court (3 lettres)' : db.Team.some((t) => t.short_name === r.nom_court.toUpperCase()) ? 'existe déjà' : ''
     if (!r.prenom || !r.nom) return 'prénom/nom manquant'
     if (r.gardien != null && !YES.test(r.gardien.trim()) && !NO.test(r.gardien.trim())) return 'gardien : oui ou non'
     if (r.capitaine != null && !YES.test(r.capitaine.trim()) && !NO.test(r.capitaine.trim())) return 'capitaine : oui ou non'
-    if (!db.Team.some((t) => t.short_name === (r.equipe_nom_court ?? '').toUpperCase())) return 'équipe inconnue'
+    if (!teamOf(r.equipe_nom_court)) return `équipe inconnue pour la saison ${seasonId ?? ''}`.trim()
     return ''
   }
   const ok = rows.filter((r) => !check(r))
   const run = async () => {
     if (kind === 'teams') await base44.entities.Team.bulkCreate(ok.map((r) => ({ name: r.nom, short_name: r.nom_court.toUpperCase(), company: r.entreprise, primary_color: r.couleur_principale || '#F85A00', secondary_color: '#04163D', logo_url: teamLogoSvgFn(r.nom_court.toUpperCase(), r.couleur_principale), status: 'active' as const })))
-    else await base44.entities.Player.bulkCreate(ok.map((r) => ({ first_name: r.prenom, last_name: r.nom, number: r.numero ? +r.numero : undefined, position: isGk(r) ? 'GK' as const : 'FIELD' as const, is_captain: r.capitaine != null && YES.test(r.capitaine.trim()), team_id: db.Team.find((t) => t.short_name === r.equipe_nom_court.toUpperCase())!.id, birth_date: r.date_naissance || undefined, email: r.email || undefined, status: 'active' as const, season_ids: [seasonId], documents: {} })))
+    else await base44.entities.Player.bulkCreate(ok.map((r) => ({ first_name: r.prenom, last_name: r.nom, number: r.numero ? +r.numero : undefined, position: isGk(r) ? 'GK' as const : 'FIELD' as const, is_captain: r.capitaine != null && YES.test(r.capitaine.trim()), team_id: teamOf(r.equipe_nom_court)!.id, birth_date: r.date_naissance || undefined, email: r.email || undefined, status: 'active' as const, season_ids: [seasonId], documents: {} })))
     toast.success(`${ok.length} ligne(s) importée(s)`); setRows([])
   }
   return (

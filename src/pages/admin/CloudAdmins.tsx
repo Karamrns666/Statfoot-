@@ -41,7 +41,7 @@ export default function CloudAdmins() {
   return (
     <AdminPage title="Administrateurs" subtitle="Comptes Supabase : mots de passe hachés, réinitialisation par e-mail, journal des actions.">
       <div className="space-y-4">
-        {!cs.initialized && (
+        {!cs.initialized && !!cs.lastSync && (
           <Card className="border-amber-300/40">
             <CardHeader><CardTitle className="flex items-center gap-2"><CloudUpload className="size-5 text-amber-300" />Base Supabase vide</CardTitle><CardDescription>Première mise en service : envoyez les données de ce navigateur (saisons, équipes, matchs, tirage officiel…) vers Supabase. Ensuite, tous les admins et tous les visiteurs voient les mêmes données.</CardDescription></CardHeader>
             <CardContent><Button disabled={!!init} onClick={async () => { if (!confirm('Envoyer les données de ce navigateur vers Supabase ? À faire une seule fois, depuis le navigateur qui a les bonnes données.')) return; setInit('0 %'); try { const n = await initializeCloud((d, t) => setInit(`${Math.round((d / t) * 100)} %`)); toast.success(`${n} enregistrements envoyés — base initialisée`) } catch (e) { toast.error((e as Error).message) } finally { setInit('') } }}>{init ? <><Loader2 className="animate-spin" />{init}</> : <><CloudUpload />Initialiser la base</>}</Button></CardContent>

@@ -127,6 +127,11 @@ export function startCloudSync(): Promise<void> {
 /** Super-admin : envoie toutes les données de ce navigateur vers Supabase (première mise en service). */
 export async function initializeCloud(onProgress?: (done: number, total: number) => void) {
   if (!canWrite()) throw new Error('Connexion super-admin requise.')
+  // sécurité : ne jamais écraser une base déjà initialisée avec les données (peut-être anciennes) d'un navigateur
+  if ((await pullRows()).some((r) => r.entity === META.entity && r.id === META.init && !r.deleted)) {
+    await fullPull()
+    throw new Error('La base Supabase est déjà initialisée : rien n’a été envoyé.')
+  }
   const { MIGRATION_COUNT } = await import('./seed/migrations')
   const rows: Pending[] = []
   for (const name of ENTITY_NAMES) if (isSynced(name)) for (const r of store.all(name)) rows.push({ entity: name, id: r.id, data: r, deleted: false })

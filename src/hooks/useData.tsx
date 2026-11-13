@@ -21,8 +21,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     ensureSeeded()
     let alive = true
-    // Supabase : on attend la première copie des données partagées (5 s maximum, sinon données locales)
-    const first = Promise.race([startCloudSync(), new Promise((r) => setTimeout(r, 5000))])
+    // Supabase : on attend la première copie des données partagées (12 s maximum, sinon données locales)
+    const first = Promise.race([startCloudSync(), new Promise((r) => setTimeout(r, 12000))])
     first.then(() => Promise.all(ENTITY_NAMES.map(async (n) => [n, await base44.entities[n].list()] as const))).then((pairs) => {
       if (!alive) return
       setDb(Object.fromEntries(pairs) as unknown as DB)

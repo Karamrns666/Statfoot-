@@ -70,8 +70,8 @@ export function TeamCard(p: TeamCardProps) {
   const inner = <div className="pcard-inner text-[clamp(8.5px,4.6cqw,40px)]">{body}</div>
   if (p.faceOnly || !p.href) return <div className={cn('pcard tcard aspect-[63/92] w-full', p.className)} {...(p.faceOnly ? {} : shine)}>{inner}</div>
   return (
-    <Link to={p.href} aria-label={`${p.team.name} — fiche de l'équipe`} className={cn('pcard tcard block aspect-[63/92] w-full rounded-2xl outline-none transition hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neon', p.className)} {...shine}>
-      {inner}
+    <Link to={p.href} aria-label={`${p.team.name} — fiche de l'équipe`} className={cn('block w-full rounded-2xl outline-none transition hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neon', p.className)}>
+      <div className="pcard tcard aspect-[63/92] w-full" {...shine}>{inner}</div>
     </Link>
   )
 }

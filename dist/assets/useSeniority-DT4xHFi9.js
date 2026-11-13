@@ -1,0 +1,1 @@
+import{i as e}from"./rolldown-runtime-COiEfhsA.js";import{U as t,n}from"./useData-D23CNV8I.js";import{a as r}from"./seniority-DyzJWiYB.js";var i=e(t(),1);function a(){let{db:e}=n();return(0,i.useMemo)(()=>r(e.Team,e.Competition,e.Season,e.Club??[]),[e.Team,e.Competition,e.Season,e.Club])}function o(e){return a().get(e??``)}export{o as n,a as t};

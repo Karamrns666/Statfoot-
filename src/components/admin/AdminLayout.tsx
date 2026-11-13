@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Image as ImageIcon, Gavel, Swords, Sparkles,
+import { Image as ImageIcon, Gavel, Swords, Sparkles, CalendarClock,
   LayoutDashboard, CalendarRange, Trophy, Layers, Shield, Users, Grid3x3, Shuffle, CalendarDays, Radio, Zap, BarChart3, Award, Image, Upload,
   ScrollText, UserCog, Settings, BookOpen, LogOut, Menu, X, ExternalLink, QrCode, Star, Scissors, Loader2 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
@@ -25,6 +25,7 @@ export const ADMIN_NAV: { group: string; items: { to: string; label: string; ico
     { to: '/admin/competitions', label: 'Compétitions', icon: Trophy, area: 'sport' },
     { to: '/admin/divisions', label: 'Séries & Divisions', icon: Layers, area: 'sport' },
     { to: '/admin/pre-saison', label: 'Pré-saison', icon: Sparkles, area: 'sport' },
+    { to: '/admin/planning', label: 'Planning', icon: CalendarClock, area: 'sport' },
     { to: '/admin/tirage', label: 'Tirage & divisions', icon: Shuffle, area: 'sport' },
     { to: '/admin/groupes', label: 'Groupes & tirage', icon: Grid3x3, area: 'sport' },
   ] },

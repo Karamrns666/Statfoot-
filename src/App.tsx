@@ -32,6 +32,7 @@ const content = () => import('@/pages/admin/ContentPages')
 const misc = () => import('@/pages/admin/AdminMisc')
 const A = {
   Preseason: lazy(() => import('@/pages/admin/PreseasonAdmin')),
+  Planning: lazy(() => import('@/pages/admin/Planning')),
   WeeklyVisuals: lazy(() => import('@/pages/admin/WeeklyVisualsAdmin')),
   Captains: lazy(() => import('@/pages/admin/CaptainsAdmin')),
   CaptainMatch: lazy(() => import('@/pages/admin/CaptainsAdmin').then((m) => ({ default: m.CaptainMatchEditor }))),
@@ -74,6 +75,7 @@ export default function App() {
           <Route path="groupes" element={guard('sport', <A.Groups />)} />
           <Route path="tirage" element={guard('sport', <A.Draw />)} />
           <Route path="pre-saison" element={guard('sport', <A.Preseason />)} />
+          <Route path="planning" element={guard('sport', <A.Planning />)} />
           <Route path="matchs" element={guard('sport', <A.Matches />)} />
           <Route path="matchs/:id/saisie" element={guard('match_center', <A.QuickEntry />)} />
           <Route path="matchs/:id/feuille" element={guard('match_center', <A.Sheet />)} />

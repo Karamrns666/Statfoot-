@@ -1,3 +1,4 @@
+import { PITCHES } from '@/config/pitches'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ClipboardList, FileText, Plus, Radio, Trash2, Wand2, Network, Eye, EyeOff, Pencil, ListChecks } from 'lucide-react'
@@ -46,7 +47,7 @@ export default function MatchesAdmin() {
     { key: 'status', label: 'Statut', type: 'select', options: Object.entries(STATUS_LABEL).map(([value, label]) => ({ value, label })) },
     { key: 'home_team_id', label: 'Équipe domicile', type: 'select', required: true, options: db.Team.map((t) => ({ value: t.id, label: t.name })) },
     { key: 'away_team_id', label: 'Équipe extérieur', type: 'select', required: true, options: db.Team.map((t) => ({ value: t.id, label: t.name })) },
-    { key: 'date', label: 'Date & heure', type: 'datetime', required: true }, { key: 'pitch', label: 'Terrain', placeholder: 'Terrain 1' },
+    { key: 'number', label: 'N° de match (PS-…)' }, { key: 'date', label: 'Date & heure (heure du Maroc)', type: 'datetime' }, { key: 'pitch', label: 'Terrain', type: 'select', options: PITCHES.map((p) => ({ value: p, label: p })) },
     { key: 'referee', label: 'Arbitre' }, { key: 'half_duration_min', label: 'Durée mi-temps (min)', type: 'number' },
     { key: 'operator_user_id', label: 'Opérateur de saisie', type: 'select', options: db.AdminUser.filter((u) => u.status !== 'disabled').map((u) => ({ value: u.id, label: `${u.full_name ?? u.email}` })) },
     { key: 'forfeit_team_id', label: 'Forfait — tapis vert (équipe forfait)', type: 'select', options: [edit?.home_team_id, edit?.away_team_id].filter(Boolean).map((t) => ({ value: t as string, label: db.Team.find((x) => x.id === t)?.name ?? '' })) },

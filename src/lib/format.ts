@@ -1,13 +1,16 @@
 import { format, formatDistanceToNow, isToday, isTomorrow, isYesterday } from 'date-fns'
 import { fr } from 'date-fns/locale'
+import { toWall } from './matchTime'
 import type { EventType, MatchStatus, Position, Player } from '@/types/entities'
 
-export const fmtDate = (d?: string, f = 'EEE d MMM') => (d ? format(new Date(d), f, { locale: fr }) : '—')
-export const fmtTime = (d?: string) => (d ? format(new Date(d), 'HH:mm') : '')
-export const fmtDateTime = (d?: string) => (d ? format(new Date(d), "EEE d MMM yyyy 'à' HH:mm", { locale: fr }) : '—')
+/** Toutes les dates s'affichent à l'heure du Maroc, quel que soit le fuseau de l'appareil (date « murale » équivalente). */
+const zoned = (d: string | Date) => { const iso = typeof d === 'string' ? d : d.toISOString(); return /^\d{4}-\d{2}-\d{2}$/.test(iso) ? new Date(`${iso}T12:00:00`) : new Date(toWall(iso)) }
+export const fmtDate = (d?: string, f = 'EEE d MMM') => (d ? format(zoned(d), f, { locale: fr }) : '—')
+export const fmtTime = (d?: string) => (d ? format(zoned(d), 'HH:mm') : '')
+export const fmtDateTime = (d?: string) => (d ? format(zoned(d), "EEE d MMM yyyy 'à' HH:mm", { locale: fr }) : '—')
 export const fmtRelativeDay = (d?: string) => {
   if (!d) return '—'
-  const x = new Date(d)
+  const x = zoned(d)
   if (isToday(x)) return "Aujourd'hui"
   if (isTomorrow(x)) return 'Demain'
   if (isYesterday(x)) return 'Hier'

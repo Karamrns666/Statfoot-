@@ -4,7 +4,7 @@ import { ChevronRight, Star } from 'lucide-react'
 import type { Match, Team } from '@/types/entities'
 import { useLookup } from '@/hooks/useData'
 import { TeamLogo } from '@/components/league/Identity'
-import { fmtTime } from '@/lib/format'
+import { fmtHour } from '@/lib/matchTime'
 import { STAGE_LABELS } from '@/lib/schedule'
 import { cn } from '@/lib/utils'
 import { useLiveLabel } from './LiveBadge'
@@ -24,13 +24,14 @@ export function MatchRow({ match, favorites, onToggleFavorite }: { match: Match;
       <div className={cn('pointer-events-none relative flex w-16 shrink-0 flex-col items-center justify-center gap-0.5 border-r border-white/10 px-1 text-center', live ? 'bg-red-500/10' : 'bg-black/15')}>
         {live ? <LiveMinute match={match} />
           : SHORT[match.status] ? <span className={cn('font-display text-base font-extrabold', match.status === 'finished' ? 'text-muted-foreground' : 'text-amber-300')}>{SHORT[match.status]}</span>
-            : <span className="num text-lg text-neon">{fmtTime(match.date)}</span>}
+            : match.date ? <span className="num text-lg text-neon">{fmtHour(match.date)}</span> : <span className="text-[10px] font-bold leading-tight text-amber-200">Horaire à définir</span>}
       </div>
       <div className="pointer-events-none relative min-w-0 flex-1 px-3 py-2.5">
         <TeamLine team={home} score={done || live ? hs : null} winner={done && hs > as} loser={done && hs < as} live={live} fav={favorites?.has(match.home_team_id)} onFav={onToggleFavorite && (() => onToggleFavorite(match.home_team_id))} />
         <TeamLine team={away} score={done || live ? as : null} winner={done && as > hs} loser={done && as < hs} live={live} fav={favorites?.has(match.away_team_id)} onFav={onToggleFavorite && (() => onToggleFavorite(match.away_team_id))} />
         <div className="mt-1.5 flex items-center gap-2 truncate text-[11px] text-muted-foreground">
-          {match.pitch && <span>{match.pitch}</span>}
+          {match.number && <span className="font-bold text-foreground/80">{match.number}</span>}
+          {match.pitch && <span>{match.number ? '· ' : ''}{match.pitch}</span>}
           {stage && <span className="truncate">· {stage}</span>}
           {done && match.home_ht_score != null && <span>· MT {match.home_ht_score}-{match.away_ht_score}</span>}
           {match.penalties && <span>· TAB {match.home_pens}-{match.away_pens}</span>}

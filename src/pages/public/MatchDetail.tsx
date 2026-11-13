@@ -17,7 +17,8 @@ import { ShareVisualsDialog } from '@/components/share/ShareVisualsDialog'
 import { ShareMatchButton } from '@/components/visuals/ShareMatchVisuals'
 import { LiveBadge } from '@/components/match/LiveBadge'
 import { TeamStatsBars } from '@/components/match/TeamStatsBars'
-import { fmtDate, fmtDateTime, playerShort, STATUS_LABEL } from '@/lib/format'
+import { fmtDate, playerShort, STATUS_LABEL } from '@/lib/format'
+import { fmtDay, fmtHour } from '@/lib/matchTime'
 import { STAGE_LABELS } from '@/lib/schedule'
 import { byDate, competitionStandings, headToHead, isPlayed, matchScorers, resultFor, computePlayerXP } from '@/lib/stats'
 import { fmtMinute, fmtScore, keeperMatchStats, possession, timelineByPeriod, PERIOD_LABEL } from '@/lib/matchEngine'
@@ -67,7 +68,7 @@ export default function MatchDetail() {
             <div className="flex flex-col items-center pt-2">
               {showScore
                 ? <div className={cn('num flex items-center gap-2 text-6xl sm:text-8xl', live && 'text-white')}><span>{m.home_score ?? 0}</span><span className="text-4xl text-white/30">-</span><span>{m.away_score ?? 0}</span></div>
-                : <div className="num text-4xl text-neon sm:text-6xl">{fmtDate(m.date, 'HH:mm')}</div>}
+                : m.date ? <div className="num text-4xl text-neon sm:text-6xl">{fmtHour(m.date)}</div> : <div className="text-center text-sm font-bold text-amber-200">Horaire à définir</div>}
               {m.status === 'scheduled' && <Countdown to={m.date} now={now} />}
               {m.penalties && <div className="mt-1 rounded bg-white/10 px-2 text-xs font-semibold">{fmtScore(m)}</div>}
               {m.home_ht_score != null && showScore && <div className="mt-1 text-xs text-muted-foreground">MT {m.home_ht_score}-{m.away_ht_score}</div>}
@@ -88,7 +89,8 @@ export default function MatchDetail() {
             </div>
           )}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 border-t border-white/10 pt-4 text-xs text-muted-foreground sm:text-sm">
-            <span className="inline-flex items-center gap-1.5 capitalize"><CalendarDays className="size-4" />{fmtDateTime(m.date)}</span>
+            {m.number && <span className="font-bold">{m.number}</span>}
+            <span className="inline-flex items-center gap-1.5"><CalendarDays className="size-4" />{m.date ? `${fmtDay(m.date)} · ${fmtHour(m.date)}` : 'Horaire à définir'}</span>
             <span className="inline-flex items-center gap-1.5"><MapPin className="size-4" />{m.pitch ?? '—'}</span>
             {m.referee && <span className="inline-flex items-center gap-1.5"><User className="size-4" />{m.referee}</span>}
           </div>

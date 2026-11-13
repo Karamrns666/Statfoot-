@@ -10,6 +10,7 @@ import { buildRulebooks } from './rulebook'
 import { LEAGUE } from '@/config/league'
 import { buildSeason2025 } from './season2025'
 import { buildSeason2026 } from './season2026'
+import { buildOfficialJ1 } from './preseasonJ1'
 import { defaultCaptainTeams } from '@/lib/captains'
 
 type DB = { [N in EntityName]: EntityMap[N][] }
@@ -57,6 +58,13 @@ export function generateLeagueData(now = new Date()): DB {
 
   // 2026-2027 : équipes inscrites et phase de sélection (un seul groupe)
   db.Team.push(...s26.teams.map((t) => ({ ...t, season_id: s26.season.id, club_id: `club_${t.id}` }))); db.Competition.push(...s26.competitions)
+  // pré-saison 2026-2027 : tirage officiel de la journée 1 (saisi à la main)
+  {
+    const ps = s26.competitions.find((c) => c.id === 'comp_2026_selection')!
+    const j1 = buildOfficialJ1(ps.id, s26.season.id, ps.team_ids ?? [], now.toISOString())
+    db.Match.push(...j1.matches)
+    Object.assign(ps, { status: 'active', rounds: [1], preseason: { ...(ps.preseason ?? {}), ...j1.preseason } })
+  }
   // un club permanent par équipe ; les liens entre saisons sont approuvés par l'admin (aucun lien automatique)
   db.CaptainTeam.push(...defaultCaptainTeams())
   db.Club.push(...db.Team.map((t) => ({ id: t.club_id!, name: t.name, logo_url: t.logo_url })))

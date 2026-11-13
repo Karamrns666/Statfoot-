@@ -128,7 +128,7 @@ export function DrawProjection({ comp, seasonName, onClose }: { comp: Competitio
       </div>
 
       <footer className="flex flex-wrap items-center gap-3 border-t border-white/10 px-[2.5vw] py-[1.4vh] text-[clamp(10px,0.85vw,15px)] text-white/60">
-        <span>Tirage enregistré le {ps.drawn_at ? new Date(ps.drawn_at).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' }) : '—'} · graine {ps.seed ?? '—'} · rejouable à l’identique</span>
+        <span>{ps.draw_source === 'manual' ? 'Tirage au sort officiel (saisie manuelle)' : <>Tirage enregistré le {ps.drawn_at ? new Date(ps.drawn_at).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' }) : '—'} · graine {ps.seed ?? '—'} · rejouable à l’identique</>}</span>
         <div className="ml-auto flex items-center gap-2">
           <button onClick={prev} disabled={!n || !!spin} className="flex cursor-pointer items-center gap-1 rounded-lg border border-white/20 px-3 py-1.5 text-white hover:bg-white/10 disabled:opacity-40"><ChevronLeft className="size-4" />Annuler</button>
           <button onClick={() => setAuto((a) => !a)} disabled={finished} className="flex cursor-pointer items-center gap-1 rounded-lg border border-white/20 px-3 py-1.5 text-white hover:bg-white/10 disabled:opacity-40">{auto ? <Pause className="size-4" /> : <Play className="size-4" />}{auto ? 'Pause' : 'Automatique'}</button>

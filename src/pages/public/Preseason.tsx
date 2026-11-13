@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DivisionMark, PreseasonTable } from '@/components/preseason/PreseasonTable'
 import { CRITERION_LABEL, preseasonRanking, teamPath } from '@/lib/preseason'
 import { competitionNames } from '@/lib/competitionNames'
-import { fmtDate } from '@/lib/format'
+import { fmtDay, fmtHour, fmtWhen, wallDay } from '@/lib/matchTime'
 import { cn } from '@/lib/utils'
 
 export default function Preseason() {
@@ -76,15 +76,17 @@ function HowItWorks({ v }: { v: PreseasonView }) {
 
 function Rounds({ v }: { v: PreseasonView }) {
   const L = useLookup()
-  const published = [...new Set(v.matches.map((m) => m.round ?? 0))].filter(Boolean).sort((a, b) => a - b)
+  const visible = v.matches.filter((m) => m.published !== false)
+  const published = [...new Set(visible.map((m) => m.round ?? 0))].filter(Boolean).sort((a, b) => a - b)
   const [sel, setSel] = useState<number | null>(null)
   const round = sel ?? published.filter((r) => v.matches.some((m) => m.round === r && v.pm.find((p) => p.id === m.id)?.played)).at(-1) ?? published.at(-1)
   const before = useMemo(() => (round ? new Map(preseasonRanking(v.teamIds, v.pm.filter((m) => m.round < round), { order: v.cfg.intermediateOrder, drawOrder: v.drawOrder, points: v.cfg.points }).map((r) => [r.team_id, r.points])) : new Map()), [v, round])
   const after = useMemo(() => (round ? preseasonRanking(v.teamIds, v.pm.filter((m) => m.round <= round), { order: round > v.cfg.rounds ? v.cfg.finalOrder : v.cfg.intermediateOrder, drawOrder: v.drawOrder, points: v.cfg.points }) : []), [v, round])
   if (!published.length) return <EmptyState title="La pré-saison n’a pas encore commencé">Les matchs de la journée 1 apparaîtront ici après le tirage au sort.</EmptyState>
-  const ms = v.matches.filter((m) => m.round === round)
+  const ms = visible.filter((m) => m.round === round).sort((a, b) => (a.date ?? '').localeCompare(b.date ?? '') || (a.pitch ?? '').localeCompare(b.pitch ?? ''))
   const rest = round ? v.rests[round] : undefined
   const anyPlayed = ms.some((m) => v.pm.find((p) => p.id === m.id)?.played)
+  const days = [...new Set(ms.map((m) => wallDay(m.date)).filter(Boolean))].sort()
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap gap-2" role="tablist" aria-label="Journée">
@@ -94,20 +96,21 @@ function Rounds({ v }: { v: PreseasonView }) {
       </div>
       <section>
         <h2 className="title-caps text-2xl">{v.roundLabel(round!)}</h2>
-        <p className="text-sm text-muted-foreground">{round === 1 ? 'Tirage au sort intégral' : round! > v.cfg.rounds ? 'Les équipes au repos jouent leur dernier match' : 'Les équipes avec le même nombre de points se rencontrent'}{ms[0]?.date ? ` · ${fmtDate(ms[0].date, 'EEEE d MMMM')}` : ''}</p>
+        <p className="text-sm text-muted-foreground">{round === 1 ? (v.ps.draw_source === 'manual' ? 'Tirage au sort officiel' : 'Tirage au sort intégral') : round! > v.cfg.rounds ? 'Les équipes au repos jouent leur dernier match' : 'Les équipes avec le même nombre de points se rencontrent'}{days.length ? ` · ${days.map((d) => fmtDay(`${d}T12:00:00Z`)).join(', ')}` : ''}</p>
         {/* ordinateur : tableau comme le fichier de référence */}
         <div className="mt-3 hidden overflow-x-auto rounded-2xl border border-white/10 md:block">
           <table className="w-full text-sm">
-            <thead className="bg-white/[.03] text-[11px] uppercase tracking-wide text-muted-foreground"><tr><th className="px-2 py-2 text-left">Match</th><th className="text-right">Équipe A</th><th className="px-2 text-center">Pts avant</th><th className="px-2 text-center">Score</th><th className="px-2 text-center">Pts avant</th><th className="text-left">Équipe B</th><th className="px-2 text-left">Pourquoi ce match ?</th></tr></thead>
+            <thead className="bg-white/[.03] text-[11px] uppercase tracking-wide text-muted-foreground"><tr><th className="px-2 py-2 text-left">Match</th><th className="px-2 text-left">Date · heure · terrain</th><th className="text-right">Équipe A</th><th className="px-2 text-center">Pts avant</th><th className="px-2 text-center">Score</th><th className="px-2 text-center">Pts avant</th><th className="text-left">Équipe B</th><th className="px-2 text-left">Pourquoi ce match ?</th></tr></thead>
             <tbody>
               {ms.map((m, i) => {
                 const p = v.pm.find((x) => x.id === m.id)!
                 return (
                   <tr key={m.id} className="border-t border-white/5">
-                    <td className="num px-2 py-2 text-muted-foreground">{i + 1}</td>
+                    <td className="num whitespace-nowrap px-2 py-2 font-bold">{m.number ?? i + 1}</td>
+                    <td className="whitespace-nowrap px-2 text-xs text-muted-foreground">{fmtWhen(m)}</td>
                     <td className="text-right"><Link to={`/equipes/${m.home_team_id}`} className="inline-flex items-center gap-2 font-semibold hover:text-neon">{L.team.get(m.home_team_id)?.name}<TeamLogo team={L.team.get(m.home_team_id)} size={24} /></Link></td>
                     <td className="num px-2 text-center text-muted-foreground">{before.get(m.home_team_id) ?? 0}</td>
-                    <td className="px-2 text-center"><Link to={`/matchs/${m.id}`} className={cn('num inline-block min-w-16 rounded-lg px-2 py-0.5 text-lg font-black', p.played ? 'bg-white text-[#0B2E73]' : 'text-muted-foreground')}>{p.played ? `${p.hs} - ${p.as}` : m.date ? fmtDate(m.date, 'HH:mm') : 'vs'}</Link></td>
+                    <td className="px-2 text-center"><Link to={`/matchs/${m.id}`} className={cn('num inline-block min-w-16 rounded-lg px-2 py-0.5 text-lg font-black', p.played ? 'bg-white text-[#0B2E73]' : 'text-muted-foreground')}>{p.played ? `${p.hs} - ${p.as}` : 'vs'}</Link></td>
                     <td className="num px-2 text-center text-muted-foreground">{before.get(m.away_team_id) ?? 0}</td>
                     <td><Link to={`/equipes/${m.away_team_id}`} className="inline-flex items-center gap-2 font-semibold hover:text-neon"><TeamLogo team={L.team.get(m.away_team_id)} size={24} />{L.team.get(m.away_team_id)?.name}</Link></td>
                     <td className="px-2 text-muted-foreground">{m.pairing_reason ?? '—'}</td>
@@ -125,10 +128,10 @@ function Rounds({ v }: { v: PreseasonView }) {
               <li key={m.id} className="glass rounded-xl p-3">
                 <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
                   <div className="min-w-0 text-right"><div className="break-words text-[13px] font-semibold leading-tight">{L.team.get(m.home_team_id)?.name}</div><div className="text-[11px] text-muted-foreground">{before.get(m.home_team_id) ?? 0} pts avant</div></div>
-                  <Link to={`/matchs/${m.id}`} className={cn('num rounded-lg px-2 py-1 text-center text-lg font-black', p.played ? 'bg-white text-[#0B2E73]' : 'text-muted-foreground')}>{p.played ? `${p.hs} - ${p.as}` : m.date ? fmtDate(m.date, 'HH:mm') : 'vs'}</Link>
+                  <Link to={`/matchs/${m.id}`} className={cn('num rounded-lg px-2 py-1 text-center text-lg font-black', p.played ? 'bg-white text-[#0B2E73]' : 'text-muted-foreground')}>{p.played ? `${p.hs} - ${p.as}` : m.date ? fmtHour(m.date) : 'vs'}</Link>
                   <div className="min-w-0"><div className="break-words text-[13px] font-semibold leading-tight">{L.team.get(m.away_team_id)?.name}</div><div className="text-[11px] text-muted-foreground">{before.get(m.away_team_id) ?? 0} pts avant</div></div>
                 </div>
-                <p className="mt-1.5 text-center text-[11px] text-muted-foreground">{m.pairing_reason}</p>
+                <p className="mt-1.5 text-center text-[11px] text-muted-foreground"><b className="text-foreground/80">{m.number}</b> · {fmtWhen(m)}{m.pairing_reason ? ` · ${m.pairing_reason}` : ''}</p>
               </li>
             )
           })}

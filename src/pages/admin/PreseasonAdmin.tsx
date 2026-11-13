@@ -1,13 +1,14 @@
 // Admin — PRÉ-SAISON (système suisse) :
 //  1. Paramètres (journées, taille MASTER) et contrôle du format (46 matchs, 4 par équipe…).
-//  2. J1 : « Tirer au sort la journée 1 » (graine enregistrée, journalisé) → projection → publication.
-//  3. J2…J4 puis rattrapage : générés quand la journée précédente est entièrement validée ; aperçu avec
+//  2. J1 : tirage officiel saisi à la main (2026-2027) — ou « Tirer au sort la journée 1 » (graine, journalisé) → projection.
+//  3. J2…J4 puis rattrapage : générés AUTOMATIQUEMENT quand la journée précédente est entièrement validée ; aperçu avec
 //     « Pts avant » et « Pourquoi ce match ? », échange manuel de deux équipes (motif, journalisé, rematch interdit),
-//     puis « Publier la journée » (création des matchs au calendrier).
+//     puis « Créer les matchs » : numéros PS-12, PS-13…, statut « Horaire à définir ».
+//  3bis. Horaires et terrains fixés par l'admin (ici ou dans le Planning) → « Publier la journée » quand tout est complet.
 //  4. Classement en cours avec zone MASTER / CHALLENGER provisoire ; ordre du tirage au sort Ardentia (critère 5).
 //  5. Clôture (classement figé) puis Répartition : top N → MASTER, le reste → CHALLENGER.
 import { useMemo, useState } from 'react'
-import { ArrowDown, ArrowUp, Check, Lock, MonitorPlay, RotateCcw, Send, Shuffle, Sparkles, Split, Wand2 } from 'lucide-react'
+import { ArrowDown, ArrowUp, Check, Lock, MonitorPlay, RotateCcw, Shuffle, Sparkles, Split, Wand2 } from 'lucide-react'
 import { base44 } from '@/api/base44Client'
 import { newId } from '@/api/localStore'
 import { useData, useLookup } from '@/hooks/useData'
@@ -28,7 +29,9 @@ import { DivisionMark, PreseasonTable } from '@/components/preseason/PreseasonTa
 import { DrawProjection } from '@/components/preseason/DrawProjection'
 import { CRITERION_LABEL, divisionSplit, drawRound1, generateNextRound, preseasonFormat, preseasonRanking, validateRound, type PMatch } from '@/lib/preseason'
 import { competitionNames } from '@/lib/competitionNames'
-import { addDays } from '@/lib/schedule'
+import { TBD, nextNumbers, numberValue } from '@/lib/matchTime'
+import { roundMatches } from '@/lib/preseasonRounds'
+import { RoundScheduleCard } from '@/components/preseason/RoundScheduleCard'
 import { cn } from '@/lib/utils'
 import type { Competition, PreseasonData } from '@/types/entities'
 
@@ -52,6 +55,7 @@ export default function PreseasonAdmin() {
         <FormatCard v={v} />
         <RoundsTimeline v={v} />
         <ActionCard v={v} seasonName={season?.name ?? ''} />
+        <RoundScheduleCard v={v} />
         <RankingCard v={v} />
         <SplitCard v={v} />
       </div>
@@ -100,7 +104,8 @@ function RoundsTimeline({ v }: { v: PreseasonView }) {
         const ms = v.matches.filter((m) => m.round === r)
         const played = v.pm.filter((m) => m.round === r && m.played).length
         const pending = v.ps.pending?.round === r
-        const status = ms.length ? (played === ms.length ? 'Jouée' : `Publiée · ${played}/${ms.length} résultats`) : pending ? 'Aperçu (non publiée)' : 'À venir'
+        const pub = ms.length > 0 && ms.every((m) => m.published !== false)
+        const status = ms.length ? (played === ms.length ? 'Jouée' : pub ? `Publiée · ${played}/${ms.length} résultats` : `Créée · ${ms.filter((m) => m.date && m.pitch).length}/${ms.length} horaires fixés`) : pending ? 'Aperçu (non publiée)' : 'À venir'
         const tone = ms.length && played === ms.length ? 'border-win/40 bg-win/10' : ms.length ? 'border-neon/40 bg-neon/10' : pending ? 'border-amber-400/50 bg-amber-400/10' : 'border-white/10'
         const rest = v.rests[r] ?? (pending ? v.ps.pending?.rest : undefined)
         return (
@@ -118,16 +123,12 @@ function RoundsTimeline({ v }: { v: PreseasonView }) {
 // ---------------------------------------------------------------------------
 function ActionCard({ v, seasonName }: { v: PreseasonView; seasonName: string }) {
   const { user } = useAuth()
+  const { db } = useData()
   const L = useLookup()
   const [seed, setSeed] = useState('')
   const [projection, setProjection] = useState(false)
   const [swap, setSwap] = useState(false)
   const pending = v.ps.pending
-  const lastDate = v.matches.map((m) => m.date ?? '').sort().at(-1)?.slice(0, 10)
-  const [day, setDay] = useState(() => (lastDate ? addDays(lastDate, 7) : new Date().toISOString().slice(0, 10)))
-  const [firstTime, setFirstTime] = useState('18:00')
-  const [slotMin, setSlotMin] = useState(45)
-  const [pitches, setPitches] = useState(v.comp.default_pitch ?? 'Terrain 1, Terrain 2, Terrain 3')
   const name = (id?: string) => (id ? L.team.get(id)?.name ?? id : '—')
 
   // classement avant la journée en préparation → « Pts avant »
@@ -155,24 +156,16 @@ function ActionCard({ v, seasonName }: { v: PreseasonView; seasonName: string })
       toast.success(`${v.roundLabel(plan.round)} générée — vérifiez l’aperçu puis publiez`)
     } catch (e) { toast.error((e as Error).message) }
   }
-  const publish = async () => {
+  /** Crée les matchs de la journée (numéros PS-n, « Horaire à définir », non publiés) : l'admin fixe ensuite date, heure et terrain. */
+  const createMatches = async () => {
     if (!pending || errors.length) return
-    const pl = pitches.split(',').map((p) => p.trim()).filter(Boolean)
-    const [hh, mm] = firstTime.split(':').map(Number)
-    await base44.entities.Match.bulkCreate(pending.pairs.map((p, i) => {
-      const slot = Math.floor(i / Math.max(1, pl.length)), minutes = hh * 60 + mm + slot * slotMin
-      return {
-        id: newId(), season_id: v.comp.season_id, competition_id: v.comp.id, round: pending.round, stage: 'league_phase' as const,
-        date: new Date(`${day}T${String(Math.floor(minutes / 60) % 24).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}:00`).toISOString(),
-        pitch: pl[i % Math.max(1, pl.length)], home_team_id: p.home, away_team_id: p.away, status: 'scheduled' as const, published: true,
-        pairing_reason: p.reason, pairing_manual: p.manual,
-      }
-    }) as never)
+    const rows = roundMatches(pending, v.comp, db.Match)
+    await base44.entities.Match.bulkCreate(rows.map((r) => ({ ...r, id: newId() })) as never)
     const rests = { ...(v.ps.rests ?? {}) }; if (pending.rest && pending.round <= v.cfg.rounds) rests[String(pending.round)] = pending.rest
-    await save(v.comp, { pending: undefined, rests, published_rounds: [...new Set([...(v.ps.published_rounds ?? []), pending.round])] })
+    await save(v.comp, { pending: undefined, rests, created_rounds: [...new Set([...(v.ps.created_rounds ?? []), pending.round])], number_counter: numberValue(rows.at(-1)?.number) || v.ps.number_counter })
     await base44.entities.Competition.update(v.comp.id, { status: 'active', rounds: [...new Set([...(v.comp.rounds ?? []), pending.round])].sort((a, b) => a - b) })
-    base44.logActivity('preseason_publish', 'Competition', { id: v.comp.id, name: v.comp.name } as never, { journee: v.shortLabel(pending.round), matchs: pending.pairs.length, repos: pending.rest ? name(pending.rest) : '—' })
-    toast.success(`${v.roundLabel(pending.round)} publiée — ${pending.pairs.length} matchs au calendrier`)
+    base44.logActivity('preseason_create_round', 'Competition', { id: v.comp.id, name: v.comp.name } as never, { journee: v.shortLabel(pending.round), matchs: rows.map((r) => `${r.number} ${name(r.home_team_id)}–${name(r.away_team_id)}`).join(' · '), repos: pending.rest ? name(pending.rest) : '—' })
+    toast.success(`${v.roundLabel(pending.round)} : ${rows.length} matchs créés (${rows[0]?.number} à ${rows.at(-1)?.number}) — fixez les horaires et terrains, puis publiez`)
   }
   const close = async () => {
     await save(v.comp, { closed_at: new Date().toISOString(), final_ranking: v.state.ranking.map((r) => r.team_id) })
@@ -210,7 +203,7 @@ function ActionCard({ v, seasonName }: { v: PreseasonView; seasonName: string })
 
         {pending && (
           <>
-            {pending.round === 1 && v.ps.seed != null && (
+            {pending.round === 1 && v.ps.seed != null && v.ps.draw_source !== 'manual' && (
               <div className="flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-white/[.03] p-3 text-sm">
                 <Sparkles className="size-4 text-neon" />Tirage du {v.ps.drawn_at ? new Date(v.ps.drawn_at).toLocaleString('fr-FR') : '—'} par {v.ps.drawn_by ?? '—'} · graine <b className="num">{v.ps.seed}</b> · {v.ps.revealed ?? 0}/{v.ps.draw_order?.length} équipes dévoilées
                 <div className="ml-auto flex gap-2">
@@ -239,14 +232,9 @@ function ActionCard({ v, seasonName }: { v: PreseasonView; seasonName: string })
             </div>
             {pending.rest && <p className="text-sm">Au repos : <b>{name(pending.rest)}</b>{pending.round <= v.cfg.rounds ? ' → jouera au rattrapage' : ''}</p>}
             {errors.map((e) => <p key={e} className="text-sm text-red-300">⚠ {e}</p>)}
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <div><Label htmlFor="ps-day">Date</Label><Input id="ps-day" type="date" value={day} onChange={(e) => setDay(e.target.value)} /></div>
-              <div><Label htmlFor="ps-time">1er coup d’envoi</Label><Input id="ps-time" type="time" value={firstTime} onChange={(e) => setFirstTime(e.target.value)} /></div>
-              <div><Label htmlFor="ps-slot">Minutes entre deux créneaux</Label><Input id="ps-slot" type="number" min={15} step={5} value={slotMin} onChange={(e) => setSlotMin(+e.target.value || 45)} /></div>
-              <div><Label htmlFor="ps-pitch">Terrains (virgules)</Label><Input id="ps-pitch" value={pitches} onChange={(e) => setPitches(e.target.value)} /></div>
-            </div>
+            <p className="text-sm text-muted-foreground">Les matchs seront créés avec les numéros {nextNumbers(db.Match.map((m) => m.number), v.ps.number_counter, pending.pairs.length).join(', ')} et le statut « {TBD} ». Vous fixerez ensuite la date, l’heure et le terrain de chacun, puis publierez la journée.</p>
             <div className="flex flex-wrap gap-2">
-              <Button size="lg" onClick={publish} disabled={!!errors.length}><Send />Publier {pending.round > v.cfg.rounds ? 'le rattrapage' : 'la journée'}</Button>
+              <Button size="lg" onClick={createMatches} disabled={!!errors.length}><Check />Créer les matchs</Button>
               <Button size="lg" variant="contrast" onClick={() => setSwap(true)}><Shuffle />Modifier un match</Button>
               {pending.round > 1 && <Button variant="ghost" onClick={async () => { await save(v.comp, { pending: undefined }); toast.info('Aperçu supprimé') }}><RotateCcw />Régénérer</Button>}
             </div>

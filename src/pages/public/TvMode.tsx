@@ -15,6 +15,7 @@ import { inferiorityAt } from '@/lib/reglement'
 import { InferiorityBar } from '@/components/reglement/InferiorityBar'
 import { matchScorers } from '@/lib/stats'
 import { fmtTime, playerShort } from '@/lib/format'
+import { fmtHour, wallDay } from '@/lib/matchTime'
 import { Logo } from '@/components/layout/Logo'
 import type { Match, MatchEvent, Team } from '@/types/entities'
 import { cn } from '@/lib/utils'
@@ -28,13 +29,13 @@ export default function TvMode() {
   const { terrain } = useParams()
   const { db, settings } = useData()
   const now = useNow(1000)
-  const today = new Date(now).toISOString().slice(0, 10)
+  const today = wallDay(new Date(now).toISOString()) // jour au Maroc
   const matches = useMemo(() => {
-    const sel = db.Match.filter((m) => !terrain || terrain === 'tous' || pitchSlug(m.pitch) === terrain)
+    const sel = db.Match.filter((m) => m.published !== false && (!terrain || terrain === 'tous' || pitchSlug(m.pitch) === terrain))
     const byPitch = (a: Match, b: Match) => (a.pitch ?? '').localeCompare(b.pitch ?? '', 'fr', { numeric: true }) || (a.date ?? '').localeCompare(b.date ?? '')
     const live = sel.filter((m) => m.status === 'live').sort(byPitch)
     if (live.length) return live
-    return sel.filter((m) => (m.date ?? '').slice(0, 10) === today).sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''))
+    return sel.filter((m) => wallDay(m.date) === today).sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''))
   }, [db.Match, terrain, today])
 
   const [selected, setSelected] = useState<string | null>(null)
@@ -115,11 +116,11 @@ function MatchTab({ m, active, onClick }: { m: Match; active: boolean; onClick: 
       className={cn('flex shrink-0 cursor-pointer items-center gap-3 rounded-xl border px-4 py-2 text-left transition', active ? 'border-neon bg-neon/20 shadow-[0_0_30px_-8px_rgb(248_90_0/.8)]' : 'border-white/10 bg-white/5 hover:bg-white/10')}>
       <div className="leading-tight">
         <div className="flex items-center gap-2 font-display text-[clamp(.8rem,1vw,1.2rem)] font-bold uppercase tracking-wider text-white/70">
-          {m.status === 'live' && <span className="size-2.5 rounded-full bg-red-500 animate-pulse-live" />}{m.pitch ?? 'Terrain'}
+          {m.status === 'live' && <span className="size-2.5 rounded-full bg-red-500 animate-pulse-live" />}{m.number ? `${m.number} · ` : ''}{m.pitch ?? 'Terrain'}
         </div>
         <div className="flex items-center gap-2 font-display text-[clamp(1.1rem,1.6vw,2rem)] font-black">
           <TeamLogo team={h} size={28} />{h?.short_name}
-          <span className="num rounded-md bg-black/40 px-2">{m.status === 'scheduled' ? fmtTime(m.date) : `${m.home_score ?? 0}-${m.away_score ?? 0}`}</span>
+          <span className="num rounded-md bg-black/40 px-2">{m.status === 'scheduled' ? fmtHour(m.date) : `${m.home_score ?? 0}-${m.away_score ?? 0}`}</span>
           {a?.short_name}<TeamLogo team={a} size={28} />
         </div>
       </div>
@@ -137,14 +138,14 @@ function Board({ m, now }: { m: Match; now: number }) {
   const st = teamStats(m, events, ls, now)
   const pos = possession(ls, now)
   const live = m.status === 'live'
-  const label = live ? liveLabel(ls, durationsFor(m, comp), now) : m.status === 'finished' ? 'Terminé' : `Coup d’envoi ${fmtTime(m.date)}`
+  const label = live ? liveLabel(ls, durationsFor(m, comp), now) : m.status === 'finished' ? 'Terminé' : `Coup d’envoi ${fmtHour(m.date)}`
   const cards = (tid: string) => events.filter((e) => e.team_id === tid && (e.type === 'yellow_card' || e.type === 'second_yellow' || e.type === 'red_card'))
   const goal = useGoalFlash(m)
   const d = durationsFor(m, comp)
   const inf = live && ls && isPlaying(ls.period) ? inferiorityAt(m, events, (ls.period === '2H' ? d.half * 60_000 : 0) + elapsedMs(ls, now), d.half) : []
   return (
     <main className="relative flex flex-1 flex-col items-center px-[2vw] py-[1vh] [justify-content:safe_center] sm:min-h-0 sm:overflow-hidden">
-      <div className="mb-[1vh] text-center font-display text-[clamp(.95rem,min(1.6vw,2.8vh),2rem)] font-bold uppercase tracking-[.2em] text-white/70">{comp?.name}{m.round ? ` · Journée ${m.round}` : ''}{m.pitch ? ` · ${m.pitch}` : ''}</div>
+      <div className="mb-[1vh] text-center font-display text-[clamp(.95rem,min(1.6vw,2.8vh),2rem)] font-bold uppercase tracking-[.2em] text-white/70">{m.number ? `${m.number} · ` : ''}{comp?.name}{m.round ? ` · Journée ${m.round}` : ''}{m.pitch ? ` · ${m.pitch}` : ''}</div>
       <div className="grid w-full max-w-[92vw] grid-cols-[1fr_auto_1fr] items-center gap-[2vw]">
         <TeamSide team={h} />
         <div className="flex flex-col items-center">

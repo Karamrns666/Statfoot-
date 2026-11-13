@@ -18,7 +18,7 @@ export const OFFICIAL_TEAMS_2026: OfficialTeam[] = [
   { name: 'Cobco', short: 'COB', aliases: ['COBCO'], c1: '#005A83', c2: '#06183A' },
   { name: 'ALD Automotive', short: 'ALD', aliases: ['ALD AUTOMOTIVE', 'ALD'], c1: '#1B2A4A', c2: '#0A1124' },
   { name: 'Pharmaprom', short: 'PHP', aliases: ['PHARMAPROM'], c1: '#3A74C2', c2: '#0A1E3D' },
-  { name: 'TAQEEF (MIDEA)', short: 'MID', aliases: ['MIDEA', 'TAQEEF', 'Taqeef Midea'], c1: '#1C6FA8', c2: '#04223A' },
+  { name: 'Taqeef (Midea)', short: 'MID', aliases: ['MIDEA', 'TAQEEF', 'Taqeef Midea', 'TAQEEF (MIDEA)'], c1: '#1C6FA8', c2: '#04223A' },
   { name: 'Wafasalaf', short: 'WAF', aliases: ['WAFASALAF'], c1: '#009CB3', c2: '#04262A' },
   { name: 'JTI', short: 'JTI', aliases: ['JTI'], c1: '#22B24C', c2: '#081B10' },
   { name: 'Crédit Agricole', short: 'CAM', aliases: ['CREDIT AGRICOLE', 'Crédit Agricole du Maroc'], c1: '#29756E', c2: '#04241B' },

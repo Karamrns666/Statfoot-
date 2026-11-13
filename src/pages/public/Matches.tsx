@@ -1,3 +1,4 @@
+import { wallDay } from '@/lib/matchTime'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { CalendarX, Star } from 'lucide-react'
@@ -21,7 +22,7 @@ import type { Match } from '@/types/entities'
 type Tab = 'tous' | 'direct' | 'a-venir' | 'termines' | 'favoris'
 const FAV_KEY = 'statfoot:favoris'
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
-const dayKey = (d?: string) => (d ?? '').slice(0, 10)
+const dayKey = (d?: string) => wallDay(d)
 
 function useFavorites() {
   const [fav, setFav] = useState<Set<string>>(() => { try { return new Set(JSON.parse(localStorage.getItem(FAV_KEY) ?? '[]')) } catch { return new Set() } })

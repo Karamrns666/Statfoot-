@@ -1,6 +1,7 @@
 // Migrations NON destructives des données déjà enregistrées dans le navigateur.
 // Elles adaptent les anciennes données aux règles en vigueur sans effacer ce que l'admin a saisi.
-import type { Award, CaptainTeam, Club, Draw, Suspension, Competition, Lineup, Match, Page, Position, MatchEvent, MatchTeamStats, Player, Rulebook, Season, Settings, Team, TeamOfWeek } from '@/types/entities'
+import { buildOfficialJ1 } from './preseasonJ1'
+import type { Award, BaseEntity, CaptainTeam, Club, Draw, Suspension, Competition, Lineup, Match, Page, Position, MatchEvent, MatchTeamStats, Player, Rulebook, Season, Settings, Team, TeamOfWeek } from '@/types/entities'
 import { CURRENT_RULEBOOK, REGLEMENT, isDisputed } from '@/lib/reglement'
 import { buildRulebooks } from './rulebook'
 import { DEFAULT_COMPETITION_NAMES, LEGACY_COMPETITION_NAMES } from '@/lib/competitionNames'
@@ -34,6 +35,7 @@ export interface Rules6Data {
   Season?: Season[]
   Competition?: Competition[]
   Match?: Match[]
+  AuditLog?: BaseEntity[]
 }
 
 /**
@@ -290,7 +292,40 @@ export function applyRemoveSimulation2026(db: Rules6Data & { Club?: Club[] }): R
   return out
 }
 
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026]
+/**
+ * Tirage OFFICIEL de la journée 1 (2026-2027) : remplace le tirage enregistré auparavant (aucun match joué), avec
+ * sauvegarde JSON de l'ancien tirage dans le journal de l'admin. « TAQEEF (MIDEA) » s'affiche « Taqeef (Midea) ».
+ */
+export function applyOfficialJ1(db: Rules6Data): Rules6Data {
+  const comp = db.Competition?.find((c) => c.id === 'comp_2026_selection' || (c.season_id === SEASON_2026_ID && c.phase === 'league_phase' && c.format === 'swiss'))
+  if (!comp || !db.Match || !db.Team) return {}
+  const out: Rules6Data = {}
+  const mid = db.Team.find((t) => t.season_id === SEASON_2026_ID && t.short_name === 'MID')
+  if (mid && mid.name !== 'Taqeef (Midea)') out.Team = db.Team.map((t) => (t.id === mid.id ? { ...t, name: 'Taqeef (Midea)', company: t.company ?? 'Taqeef (Midea)' } : t))
+  let j1: ReturnType<typeof buildOfficialJ1>
+  try { j1 = buildOfficialJ1(comp.id, comp.season_id, comp.team_ids ?? [], undefined, db.Team) } catch (e) { void e; return out }
+  const old = db.Match.filter((m) => m.competition_id === comp.id && m.round === 1)
+  const alreadyOfficial = old.length === j1.matches.length && j1.matches.every((o) => old.some((m) => m.number === o.number && m.home_team_id === o.home_team_id && m.away_team_id === o.away_team_id))
+  if (alreadyOfficial && comp.preseason?.draw_source === 'manual') return out
+  const ids = new Set(old.map((m) => m.id))
+  const played = old.some((m) => m.status === 'finished' || m.status === 'live' || m.validated) || (db.MatchEvent ?? []).some((e) => ids.has(e.match_id))
+  const now = new Date().toISOString()
+  const entry = (action: string, details: Record<string, unknown>) => ({ id: `log_${action}_${Date.now().toString(36)}`, created_date: now, action, entity: 'Competition', entity_id: comp.id, entity_label: comp.name, author_email: 'systeme', author_name: 'Mise à jour du site', details } as BaseEntity)
+  if (played) {
+    out.AuditLog = [entry('preseason_official_draw_blocked', { message: 'Tirage officiel NON appliqué : des matchs de la journée 1 ont déjà été joués. À corriger à la main.' }), ...(db.AuditLog ?? [])]
+    return out
+  }
+  const backup = { competition: comp.id, preseason: comp.preseason ?? null, matches: old }
+  out.Match = [...db.Match.filter((m) => !ids.has(m.id) && !j1.matches.some((o) => o.id === m.id)), ...j1.matches.map((m) => ({ ...m, created_date: now }))]
+  if (db.Lineup?.some((l) => ids.has(l.match_id))) out.Lineup = db.Lineup.filter((l) => !ids.has(l.match_id))
+  const { pending: _p, seed: _s, ...keep } = comp.preseason ?? {}
+  void _p; void _s
+  out.Competition = db.Competition!.map((c) => (c.id === comp.id ? { ...c, status: 'active' as const, rounds: [...new Set([...(c.rounds ?? []), 1])].sort((a, b) => a - b), preseason: { ...keep, ...j1.preseason } } : c))
+  out.AuditLog = [entry('preseason_official_draw', { message: 'Tirage J1 remplacé par le tirage officiel', anciens_matchs: old.length, nouveaux_matchs: j1.matches.length, repos: 'Canpack 2', sauvegarde_json: JSON.stringify(backup) }), ...(db.AuditLog ?? [])]
+  return out
+}
+
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */
@@ -309,7 +344,7 @@ export function migrateStoredData() {
   const legacy = store.getFlag('migrated-6v6') ? 1 : 0
   const from = Number(store.getFlag(VERSION_FLAG) ?? legacy) || legacy
   if (from >= STEPS.length) return
-  const names = ['Player', 'MatchEvent', 'MatchTeamStats', 'Award', 'TeamOfWeek', 'Lineup', 'Page', 'Team', 'Settings', 'Rulebook', 'Season', 'Competition', 'Match', 'Division', 'Club', 'Suspension', 'Draw', 'CaptainTeam'] as const
+  const names = ['Player', 'MatchEvent', 'MatchTeamStats', 'Award', 'TeamOfWeek', 'Lineup', 'Page', 'Team', 'Settings', 'Rulebook', 'Season', 'Competition', 'Match', 'Division', 'Club', 'Suspension', 'Draw', 'CaptainTeam', 'AuditLog'] as const
   const db = Object.fromEntries(names.map((n) => [n, store.all(n)])) as Rules6Data
   const changed = migrate(db, from)
   store.batch(() => { for (const [name, rows] of Object.entries(changed)) store.replace(name as (typeof names)[number], rows as never) })

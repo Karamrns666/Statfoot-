@@ -42,7 +42,7 @@ describe('liste officielle 2026-2027', () => {
     const before25 = JSON.stringify([db.Team.filter((t) => t.season_id === 'season_2025'), db.Match.filter((m) => m.season_id === 'season_2025'), db.Player.filter((p) => p.season_ids?.includes('season_2025'))])
     const plan = planOfficialTeams(db, 'season_2026')
     const r = planReport(plan)
-    expect(r.renommees.sort()).toEqual(['Arrow → Arrow ECS', 'L’Heure Joyeuse → L\'Heure Joyeuse', 'Midea → TAQEEF (MIDEA)'].sort())
+    expect(r.renommees.sort()).toEqual(['Arrow → Arrow ECS', 'L’Heure Joyeuse → L\'Heure Joyeuse', 'Midea → Taqeef (Midea)'].sort())
     expect(r.creees.sort()).toEqual(['ALD Automotive', 'CTR', 'G3C', 'Parebrise Express'])
     expect(plan.removed.map((x) => x.team.name)).toEqual(['Simulation FC'])
     expect(plan.removed[0]).toMatchObject({ players: [{ id: 'p_sim' }], matches: [{ id: 'm_sim' }] })

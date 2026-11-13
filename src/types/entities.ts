@@ -60,8 +60,11 @@ export interface Competition extends BaseEntity {
 export interface PreseasonData {
   /** paramètres modifiables (journées, points, taille MASTER, ordres de départage) */
   config?: { rounds?: number; masterSize?: number; points?: { win: number; draw: number; loss: number } }
-  /** tirage de la J1 : graine (rejouable) et ordre obtenu */
+  /** tirage de la J1 : graine (rejouable) et ordre obtenu — ou tirage officiel saisi à la main (`draw_source: 'manual'`) */
   seed?: number
+  draw_source?: 'seed' | 'manual'
+  /** dernier numéro de match attribué (PS-n) : les numéros ne sont jamais réutilisés */
+  number_counter?: number
   draw_order?: string[]
   drawn_at?: string
   drawn_by?: string
@@ -73,6 +76,8 @@ export interface PreseasonData {
   rests?: Record<string, string>
   /** journée générée, en attente de publication (aperçu, modifiable) */
   pending?: { round: number; rest?: string; pairs: { home: string; away: string; reason: string; manual?: { motif: string; by?: string; at: string } }[] }
+  /** journées dont les matchs sont créés (« Horaire à définir » tant que date, heure et terrain ne sont pas fixés) */
+  created_rounds?: number[]
   published_rounds?: number[]
   closed_at?: string
   /** classement final figé à la clôture */
@@ -206,6 +211,8 @@ export interface Match extends BaseEntity {
   motm_vote_closes_at?: string
   /** forfait (tapis vert, Art. 14) : équipe forfait — score officiel 3-0 pour l'adversaire */
   forfeit_team_id?: string
+  /** numéro officiel du match (« PS-01 »…), jamais réutilisé */
+  number?: string
   /** pré-saison : « Pourquoi ce match ? » (Tirage au sort, Même total de points…) et modification manuelle */
   pairing_reason?: string
   pairing_manual?: { motif: string; by?: string; at: string }

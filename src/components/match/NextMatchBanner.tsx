@@ -7,7 +7,7 @@ import { useNow } from '@/hooks/useNow'
 import { TeamLogo } from '@/components/league/Identity'
 import { CompetitionBadge } from '@/components/league/Bits'
 import { countdown } from '@/lib/ics'
-import { fmtDate } from '@/lib/format'
+import { fmtWhen } from '@/lib/matchTime'
 
 export function NextMatchBanner({ match }: { match: Match }) {
   const L = useLookup()
@@ -24,7 +24,7 @@ export function NextMatchBanner({ match }: { match: Match }) {
       </div>
       <div className="flex flex-wrap items-center gap-3 text-sm sm:justify-end">
         <CompetitionBadge competition={L.competition.get(match.competition_id)} />
-        <span className="capitalize text-muted-foreground">{fmtDate(match.date, "EEE d MMM 'à' HH:mm")}</span>
+        <span className="text-muted-foreground">{match.number ? `${match.number} · ` : ''}{fmtWhen(match, { pitch: false })}</span>
         {match.pitch && <span className="inline-flex items-center gap-1 text-muted-foreground"><MapPin className="size-3.5" />{match.pitch}</span>}
         {c && <span className="num rounded-lg bg-neon px-2.5 py-1 text-lg text-white" aria-label="Temps restant avant le coup d'envoi">{c.d ? `${c.d} j ${String(c.h).padStart(2, '0')} h` : `${String(c.h).padStart(2, '0')}:${String(c.m).padStart(2, '0')}:${String(c.s).padStart(2, '0')}`}</span>}
       </div>

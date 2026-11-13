@@ -1,0 +1,219 @@
+## tsc
+exit=0
+## tests
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.0.5 [39m[90m/home/runner/work/Statfoot-/Statfoot-[39m
+
+ [32m✓[39m src/lib/stats.test.ts [2m([22m[2m29 tests[22m[2m)[22m[32m 39[2mms[22m[39m
+ [32m✓[39m src/lib/reglement.test.ts [2m([22m[2m27 tests[22m[2m)[22m[32m 200[2mms[22m[39m
+ [32m✓[39m src/lib/matchEngine.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m src/lib/preseason.test.ts [2m([22m[2m20 tests[22m[2m)[22m[33m 402[2mms[22m[39m
+   [32m✓[39m pré-saison — appariement robuste (retour arrière) [2m(3)[22m
+     [33m[2m✓[22m[39m 500 pré-saisons aléatoires : jamais de rematch, jamais de blocage, 4 matchs chacune[33m 384[2mms[22m[39m
+ [32m✓[39m src/lib/visuals/model.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 38[2mms[22m[39m
+ [32m✓[39m src/api/seed/migrations.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 389[2mms[22m[39m
+ [32m✓[39m src/lib/officialTeams.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 3809[2mms[22m[39m
+   [32m✓[39m mise à jour automatique des navigateurs (migration) [2m(2)[22m
+     [33m[2m✓[22m[39m crée et renomme ; retire Simulation FC seulement si elle n’a ni joueur ni match joué[33m 3106[2mms[22m[39m
+ [32m✓[39m src/lib/seasonStrip.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/lib/rewards.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 296[2mms[22m[39m
+ [32m✓[39m src/lib/shots.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 36[2mms[22m[39m
+ [32m✓[39m src/lib/captains.isolation.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 623[2mms[22m[39m
+   [32m✓[39m Match des capitaines — isolation totale de la ligue [2m(2)[22m
+     [33m[2m✓[22m[39m ajouter des matchs des capitaines ne change aucun calcul de la ligue[33m 432[2mms[22m[39m
+ [32m✓[39m src/lib/cutoutProcess.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 228[2mms[22m[39m
+ [32m✓[39m src/lib/clubs.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 119[2mms[22m[39m
+ [32m✓[39m src/api/seed/preseasonJ1.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 279[2mms[22m[39m
+ [32m✓[39m src/lib/matchTime.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m src/lib/visuals/weekly.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 40[2mms[22m[39m
+ [32m✓[39m src/lib/competitionNames.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 277[2mms[22m[39m
+ [32m✓[39m src/lib/council.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/lib/visuals/rows.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m src/lib/schedule.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m src/api/seed/generate.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 113[2mms[22m[39m
+ [32m✓[39m src/lib/captains.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m src/lib/seniority.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32m✓[39m src/lib/draw.selection.test.ts [2m([22m[2m22 tests[22m[2m)[22m[32m 76[2mms[22m[39m
+ [32m✓[39m src/lib/badges.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32m✓[39m src/lib/cutoutQueue.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m src/lib/xp.motm.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 26[2mms[22m[39m
+ [32m✓[39m src/api/seed/playersSeasonTeams.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/lib/media.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m29 passed[39m[22m[90m (29)[39m
+[2m      Tests [22m [1m[32m228 passed[39m[22m[90m (228)[39m
+[2m   Start at [22m 17:44:28
+[2m   Duration [22m 14.36s[2m (import 76%, tests 20%, transform 4%)[22m
+
+[2m    Isolate [22m [33m29 workers spawned[39m[2m · ~137ms startup each (spawn + environment, per file)[22m
+[2m            [22m [2mat least ~1.19s faster with [22m[33misolate: false[39m[2m — reuses workers across files instead of one per file[22m
+
+exit=0
+## build
+[36mvite v8.3.5 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 4137 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                             2.27 kB │ gzip:     0.86 kB
+dist/assets/ort.bundle.min-OfoG_cy9.mjs                   399.90 kB
+dist/assets/ort.webgpu.bundle.min-CEayb2S6.mjs            399.92 kB
+dist/assets/ort-wasm-simd-threaded.jsep-D5Jk56-t.wasm  23,914.39 kB │ gzip: 5,743.61 kB
+dist/assets/index-BtVRQ0ST.css                            121.43 kB │ gzip:    21.21 kB
+dist/assets/divisionLogo-BJhLVZS_.js                        0.16 kB │ gzip:     0.13 kB
+dist/assets/chevron-left-BhAIT-d-.js                        0.16 kB │ gzip:     0.16 kB
+dist/assets/chevron-right-DuVzyAZw.js                       0.16 kB │ gzip:     0.16 kB
+dist/assets/square-CI2kNfMb.js                              0.17 kB │ gzip:     0.17 kB
+dist/assets/plus-B4DhACFA.js                                0.18 kB │ gzip:     0.17 kB
+dist/assets/arrow-left-BA08sC27.js                          0.19 kB │ gzip:     0.18 kB
+dist/assets/search-BeLFq2zX.js                              0.20 kB │ gzip:     0.18 kB
+dist/assets/ban--H_78Uk4.js                                 0.21 kB │ gzip:     0.19 kB
+dist/assets/play-CMSzAY2c.js                                0.22 kB │ gzip:     0.20 kB
+dist/assets/user-BaAJg_iB.js                                0.22 kB │ gzip:     0.20 kB
+dist/assets/smartphone-KKmfxnLE.js                          0.22 kB │ gzip:     0.20 kB
+dist/assets/rotate-ccw-DcVCeDMw.js                          0.23 kB │ gzip:     0.20 kB
+dist/assets/rotate-cw-DApuWnCA.js                           0.23 kB │ gzip:     0.21 kB
+dist/assets/undo-2-9oELt4M4.js                              0.23 kB │ gzip:     0.19 kB
+dist/assets/pause-Cc83gXpB.js                               0.24 kB │ gzip:     0.18 kB
+dist/assets/download-DoD10KE6.js                            0.26 kB │ gzip:     0.21 kB
+dist/assets/copy-D09wX1Wj.js                                0.26 kB │ gzip:     0.23 kB
+dist/assets/link-2-G75vUVlC.js                              0.27 kB │ gzip:     0.23 kB
+dist/assets/goal-BiFMsiV0.js                                0.27 kB │ gzip:     0.23 kB
+dist/assets/flag-uGv_IWsK.js                                0.28 kB │ gzip:     0.23 kB
+dist/assets/eye-BYxd0Ghz.js                                 0.28 kB │ gzip:     0.22 kB
+dist/assets/rotate-ccw-clock-uoubhC6y.js                    0.29 kB │ gzip:     0.24 kB
+dist/assets/pencil-DKFTvCWE.js                              0.30 kB │ gzip:     0.24 kB
+dist/assets/list-checks-DEpXO41Z.js                         0.31 kB │ gzip:     0.21 kB
+dist/assets/send-DZJbcdRS.js                                0.32 kB │ gzip:     0.25 kB
+dist/assets/shield-check-CBi8DB2o.js                        0.35 kB │ gzip:     0.27 kB
+dist/assets/refresh-cw-Ch0E2qOL.js                          0.35 kB │ gzip:     0.25 kB
+dist/assets/save-CIzTkxmo.js                                0.35 kB │ gzip:     0.24 kB
+dist/assets/image-down-Pcm1P-BB.js                          0.36 kB │ gzip:     0.27 kB
+dist/assets/trash-NHYLVaMC.js                               0.37 kB │ gzip:     0.24 kB
+dist/assets/file-down-l2-9TFGB.js                           0.38 kB │ gzip:     0.26 kB
+dist/assets/key-round-4jzm4KV8.js                           0.38 kB │ gzip:     0.28 kB
+dist/assets/list-ordered-kEd7roLm.js                        0.38 kB │ gzip:     0.25 kB
+dist/assets/share-2-CiC_f9bK.js                             0.38 kB │ gzip:     0.25 kB
+dist/assets/crown-D20bwCpz.js                               0.39 kB │ gzip:     0.27 kB
+dist/assets/file-text-eVPx7o8a.js                           0.41 kB │ gzip:     0.27 kB
+dist/assets/hand-zub0hcAJ.js                                0.43 kB │ gzip:     0.27 kB
+dist/assets/clipboard-list-q6vCUF1E.js                      0.44 kB │ gzip:     0.28 kB
+dist/assets/footprints-BjGS8ItG.js                          0.48 kB │ gzip:     0.32 kB
+dist/assets/split-DzJ15iRz.js                               0.50 kB │ gzip:     0.30 kB
+dist/assets/ArtLink-DeBaG3-T.js                             0.51 kB │ gzip:     0.37 kB
+dist/assets/calculator-JWhHXDWt.js                          0.56 kB │ gzip:     0.30 kB
+dist/assets/wand-sparkles-A4Jie_Y3.js                       0.56 kB │ gzip:     0.32 kB
+dist/assets/label-BQAcucBw.js                               0.60 kB │ gzip:     0.41 kB
+dist/assets/card-Ck8z875T.js                                0.62 kB │ gzip:     0.30 kB
+dist/assets/useReschedule-HX6mpmHo.js                       0.71 kB │ gzip:     0.48 kB
+dist/assets/zones-F9fIZTEv.js                               0.73 kB │ gzip:     0.35 kB
+dist/assets/SeasonNotStarted-qhoUrQzS.js                    0.73 kB │ gzip:     0.50 kB
+dist/assets/dist-CiD1HBcg.js                                0.74 kB │ gzip:     0.50 kB
+dist/assets/shotColumns-DGF8pJVU.js                         0.77 kB │ gzip:     0.38 kB
+dist/assets/useDiscipline-BX_2lycH.js                       0.79 kB │ gzip:     0.44 kB
+dist/assets/logos-acBxgz0w.js                               0.85 kB │ gzip:     0.52 kB
+dist/assets/input-Dg_z4AKm.js                               0.87 kB │ gzip:     0.40 kB
+dist/assets/badge-Dp3PDy5b.js                               0.90 kB │ gzip:     0.47 kB
+dist/assets/InferiorityBar-keHW9_KR.js                      0.90 kB │ gzip:     0.55 kB
+dist/assets/AddToCalendar-BDaiSiD8.js                       0.92 kB │ gzip:     0.57 kB
+dist/assets/table-CnGCe7m5.js                               0.93 kB │ gzip:     0.43 kB
+dist/assets/CompetitionTabs-BsCMSi87.js                     1.02 kB │ gzip:     0.64 kB
+dist/assets/rolldown-runtime-COiEfhsA.js                    1.11 kB │ gzip:     0.62 kB
+dist/assets/AccountPages-hwnmO9-g.js                        1.31 kB │ gzip:     0.72 kB
+dist/assets/History-C1ZiWdOD.js                             1.38 kB │ gzip:     0.71 kB
+dist/assets/preload-helper-BLdHbfdN.js                      1.51 kB │ gzip:     0.79 kB
+dist/assets/fileStore-YUoD9KVu.js                           1.52 kB │ gzip:     0.77 kB
+dist/assets/VisualFrame-B7foF9di.js                         1.60 kB │ gzip:     0.75 kB
+dist/assets/ics-C-MQWoH7.js                                 1.65 kB │ gzip:     0.98 kB
+dist/assets/zip-CNtQjxRr.js                                 1.72 kB │ gzip:     0.82 kB
+dist/assets/pdf-vQy7I29k.js                                 2.00 kB │ gzip:     0.98 kB
+dist/assets/Identity-CmoQ23bm.js                            2.02 kB │ gzip:     1.03 kB
+dist/assets/Teams-CSYQHAe2.js                               2.02 kB │ gzip:     1.01 kB
+dist/assets/button-Dm423y4a.js                              2.03 kB │ gzip:     1.06 kB
+dist/assets/TrophyBadge-BKWpbTps.js                         2.13 kB │ gzip:     1.03 kB
+dist/assets/RewardsList-BDZCZDhE.js                         2.46 kB │ gzip:     1.19 kB
+dist/assets/SortableTable-CVlyC0B8.js                       2.53 kB │ gzip:     1.21 kB
+dist/assets/draw-B2shuC4s.js                                2.54 kB │ gzip:     1.21 kB
+dist/assets/SeniorityBadge-Dngjx3OW.js                      2.55 kB │ gzip:     1.20 kB
+dist/assets/TeamBanner-vL5dcdJJ.js                          2.60 kB │ gzip:     1.21 kB
+dist/assets/Login-BvfPDRz7.js                               2.87 kB │ gzip:     1.38 kB
+dist/assets/dist-ID4xbq8l.js                                3.17 kB │ gzip:     1.43 kB
+dist/assets/Standings-CuKmwCTv.js                           3.21 kB │ gzip:     1.64 kB
+dist/assets/tabs-B7t8fYYB.js                                3.25 kB │ gzip:     1.51 kB
+dist/assets/useCardShine-TcquaomF.js                        3.38 kB │ gzip:     1.38 kB
+dist/assets/TeamStatsBars-OAB3BEwb.js                       3.53 kB │ gzip:     1.51 kB
+dist/assets/useSeniority-jO7QXzEh.js                        3.61 kB │ gzip:     1.62 kB
+dist/assets/MatchCard-ato0nDO8.js                           3.64 kB │ gzip:     1.36 kB
+dist/assets/Cards-ZQ-K52Me.js                               3.68 kB │ gzip:     1.60 kB
+dist/assets/react-dom-DmDdfzkc.js                           3.90 kB │ gzip:     1.42 kB
+dist/assets/TeamCard-C9W2pMy5.js                            3.98 kB │ gzip:     1.80 kB
+dist/assets/TeamOfWeekPitch-BdoTcW2R.js                     4.21 kB │ gzip:     1.80 kB
+dist/assets/switch-BT7Lf9RB.js                              4.21 kB │ gzip:     1.79 kB
+dist/assets/PreseasonTable-D9YKqypt.js                      4.28 kB │ gzip:     1.55 kB
+dist/assets/matchOps-MU3MPFpQ.js                            4.69 kB │ gzip:     1.98 kB
+dist/assets/TeamOfWeekAdmin-CtlU4mp9.js                     4.69 kB │ gzip:     2.15 kB
+dist/assets/WeeklyVisualsAdmin-Cl7WLnXg.js                  5.07 kB │ gzip:     2.43 kB
+dist/assets/Captains-BkRNIvvD.js                            5.28 kB │ gzip:     1.85 kB
+dist/assets/MatchVisualsPanel-BQpzc7zH.js                   5.50 kB │ gzip:     2.04 kB
+dist/assets/StandingsTable-D9V29HZN.js                      5.73 kB │ gzip:     2.17 kB
+dist/assets/dialog-6EDKqiCA.js                              6.01 kB │ gzip:     2.33 kB
+dist/assets/MatchCenterProgram-DJaDAC52.js                  6.11 kB │ gzip:     2.41 kB
+dist/assets/EntityCrud-DijSKTbp.js                          6.77 kB │ gzip:     2.62 kB
+dist/assets/CloudAdmins-5F00L_k6.js                         6.97 kB │ gzip:     2.67 kB
+dist/assets/Stats-CdfwgZ8V.js                               7.01 kB │ gzip:     2.61 kB
+dist/assets/SeasonLinkControl-D6eXpbSp.js                   7.05 kB │ gzip:     2.76 kB
+dist/assets/usePreseason-DK8F-oNR.js                        7.16 kB │ gzip:     3.09 kB
+dist/assets/TeamOfRound-UpgdWeKA.js                         7.21 kB │ gzip:     2.89 kB
+dist/assets/VisualsAdmin-BlNrdiEt.js                        7.50 kB │ gzip:     3.16 kB
+dist/assets/dist-dIrXma6-.js                                7.52 kB │ gzip:     2.85 kB
+dist/assets/Discipline-_zAdlkVs.js                          7.94 kB │ gzip:     2.66 kB
+dist/assets/CardShare-BRJ7fk4B.js                           8.08 kB │ gzip:     3.22 kB
+dist/assets/Groups-DjNS92VN.js                              8.72 kB │ gzip:     3.13 kB
+dist/assets/Dashboard-DCNLHqWU.js                           8.77 kB │ gzip:     3.09 kB
+dist/assets/QuickEntry-D4fSaRf1.js                          9.04 kB │ gzip:     3.38 kB
+dist/assets/Planning-CCN5g6D4.js                            9.72 kB │ gzip:     3.61 kB
+dist/assets/XPRules-c9xqnPTf.js                            10.48 kB │ gzip:     3.89 kB
+dist/assets/Rules-CBisxk5-.js                              12.07 kB │ gzip:     4.57 kB
+dist/assets/CaptainBits-G1n7bDsR.js                        12.25 kB │ gzip:     4.34 kB
+dist/assets/MatchesAdmin-DRcBsPJT.js                       12.83 kB │ gzip:     4.53 kB
+dist/assets/es-BWWq2oHV.js                                 12.91 kB │ gzip:     5.12 kB
+dist/assets/TvMode-Dj8De-di.js                             13.23 kB │ gzip:     4.89 kB
+dist/assets/Matches-DQJTljjG.js                            13.79 kB │ gzip:     4.88 kB
+dist/assets/PlayerCard-BMNhaRya.js                         13.82 kB │ gzip:     4.63 kB
+dist/assets/Preseason-BvKYFXcn.js                          14.18 kB │ gzip:     4.69 kB
+dist/assets/CaptainsAdmin-C0i9ARCt.js                      14.32 kB │ gzip:     4.79 kB
+dist/assets/Awards-BtfX5k7R.js                             14.44 kB │ gzip:     4.21 kB
+dist/assets/MatchSheet-DPSiB9UV.js                         14.73 kB │ gzip:     4.91 kB
+dist/assets/useStats-zxvhfSKq.js                           15.40 kB │ gzip:     5.59 kB
+dist/assets/Players-B1AJ0Otd.js                            15.94 kB │ gzip:     5.42 kB
+dist/assets/ContentPages-DzI2TNjJ.js                       19.87 kB │ gzip:     6.87 kB
+dist/assets/DrawSwiss-DxaMWoLE.js                          21.01 kB │ gzip:     6.73 kB
+dist/assets/PlayersAdmin-D6rEtPTQ.js                       22.67 kB │ gzip:     7.80 kB
+dist/assets/QrCode-BIWVthhJ.js                             23.96 kB │ gzip:     9.11 kB
+dist/assets/PlayerDetail-cqsAmQTI.js                       24.90 kB │ gzip:     8.33 kB
+dist/assets/TeamDetail-CnjcKJUn.js                         25.19 kB │ gzip:     8.46 kB
+dist/assets/SportPages-BRxKn2bA.js                         26.91 kB │ gzip:     9.27 kB
+dist/assets/purify.es-Dqk5qvad.js                          29.02 kB │ gzip:    11.45 kB
+dist/assets/xp-DnxER9Zq.js                                 29.64 kB │ gzip:     9.66 kB
+dist/assets/Home-CVEajspb.js                               30.56 kB │ gzip:     9.86 kB
+dist/assets/DisciplineAdmin-BdPiA_6b.js                    30.85 kB │ gzip:     9.23 kB
+dist/assets/PreseasonAdmin-COgTbnmj.js                     35.95 kB │ gzip:    11.03 kB
+dist/assets/MatchDetail-df1iL2go.js                        36.83 kB │ gzip:    10.45 kB
+dist/assets/AdminMisc-BloE8CN5.js                          37.70 kB │ gzip:    13.24 kB
+dist/assets/visuals-KM97WmaI.js                            38.42 kB │ gzip:    13.93 kB
+dist/assets/format-Do_IB1co.js                             44.07 kB │ gzip:    14.59 kB
+dist/assets/MatchCenter-6xz14ll6.js                        53.74 kB │ gzip:    16.06 kB
+dist/assets/dist-cFU93znl.js                               82.05 kB │ gzip:    22.24 kB
+dist/assets/Media-xN3AyV3W.js                             124.02 kB │ gzip:    37.91 kB
+dist/assets/useData-C2sxPTgU.js                           144.09 kB │ gzip:    48.41 kB
+dist/assets/index.es-SySp6Trk.js                          151.43 kB │ gzip:    48.92 kB
+dist/assets/migrations-BrfUuVJG.js                        158.45 kB │ gzip:    48.14 kB
+dist/assets/html2canvas-BTnHhQlH.js                       199.40 kB │ gzip:    46.74 kB
+dist/assets/theme-BuGFQPXZ.js                             358.15 kB │ gzip:   103.82 kB
+dist/assets/index-CuXXsCw5.js                             369.32 kB │ gzip:   117.34 kB
+dist/assets/ort.bundle.min-DvllMUge.js                    389.56 kB │ gzip:   104.77 kB
+dist/assets/ort.webgpu.bundle.min-DbYdiaim.js             389.58 kB │ gzip:   104.78 kB
+dist/assets/jspdf.plugin.autotable-DRpYFp3C.js            429.18 kB │ gzip:   138.96 kB
+
+[32m✓ built in 1.68s[39m
+exit=0

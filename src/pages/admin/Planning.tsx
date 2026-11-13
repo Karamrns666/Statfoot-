@@ -53,17 +53,7 @@ export default function Planning() {
     await reschedule(m, { date: wallToISO(day, slot), pitch })
   }
 
-  const Card_ = ({ m }: { m: Match }) => (
-    <button
-      type="button" draggable={movable(m)} onDragStart={(e) => { setDrag(m.id); e.dataTransfer.setData('text/plain', m.id); e.dataTransfer.effectAllowed = 'move' }} onDragEnd={() => { setDrag(null); setOver(null) }}
-      onClick={() => setEdit(m)} aria-label={`${m.number ?? ''} ${name(m.home_team_id)} contre ${name(m.away_team_id)} — modifier l’horaire`}
-      className={cn('w-full cursor-grab rounded-xl border bg-night-900/80 p-2 text-left text-sm shadow-sm transition hover:border-neon/60 active:cursor-grabbing', m.published === false ? 'border-dashed border-amber-300/50' : 'border-white/15', drag === m.id && 'opacity-40', !movable(m) && 'cursor-not-allowed opacity-70')}
-    >
-      <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground"><b className="num text-foreground">{m.number ?? '—'}</b>{L.competition.get(m.competition_id)?.name} · {m.round && m.round > 4 && L.competition.get(m.competition_id)?.format === 'swiss' ? 'Rattrapage' : `J${m.round}`}{m.published === false && <Badge variant="warning" className="ml-auto px-1.5 py-0 text-[10px]">Non publié</Badge>}</div>
-      <div className="mt-1 flex min-w-0 items-center gap-1.5 font-semibold"><TeamLogo team={L.team.get(m.home_team_id)} size={18} /><span className="truncate">{name(m.home_team_id)}</span></div>
-      <div className="flex min-w-0 items-center gap-1.5 font-semibold"><TeamLogo team={L.team.get(m.away_team_id)} size={18} /><span className="truncate">{name(m.away_team_id)}</span></div>
-    </button>
-  )
+  const card = (m: Match) => <PlanCard key={m.id} m={m} name={name} dragging={drag === m.id} movable={movable(m)} onStart={() => setDrag(m.id)} onEnd={() => { setDrag(null); setOver(null) }} onOpen={() => setEdit(m)} />
   const dropZone = (id: string, slot: string | null, pitch: string | null) => ({
     onDragOver: (e: React.DragEvent) => { if (drag) { e.preventDefault(); setOver(id) } },
     onDragLeave: () => setOver((o) => (o === id ? null : o)),
@@ -102,7 +92,7 @@ export default function Planning() {
                       const id = `${slot}|${p}`, m = at(slot, p), pv = over === id ? preview(slot, p) : null
                       return (
                         <td key={p} {...dropZone(id, slot, p)} className={cn('h-28 rounded-xl border border-dashed align-top p-1.5 transition', over === id ? (pv?.errors.length ? 'border-red-400 bg-red-500/10' : pv?.warnings.length ? 'border-amber-300 bg-amber-300/10' : 'border-neon bg-neon/10') : 'border-white/10')}>
-                          {m ? <Card_ m={m} /> : <span className="block pt-8 text-center text-xs text-muted-foreground/60">Libre</span>}
+                          {m ? card(m) : <span className="block pt-8 text-center text-xs text-muted-foreground/60">Libre</span>}
                           {pv && (pv.errors[0] || pv.warnings[0]) && <p className={cn('mt-1 text-[11px]', pv.errors.length ? 'text-red-300' : 'text-amber-200')}>{pv.errors[0] ?? pv.warnings[0]}</p>}
                         </td>
                       )
@@ -117,12 +107,29 @@ export default function Planning() {
           <Card {...dropZone('tbd', null, null)} className={cn(over === 'tbd' && 'border-neon')}><CardContent className="space-y-2 pt-4">
             <h2 className="font-display text-lg font-black uppercase">{TBD} <span className="text-muted-foreground">({tbd.length})</span></h2>
             <p className="text-xs text-muted-foreground">Glissez ces matchs dans la grille. Un match non publié peut revenir ici. <Link to="/admin/pre-saison" className="text-neon">Publier une journée</Link> quand tous ses matchs sont placés.</p>
-            {tbd.length ? tbd.map((m) => <Card_ key={m.id} m={m} />) : <p className="py-4 text-center text-sm text-muted-foreground">Tous les matchs ont un horaire.</p>}
+            {tbd.length ? tbd.map(card) : <p className="py-4 text-center text-sm text-muted-foreground">Tous les matchs ont un horaire.</p>}
           </CardContent></Card>
         </div>
       </div>
       {edit && <EditDialog m={edit} onClose={() => setEdit(null)} />}
     </AdminPage>
+  )
+}
+
+/** Carte de match du planning (composant stable : il ne doit pas être recréé pendant un glisser-déposer). */
+function PlanCard({ m, name, dragging, movable, onStart, onEnd, onOpen }: { m: Match; name: (id: string) => string; dragging: boolean; movable: boolean; onStart: () => void; onEnd: () => void; onOpen: () => void }) {
+  const L = useLookup()
+  const comp = L.competition.get(m.competition_id)
+  return (
+    <button
+      type="button" draggable={movable} onDragStart={(e) => { e.dataTransfer.setData('text/plain', m.id); e.dataTransfer.effectAllowed = 'move'; onStart() }} onDragEnd={onEnd}
+      onClick={onOpen} aria-label={`${m.number ?? ''} ${name(m.home_team_id)} contre ${name(m.away_team_id)} — modifier l’horaire`}
+      className={cn('w-full cursor-grab rounded-xl border bg-night-900/80 p-2 text-left text-sm shadow-sm transition hover:border-neon/60 active:cursor-grabbing', m.published === false ? 'border-dashed border-amber-300/50' : 'border-white/15', dragging && 'opacity-40', !movable && 'cursor-not-allowed opacity-70')}
+    >
+      <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground"><b className="num text-foreground">{m.number ?? '—'}</b>{comp?.name} · {m.round && m.round > 4 && comp?.format === 'swiss' ? 'Rattrapage' : `J${m.round}`}{m.published === false && <Badge variant="warning" className="ml-auto px-1.5 py-0 text-[10px]">Non publié</Badge>}</div>
+      <div className="mt-1 flex min-w-0 items-center gap-1.5 font-semibold"><TeamLogo team={L.team.get(m.home_team_id)} size={18} /><span className="truncate">{name(m.home_team_id)}</span></div>
+      <div className="flex min-w-0 items-center gap-1.5 font-semibold"><TeamLogo team={L.team.get(m.away_team_id)} size={18} /><span className="truncate">{name(m.away_team_id)}</span></div>
+    </button>
   )
 }
 

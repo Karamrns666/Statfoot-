@@ -1,8 +1,8 @@
 // Mode simulation : l'admin connecté voit tout le site avec les données simulées, rangées À PART des vraies
-// (table sim_rows dans Supabase, lisible uniquement par les admins). Le mode est propre à l'onglet (sessionStorage),
-// jamais actif pour un visiteur, et le site passe en LECTURE SEULE tant qu'il est actif (aucune écriture possible,
+// (table sim_rows dans Supabase, lisible uniquement par les admins). Le mode vaut pour tous les onglets du navigateur
+// de l'admin (localStorage, synchronisé entre onglets), jamais pour un visiteur (la table lui est illisible), et le site passe en LECTURE SEULE tant qu'il est actif (aucune écriture possible,
 // ni dans les vraies données ni ailleurs).
-import { adminRest, cloudAuth, cloudEnabled } from '@/api/cloud'
+import { adminRest, cloudAuth, cloudEnabled, onAuthChange } from '@/api/cloud'
 import type { BaseEntity } from '@/types/entities'
 import { SIM_ID } from './constants'
 import type { SimReport, SimRows } from './simulation'
@@ -83,18 +83,29 @@ export async function enterSimulation() {
     if (!data.some((r) => r.entity === 'Match')) throw new Error('Aucune simulation enregistrée : générez-la d’abord.')
     const out: Record<string, BaseEntity[]> = {}
     for (const r of data) if (r.entity !== '__meta') (out[r.entity] ??= []).push(r.data)
-    try { sessionStorage.setItem(FLAG, '1') } catch { /* indisponible */ }
+    try { localStorage.setItem(FLAG, '1') } catch { /* indisponible */ }
     set({ active: true, loading: false, rows: out as SimRows, meta })
   } catch (e) { set({ loading: false, error: (e as Error).message }); throw e }
 }
 export function leaveSimulation() {
-  try { sessionStorage.removeItem(FLAG) } catch { /* indisponible */ }
+  try { localStorage.removeItem(FLAG) } catch { /* indisponible */ }
   set({ active: false, rows: null, meta: null })
 }
 /** Au chargement : reprend le mode simulation de l'onglet si un admin est connecté */
 export function resumeSimulation() {
   let on = false
-  try { on = sessionStorage.getItem(FLAG) === '1' } catch { /* indisponible */ }
+  try { on = localStorage.getItem(FLAG) === '1' } catch { /* indisponible */ }
   if (on && isAdmin()) enterSimulation().catch(() => leaveSimulation())
   else if (on) leaveSimulation()
 }
+
+// un autre onglet active / quitte le mode simulation → cet onglet suit
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (e) => {
+    if (e.key !== FLAG) return
+    if (e.newValue === '1' && !state.active) resumeSimulation()
+    else if (e.newValue !== '1' && state.active) set({ active: false, rows: null, meta: null })
+  })
+}
+// déconnexion de l'admin → retour immédiat aux vraies données
+if (cloudEnabled) onAuthChange(() => { if (!cloudAuth.me() && state.active) leaveSimulation() })

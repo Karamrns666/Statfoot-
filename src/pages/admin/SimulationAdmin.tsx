@@ -116,7 +116,7 @@ export default function SimulationAdmin() {
           </div>
           {progress && <p className="text-xs text-muted-foreground"><Loader2 className="mr-1 inline size-3 animate-spin" />{progress}</p>}
           {sim.error && <p className="text-xs text-red-400">{sim.error}</p>}
-          <p className="text-xs text-muted-foreground">Le mode simulation est propre à cet onglet : tout le site public (y compris le mode TV) affiche les données simulées avec un bandeau orange, en lecture seule. Les visiteurs ne voient jamais la simulation (la table n’est lisible que par les admins), elle n’est ni indexée ni partageable.</p>
+          <p className="text-xs text-muted-foreground">Une fois activé, le mode simulation vaut pour tous les onglets de ce navigateur tant que vous êtes connecté : tout le site public (y compris le mode TV) affiche les données simulées avec un bandeau orange, en lecture seule. Les visiteurs ne voient jamais la simulation (la table n’est lisible que par les admins), elle n’est ni indexée ni partageable.</p>
         </CardContent>
       </Card>
 

@@ -46,7 +46,7 @@ export function shareLinks(url: string, text: string) {
   ]
 }
 
-export function CardShareActions({ card, fileName, url, text, subtitle }: { card: ReactNode; fileName: string; url: string; text: string; subtitle?: string }) {
+export function CardShareActions({ card, fileName, url, text, subtitle, downloadLabel = 'Télécharger ma carte' }: { card: ReactNode; fileName: string; url: string; text: string; subtitle?: string; downloadLabel?: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const [busy, setBusy] = useState<'dl' | 'share' | null>(null)
   const [fallback, setFallback] = useState(false)
@@ -78,7 +78,7 @@ export function CardShareActions({ card, fileName, url, text, subtitle }: { card
   return (
     <>
       <div className="grid w-full gap-2">
-        <Button size="sm" onClick={download} disabled={!!busy} className="w-full">{busy === 'dl' ? <Loader2 className="animate-spin" /> : <Download />}Télécharger ma carte</Button>
+        <Button size="sm" onClick={download} disabled={!!busy} className="w-full">{busy === 'dl' ? <Loader2 className="animate-spin" /> : <Download />}{downloadLabel}</Button>
         <Button size="sm" variant="outline" onClick={share} disabled={!!busy} className="w-full border-white/30 bg-white/10 text-white hover:bg-white/20">{busy === 'share' ? <Loader2 className="animate-spin" /> : <Share2 />}Partager</Button>
       </div>
       {/* composition 1080 × 1350 rendue hors écran pour l'export */}

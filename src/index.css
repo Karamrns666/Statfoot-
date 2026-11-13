@@ -207,8 +207,20 @@
 .pcard-shape { clip-path: polygon(0 7%, 50% 0, 100% 7%, 100% 100%, 0 100%); }
 .pcard-sheen { background: linear-gradient(115deg, transparent 30%, rgb(255 255 255 / .16) 45%, transparent 60%); background-size: 250% 100%; background-position: 120% 0; transition: background-position .9s ease; }
 .pcard:hover .pcard-sheen { background-position: -40% 0; }
+/* niveaux Platinum / Gold / Silver : brillance qui suit le curseur ou l'inclinaison (variables posées par useCardShine) */
+.pcard, .tcard { --mx: 30%; --my: 20%; --hx: 70%; --hy: 80%; }
+.pcard-glare { background: radial-gradient(circle at var(--mx) var(--my), rgb(255 255 255 / .5), rgb(255 255 255 / .12) 22%, transparent 48%); mix-blend-mode: overlay; opacity: 0; transition: opacity .35s ease; }
+[data-shine="on"] .pcard-glare { opacity: 1; }
+/* Platinum : dégradé prismatique qui bouge lentement + reflet irisé qui suit le geste */
+.pcard-prism { background-size: 220% 220%; animation: pcard-prism 9s ease-in-out infinite alternate; }
+@keyframes pcard-prism { from { background-position: 0% 20%; } to { background-position: 100% 80%; } }
+.pcard-holo { background-size: 240% 240%; background-position: var(--hx) var(--hy); mix-blend-mode: color-dodge; opacity: .35; transition: opacity .35s ease; }
+[data-shine="on"] .pcard-holo { opacity: .75; }
 @media (prefers-reduced-motion: reduce) {
   .pcard-inner, .pcard-sheen { transition: none; }
+  .pcard-prism { animation: none; }
+  .pcard-glare { display: none; }
+  .pcard-holo { transition: none; }
   .bb-beam, .bb-flash, .bb-wipe-in, .bb-wipe-out, .bb-text, .bb-pop, .bb-value, .bb-sheen, .bb-ball-track, .bb-ball, .bb-ball-spin, .bb-brand-in, .bb-logo, .bb-ring { animation: none !important; }
   .bb-wipe-out, .bb-ball-track, .bb-flash { display: none; }
   .bb-sheen { -webkit-text-fill-color: currentColor; background: none; }

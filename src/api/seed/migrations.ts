@@ -10,7 +10,7 @@ import { SEASON_2026_ID } from './season2026'
 import { toRole } from '@/lib/format'
 import { capStarters } from '@/lib/lineup'
 import { defaultCaptainTeams } from '@/lib/captains'
-import { applyOfficialPlan, planIsEmpty, planOfficialTeams } from '@/lib/officialTeams'
+import { LOGO_REVISION, applyOfficialPlan, officialLogo, planIsEmpty, planOfficialTeams } from '@/lib/officialTeams'
 import { store } from '../localStore'
 
 /** copie sans la clé donnée */
@@ -355,7 +355,27 @@ export function applyHideSeason2025(db: Rules6Data): Rules6Data {
   return { Season: db.Season.map((s) => (s.id === 'season_2025' ? { ...s, hidden: true, is_active: false } : s)) }
 }
 
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams, applyHideSeason2025]
+/**
+ * Logos officiels remplacés (Crédit Agricole, nov. 2026) : les équipes et clubs qui utilisent le fichier du dépôt
+ * passent à la nouvelle URL (cache vidé). Un logo importé à la main par un admin n'est pas touché.
+ */
+export function applyLogoRevisions(db: Rules6Data & { Club?: Club[] }): Rules6Data & { Club?: Club[] } {
+  const out: Rules6Data & { Club?: Club[] } = {}
+  const fix = <T extends { logo_url?: string; company_logo_url?: string }>(x: T): T => {
+    for (const short of Object.keys(LOGO_REVISION)) {
+      const f = `/logos/${short.toLowerCase()}`, o = officialLogo({ short })
+      const isOld = (u?: string) => !!u && (u === `${f}.png` || u === `${f}-full.png` || (u.startsWith(`${f}.png?`) || u.startsWith(`${f}-full.png?`)))
+      if (isOld(x.logo_url) && x.logo_url !== o.logo_url) x = { ...x, logo_url: x.logo_url!.includes('-full') ? o.company_logo_url : o.logo_url }
+      if ('company_logo_url' in x && isOld(x.company_logo_url) && x.company_logo_url !== o.company_logo_url) x = { ...x, company_logo_url: o.company_logo_url }
+    }
+    return x
+  }
+  if (db.Team) { const T = db.Team.map(fix); if (T.some((t, i) => t !== db.Team![i])) out.Team = T }
+  if (db.Club) { const C = db.Club.map(fix); if (C.some((c, i) => c !== db.Club![i])) out.Club = C }
+  return out
+}
+
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams, applyHideSeason2025, applyLogoRevisions]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */

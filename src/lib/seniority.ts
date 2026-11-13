@@ -29,35 +29,69 @@ export function seniorityMap(teams: Team[], competitions: Competition[], seasons
   return new Map(teams.map((t) => [t.id, teamSeniority(t, teams, competitions, seasons, clubs)]))
 }
 
-/** Couleurs des cartes et des badges, cohérentes avec la charte MBL (bleu marine #0B2E73, orange #F05A22). */
+/**
+ * Couleurs des cartes et des badges. Chaque niveau a un fond, une matière et un effet différents, pour se
+ * reconnaître au premier coup d'œil même en petit :
+ *  - PLATINUM : carte sombre (noir / bleu nuit), reflet holographique irisé, liseré platine, texte blanc, motif diamant ;
+ *  - GOLD : or chaud (#8A6A1F → #F5D77A → #B8892B), reflet métallique, texte brun foncé, liseré doré ;
+ *  - SILVER : argent clair (gris perle → blanc → gris acier), métal brossé, texte bleu foncé, liseré gris.
+ * Contrastes du texte vérifiés WCAG AA (≥ 4,5:1) sur toute la hauteur du fond.
+ */
 export interface SeniorityStyle {
-  /** cadre métallique */ frame: string
+  /** cadre métallique (liseré) */ frame: string
   /** fond du recto */ bg: string
-  /** reflet nacré / métal par-dessus le fond */ sheen: string
+  /** matière par-dessus le fond (holographique, reflet or, métal brossé) */ sheen: string
+  /** mode de fusion de la matière */ sheenBlend: string
+  /** motif discret (diamants pour Platinum) */ pattern?: string
+  /** reflet irisé qui suit le curseur / l'inclinaison (Platinum uniquement) */ holo?: string
   /** texte principal sur le fond */ fg: string
   /** texte secondaire */ fgSoft: string
+  /** relief du texte (gravé clair sur métal, lueur sur fond sombre) */ textShadow: string
   /** pastille (badge, chips) */ chip: string
   chipText: string
+  /** bandeau de stats en bas de carte */ bar: string
+  barText: string
+  barLabel: string
+  /** pastille de niveau (badges, légendes) */ badge: string
+  badgeText: string
   /** couleur unie représentative (légende, liserés) */ solid: string
   glow: string
 }
+const DIAMONDS = `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"><path d="M11 3 L16 11 L11 19 L6 11 Z" fill="none" stroke="white" stroke-opacity=".09" stroke-width="1"/></svg>')}")`
 export const SENIORITY_STYLE: Record<SeniorityTier, SeniorityStyle> = {
   platinum: {
-    frame: 'linear-gradient(150deg, #FFFFFF 0%, #DCE8F5 22%, #9FB7D2 45%, #F4F8FF 62%, #B9CDE4 80%, #FFFFFF 100%)',
-    bg: 'linear-gradient(180deg, #FFFFFF 0%, #EEF3FA 38%, #D5E1EF 70%, #BCCDE2 100%)',
-    sheen: 'linear-gradient(125deg, rgb(190 220 255 / .55) 0%, rgb(255 226 242 / .45) 30%, rgb(206 255 244 / .45) 55%, rgb(214 226 255 / .55) 80%, rgb(255 255 255 / .2) 100%)',
-    fg: '#0B2E73', fgSoft: '#3D5A8A', chip: 'linear-gradient(180deg, #0B2E73, #061A47)', chipText: '#FFFFFF', solid: '#DCE8F5', glow: 'rgb(170 200 235 / .55)',
+    frame: 'linear-gradient(150deg, #FFFFFF 0%, #C9D2DE 18%, #7F8A9C 38%, #F6F9FC 55%, #9AA5B6 75%, #E8EDF4 100%)',
+    bg: 'radial-gradient(120% 60% at 50% 0%, #22306B 0%, transparent 62%), linear-gradient(180deg, #121B45 0%, #0A1230 45%, #060A1E 100%)',
+    sheen: 'linear-gradient(115deg, transparent 8%, rgb(168 85 247 / .38) 26%, rgb(34 211 238 / .34) 44%, rgb(244 114 182 / .34) 62%, rgb(129 140 248 / .3) 78%, transparent 94%)',
+    sheenBlend: 'screen',
+    pattern: DIAMONDS,
+    holo: 'linear-gradient(105deg, transparent 20%, rgb(196 181 253 / .55) 36%, rgb(103 232 249 / .5) 48%, rgb(249 168 212 / .5) 60%, transparent 76%)',
+    fg: '#FFFFFF', fgSoft: '#C3CEEA', textShadow: '0 0 14px rgb(140 170 255 / .45)',
+    chip: 'linear-gradient(180deg, #F6F9FC, #AEB8C8)', chipText: '#0A1230',
+    bar: 'linear-gradient(180deg, #0E1A3F, #070C22)', barText: '#FFFFFF', barLabel: '#AFC0E6',
+    badge: 'linear-gradient(135deg, #2A3A7A 0%, #0A1230 55%, #3B2370 100%)', badgeText: '#FFFFFF',
+    solid: '#1E2C63', glow: 'rgb(139 92 246 / .45)',
   },
   gold: {
-    frame: 'linear-gradient(150deg, #FFF3C4 0%, #E8B931 28%, #A87512 52%, #F7D774 74%, #FFF3C4 100%)',
-    bg: 'linear-gradient(180deg, #FCE9A6 0%, #EBC453 40%, #C99525 75%, #A87512 100%)',
-    sheen: 'radial-gradient(90% 55% at 50% 0%, rgb(255 255 255 / .55), transparent 65%)',
-    fg: '#2B1C00', fgSoft: '#5E4410', chip: 'linear-gradient(180deg, #0B2E73, #061A47)', chipText: '#FFE9A3', solid: '#E8B931', glow: 'rgb(232 185 49 / .5)',
+    frame: 'linear-gradient(150deg, #FFF3C4 0%, #B8892B 30%, #F5D77A 52%, #8A6A1F 78%, #E9C766 100%)',
+    bg: 'linear-gradient(180deg, #F5D77A 0%, #E9C766 30%, #D6AC46 60%, #C99A35 85%, #B8892B 100%)',
+    sheen: 'linear-gradient(120deg, rgb(138 106 31 / .35) 0%, transparent 22%, rgb(255 248 220 / .65) 40%, transparent 55%, rgb(138 106 31 / .25) 80%, transparent 100%)',
+    sheenBlend: 'soft-light',
+    fg: '#2B1A00', fgSoft: '#3F2A03', textShadow: '0 1px 0 rgb(255 240 190 / .7)',
+    chip: 'linear-gradient(180deg, #3A2600, #1F1400)', chipText: '#F5D77A',
+    bar: 'linear-gradient(180deg, #3A2600, #1F1400)', barText: '#F5D77A', barLabel: '#D9BC6A',
+    badge: 'linear-gradient(180deg, #F8E08E, #E2BC55)', badgeText: '#2B1A00',
+    solid: '#D6AC46', glow: 'rgb(232 185 49 / .5)',
   },
   silver: {
-    frame: 'linear-gradient(150deg, #FFFFFF 0%, #C9D3DD 28%, #7D8A99 52%, #E6EBF0 74%, #FFFFFF 100%)',
-    bg: 'linear-gradient(180deg, #DDE3E9 0%, #B4BFCB 42%, #8C99A9 78%, #75839A 100%)',
-    sheen: 'radial-gradient(90% 55% at 50% 0%, rgb(255 255 255 / .6), transparent 65%)',
-    fg: '#0E1E3A', fgSoft: '#3A4A62', chip: 'linear-gradient(180deg, #0B2E73, #061A47)', chipText: '#FFFFFF', solid: '#C9D3DD', glow: 'rgb(201 211 221 / .45)',
+    frame: 'linear-gradient(150deg, #FFFFFF 0%, #AEB6C0 32%, #EEF1F4 52%, #7E8896 78%, #D5DAE0 100%)',
+    bg: 'linear-gradient(180deg, #F4F6F8 0%, #E3E7EC 35%, #C9D0D8 72%, #AEB7C2 100%)',
+    sheen: 'repeating-linear-gradient(90deg, rgb(255 255 255 / .35) 0 1px, rgb(0 0 0 / .045) 1px 2px, transparent 2px 4px)',
+    sheenBlend: 'normal',
+    fg: '#0B2350', fgSoft: '#2E4266', textShadow: '0 1px 0 rgb(255 255 255 / .8)',
+    chip: 'linear-gradient(180deg, #0B2350, #061433)', chipText: '#FFFFFF',
+    bar: 'linear-gradient(180deg, #0B2350, #061433)', barText: '#FFFFFF', barLabel: '#B9C6DE',
+    badge: 'linear-gradient(180deg, #FFFFFF, #D3D9E0)', badgeText: '#0B2350',
+    solid: '#C9D0D8', glow: 'rgb(120 135 155 / .4)',
   },
 }

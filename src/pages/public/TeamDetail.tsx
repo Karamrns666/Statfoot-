@@ -14,6 +14,8 @@ import { usePlayerXP, useTeamStats, useSeasonCompetitions } from '@/hooks/useSta
 import { CompetitionBadge, EmptyState, FormPills, SectionTitle, StatTile } from '@/components/league/Bits'
 import { PlayerAvatar, RoleBadge } from '@/components/league/Identity'
 import { TeamBanner } from '@/components/league/TeamBanner'
+import { SeasonTeamCard } from '@/components/cards/TeamCard'
+import { CardShareActions } from '@/components/players/CardShare'
 import { MatchCard } from '@/components/match/MatchCard'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SortableTable } from '@/components/league/SortableTable'
@@ -58,6 +60,13 @@ export default function TeamDetail() {
         <div className="mt-3"><FormPills form={teamForm(matches, team.id)} size="md" /></div>
         <ClubHistory team={team} />
       </TeamBanner>
+      <section className="flex flex-col items-center gap-4 sm:flex-row sm:items-end" aria-label="Carte de l'équipe">
+        <div className="w-56 shrink-0"><SeasonTeamCard team={team} faceOnly /></div>
+        <div className="w-full max-w-56">
+          <CardShareActions card={<SeasonTeamCard team={team} faceOnly />} fileName={`carte-equipe-${team.short_name.toLowerCase()}.png`} downloadLabel="Télécharger la carte"
+            url={`${location.origin}/equipes/${team.id}`} text={`${team.name} · Morocco Business League`} subtitle={effSeason?.name} />
+        </div>
+      </section>
       {pre && pre.teamIds.includes(team.id) && pre.matches.length > 0 && (
         <section>
           <SectionTitle title="Parcours en pré-saison" action={<Link to="/pre-saison?onglet=parcours" className="text-sm font-semibold text-neon hover:underline">Toutes les équipes</Link>} />

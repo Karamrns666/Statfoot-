@@ -29,3 +29,21 @@ describe('applyHideSeason2025', () => {
     expect(applyHideSeason2025({ Season: out.Season } as never)).toEqual({})
   })
 })
+
+describe('applyLogoRevisions', () => {
+  it('passe le logo Crédit Agricole à la nouvelle URL, sans toucher un logo importé', async () => {
+    const { applyLogoRevisions } = await import('./migrations')
+    const Team = [
+      { id: 'a', short_name: 'CAM', logo_url: '/logos/cam.png', company_logo_url: '/logos/cam-full.png' },
+      { id: 'b', short_name: 'CAM', logo_url: '/_files/perso.png' },
+      { id: 'c', short_name: 'BMC', logo_url: '/logos/bmc.png' },
+    ]
+    const out = applyLogoRevisions({ Team, Club: [{ id: 'k', logo_url: '/logos/cam.png' }] } as never)
+    const T = out.Team as { logo_url?: string; company_logo_url?: string }[]
+    expect(T[0]).toMatchObject({ logo_url: '/logos/cam.png?v=2026-11', company_logo_url: '/logos/cam-full.png?v=2026-11' })
+    expect(T[1].logo_url).toBe('/_files/perso.png')
+    expect(T[2].logo_url).toBe('/logos/bmc.png')
+    expect((out.Club as { logo_url: string }[])[0].logo_url).toBe('/logos/cam.png?v=2026-11')
+    expect(applyLogoRevisions({ Team: T, Club: out.Club } as never)).toEqual({})
+  })
+})

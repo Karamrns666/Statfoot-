@@ -39,7 +39,12 @@ export const OFFICIAL_TEAMS_2026: OfficialTeam[] = [
 
 /** Clé de rapprochement : sans majuscules, accents, tirets, apostrophes ni espaces. */
 export const teamKey = (s?: string) => (s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '')
-export const officialLogo = (o: OfficialTeam) => ({ logo_url: `/logos/${o.short.toLowerCase()}.png`, company_logo_url: `/logos/${o.short.toLowerCase()}-full.png` })
+/** Révision des fichiers logo remplacés : l'URL change (?v=…) pour vider les caches des navigateurs et du site. */
+export const LOGO_REVISION: Record<string, string> = { CAM: '2026-11' }
+export const officialLogo = (o: Pick<OfficialTeam, 'short'>) => {
+  const f = o.short.toLowerCase(), v = LOGO_REVISION[o.short] ? `?v=${LOGO_REVISION[o.short]}` : ''
+  return { logo_url: `/logos/${f}.png${v}`, company_logo_url: `/logos/${f}-full.png${v}` }
+}
 
 /** Équipe officielle correspondant à un nom (nom affiché, alias ou code) — undefined si aucune. */
 export function matchOfficial(names: (string | undefined)[], list: OfficialTeam[] = OFFICIAL_TEAMS_2026): OfficialTeam | undefined {

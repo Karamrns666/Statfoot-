@@ -1,17 +1,25 @@
 // Badge d'ancienneté du club : PLATINUM (≥ 3 saisons) · GOLD (2) · SILVER (1).
 import { useTeamSeniority } from '@/hooks/useSeniority'
 import { SENIORITY_LABEL, SENIORITY_ORDER, SENIORITY_RULE, SENIORITY_STYLE, type Seniority, type SeniorityTier } from '@/lib/seniority'
+import { Crown, Gem, Shield, type LucideProps } from 'lucide-react'
 import { cn } from '@/lib/utils'
+
+/** Icône dédiée à chaque niveau (le niveau ne repose jamais uniquement sur la couleur) */
+const TIER_ICONS = { platinum: Gem, gold: Crown, silver: Shield } as const
+export function TierIcon({ tier, ...props }: { tier: SeniorityTier } & LucideProps) {
+  const I = TIER_ICONS[tier]
+  return <I aria-hidden strokeWidth={2.5} {...props} />
+}
 
 const tip = (s: Seniority) => `${SENIORITY_LABEL[s.tier]} · ${s.seasons} saison${s.seasons > 1 ? 's' : ''} MBL`
 
 export function SeniorityChip({ tier, seasons, size = 'sm', className }: { tier: SeniorityTier; seasons?: number; size?: 'xs' | 'sm' | 'md'; className?: string }) {
   const st = SENIORITY_STYLE[tier]
   return (
-    <span className={cn('inline-flex shrink-0 items-center gap-1 rounded-full font-extrabold uppercase leading-none tracking-wide ring-1 ring-black/10',
+    <span className={cn('inline-flex shrink-0 items-center gap-1 rounded-full font-extrabold uppercase leading-none tracking-wide',
       size === 'xs' ? 'px-1.5 py-[3px] text-[9px]' : size === 'sm' ? 'px-2 py-1 text-[10px]' : 'px-2.5 py-1 text-xs', className)}
-      style={{ background: st.frame, color: st.fg }}>
-      {SENIORITY_LABEL[tier]}{seasons != null && size !== 'xs' && <span className="font-bold opacity-70">· {seasons} s.</span>}
+      style={{ background: st.badge, color: st.badgeText, boxShadow: `inset 0 0 0 1px ${tier === 'platinum' ? 'rgb(220 228 240 / .85)' : 'rgb(0 0 0 / .14)'}` }}>
+      <TierIcon tier={tier} className={size === 'md' ? 'size-3.5' : 'size-3'} />{SENIORITY_LABEL[tier]}{seasons != null && size !== 'xs' && <span className="font-bold opacity-70">· {seasons} s.</span>}
     </span>
   )
 }
@@ -19,7 +27,7 @@ export function SeniorityChip({ tier, seasons, size = 'sm', className }: { tier:
 /** Pastille ronde (P / G / S) pour les listes serrées sur mobile */
 export function SeniorityDot({ tier, className }: { tier: SeniorityTier; className?: string }) {
   const st = SENIORITY_STYLE[tier]
-  return <span className={cn('inline-flex size-[15px] shrink-0 items-center justify-center rounded-full text-[8px] font-black leading-none ring-1 ring-black/15', className)} style={{ background: st.frame, color: st.fg }}>{SENIORITY_LABEL[tier][0]}</span>
+  return <span className={cn('inline-flex size-[15px] shrink-0 items-center justify-center rounded-full text-[8px] font-black leading-none ring-1 ring-black/15', className)} style={{ background: st.badge, color: st.badgeText }}>{SENIORITY_LABEL[tier][0]}</span>
 }
 
 /** Badge d'une équipe (calcul automatique + correction admin). `showSeasons` affiche le nombre de saisons. */

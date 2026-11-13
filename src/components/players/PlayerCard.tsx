@@ -11,7 +11,9 @@ import { cn } from '@/lib/utils'
 import { RankDelta } from '@/components/league/Bits'
 import { BADGE_ICONS } from './BadgeMedal'
 import { TIER_LABEL, TIER_STYLE, type BadgeState } from '@/lib/badges'
-import { SENIORITY_LABEL, SENIORITY_STYLE, type SeniorityTier } from '@/lib/seniority'
+import { SENIORITY_STYLE, type SeniorityTier } from '@/lib/seniority'
+import { TierRibbon, TierSurface } from '@/components/cards/TierSurface'
+import { useCardShine } from '@/hooks/useCardShine'
 
 export interface CardStat { label: string; value: ReactNode; hint?: string }
 
@@ -109,11 +111,13 @@ function CardPhoto({ cutout, photo, initials, color }: { cutout?: string; photo?
 export function PlayerCard(p: PlayerCardProps) {
   const [flipped, setFlipped] = useState(false)
   const toggle = () => setFlipped((f) => !f)
+  const shine = useCardShine<HTMLDivElement>()
   if (p.faceOnly) return <div className={cn('pcard aspect-[63/92] w-full', p.className)}><div className="pcard-inner text-[clamp(8.5px,4.6cqw,40px)]"><CardFront p={p} /></div></div>
   return (
     <div
       className={cn('pcard group aspect-[63/92] w-full cursor-pointer select-none outline-none', p.className)}
       data-flipped={flipped}
+      {...shine}
       role="button"
       tabIndex={0}
       aria-pressed={flipped}
@@ -141,16 +145,8 @@ function CardFront({ p }: { p: PlayerCardProps }) {
   const logo = cardLogo(p)
   const teamLabel = p.team?.name ?? p.teamName ?? ''
   return (
-    <div className="pcard-face pcard-shape overflow-hidden rounded-b-2xl group-focus-visible:outline-2 group-focus-visible:outline-neon" data-tier={tier} style={{ background: st.frame, padding: 3, filter: `drop-shadow(0 14px 22px ${st.glow})` }}>
-      <div className="pcard-shape relative flex h-full flex-col overflow-hidden rounded-b-[13px]" style={{ background: st.bg, color: st.fg }}>
-        <div className={cn('pointer-events-none absolute inset-0', tier === 'platinum' ? 'opacity-70' : 'mix-blend-soft-light')} style={{ background: st.sheen }} />
-        {tier === 'platinum' && <div className="pointer-events-none absolute inset-0 opacity-60 mix-blend-overlay" style={{ background: 'repeating-linear-gradient(125deg, transparent 0 14px, rgb(255 255 255 / .35) 14px 16px)' }} />}
-        <div className="pcard-sheen pointer-events-none absolute inset-0" />
-        {/* liseré orange MBL sous le chapeau de la carte */}
-        <div className="absolute inset-x-[30%] top-[1.2%] h-[.22em] rounded-full bg-[#F05A22]" />
-        <div className="absolute inset-x-0 top-[2.9%] text-center text-[.68em] font-black tracking-[.24em]" style={{ color: st.fgSoft }}>
-          {SENIORITY_LABEL[tier].toUpperCase()}{p.rank != null && <span className="ml-[.5em] rounded-full px-[.55em] py-[.1em] tracking-normal" style={{ background: st.chip, color: st.chipText }}>N°{p.rank}</span>}
-        </div>
+    <TierSurface tier={tier} className="group-focus-visible:outline-2 group-focus-visible:outline-neon">
+        <TierRibbon tier={tier} extra={p.rank != null && <span className="ml-[.2em] rounded-full px-[.5em] py-[.12em] tracking-normal" style={{ background: st.bar, color: st.barText }}>N°{p.rank}</span>} />
         {/* zone photo : le joueur détouré est posé sur le fond de la carte */}
         <div className="relative h-[61%] shrink-0">
           <div className="pointer-events-none absolute inset-0" style={{ background: `radial-gradient(58% 52% at 60% 60%, ${color}44, transparent 70%)` }} />
@@ -158,7 +154,7 @@ function CardFront({ p }: { p: PlayerCardProps }) {
           <CardPhoto cutout={p.cutoutUrl} photo={p.photoUrl} initials={(p.firstName.replace('.', '')[0] ?? '') + (p.lastName[0] ?? '')} color={color} />
           {/* colonne gauche : note, rôle, club, IPG */}
           <div className="absolute left-[7%] top-[13%] z-10 flex flex-col items-center leading-none">
-            <div className={cn('font-display font-black leading-[.85]', String(p.rating).length > 3 ? 'text-[2.7em]' : 'text-[3.6em]')} style={{ textShadow: '0 1px 0 rgb(255 255 255 / .45)' }}>{p.rating}</div>
+            <div className={cn('font-display font-black leading-[.85]', String(p.rating).length > 3 ? 'text-[2.7em]' : 'text-[3.6em]')} style={{ textShadow: st.textShadow }}>{p.rating}</div>
             <div className="mt-[.25em] text-[.85em] font-extrabold tracking-wider" style={{ color: st.fgSoft }}>{p.ratingLabel}</div>
             {(p.position === 'GK' || p.captain) && <div className="mt-[.35em] font-display text-[1.35em] font-extrabold leading-none" title={[p.position === 'GK' && 'Gardien', p.captain && 'Capitaine'].filter(Boolean).join(' · ')}>{[p.position === 'GK' && 'GB', p.captain && 'C'].filter(Boolean).join(' · ')}</div>}
             <div className="my-[.45em] h-[2px] w-[2.2em] rounded-full bg-[#F05A22]" />
@@ -174,21 +170,20 @@ function CardFront({ p }: { p: PlayerCardProps }) {
         </div>
         <div className="relative z-10 -mt-[1.5em] px-[6%] text-center">
           <div className="truncate text-[.9em] font-bold" style={{ color: st.fgSoft }}>{p.firstName}</div>
-          <div className="truncate font-display text-[2.15em] font-black uppercase leading-[.92]" style={{ textShadow: '0 1px 0 rgb(255 255 255 / .5), 0 0 14px rgb(255 255 255 / .35)' }}>{p.lastName}</div>
+          <div className="truncate font-display text-[2.15em] font-black uppercase leading-[.92]" style={{ textShadow: st.textShadow }}>{p.lastName}</div>
           <div className="mt-[.15em] flex items-center justify-center gap-1.5 text-[.9em] font-semibold" style={{ color: st.fgSoft }}><span className="truncate">{teamLabel}</span>{p.delta !== undefined && <RankDelta delta={p.delta} />}</div>
           {!medals.length && p.badge && <div className="mt-[.3em] flex justify-center">{p.badge}</div>}
         </div>
-        <div className="relative mt-auto grid grid-cols-4 divide-x divide-white/15 border-t-[.22em] border-[#F05A22] bg-[#0B2E73] text-white">
+        <div className="relative mt-auto grid grid-cols-4 divide-x divide-white/15 border-t-[.22em] border-[#F05A22]" style={{ background: st.bar, color: st.barText }}>
           {p.front.slice(0, 4).map((s) => (
             <div key={s.label} className="py-[.6em] text-center" title={s.hint}>
               <div className="font-display text-[1.85em] font-extrabold leading-none">{s.value}</div>
-              <div className="mt-[.15em] text-[.75em] font-bold text-white/65">{s.label}</div>
+              <div className="mt-[.15em] text-[.75em] font-bold" style={{ color: st.barLabel }}>{s.label}</div>
             </div>
           ))}
         </div>
         {!p.faceOnly && <RotateCw className="absolute bottom-[17%] right-[5%] size-[1.1em] opacity-40 transition group-hover:opacity-80" aria-hidden />}
-      </div>
-    </div>
+    </TierSurface>
   )
 }
 

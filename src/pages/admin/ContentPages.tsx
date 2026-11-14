@@ -154,6 +154,7 @@ export function SettingsPage() {
   const fields: Field[] = [
     { key: 'league_name', label: 'Nom de la ligue' }, { key: 'short_name', label: 'Nom court' }, { key: 'tagline', label: 'Accroche', full: true }, { key: 'tagline_ar', label: 'Accroche en arabe', full: true },
     { key: 'organizer', label: 'Organisateur' }, { key: 'logo_url', label: 'Logo', type: 'image', full: true },
+    { key: 'billboard_poster_url', label: 'Affiche de la saison (2e panneau du billboard de l’accueil) — vide : affiche « Saison 4 » fournie', type: 'image', full: true }, { key: 'billboard_poster_alt', label: 'Texte alternatif de l’affiche (lecteurs d’écran)', full: true }, { key: 'billboard_poster_hidden', label: 'Masquer l’affiche du billboard', type: 'boolean' },
     { key: 'contact_email', label: 'Email de contact', type: 'email' }, { key: 'contact_phone', label: 'Téléphone / WhatsApp' }, { key: 'address', label: 'Adresse', full: true },
     { key: 'website', label: 'Site de l’organisateur' },
     { key: 'social_instagram', label: 'Instagram MBL' }, { key: 'social_organizer_instagram', label: 'Instagram Ardentia' }, { key: 'social_linkedin', label: 'LinkedIn Ardentia' },

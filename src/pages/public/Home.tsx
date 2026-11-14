@@ -1,5 +1,12 @@
 import { useMemo, type ReactNode } from 'react'
-import { Billboard, type BillboardSlide } from '@/components/home/Billboard'
+import { Billboard, type BillboardPoster, type BillboardSlide } from '@/components/home/Billboard'
+
+/** Affiche « Saison 4 » fournie avec le site (WebP en 3 tailles) ; remplaçable dans Admin → Paramètres */
+const DEFAULT_POSTER: BillboardPoster = {
+  src: '/brand/affiche-saison-4-1280.webp',
+  srcSet: '/brand/affiche-saison-4-768.webp 768w, /brand/affiche-saison-4-1280.webp 1280w, /brand/affiche-saison-4-1920.webp 1920w',
+  alt: 'Affiche de la Saison 4 de la Morocco Business League : 23 équipes, Atlantique Club, logos des entreprises participantes et joueurs en maillot, organisée par Ardentia',
+}
 import { previousSeasons } from '@/lib/clubs'
 import { returningHighlights } from '@/lib/heritage'
 import { SeasonStrip } from '@/components/home/SeasonStrip'
@@ -134,7 +141,7 @@ export default function Home() {
 
   return (
     <div className="space-y-12">
-      <Billboard slides={slides} leagueName={settings.league_name ?? 'Morocco Business League'} seasonLabel={season?.name.replace(/^Saison /, 'saison ') ?? ''} logoUrl={settings.logo_url} />
+      <Billboard slides={slides} leagueName={settings.league_name ?? 'Morocco Business League'} seasonLabel={season?.name.replace(/^Saison /, 'saison ') ?? ''} logoUrl={settings.logo_url} poster={settings.billboard_poster_hidden ? null : settings.billboard_poster_url ? { src: settings.billboard_poster_url, alt: settings.billboard_poster_alt || DEFAULT_POSTER.alt } : DEFAULT_POSTER} />
       <div className="-mt-6">{sid && <SeasonStrip s={strip} />}</div>
 
       {live.length > 0 && (

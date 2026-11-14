@@ -512,6 +512,10 @@ export interface Settings extends BaseEntity {
   tagline?: string
   /** accroche en arabe (accueil) */
   tagline_ar?: string
+  /** affiche de la saison (2e panneau du billboard) ; vide = affiche fournie avec le site */
+  billboard_poster_url?: string
+  billboard_poster_alt?: string
+  billboard_poster_hidden?: boolean
   /** noms des compétitions : gold → MASTER, silver → CHALLENGER (modifiable dans l'admin) */
   competition_names?: { gold?: string; silver?: string; league_phase?: string }
   organizer?: string

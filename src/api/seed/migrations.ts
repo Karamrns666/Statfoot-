@@ -456,7 +456,15 @@ export function applyTierCorrections2026(db: Rules6Data): Rules6Data {
   return { Club, AuditLog: [...logs, ...(db.AuditLog ?? [])] }
 }
 
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams, applyHideSeason2025, applyLogoRevisions, applyRemoveCanpack2026, applyTierCorrections2026]
+/** Nouvelle accroche (nov. 2026) : remplace l'ancienne accroche si elle n'a pas été personnalisée dans l'admin. */
+export function applyTagline2026(db: Rules6Data): Rules6Data {
+  const OLD_FR = ['Le premier championnat inter-entreprises au Maroc', '']
+  const OLD_AR = ['الدوري الوطني للشركات المغربية', '']
+  if (!db.Settings?.some((x) => OLD_FR.includes(x.tagline ?? '') || OLD_AR.includes(x.tagline_ar ?? ''))) return {}
+  return { Settings: db.Settings.map((x) => ({ ...x, tagline: OLD_FR.includes(x.tagline ?? '') ? LEAGUE.tagline : x.tagline, tagline_ar: OLD_AR.includes(x.tagline_ar ?? '') ? LEAGUE.taglineAr : x.tagline_ar })) }
+}
+
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams, applyHideSeason2025, applyLogoRevisions, applyRemoveCanpack2026, applyTierCorrections2026, applyTagline2026]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */

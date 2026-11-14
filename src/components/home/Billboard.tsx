@@ -37,6 +37,7 @@ export interface BillboardSlide {
 const TONE = { orange: '#FF7A2E', sky: '#8FD0E6', white: '#FFFFFF', red: '#FF5A5A' }
 const DURATION = 6500
 const BRAND_DURATION = 3400
+const POSTER_DURATION = 8000
 const TRANSITION = 950
 
 function useReducedMotion() {
@@ -139,11 +140,25 @@ function BrandView({ logo, leagueName, seasonLabel, phase }: { logo: string; lea
   )
 }
 
-export function Billboard({ slides: content, leagueName, seasonLabel, logoUrl }: { slides: BillboardSlide[]; leagueName: string; seasonLabel: string; logoUrl?: string }) {
+export interface BillboardPoster { src: string; srcSet?: string; alt: string }
+
+/** Affiche de la saison : image ENTIÈRE toujours visible (aucun recadrage), fond flouté de la même image autour */
+function PosterView({ poster, phase }: { poster: BillboardPoster; phase: 'in' | 'out' }) {
+  return (
+    <div className={cn('bb-slide relative -mx-5 -my-7 flex items-center justify-center overflow-hidden sm:-mx-10 sm:-my-9', phase === 'in' ? 'bb-wipe-in' : 'bb-wipe-out')} aria-hidden={phase === 'out'}>
+      <img src={poster.src} srcSet={poster.srcSet} sizes="(min-width: 1280px) 1200px, 100vw" alt="" aria-hidden className="absolute inset-0 size-full scale-110 object-cover opacity-45 blur-2xl" />
+      <img src={poster.src} srcSet={poster.srcSet} sizes="(min-width: 1280px) 1200px, 100vw" alt={poster.alt} className="relative block max-h-[min(72vh,560px)] w-full object-contain drop-shadow-[0_12px_30px_rgb(0_0_0/.5)]" decoding="async" />
+    </div>
+  )
+}
+
+export function Billboard({ slides: content, leagueName, seasonLabel, logoUrl, poster }: { slides: BillboardSlide[]; leagueName: string; seasonLabel: string; logoUrl?: string; poster?: BillboardPoster | null }) {
   const reduced = useReducedMotion()
   const logo = logoUrl || MBL_LOGO
   // le logo MBL ouvre chaque tour du billboard
-  const slides: (BillboardSlide | { key: 'brand'; brand: true; eyebrow: string })[] = [{ key: 'brand', brand: true, eyebrow: leagueName }, ...content]
+  // 1 : logo de la ligue · 2 : affiche de la saison (remplaçable dans l'admin) · puis les panneaux de données
+  type Special = { key: 'brand'; brand: true; eyebrow: string } | { key: 'poster'; poster: BillboardPoster; eyebrow: string }
+  const slides: (BillboardSlide | Special)[] = [{ key: 'brand', brand: true, eyebrow: leagueName }, ...(poster ? [{ key: 'poster' as const, poster, eyebrow: 'Affiche de la saison' }] : []), ...content]
   const n = slides.length
   const [cur, setCur] = useState(0)
   const [prev, setPrev] = useState<number | null>(null)
@@ -169,7 +184,7 @@ export function Billboard({ slides: content, leagueName, seasonLabel, logoUrl }:
   }, [])
   const stopped = paused || hover || hidden || reduced || n < 2
   const isBrand = 'brand' in slides[idx]
-  const duration = isBrand ? BRAND_DURATION : DURATION
+  const duration = isBrand ? BRAND_DURATION : 'poster' in slides[idx] ? POSTER_DURATION : DURATION
   useEffect(() => {
     if (stopped) return
     const t = setTimeout(() => go(idx + 1), duration)
@@ -180,6 +195,7 @@ export function Billboard({ slides: content, leagueName, seasonLabel, logoUrl }:
     const s = slides[k]
     return 'brand' in s
       ? <BrandView key={`${s.key}-${phase}-${tk}`} logo={logo} leagueName={leagueName} seasonLabel={seasonLabel} phase={phase} />
+      : 'poster' in s ? <PosterView key={`${s.key}-${phase}-${tk}`} poster={s.poster} phase={phase} />
       : <SlideView key={`${s.key}-${phase}-${tk}`} s={s} phase={phase} />
   }
 

@@ -6,8 +6,8 @@
 export const LEAGUE = {
   name: 'Morocco Business League',
   shortName: 'MBL',
-  tagline: 'Le premier championnat inter-entreprises au Maroc',
-  taglineAr: 'الدوري الوطني للشركات المغربية',
+  tagline: '1ère LIGUE DE FOOTBALL INTER-ENTREPRISES AU MAROC',
+  taglineAr: 'الدوري الوطني للشركات لكرة القدم',
   logo: '/brand/mbl-logo.png',
   founded: 2023,
   instagram: 'https://www.instagram.com/morocco.business.league/',

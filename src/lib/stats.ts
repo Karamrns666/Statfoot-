@@ -106,6 +106,7 @@ export function computeTeamStats(data: LeagueData, scope: XPScope = {}): Map<str
     if (e.type === 'red_card' || e.type === 'second_yellow') t.red++
   }
   for (const t of out.values()) { t.gd = t.gf - t.ga; t.gf_avg = t.played ? +(t.gf / t.played).toFixed(2) : 0; t.ga_avg = t.played ? +(t.ga / t.played).toFixed(2) : 0 }
+  if (scope.teamIds) { const keep = new Set(scope.teamIds); for (const id of [...out.keys()]) if (!keep.has(id)) out.delete(id) }
   return out
 }
 export const bestDefense = (ts: TeamStats[]) => ts.filter((t) => t.played > 0).sort((a, b) => a.ga_avg - b.ga_avg || a.ga - b.ga || b.points - a.points)

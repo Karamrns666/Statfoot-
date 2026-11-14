@@ -83,6 +83,10 @@ export interface XPScope {
   seasonId?: string | null
   phase?: PhaseFilter
   competitionId?: string | null
+  /** plusieurs compétitions (ex. MASTER = pré-saison + MASTER : les stats de la pré-saison comptent) */
+  competitionIds?: string[] | null
+  /** joueurs de ces équipes uniquement (ex. équipes de la division MASTER) */
+  teamIds?: string[] | null
   /** exclut tout ce qui est >= cette clé "saison#journée" (calcul du rang à la journée précédente) */
   excludeFromRoundKey?: string | null
 }
@@ -92,6 +96,7 @@ export const roundKey = (m: Pick<Match, 'season_id' | 'round'>) => `${m.season_i
 export function matchInScope(m: Match, comps: Map<string, Competition>, s: XPScope) {
   if (s.seasonId && m.season_id !== s.seasonId) return false
   if (s.competitionId && m.competition_id !== s.competitionId) return false
+  if (s.competitionIds && !s.competitionIds.includes(m.competition_id)) return false
   const phase = s.phase ?? 'all'
   if (phase !== 'all') {
     const c = comps.get(m.competition_id)
@@ -388,6 +393,7 @@ export function computePlayerXP(data: XPData, scope: XPScope = {}): Map<string, 
     const s = get(l.player_id); if (!s) continue
     s.lines.push(l); s.xp += l.points
   }
+  if (scope.teamIds) { const keep = new Set(scope.teamIds); for (const [pid, x] of out) if (!keep.has(x.team_id)) out.delete(pid) }
   return out
 }
 

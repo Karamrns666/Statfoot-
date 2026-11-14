@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { phaseName } from '@/lib/competitionNames'
 import { Goal, Handshake, Hand, Square, CalendarDays, ShieldCheck } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
 import { useSeason } from '@/hooks/useSeason'
-import { usePlayerXP, useTeamStats } from '@/hooks/useStats'
+import { useEffectiveSeason, usePlayerXP, useTeamStats } from '@/hooks/useStats'
+import { useSections } from '@/hooks/useSections'
+import { SectionPicker, SectionPending, useSectionState } from '@/components/league/SectionPicker'
 import { PageHeader, StatTile } from '@/components/league/Bits'
 import { AXIS, ChartBox, GRID, SERIES, TOOLTIP } from '@/components/charts/theme'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -13,18 +14,19 @@ import { SortableTable, type SortColumn } from '@/components/league/SortableTabl
 import { shotColumns } from '@/components/league/shotColumns'
 import { playerName } from '@/lib/format'
 import { TeamLogo } from '@/components/league/Identity'
-import { bestAttack, bestDefense, kpis, type PhaseFilter, type PlayerXP, type TeamStats } from '@/lib/stats'
-import { cn } from '@/lib/utils'
+import { bestAttack, bestDefense, kpis, type PlayerXP, type TeamStats } from '@/lib/stats'
 import { SeasonNotStarted } from '@/components/league/SeasonNotStarted'
 
 export default function Stats() {
   const { league } = useData()
   const L = useLookup()
   const { scopeSeasonId } = useSeason()
-  const [phase, setPhase] = useState<PhaseFilter>('all')
-  const hasCups = league.competitions.some((c) => (!scopeSeasonId || c.season_id === scopeSeasonId) && (c.phase === 'gold' || c.phase === 'silver'))
-  const scope = { seasonId: scopeSeasonId, phase }
-  const k = useMemo(() => kpis(league, scope), [league, scopeSeasonId, phase]) // eslint-disable-line react-hooks/exhaustive-deps
+  const eff = useEffectiveSeason()
+  const sections = useSections(scopeSeasonId ?? eff?.id ?? null)
+  const [key, setKey] = useSectionState()
+  const sec = sections[key]
+  const scope = sec.scope
+  const k = useMemo(() => kpis(league, scope), [league, JSON.stringify(scope)]) // eslint-disable-line react-hooks/exhaustive-deps
   const ts = [...useTeamStats(scope).values()].filter((t) => t.played > 0)
   const xp = usePlayerXP(scope)
   const players = useMemo(() => [...xp.values()].filter((p) => p.matches > 0).sort((a, b) => b.goals - a.goals || b.assists - a.assists || b.xp - a.xp), [xp])
@@ -34,9 +36,9 @@ export default function Stats() {
     <div className="space-y-8">
       <PageHeader title="Statistiques" subtitle="Leaders et chiffres clés">
         <Link to="/discipline" className="rounded-full border border-white/10 px-3 py-1 text-xs font-bold uppercase text-muted-foreground hover:border-neon hover:text-neon">Discipline</Link>
-        {hasCups && (['all', 'league_phase', 'gold', 'silver'] as const).filter((x) => x === 'all' || league.competitions.some((c) => (!scopeSeasonId || c.season_id === scopeSeasonId) && c.phase === x)).map((p) => <button key={p} onClick={() => setPhase(p)} className={cn('rounded-full border px-3 py-1 text-xs font-bold uppercase cursor-pointer', phase === p ? 'border-neon bg-neon/15 text-neon' : 'border-white/10 text-muted-foreground')}>{{ all: 'Toutes', league_phase: 'Phase de ligue', gold: phaseName('gold'), silver: phaseName('silver') }[p]}</button>)}
       </PageHeader>
-      {k.matches === 0 ? <SeasonNotStarted what="Les statistiques" /> : <>
+      <SectionPicker sections={sections} value={key} onChange={setKey} />
+      {!sec.available ? <SectionPending section={sec} seasonId={scopeSeasonId ?? eff?.id ?? null} /> : k.matches === 0 ? <SeasonNotStarted what="Les statistiques" /> : <>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <StatTile label="Matchs" value={k.matches} icon={<CalendarDays />} color="#e6edf8" />
         <StatTile label="Buts" value={k.goals} icon={<Goal />} sub={`${k.goals_avg} / match`} />

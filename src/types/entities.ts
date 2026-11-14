@@ -408,7 +408,7 @@ export type AwardCategory =
   | 'best_defense' | 'best_attack'
 export interface Award extends BaseEntity {
   season_id: string
-  scope?: 'season' | 'league_phase' | 'gold' | 'silver'
+  scope?: 'season' | 'league_phase' | 'gold' | 'silver' | 'tournament'
   category: AwardCategory
   player_id?: string
   team_id?: string

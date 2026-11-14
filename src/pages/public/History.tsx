@@ -2,7 +2,11 @@ import { useData, useLookup } from '@/hooks/useData'
 import { PageHeader, EmptyState } from '@/components/league/Bits'
 import { TeamLogo } from '@/components/league/Identity'
 import { Card, CardContent } from '@/components/ui/card'
+import { useState } from 'react'
 import { Palmares } from './Awards'
+import type { Award } from '@/types/entities'
+import { competitionNames, phaseName } from '@/lib/competitionNames'
+import { cn } from '@/lib/utils'
 import { generalStandings } from '@/lib/stats'
 
 export default function History() {
@@ -27,7 +31,23 @@ export default function History() {
           )
         })}
       </div>
-      <Palmares />
+      <PalmaresTabs />
     </div>
+  )
+}
+
+/** Palmarès par prix : saison entière, puis Prix de la Ligue (pré-saison, MASTER, CHALLENGER) et Prix du Tournoi */
+function PalmaresTabs() {
+  const [scope, setScope] = useState<NonNullable<Award['scope']>>('season')
+  const tabs: [NonNullable<Award['scope']>, string][] = [['season', 'Saison'], ['league_phase', competitionNames().league_phase], ['gold', phaseName('gold')], ['silver', phaseName('silver')], ['tournament', 'Tournoi']]
+  return (
+    <section>
+      <h2 className="title-caps mb-1 text-2xl">Palmarès</h2>
+      <p className="mb-3 text-sm text-muted-foreground">Prix de la Ligue (saison, pré-saison, divisions) et Prix du Tournoi, séparés.</p>
+      <div className="mb-4 flex flex-wrap gap-2" role="tablist">
+        {tabs.map(([k, l]) => <button key={k} role="tab" aria-selected={scope === k} onClick={() => setScope(k)} className={cn('min-h-9 cursor-pointer rounded-full border px-4 font-display text-sm font-bold uppercase', scope === k ? 'border-neon bg-neon/15 text-neon' : 'border-white/10 text-muted-foreground hover:text-white')}>{l}</button>)}
+      </div>
+      <Palmares scope={scope} />
+    </section>
   )
 }

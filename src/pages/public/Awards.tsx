@@ -1,7 +1,6 @@
 import { useRookie } from '@/hooks/useSeniority'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { phaseName } from '@/lib/competitionNames'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { CompetitionTabs } from '@/components/league/CompetitionTabs'
@@ -17,42 +16,48 @@ import { PlayerAvatar, RoleBadge, TeamLogo } from '@/components/league/Identity'
 import { AWARD_STYLE, TrophyBadge } from '@/components/awards/TrophyBadge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { competitionStandings, generalStandings, race, AWARD_LABELS, type PhaseFilter, type PlayerXP, type Ranked, type RaceKey, type StandingRow } from '@/lib/stats'
+import { competitionStandings, race, AWARD_LABELS, type PlayerXP, type Ranked, type RaceKey, type StandingRow } from '@/lib/stats'
 import { playerName } from '@/lib/format'
-import type { AwardCategory } from '@/types/entities'
+import type { Award, AwardCategory, Competition } from '@/types/entities'
+import type { XPScope } from '@/lib/xp'
+import { useSections, type Section } from '@/hooks/useSections'
+import { SectionPicker, SectionPending, useSectionState } from '@/components/league/SectionPicker'
+import { usePreseason } from '@/hooks/usePreseason'
 import { cn } from '@/lib/utils'
-
-const PHASES: { value: PhaseFilter; label: string }[] = [{ value: 'all', label: 'Toute la saison' }, { value: 'league_phase', label: 'Phase de ligue' }, { value: 'gold', get label() { return phaseName('gold') } }, { value: 'silver', get label() { return phaseName('silver') } }]
 
 export default function Awards() {
   const { scopeSeasonId } = useSeason()
   const eff = useEffectiveSeason()
   const seasonId = scopeSeasonId ?? eff?.id ?? null
-  const [phase, setPhase] = useState<PhaseFilter>('all')
-  const scope = { seasonId, phase }
-  const { db } = useData()
-  const hasCups = db.Competition.some((c) => c.season_id === seasonId && (c.phase === 'gold' || c.phase === 'silver'))
+  const sections = useSections(seasonId)
+  const [key, setKey] = useSectionState()
+  const sec = sections[key]
   return (
     <div>
       <PageHeader title="Les Trophées" subtitle="Classements mis à jour automatiquement après chaque match" />
-      <div className="mb-5 flex flex-wrap gap-2">
-        {hasCups && PHASES.filter((x) => x.value === 'all' || db.Competition.some((c) => c.season_id === seasonId && c.phase === x.value)).map((p) => <button key={p.value} onClick={() => setPhase(p.value)} className={cn('rounded-full border px-4 py-1.5 font-display text-sm font-bold uppercase tracking-wide cursor-pointer', phase === p.value ? 'border-neon bg-neon/15 text-neon' : 'border-white/10 text-muted-foreground hover:text-white')}>{p.label}</button>)}
-      </div>
-      <Tabs defaultValue="race">
-        <TabsList><TabsTrigger value="race">Course aux trophées</TabsTrigger><TabsTrigger value="rewards">Meilleure performance</TabsTrigger><TabsTrigger value="stats">Statistiques</TabsTrigger><TabsTrigger value="palmares">Palmarès</TabsTrigger></TabsList>
-        <TabsContent value="rewards">{seasonId ? <RewardsByPeriod seasonId={seasonId} /> : null}</TabsContent>
-        <TabsContent value="race" className="space-y-10">
-          <PlayerRace scope={scope} raceKey="ballon_or" category="ballon_or" />
-          <PlayerRace scope={scope} raceKey="golden_glove" category="golden_glove" />
-          <PlayerRace scope={scope} raceKey="top_scorer" category="top_scorer" />
-          <PlayerRace scope={scope} raceKey="top_assist" category="top_assist" />
-          <TeamRace seasonId={seasonId} phase={phase} />
-        </TabsContent>
-        <TabsContent value="stats"><StatsLeaders seasonId={seasonId} phase={phase} /></TabsContent>
-        <TabsContent value="palmares"><Palmares /></TabsContent>
-      </Tabs>
+      <SectionPicker sections={sections} value={key} onChange={setKey} />
+      {!sec.available ? <SectionPending section={sec} seasonId={seasonId} /> : (
+        <Tabs defaultValue="race">
+          <TabsList><TabsTrigger value="race">Course aux trophées</TabsTrigger><TabsTrigger value="rewards">Meilleure performance</TabsTrigger><TabsTrigger value="stats">Statistiques</TabsTrigger><TabsTrigger value="palmares">Palmarès</TabsTrigger></TabsList>
+          <TabSubtitle>{sec.label} · {sec.note}</TabSubtitle>
+          <TabsContent value="rewards">{seasonId ? <RewardsByPeriod seasonId={seasonId} comps={sec.key === 'master' || sec.key === 'challenger' ? sec.comps.filter((c) => c.phase !== 'league_phase') : sec.comps} /> : null}</TabsContent>
+          <TabsContent value="race" className="space-y-10">
+            <PlayerRace scope={sec.scope} raceKey="ballon_or" category="ballon_or" />
+            <PlayerRace scope={sec.scope} raceKey="golden_glove" category="golden_glove" />
+            <PlayerRace scope={sec.scope} raceKey="top_scorer" category="top_scorer" />
+            <PlayerRace scope={sec.scope} raceKey="top_assist" category="top_assist" />
+            <TeamRace section={sec} />
+          </TabsContent>
+          <TabsContent value="stats"><StatsLeaders scope={sec.scope} /></TabsContent>
+          <TabsContent value="palmares"><Palmares scope={sec.awardScope} /></TabsContent>
+        </Tabs>
+      )}
     </div>
   )
+}
+
+function TabSubtitle({ children }: { children: ReactNode }) {
+  return <p className="mb-4 mt-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{children}</p>
 }
 
 function metric(key: RaceKey, s: PlayerXP) {
@@ -61,7 +66,7 @@ function metric(key: RaceKey, s: PlayerXP) {
   return { v: s.xp, u: 'XP' }
 }
 
-function PlayerRace({ scope, raceKey, category }: { scope: { seasonId: string | null; phase: PhaseFilter }; raceKey: RaceKey; category: AwardCategory }) {
+function PlayerRace({ scope, raceKey, category }: { scope: XPScope; raceKey: RaceKey; category: AwardCategory }) {
   const rookie = useRookie()
   const L = useLookup()
   const list = useRace(scope, raceKey)
@@ -123,22 +128,23 @@ function HeroCard({ r, raceKey, color }: { r: Ranked<PlayerXP>; raceKey: RaceKey
   )
 }
 
-function TeamRace({ seasonId, phase }: { seasonId: string | null; phase: PhaseFilter }) {
-  const { db, league } = useData()
+function TeamRace({ section }: { section: Section }) {
+  const { league } = useData()
   const L = useLookup()
+  const pre = usePreseason(section.standing?.season_id)
+  // classement par points de la section (MASTER / CHALLENGER : matchs de la division seulement, repart de zéro)
   const rows: StandingRow[] = useMemo(() => {
-    if (!seasonId) return []
-    if (phase === 'all') return generalStandings(league, seasonId)
-    const c = db.Competition.find((x) => x.season_id === seasonId && x.phase === phase)
-    return c ? competitionStandings(league, c.id) : []
-  }, [league, db.Competition, seasonId, phase])
+    const c = section.standing; if (!c) return []
+    if (section.key === 'preseason' && pre && pre.comp.id === c.id) return pre.state.ranking.map((r) => ({ ...r, gd: r.diff, yellow: 0, red: 0, form: [] }))
+    return competitionStandings(league, c.id)
+  }, [league, section, pre])
   const valid = rows.filter((r) => r.played > 0 && r.points > 0)
   const st = AWARD_STYLE.best_team
   const top = valid[0]
   const t = top ? L.team.get(top.team_id) : undefined
   return (
     <section>
-      <div className="mb-4 flex items-center gap-3"><TrophyBadge category="best_team" size={52} /><div><h2 className="title-caps text-3xl" style={{ color: st.color }}>{st.label}</h2><p className="text-xs text-muted-foreground">Classement général de la saison</p></div></div>
+      <div className="mb-4 flex items-center gap-3"><TrophyBadge category="best_team" size={52} /><div><h2 className="title-caps text-3xl" style={{ color: st.color }}>{st.label}</h2><p className="text-xs text-muted-foreground">Classement {section.label}{section.key === 'master' || section.key === 'challenger' ? ' (repart de zéro après la pré-saison)' : ''}</p></div></div>
       {!top ? <EmptyState title="Non attribué" /> : (
         <div className="grid gap-4 lg:grid-cols-5">
           <Link to={`/equipes/${t?.id}`} className="relative flex flex-col items-center overflow-hidden rounded-3xl border p-6 text-center lg:col-span-2" style={{ borderColor: `${st.color}55`, background: `radial-gradient(ellipse 80% 70% at 50% 0%, ${st.color}33, transparent 70%), linear-gradient(180deg,#0D2B66,#04163D)` }}>
@@ -161,10 +167,10 @@ function TeamRace({ seasonId, phase }: { seasonId: string | null; phase: PhaseFi
   )
 }
 
-function StatsLeaders({ seasonId, phase }: { seasonId: string | null; phase: PhaseFilter }) {
+function StatsLeaders({ scope }: { scope: XPScope }) {
   const { league } = useData()
   const L = useLookup()
-  const list = [...usePlayerXP({ seasonId, phase }).values()]
+  const list = [...usePlayerXP(scope).values()]
   const cats: { title: string; key: keyof PlayerXP; filter?: (s: PlayerXP) => boolean }[] = [
     { title: 'Buts', key: 'goals' }, { title: 'Passes décisives', key: 'assists' }, { title: 'XP', key: 'xp' },
     { title: 'Clean sheets', key: 'clean_sheets', filter: (s) => s.gk_matches > 0 }, { title: 'Arrêts', key: 'saves', filter: (s) => s.gk_matches > 0 },
@@ -189,16 +195,18 @@ function StatsLeaders({ seasonId, phase }: { seasonId: string | null; phase: Pha
   )
 }
 
-export function Palmares() {
+export function Palmares({ scope }: { scope?: NonNullable<Award['scope']> } = {}) {
   const { db } = useData()
   const L = useLookup()
   const seasons = [...db.Season].sort((a, b) => b.start_date.localeCompare(a.start_date))
   const published = db.Award.filter((a) => a.status === 'published')
-  if (!published.length) return <EmptyState title="Aucun palmarès publié">Les trophées de fin de saison apparaissent ici une fois validés et publiés.</EmptyState>
+  const inScope = (a: Award) => (a.scope ?? 'season') === (scope ?? 'season')
+  if (!published.some(inScope)) return <EmptyState title="Aucun palmarès publié">Les trophées apparaissent ici une fois validés et publiés par Ardentia.</EmptyState>
   return (
     <div className="space-y-8">
       {seasons.map((s) => {
-        const aw = published.filter((a) => a.season_id === s.id && (a.scope ?? 'season') === 'season')
+        // sans périmètre : palmarès de la saison entière ; sinon les prix de cette section (pré-saison, MASTER, CHALLENGER, tournoi)
+        const aw = published.filter((a) => a.season_id === s.id && inScope(a))
         if (!aw.length) return null
         return (
           <section key={s.id}>
@@ -226,11 +234,12 @@ export function Palmares() {
 }
 
 /** Récompenses par journée, par mois ou sur la saison, avec filtre de compétition */
-function RewardsByPeriod({ seasonId }: { seasonId: string }) {
-  const { db, league } = useData()
+function RewardsByPeriod({ seasonId, comps: compsIn }: { seasonId: string; comps: Competition[] }) {
+  const { league } = useData()
   const [kind, setKind] = useState<'round' | 'month' | 'season'>('round')
-  const [comp, setComp] = useState('')
-  const comps = db.Competition.filter((c) => c.season_id === seasonId).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+  const comps = compsIn
+  const [compSel, setComp] = useState('')
+  const comp = comps.some((c) => c.id === compSel) ? compSel : comps[0]?.id ?? ''
   const rounds = seasonRounds(league, seasonId, comp || null)
   const months = seasonMonths(league, seasonId, comp || null)
   const [round, setRound] = useState<number | null>(null)

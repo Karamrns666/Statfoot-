@@ -11,25 +11,19 @@ import { isSimActive } from '@/sim/simMode'
 
 const W = 1080, H = 1350, CARD_W = 660
 
-// Polices du site (Google Fonts) intégrées en data: — html-to-image ne peut pas lire une feuille de style
-// d'un autre domaine ; sans ça l'image sortirait en police système.
+// Polices du site (hébergées sur le site, /fonts) intégrées en data: dans l'image — sans ça html-to-image
+// sortirait le texte en police système.
 let fontCss: Promise<string> | null = null
 const toDataUrl = (b: Blob) => new Promise<string>((res) => { const r = new FileReader(); r.onload = () => res(r.result as string); r.readAsDataURL(b) })
+export const SITE_FONTS = [
+  { family: 'Big Shoulders Display', file: '/fonts/big-shoulders-display-var.woff', weight: '100 900' },
+  { family: 'Manrope', file: '/fonts/manrope-var.woff', weight: '200 800' },
+]
 export function embeddedFontCss(): Promise<string> {
   fontCss ??= (async () => {
-    const links = [...document.querySelectorAll<HTMLLinkElement>('link[rel=stylesheet][href*="fonts.googleapis"]')].map((l) => l.href)
     let out = ''
-    for (const href of links) {
-      try {
-        const css = await (await fetch(href)).text()
-        // sous-ensembles latins uniquement (le texte de la carte est en alphabet latin)
-        const blocks = css.split('/*').filter((b) => /^\s*latin \*\//.test(b)).map((b) => b.slice(b.indexOf('*/') + 2))
-        for (const b of blocks.length ? blocks : [css]) {
-          let block = b
-          for (const m of b.matchAll(/url\((https:[^)]+)\)/g)) block = block.replace(m[1], await toDataUrl(await (await fetch(m[1])).blob()))
-          out += block
-        }
-      } catch { /* hors ligne : police système */ }
+    for (const f of SITE_FONTS) {
+      try { out += `@font-face{font-family:'${f.family}';font-style:normal;font-weight:${f.weight};src:url(${await toDataUrl(await (await fetch(f.file)).blob())}) format('woff');}` } catch { /* hors ligne : police système */ }
     }
     return out
   })()

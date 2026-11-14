@@ -37,7 +37,7 @@ export function PublicLayout() {
     <div className="flex min-h-screen flex-col overflow-x-clip">
       <SimBanner />
       <ScoreTicker />
-      <header className="sticky top-0 z-40 border-b border-white/5 bg-night-900/80 backdrop-blur-xl no-print">
+      <header className="sticky top-[var(--sim-h,0px)] z-40 border-b border-white/5 bg-night-900/80 backdrop-blur-xl no-print">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
           <Logo subtitle="" className="shrink-0" />
           <nav className="ml-6 hidden min-w-0 flex-1 items-center gap-0.5 xl:flex">

@@ -1,5 +1,5 @@
 // Bandeau orange en haut de chaque page quand l'admin regarde le site en mode simulation (+ page non indexée).
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { FlaskConical } from 'lucide-react'
 import { useData } from '@/hooks/useData'
@@ -13,9 +13,18 @@ export function SimBanner({ compact = false }: { compact?: boolean }) {
     document.head.appendChild(m)
     return () => m.remove()
   }, [simulation])
+  // hauteur du bandeau publiée en --sim-h : les en-têtes collants se placent dessous au lieu d'être recouverts
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = ref.current, root = document.documentElement
+    if (!el) { root.style.removeProperty('--sim-h'); return }
+    const ro = new ResizeObserver(() => root.style.setProperty('--sim-h', `${el.offsetHeight}px`))
+    ro.observe(el)
+    return () => { ro.disconnect(); root.style.removeProperty('--sim-h') }
+  }, [simulation])
   if (!simulation) return null
   return (
-    <div role="status" className="sticky top-0 z-[60] flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-[#F97316] px-3 py-1.5 text-center text-[13px] font-black uppercase tracking-wide text-[#1A0A00] shadow-[0_2px_12px_rgb(249_115_22_/_.5)] no-print">
+    <div ref={ref} role="status" className="sticky top-0 z-[60] flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-[#F97316] px-3 py-1.5 text-center text-[13px] font-black uppercase tracking-wide text-[#1A0A00] shadow-[0_2px_12px_rgb(249_115_22_/_.5)] no-print">
       <FlaskConical className="size-4" aria-hidden />
       <span>SIMULATION — données fictives</span>
       {!compact && <>

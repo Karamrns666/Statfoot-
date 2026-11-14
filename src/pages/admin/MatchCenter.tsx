@@ -175,7 +175,7 @@ export default function MatchCenter() {
   return (
     <div className={cn('min-h-screen overflow-x-hidden pb-24', bright && 'mc-bright')}>
       {/* barre d'outils */}
-      <div className="sticky top-14 z-20 flex flex-wrap items-center gap-2 border-b border-white/5 bg-night-900/95 px-3 py-2 backdrop-blur">
+      <div className="sticky top-[calc(3.5rem+var(--sim-h,0px))] z-20 flex flex-wrap items-center gap-2 border-b border-white/5 bg-night-900/95 px-3 py-2 backdrop-blur">
         <Button asChild variant="ghost" size="sm"><Link to="/admin/match-center"><ArrowLeft />Programme</Link></Button>
         <span className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs', pending ? 'bg-amber-400/15 text-amber-200' : 'bg-win/15 text-win')}>{online ? <Cloud className="size-3.5" /> : <CloudOff className="size-3.5" />}{pending ? `⏳ ${pending} action(s) en attente` : '✓ synchronisé'}</span>
         <span className="text-xs text-muted-foreground">Opérateur : <b className="text-white">{holder?.name ?? '—'}</b></span>

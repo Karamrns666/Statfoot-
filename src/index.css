@@ -234,6 +234,9 @@
 @media (prefers-reduced-motion: reduce) { .rule-section:target { animation: none; outline: 2px solid var(--color-neon); outline-offset: 6px; } }
 
 /* Accroche FR + AR : une ligne chacune, taille adaptée à la largeur du bloc (jusqu'à 320 px d'écran) */
+/* polices du site hébergées localement (plus de dépendance à Google Fonts : pas de saut de mise en page ni de police de secours) */
+@font-face { font-family: 'Big Shoulders Display'; font-style: normal; font-weight: 100 900; font-display: swap; src: url('/fonts/big-shoulders-display-var.woff') format('woff'); }
+@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 200 800; font-display: swap; src: url('/fonts/manrope-var.woff') format('woff'); }
 @font-face { font-family: 'Tajawal'; font-style: normal; font-weight: 700; font-display: swap; src: url('/fonts/tajawal-arabic-700-normal.woff2') format('woff2'); unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
 .tagline { container-type: inline-size; width: 100%; min-width: 0; }
 .tagline p { margin: 0; white-space: nowrap; overflow: hidden; line-height: 1.25; }

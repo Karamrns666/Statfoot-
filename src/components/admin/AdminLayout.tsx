@@ -101,10 +101,10 @@ export function AdminLayout() {
     <AdminScopeProvider>
       <SimBanner />
       <div className="flex min-h-screen">
-        {!live && <aside className="sticky top-0 hidden h-screen w-64 shrink-0 overflow-y-auto border-r border-white/5 bg-night-950/70 p-4 lg:block"><div className="mb-6"><Logo to="/admin" subtitle="Administration" /></div>{nav}</aside>}
+        {!live && <aside className="sticky top-[var(--sim-h,0px)] hidden h-[calc(100vh-var(--sim-h,0px))] w-64 shrink-0 overflow-y-auto border-r border-white/5 bg-night-950/70 p-4 lg:block"><div className="mb-6"><Logo to="/admin" subtitle="Administration" /></div>{nav}</aside>}
         {open && <div className="fixed inset-0 z-50 bg-black/60 lg:hidden" onClick={() => setOpen(false)}><aside className="h-full w-72 overflow-y-auto bg-night-900 p-4" onClick={(e) => e.stopPropagation()}><div className="mb-6 flex items-center justify-between"><Logo to="/admin" subtitle="Admin" /><button onClick={() => setOpen(false)}><X /></button></div>{nav}</aside></div>}
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-white/5 bg-night-900/90 px-3 backdrop-blur sm:px-5">
+          <header className="sticky top-[var(--sim-h,0px)] z-30 flex h-14 items-center gap-2 border-b border-white/5 bg-night-900/90 px-3 backdrop-blur sm:px-5">
             <button className={cn('rounded-lg p-2 hover:bg-white/10', !live && 'lg:hidden')} onClick={() => setOpen(true)} aria-label="Menu"><Menu className="size-5" /></button>
             {user.role !== 'operator' && <ScopeSelectors />}
             <div className="ml-auto flex items-center gap-2">

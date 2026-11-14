@@ -65,19 +65,21 @@ export default function MatchDetail() {
               : <span className={cn('rounded-full px-2 py-0.5 text-xs font-bold uppercase', m.status === 'finished' ? 'bg-white/10' : m.status === 'postponed' || m.status === 'cancelled' ? 'bg-amber-400/15 text-amber-300' : 'bg-neon/10 text-neon')}>{STATUS_LABEL[m.status]}</span>}
           </div>
           {m.postponed_from && <p className="-mt-2 mb-4 text-center text-xs font-semibold text-amber-300">Match reporté — initialement prévu le {fmtDay(m.postponed_from)} à {fmtHour(m.postponed_from)}{m.postponed_reason ? ` (${m.postponed_reason})` : ''}</p>}
-          <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-3 sm:gap-8">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-2 sm:gap-8">
             <TeamBlock id={m.home_team_id} />
             <div className="flex flex-col items-center pt-2">
               {showScore
                 ? <div className={cn('num flex items-center gap-2 text-6xl sm:text-8xl', live && 'text-white')}><span>{m.home_score ?? 0}</span><span className="text-4xl text-white/30">-</span><span>{m.away_score ?? 0}</span></div>
                 : m.date ? <div className="num text-4xl text-neon sm:text-6xl">{fmtHour(m.date)}</div> : <div className="text-center text-sm font-bold text-amber-200">Horaire à définir</div>}
-              {m.status === 'scheduled' && <Countdown to={m.date} now={now} />}
+              {m.status === 'scheduled' && <div className="hidden sm:block"><Countdown to={m.date} now={now} /></div>}
               {m.penalties && <div className="mt-1 rounded bg-white/10 px-2 text-xs font-semibold">{fmtScore(m)}</div>}
               {m.home_ht_score != null && showScore && <div className="mt-1 text-xs text-muted-foreground">MT {m.home_ht_score}-{m.away_ht_score}</div>}
               {m.extra_time && <div className="mt-1 text-[11px] text-muted-foreground">après prolongation</div>}
             </div>
             <TeamBlock id={m.away_team_id} />
           </div>
+          {/* téléphone : compte à rebours sous les deux équipes (les deux restent visibles) */}
+          {m.status === 'scheduled' && <div className="mt-3 flex justify-center sm:hidden"><Countdown to={m.date} now={now} /></div>}
           {showScore && (
             <div className="mt-4 grid grid-cols-2 gap-4 text-xs sm:text-sm">
               <ScorerList list={scorers.home} align="right" />
@@ -141,9 +143,9 @@ export default function MatchDetail() {
 function TeamBlock({ id }: { id: string }) {
   const team = useLookup().team.get(id)
   return (
-    <Link to={`/equipes/${id}`} className="flex flex-col items-center gap-2 text-center">
-      <TeamLogo team={team} size={88} />
-      <div className="title-caps text-lg leading-tight sm:text-2xl">{team?.name ?? 'À déterminer'}</div>
+    <Link to={`/equipes/${id}`} className="flex min-w-0 flex-col items-center gap-2 text-center">
+      <TeamLogo team={team} size={72} className="sm:scale-[1.22] sm:my-2" />
+      <div className="title-caps w-full text-base leading-tight [overflow-wrap:anywhere] [hyphens:auto] sm:text-2xl">{team?.name ?? 'À déterminer'}</div>
       {team?.company && <div className="text-xs text-muted-foreground">{team.company}</div>}
     </Link>
   )

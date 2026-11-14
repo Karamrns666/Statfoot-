@@ -9,7 +9,7 @@ import { EmptyState } from './Bits'
 export function SeasonNotStarted({ what }: { what: string }) {
   const { db } = useData()
   const { season, setSeasonId } = useSeason()
-  const prev = [...db.Season].filter((s) => s.id !== season?.id && db.Match.some((m) => m.season_id === s.id && isPlayed(m))).sort((a, b) => b.start_date.localeCompare(a.start_date))[0]
+  const prev = [...db.Season].filter((s) => s.id !== season?.id && !s.hidden && db.Match.some((m) => m.season_id === s.id && isPlayed(m))).sort((a, b) => b.start_date.localeCompare(a.start_date))[0]
   return (
     <EmptyState title={`${what} ${season?.name.replace('Saison ', '') ?? ''} arrivent bientôt`} icon={<CalendarClock />}>
       <p>Ils seront publiés ici dès qu’ils seront disponibles.</p>

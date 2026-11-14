@@ -458,8 +458,8 @@ export function applyTierCorrections2026(db: Rules6Data): Rules6Data {
 
 /** Nouvelle accroche (nov. 2026) : remplace l'ancienne accroche si elle n'a pas été personnalisée dans l'admin. */
 export function applyTagline2026(db: Rules6Data): Rules6Data {
-  const OLD_FR = ['Le premier championnat inter-entreprises au Maroc', '']
-  const OLD_AR = ['الدوري الوطني للشركات المغربية', '']
+  const OLD_FR = ['Le premier championnat inter-entreprises au Maroc']
+  const OLD_AR = ['الدوري الوطني للشركات المغربية']
   if (!db.Settings?.some((x) => OLD_FR.includes(x.tagline ?? '') || OLD_AR.includes(x.tagline_ar ?? ''))) return {}
   return { Settings: db.Settings.map((x) => ({ ...x, tagline: OLD_FR.includes(x.tagline ?? '') ? LEAGUE.tagline : x.tagline, tagline_ar: OLD_AR.includes(x.tagline_ar ?? '') ? LEAGUE.taglineAr : x.tagline_ar })) }
 }

@@ -37,7 +37,7 @@ describe('noms des compétitions (config admin)', () => {
     expect(out.Competition!.map((c) => c.name)).toEqual(['MASTER', 'CHALLENGER', 'Coupe du Président', 'Phase de sélection'])
     expect(out.Competition![3].split).toMatchObject({ gold_name: 'MASTER', silver_name: 'CHALLENGER' })
     expect(out.Division!.map((d) => d.name)).toEqual(['MASTER', 'CHALLENGER'])
-    expect(out.Settings![0].tagline).toBe('Le premier championnat inter-entreprises au Maroc')
+    expect(out.Settings![0].tagline).toBe('1ère LIGUE DE FOOTBALL INTER-ENTREPRISES AU MAROC')
     expect(applyRenameCompetitions({ ...db, ...out })).toEqual({})
   })
   it('données neuves : plus aucun « Gold Cup » / « Silver Cup » hors texte officiel du règlement', () => {

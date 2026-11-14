@@ -239,3 +239,10 @@
 .tagline p { margin: 0; white-space: nowrap; overflow: hidden; line-height: 1.25; }
 .tagline-fr { font-family: var(--font-display); font-weight: 800; letter-spacing: .02em; color: #fff; font-size: clamp(8px, 3.45cqi, 26px); }
 .tagline-ar { font-family: 'Tajawal', 'Noto Kufi Arabic', 'Segoe UI', Tahoma, sans-serif; font-weight: 700; color: var(--color-sky-soft, #9cc7f5); font-size: clamp(10px, 4.6cqi, 24px); margin-top: .1em; }
+
+/* Tableaux : colonnes figées à gauche (rang, logo, nom) et en-tête figé — fond opaque, ombre de séparation */
+.table-scroll .sticky-col { position: sticky; z-index: 2; background: #0b1c45; }
+.table-scroll tr:hover .sticky-col { background: #102452; }
+.table-scroll .sticky-col-last { box-shadow: 8px 0 10px -8px rgb(0 0 0 / .7); white-space: normal; overflow-wrap: break-word; hyphens: auto; min-width: 7.5rem; }
+.table-scroll.sticky-head thead th { position: sticky; top: 0; z-index: 3; background: #0a1838; }
+.table-scroll.sticky-head thead th.sticky-col { z-index: 4; }

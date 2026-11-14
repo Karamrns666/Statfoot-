@@ -73,13 +73,18 @@ export function SortHead({ col, state, onSort }: { col: { key: string; label: Re
 }
 
 /** Tableau triable complet. */
-export function SortableTable<T>({ rows, columns, rowKey, initial, rowClassName, className, empty }: {
+/** Colonnes figées par défaut : jusqu'à la colonne du nom (équipe / joueur) incluse, si elle est parmi les 3 premières */
+const NAME_KEYS = ['team', 'name', 'player']
+export function SortableTable<T>({ rows, columns, rowKey, initial, rowClassName, className, empty, stickyCols, stickyHeader = true }: {
   rows: T[]; columns: SortColumn<T>[]; rowKey: (r: T) => string
   initial?: { key: string; dir: SortDir }; rowClassName?: (r: T) => string | undefined | false; className?: string; empty?: ReactNode
+  stickyCols?: number; stickyHeader?: boolean
 }) {
   const s = useSort(rows, columns, initial)
+  const nameIdx = columns.findIndex((c) => NAME_KEYS.includes(c.key))
+  const frozen = stickyCols ?? (nameIdx >= 0 && nameIdx < 3 ? nameIdx + 1 : 0)
   return (
-    <Table className={className}>
+    <Table className={className} stickyCols={frozen} stickyHeader={stickyHeader && rows.length > 12}>
       <TableHeader><TableRow className="hover:bg-transparent">{columns.map((c) => <SortHead key={c.key} col={{ ...c, sortable: !!c.sort }} state={s.state} onSort={s.toggle} />)}</TableRow></TableHeader>
       <TableBody>
         {s.rows.length === 0 && empty ? <TableRow><TableCell colSpan={columns.length} className="py-6 text-center text-muted-foreground">{empty}</TableCell></TableRow> : null}

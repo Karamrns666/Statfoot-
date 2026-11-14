@@ -177,9 +177,9 @@ function CardFront({ p }: { p: PlayerCardProps }) {
         </div>
         {/* grand cartouche du logo de l'équipe (remplit l'espace entre le nom et les stats) */}
         {logo && (
-          <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center px-[9%] py-[.45em]">
-            <div className={cn('flex h-full max-h-[4.2em] min-h-[2.4em] w-full items-center justify-center rounded-[.7em] px-[.8em] py-[.35em]', isBrandLogo(logo) ? 'bg-white shadow-[0_.25em_.8em_rgb(0_0_0/.3)] ring-1 ring-black/5' : 'bg-white/10 ring-1 ring-white/20')}>
-              <img src={logo} alt={teamLabel} draggable={false} className="h-full max-h-[3.4em] w-full object-contain" onError={(e) => { e.currentTarget.style.visibility = 'hidden' }} />
+          <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center px-[9%] py-[.35em]">
+            <div className={cn('flex h-[3.5em] w-full items-center justify-center overflow-hidden rounded-[.7em] px-[.6em] py-[.2em]', isBrandLogo(logo) ? 'bg-white shadow-[0_.25em_.8em_rgb(0_0_0/.3)] ring-1 ring-black/5' : 'bg-white/10 ring-1 ring-white/20')}>
+              <img src={logo} alt={teamLabel} draggable={false} className="h-[3.1em] w-full object-contain" onError={(e) => { e.currentTarget.style.visibility = 'hidden' }} />
             </div>
           </div>
         )}

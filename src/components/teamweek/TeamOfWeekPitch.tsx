@@ -29,9 +29,11 @@ export function PitchBackground({ className }: { className?: string }) {
 export function TeamOfWeekPitch({ result, size = 'md', link = true, className }: { result: TeamOfWeekResult; size?: 'sm' | 'md' | 'lg'; link?: boolean; className?: string }) {
   const L = useLookup()
   const av = size === 'sm' ? 40 : size === 'lg' ? 72 : 58
+  // avatar réduit sur petit écran (14,5 % de la largeur du terrain) : plus de chevauchement entre les lignes
+  const avCss = `min(${av}px, 14.5cqw)`
   const best = result.player_of_round?.player_id
   return (
-    <div className={cn('relative aspect-[3/4] w-full overflow-hidden rounded-3xl border border-sky/20 shadow-[0_30px_60px_-30px_rgba(0,0,0,.8)]', className)}>
+    <div className={cn('relative aspect-[5/7] w-full overflow-hidden rounded-3xl [container-type:inline-size] sm:aspect-[3/4] border border-sky/20 shadow-[0_30px_60px_-30px_rgba(0,0,0,.8)]', className)}>
       <PitchBackground />
       <div className="absolute left-3 top-3 rounded-full bg-night-950/70 px-2.5 py-0.5 font-display text-sm font-black text-sky-soft">{result.formation.label}</div>
       {result.manual && <div className="absolute right-3 top-3 rounded-full bg-night-950/70 px-2.5 py-0.5 text-[11px] font-semibold text-muted-foreground">Sélection de la ligue</div>}
@@ -41,16 +43,16 @@ export function TeamOfWeekPitch({ result, size = 'md', link = true, className }:
         const body = (
           <>
             <div className="relative">
-              <div className="overflow-hidden rounded-full" style={{ width: av, height: av, boxShadow: `0 0 0 3px ${s.player_id === best ? '#E8B931' : color}, 0 8px 18px rgba(0,0,0,.5)` }}>
+              <div className="overflow-hidden rounded-full" style={{ width: avCss, height: avCss, boxShadow: `0 0 0 3px ${s.player_id === best ? '#E8B931' : color}, 0 8px 18px rgba(0,0,0,.5)` }}>
                 {p?.photo_url ? <img src={p.photo_url} alt="" className="size-full object-cover object-[50%_18%]" />
-                  : <div className="flex size-full items-center justify-center font-display font-black text-white" style={{ fontSize: av * 0.38, background: `radial-gradient(circle at 30% 25%, ${color}, #04163D 80%)` }}>{(p?.first_name[0] ?? '') + (p?.last_name[0] ?? '')}</div>}
+                  : <div className="flex size-full items-center justify-center font-display font-black text-white" style={{ fontSize: `calc(${avCss} * .38)`, background: `radial-gradient(circle at 30% 25%, ${color}, #04163D 80%)` }}>{(p?.first_name[0] ?? '') + (p?.last_name[0] ?? '')}</div>}
               </div>
               {s.rating > 0 && <span className="absolute -right-2 -top-1 rounded-md px-1.5 font-display text-[13px] font-black leading-5 text-ink shadow" style={{ background: ratingColor(s.rating) }}>{fmtRating(s.rating)}</span>}
               {s.player_id === best && <Crown className="absolute -left-2 -top-2 size-5 fill-award-gold text-award-gold drop-shadow" aria-label="Joueur de la journée" />}
               <TeamLogo team={t} size={size === 'sm' ? 16 : 22} className="absolute -bottom-1 -right-2" />
             </div>
             <span className={cn('mt-1.5 max-w-full truncate rounded bg-night-950/80 px-1.5 font-bold leading-5', size === 'sm' ? 'text-[11px]' : 'text-sm')}>{p ? `${p.first_name.charAt(0)}. ${p.last_name}` : '—'}</span>
-            {size !== 'sm' && <span className="text-[11px] text-white/75">{s.position === 'GK' ? 'Gardien · ' : ''}{t?.short_name}{s.goals ? ` · ${s.goals}⚽` : ''}{s.assists ? ` ${s.assists}🅰` : ''}{s.position === 'GK' && s.saves ? ` · ${s.saves} arr.` : ''}</span>}
+            {size !== 'sm' && <span className="mt-0.5 max-w-full truncate rounded bg-night-950/60 px-1 text-[11px] leading-4 text-white/80">{s.position === 'GK' ? 'Gardien · ' : ''}{t?.short_name}{s.goals ? ` · ${s.goals}⚽` : ''}{s.assists ? ` ${s.assists}🅰` : ''}{s.position === 'GK' && s.saves ? ` · ${s.saves} arr.` : ''}</span>}
           </>
         )
         const cls = 'absolute flex w-[30%] -translate-x-1/2 -translate-y-1/2 flex-col items-center text-center'

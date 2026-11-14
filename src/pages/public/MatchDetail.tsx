@@ -154,8 +154,14 @@ function TeamBlock({ id }: { id: string }) {
 function ScorerList({ list, align }: { list: MatchEvent[]; align: 'left' | 'right' }) {
   const L = useLookup()
   return (
-    <ul className={cn('space-y-0.5', align === 'right' ? 'text-right' : 'text-left')}>
-      {list.map((e) => <li key={e.id} className="text-muted-foreground"><span className="text-white">⚽ {e.player_id ? playerShort(L.player.get(e.player_id)) : e.player_name_free ?? (e.type === 'own_goal' ? 'Contre son camp' : '—')}</span> {fmtMinute(e.minute, e.added_minute)}{e.goal_kind === 'penalty' ? ' (pen.)' : e.type === 'own_goal' ? ' (csc)' : ''}{e.type === 'goal' && e.related_player_id ? <span className="text-neon-soft"> · passe {playerShort(L.player.get(e.related_player_id))}</span> : null}</li>)}
+    <ul className={cn('space-y-1', align === 'right' ? 'text-right' : 'text-left')}>
+      {list.map((e) => (
+        <li key={e.id} className="leading-tight text-muted-foreground">
+          <span className="text-white">⚽ {e.player_id ? playerShort(L.player.get(e.player_id)) : e.player_name_free ?? (e.type === 'own_goal' ? 'Contre son camp' : '—')}</span> <span className="whitespace-nowrap">{fmtMinute(e.minute, e.added_minute)}{e.goal_kind === 'penalty' ? ' (pen.)' : e.type === 'own_goal' ? ' (csc)' : ''}</span>
+          {/* passeur : sur sa propre ligne sur mobile (plus de nom coupé en deux), à la suite sur grand écran */}
+          {e.type === 'goal' && e.related_player_id ? <span className="block text-[11px] text-neon-soft sm:inline sm:text-[inherit]"><span className="hidden sm:inline"> · </span>passe <span className="whitespace-nowrap">{playerShort(L.player.get(e.related_player_id))}</span></span> : null}
+        </li>
+      ))}
     </ul>
   )
 }

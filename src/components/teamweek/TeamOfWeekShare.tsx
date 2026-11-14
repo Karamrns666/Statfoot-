@@ -44,7 +44,7 @@ export function TeamOfWeekShare({ open, onOpenChange, result, title }: { open: b
                 <div className="title-caps text-white" style={{ fontSize: fmt === 'post' ? 84 : 110, lineHeight: 1 }}>Équipe type</div>
                 <div className="font-display font-bold text-white/70" style={{ fontSize: 40 }}>Journée {result.round}</div>
                 <div className="mt-6" style={{ width: pitchW * zoom, height: (pitchW * 4 / 3) * zoom }}>
-                  <div style={{ width: pitchW, transform: `scale(${zoom})`, transformOrigin: 'top left' }}><TeamOfWeekPitch result={result} link={false} /></div>
+                  <div style={{ width: pitchW, transform: `scale(${zoom})`, transformOrigin: 'top left' }}><TeamOfWeekPitch result={result} link={false} className="!aspect-[3/4]" /></div>
                 </div>
                 {best && result.player_of_round && (
                   <div className="mt-6 font-display font-black text-white" style={{ fontSize: fmt === 'post' ? 36 : 48 }}>

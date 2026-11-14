@@ -93,7 +93,7 @@ function Footer() {
           <img src={L.logo || MBL_LOGO} alt={L.name} className="h-24 w-auto" />
           <div>
             <div className="font-display text-2xl font-black uppercase leading-none">{L.name}</div>
-            <p className="mt-2 max-w-xs text-sm text-muted-foreground">{L.tagline}</p>
+            <p className="mt-2 max-w-xs text-sm text-muted-foreground">{L.tagline.replace('INTER-', 'INTER\u2011')}</p>
             <p className="mt-1 max-w-xs text-sm text-muted-foreground" dir="rtl" lang="ar" style={{ fontFamily: "'Tajawal', 'Segoe UI', Tahoma, sans-serif", textAlign: 'left' }}>{L.taglineAr}</p>
             <a href={o.website} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2.5 text-sm text-muted-foreground hover:text-white">Organisé par <img src={o.logo} alt={o.name} className="h-7 w-auto" /></a>
           </div>

@@ -18,7 +18,7 @@
         try {
           var u = '%VITE_SUPABASE_URL%', k = '%VITE_SUPABASE_ANON_KEY%'
           if (!u || u.charAt(0) === '%' || !k || k.charAt(0) === '%' || localStorage.getItem('statfoot:cloud-session')) return
-          var q = '/rest/v1/entity_rows?select=entity,id,data,deleted,updated_at&order=updated_at.asc,entity.asc,id.asc&limit=1000&offset=0'
+          var q = '/rest/v1/entity_rows?select=entity,id,data,deleted,updated_at&deleted=is.false&order=updated_at.asc,entity.asc,id.asc&limit=1000&offset=0'
           window.__mblPrefetch = { path: q, res: fetch(u.replace(/\/$/, '') + q, { headers: { apikey: k, Authorization: 'Bearer ' + k } }).then(function (r) { return r.ok ? r.json() : null }).catch(function () { return null }) }
         } catch (e) { /* pas de préchargement */ }
       })()

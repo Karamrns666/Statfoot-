@@ -174,16 +174,18 @@ export async function adminApi<T = unknown>(action: string, body: Record<string,
 export interface CloudRow { entity: string; id: string; data: BaseEntity; deleted: boolean; updated_at: string }
 export async function pullRows(since?: string): Promise<CloudRow[]> {
   const token = (await accessToken()) ?? ANON
-  const out: CloudRow[] = []
-  for (let offset = 0; ; offset += 1000) {
-    const q = `/rest/v1/entity_rows?select=entity,id,data,deleted,updated_at${since ? `&updated_at=gt.${encodeURIComponent(since)}` : ''}&order=updated_at.asc,entity.asc,id.asc&limit=1000&offset=${offset}`
-    // 1re page déjà demandée par index.html (visiteur, avant le chargement du JavaScript) : on la réutilise
-    const pre = (window as { __mblPrefetch?: { path: string; res: Promise<CloudRow[] | null> } }).__mblPrefetch
-    let rows: CloudRow[] | null = null
-    if (pre && pre.path === q && token === ANON) { (window as { __mblPrefetch?: unknown }).__mblPrefetch = undefined; rows = await pre.res }
-    rows ??= await call(q, { token }) as CloudRow[]
-    out.push(...rows)
-    if (rows.length < 1000) break
+  // chargement complet : les enregistrements supprimés sont inutiles (la copie locale est remplacée en entier)
+  const q = (offset: number) => `/rest/v1/entity_rows?select=entity,id,data,deleted,updated_at${since ? `&updated_at=gt.${encodeURIComponent(since)}` : '&deleted=is.false'}&order=updated_at.asc,entity.asc,id.asc&limit=1000&offset=${offset}`
+  // 1re page déjà demandée par index.html (visiteur, avant le chargement du JavaScript) : on la réutilise
+  const pre = (window as { __mblPrefetch?: { path: string; res: Promise<CloudRow[] | null> } }).__mblPrefetch
+  let first: CloudRow[] | null = null
+  if (pre && pre.path === q(0) && token === ANON) { (window as { __mblPrefetch?: unknown }).__mblPrefetch = undefined; first = await pre.res }
+  first ??= await call(q(0), { token }) as CloudRow[]
+  const out: CloudRow[] = [...first]
+  // pages suivantes demandées 4 par 4 en parallèle (au lieu d'une à la fois)
+  for (let offset = 1000, more = first.length === 1000; more; offset += 4000) {
+    const pages = await Promise.all([0, 1, 2, 3].map((k) => call(q(offset + k * 1000), { token }) as Promise<CloudRow[]>))
+    for (const p of pages) { out.push(...p); if (p.length < 1000) { more = false; break } }
   }
   return out
 }

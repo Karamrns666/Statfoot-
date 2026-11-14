@@ -15,6 +15,14 @@ void registerFileWorker()
 addEventListener('error', (e) => { const t = e.target; if (t instanceof HTMLImageElement) t.style.visibility = 'hidden' }, true)
 addEventListener('load', (e) => { const t = e.target; if (t instanceof HTMLImageElement && t.style.visibility === 'hidden') t.style.visibility = '' }, true)
 
+// code de la page demandée chargé tout de suite, en parallèle des données (au lieu d'attendre qu'elles soient arrivées)
+const PAGE: Record<string, () => Promise<unknown>> = {
+  '/': () => import('@/pages/public/Home'), '/classement': () => import('@/pages/public/Standings'), '/joueurs': () => import('@/pages/public/Players'),
+  '/matchs': () => import('@/pages/public/Matches'), '/equipes': () => import('@/pages/public/Teams'), '/trophees': () => import('@/pages/public/Awards'),
+  '/pre-saison': () => import('@/pages/public/Preseason'),
+}
+void PAGE[location.pathname.replace(/\/$/, '') || '/']?.().catch(() => undefined)
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>

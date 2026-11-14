@@ -37,7 +37,7 @@ export default function Badges() {
           const hidden = d.secret && !o?.count
           return (
             <article key={d.id} className="glass flex gap-4 rounded-2xl p-4">
-              <BadgeEmblem pictogram={hidden ? 'lock_net' : m.pictogram} rarity={m.rarity} level={m.level} locked={!o?.count} size={88} title={hidden ? 'Badge secret' : d.name} />
+              <BadgeEmblem pictogram={hidden ? 'lock_net' : m.pictogram} rarity={m.rarity} level={m.level} size={88} title={hidden ? 'Badge secret' : d.name} />
               <div className="min-w-0 flex-1">
                 <h2 className="font-display text-xl font-extrabold leading-tight">{hidden ? 'Badge secret' : d.name}</h2>
                 <div className="text-xs font-bold" style={{ color: RARITY_ACCENT[m.rarity] }}>{RARITY_LABEL[m.rarity]} · {m.category}{m.level ? ` · ${m.family} ${ROMAN[m.level]}` : ''}</div>

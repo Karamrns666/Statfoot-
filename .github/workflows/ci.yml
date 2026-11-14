@@ -51,7 +51,10 @@ jobs:
         if: always()
         run: |
           mkdir -p /tmp/out && cp ci-report.txt /tmp/out/ && { [ -d dist ] && cp -r dist /tmp/out/ || true; } && { [ -d dist-e2e ] && cp -r dist-e2e /tmp/out/ || true; }
-          cp e2e-report.txt /tmp/out/ 2>/dev/null; cp -r test-results /tmp/out/ 2>/dev/null; cp -r e2e/__screenshots__ /tmp/out/screenshots 2>/dev/null; cp lh*.json /tmp/out/ 2>/dev/null; true
+          cp e2e-report.txt /tmp/out/ 2>/dev/null || true
+          cp -r test-results /tmp/out/ 2>/dev/null || true
+          cp -r e2e/__screenshots__ /tmp/out/screenshots 2>/dev/null || true
+          cp lh*.json /tmp/out/ 2>/dev/null || true
           cd /tmp/out && git init -q && git config user.name ci && git config user.email ci@users.noreply.github.com
           git add -A && git commit -qm "CI ${GITHUB_SHA}"
           git push -qf "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/ci/${GITHUB_REF_NAME}"

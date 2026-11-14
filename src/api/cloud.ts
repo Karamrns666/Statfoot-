@@ -177,7 +177,11 @@ export async function pullRows(since?: string): Promise<CloudRow[]> {
   const out: CloudRow[] = []
   for (let offset = 0; ; offset += 1000) {
     const q = `/rest/v1/entity_rows?select=entity,id,data,deleted,updated_at${since ? `&updated_at=gt.${encodeURIComponent(since)}` : ''}&order=updated_at.asc,entity.asc,id.asc&limit=1000&offset=${offset}`
-    const rows = await call(q, { token }) as CloudRow[]
+    // 1re page déjà demandée par index.html (visiteur, avant le chargement du JavaScript) : on la réutilise
+    const pre = (window as { __mblPrefetch?: { path: string; res: Promise<CloudRow[] | null> } }).__mblPrefetch
+    let rows: CloudRow[] | null = null
+    if (pre && pre.path === q && token === ANON) { (window as { __mblPrefetch?: unknown }).__mblPrefetch = undefined; rows = await pre.res }
+    rows ??= await call(q, { token }) as CloudRow[]
     out.push(...rows)
     if (rows.length < 1000) break
   }

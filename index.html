@@ -10,6 +10,19 @@
     <link rel="preload" href="/fonts/manrope-var.woff" as="font" type="font/woff" crossorigin />
     <title>Morocco Business League — 1ère ligue de football inter-entreprises au Maroc</title>
     <meta name="description" content="Morocco Business League — 1ère ligue de football inter-entreprises au Maroc. الدوري الوطني للشركات لكرة القدم. Résultats, classements, joueurs et meilleures performances, organisé par Ardentia." />
+      <link rel="preconnect" href="%VITE_SUPABASE_URL%" crossorigin />
+    <!-- Données du site demandées dès le chargement de la page, en parallèle du JavaScript (premier affichage plus rapide).
+         Visiteurs uniquement (un admin connecté passe par son propre jeton). La clé « anon » est publique par nature. -->
+    <script>
+      (function () {
+        try {
+          var u = '%VITE_SUPABASE_URL%', k = '%VITE_SUPABASE_ANON_KEY%'
+          if (!u || u.charAt(0) === '%' || !k || k.charAt(0) === '%' || localStorage.getItem('statfoot:cloud-session')) return
+          var q = '/rest/v1/entity_rows?select=entity,id,data,deleted,updated_at&order=updated_at.asc,entity.asc,id.asc&limit=1000&offset=0'
+          window.__mblPrefetch = { path: q, res: fetch(u.replace(/\/$/, '') + q, { headers: { apikey: k, Authorization: 'Bearer ' + k } }).then(function (r) { return r.ok ? r.json() : null }).catch(function () { return null }) }
+        } catch (e) { /* pas de préchargement */ }
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

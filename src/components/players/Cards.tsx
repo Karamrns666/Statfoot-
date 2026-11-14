@@ -1,5 +1,4 @@
 import { PlayerCard } from './PlayerCard'
-import { RookieBadge } from '@/components/league/Bits'
 import { useLookup } from '@/hooks/useData'
 import { usePlayerBadges } from '@/hooks/useStats'
 import { SEASON_2025_ID } from '@/api/seed/season2025'

@@ -4,6 +4,7 @@ import { migrate } from '@/api/seed/migrations'
 import { ENTITY_NAMES } from '@/types/entities'
 import { buildSimulation, SIM_ID, SIM_SEASON_ID, type RealDb } from './simulation'
 import { isPlayed } from '@/lib/standings'
+import { preseasonFormat } from '@/lib/preseason'
 
 function realDb(): RealDb {
   const db = generateLeagueData() as unknown as Record<string, unknown[]>
@@ -36,9 +37,11 @@ describe('simulation de saison', () => {
   it('contient une saison complète', () => {
     const ms = rows.Match!
     const pre = ms.filter((m) => m.competition_id === 'sim_comp_pre')
-    expect(pre).toHaveLength(46)
+    const nReal = rows.Team!.length - 4
+    expect(pre).toHaveLength(preseasonFormat(nReal, 4).total)
     expect(ms.every((m) => isPlayed(m))).toBe(true)
-    expect(rows.Team!.filter((t) => t.season_id === SIM_SEASON_ID).length).toBe(27) // 23 + 4 nouvelles au tournoi
+    expect(rows.Team!.filter((t) => t.season_id === SIM_SEASON_ID).length).toBe(nReal + 4) // équipes de la saison + 4 nouvelles au tournoi
+    expect(nReal).toBe(21)
     for (const t of rows.Team!) {
       const ps = rows.Player!.filter((p) => p.team_id === t.id)
       expect(ps.length).toBeGreaterThanOrEqual(10); expect(ps.length).toBeLessThanOrEqual(12)

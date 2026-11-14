@@ -17,7 +17,7 @@ import type {
   MatchEvent, MatchStage, MonthlyAward, Player, ProcesVerbal, Season, Settings, Suspension, Team, XPRule,
 } from '@/types/entities'
 import { seededRng } from '@/lib/draw'
-import { PRESEASON_DEFAULTS, drawRound1, generateNextRound, preseasonState, resolvePreseasonConfig, type PMatch } from '@/lib/preseason'
+import { PRESEASON_DEFAULTS, preseasonFormat, drawRound1, generateNextRound, preseasonState, resolvePreseasonConfig, type PMatch } from '@/lib/preseason'
 import { buildBracket, resolveSource, roundRobin } from '@/lib/schedule'
 import { buildAction, type NewEvent } from '@/lib/matchEngine'
 import { computeStandings, isPlayed, type StandingRow } from '@/lib/standings'
@@ -298,9 +298,9 @@ export function buildSimulation(real: RealDb, opts: { seed?: number; generatedAt
   }
 
   // =========================================================================
-  //  1. Pré-saison en système suisse : 4 journées + rattrapage = 46 matchs
+  //  1. Pré-saison en système suisse : 4 journées + rattrapage (42 matchs à 21 équipes)
   // =========================================================================
-  const cfg = resolvePreseasonConfig({ ...PRESEASON_DEFAULTS, rounds: 4, masterSize: 12 })
+  const cfg = resolvePreseasonConfig({ ...PRESEASON_DEFAULTS, rounds: 4, masterSize: Math.min(PRESEASON_DEFAULTS.masterSize, teamIds.length - 2) })
   const pre: Competition = tag({ id: 'sim_comp_pre', season_id: SIM_SEASON_ID, name: names.pre, phase: 'league_phase', format: 'swiss', status: 'finished', team_ids: teamIds, half_duration_min: 20, foul_alert_threshold: 5, order: 1, color: '#F05A22', description: 'Pré-saison en système suisse (simulation)' } as Competition)
   const drawSeed = seed % 100000
   const r1 = drawRound1(teamIds, drawSeed)
@@ -326,7 +326,7 @@ export function buildSimulation(real: RealDb, opts: { seed?: number; generatedAt
     })
   }
   const preState = preseasonState(teamIds, pm, rests, cfg, drawOrder)
-  if (!preState.finished || pm.length !== 46) throw new Error(`Pré-saison incomplète (${pm.length} matchs).`)
+  if (!preState.finished || pm.length !== preseasonFormat(teamIds.length, cfg.rounds).total) throw new Error(`Pré-saison incomplète (${pm.length} matchs).`)
   const finalRanking = preState.ranking.map((r) => r.team_id)
   const masterIds = finalRanking.slice(0, cfg.masterSize), challengerIds = finalRanking.slice(cfg.masterSize)
 

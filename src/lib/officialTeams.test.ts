@@ -22,20 +22,22 @@ function oldDb() {
 
 describe('liste officielle 2026-2027', () => {
   it('rapprochement : majuscules, accents, tirets, apostrophes et alias', () => {
-    const found = XLSX_NAMES.map((n) => matchOfficial([n])?.name)
+    // Canpack 1 / 2 (liste Excel d'origine) retirées de la saison en nov. 2026 : plus reconnues comme officielles
+    const found = XLSX_NAMES.filter((n) => !/canpack/i.test(n)).map((n) => matchOfficial([n])?.name)
     expect(found.every(Boolean)).toBe(true)
-    expect(new Set(found).size).toBe(23)
+    expect(new Set(found).size).toBe(21)
+    expect(matchOfficial(['CANPACK 1'])).toBeUndefined()
     expect(teamKey('L’Heure Joyeuse')).toBe(teamKey("L'HEURE JOYEUSE"))
     expect(matchOfficial(['Construction & Travaux Routiers'])?.name).toBe('CTR')
     expect(matchOfficial(['Mega Post-Tension'])?.name).toBe('Mega Post Tension')
     expect(matchOfficial(['Simulation FC'])).toBeUndefined()
   })
-  it('seed : exactement les 23 équipes, plan vide', () => {
+  it('seed : exactement les 21 équipes, plan vide', () => {
     const db = generateLeagueData()
     const plan = planOfficialTeams(db, 'season_2026')
-    expect(plan.kept).toHaveLength(23)
+    expect(plan.kept).toHaveLength(21)
     expect(planIsEmpty(plan)).toBe(true)
-    expect(OFFICIAL_TEAMS_2026).toHaveLength(23)
+    expect(OFFICIAL_TEAMS_2026).toHaveLength(21)
   })
   it('ancienne saison : gardées / renommées / créées / retirées, puis idempotent, 2025-2026 intact', () => {
     const db = oldDb()
@@ -44,14 +46,14 @@ describe('liste officielle 2026-2027', () => {
     const r = planReport(plan)
     expect(r.renommees.sort()).toEqual(['Arrow → Arrow ECS', 'L’Heure Joyeuse → L\'Heure Joyeuse', 'Midea → Taqeef (Midea)'].sort())
     expect(r.creees.sort()).toEqual(['ALD Automotive', 'CTR', 'G3C', 'Parebrise Express'])
-    expect(plan.removed.map((x) => x.team.name)).toEqual(['Simulation FC'])
+    expect(plan.removed.map((x) => x.team.name)).toEqual(['Simulation FC', 'Canpack 1', 'Canpack 2'])
     expect(plan.removed[0]).toMatchObject({ players: [{ id: 'p_sim' }], matches: [{ id: 'm_sim' }] })
     Object.assign(db, applyOfficialPlan(db, plan))
     const s26 = db.Team.filter((t) => t.season_id === 'season_2026')
-    expect(s26).toHaveLength(23)
+    expect(s26).toHaveLength(21)
     expect(s26.find((t) => t.short_name === 'ARW')).toMatchObject({ id: 't26_arw', name: 'Arrow ECS', logo_url: '/logos/arw.png' })
     expect(db.Player.some((p) => p.id === 'p_sim') || db.Match.some((m) => m.id === 'm_sim')).toBe(false)
-    expect(db.Competition.find((c) => c.season_id === 'season_2026' && c.phase === 'league_phase')!.team_ids).toHaveLength(23)
+    expect(db.Competition.find((c) => c.season_id === 'season_2026' && c.phase === 'league_phase')!.team_ids).toHaveLength(21)
     expect(planIsEmpty(planOfficialTeams(db, 'season_2026'))).toBe(true)
     expect(JSON.stringify([db.Team.filter((t) => t.season_id === 'season_2025'), db.Match.filter((m) => m.season_id === 'season_2025'), db.Player.filter((p) => p.season_ids?.includes('season_2025'))])).toBe(before25)
   })
@@ -73,17 +75,17 @@ describe('mise à jour automatique des navigateurs (migration)', () => {
     const db = oldDb()
     db.Player = db.Player.filter((p) => p.id !== 'p_sim') // sans joueur, match seulement programmé
     const out = applyOfficialTeams2026(db as never)
-    expect(out.Team!.filter((t) => t.season_id === 'season_2026')).toHaveLength(23)
+    expect(out.Team!.filter((t) => t.season_id === 'season_2026')).toHaveLength(21)
     expect(out.Team!.some((t) => t.id === 't26_sim')).toBe(false)
     const withPlayer = oldDb() // Simulation FC a un joueur → laissée à la décision de l’admin
     const out2 = applyOfficialTeams2026(withPlayer as never)
     expect(out2.Team!.some((t) => t.id === 't26_sim')).toBe(true)
     expect(out2.Team!.filter((t) => t.season_id === 'season_2026')).toHaveLength(24)
-    // la pré-saison ne contient que les 23 équipes officielles, même si une équipe hors liste est conservée
-    expect(out2.Competition!.find((c) => c.id === 'comp_2026_selection')!.team_ids).toHaveLength(23)
+    // la pré-saison ne contient que les 21 équipes officielles, même si une équipe hors liste est conservée
+    expect(out2.Competition!.find((c) => c.id === 'comp_2026_selection')!.team_ids).toHaveLength(21)
     expect(applyOfficialTeams2026({ ...db, ...out } as never)).toEqual({})
   })
-  it('Simulation FC retirée même avec des joueurs : 23 équipes, pré-saison à 23, tirage incluant l’équipe annulé (idempotent)', async () => {
+  it('Simulation FC retirée même avec des joueurs : 21 équipes, pré-saison à 21, tirage incluant l’équipe annulé (idempotent)', async () => {
     const { applyOfficialTeams2026, applyRemoveSimulation2026 } = await import('@/api/seed/migrations')
     const db = oldDb()
     const step1 = { ...db, ...applyOfficialTeams2026(db as never) } as typeof db
@@ -91,11 +93,11 @@ describe('mise à jour automatique des navigateurs (migration)', () => {
     comp.team_ids = [...comp.team_ids!, 't26_sim']
     comp.preseason = { seed: 42, draw_order: comp.team_ids, revealed: 3 }
     const out = applyRemoveSimulation2026(step1 as never)
-    expect(out.Team!.filter((t) => t.season_id === 'season_2026')).toHaveLength(23)
+    expect(out.Team!.filter((t) => t.season_id === 'season_2026')).toHaveLength(21)
     expect(out.Player!.some((p) => p.id === 'p_sim')).toBe(false)
     expect(out.Match!.some((m) => m.id === 'm_sim')).toBe(false)
     const c = out.Competition!.find((x) => x.id === 'comp_2026_selection')!
-    expect(c.team_ids).toHaveLength(23)
+    expect(c.team_ids).toHaveLength(21)
     expect(c.preseason?.draw_order).toBeUndefined()
     expect(applyRemoveSimulation2026({ ...step1, ...out } as never)).toEqual({})
   })

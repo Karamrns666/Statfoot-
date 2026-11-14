@@ -1,4 +1,5 @@
 // Ligne de match compacte (page Matchs) : statut à gauche, deux équipes empilées avec leur score, favoris.
+import { ForfeitBadge } from './ForfeitBadge'
 import { Link } from 'react-router-dom'
 import { ChevronRight, Star } from 'lucide-react'
 import type { Match, Team } from '@/types/entities'
@@ -33,9 +34,10 @@ export function MatchRow({ match, favorites, onToggleFavorite }: { match: Match;
           {match.number && <span className="font-bold text-foreground/80">{match.number}</span>}
           {match.pitch && <span>{match.number ? '· ' : ''}{match.pitch}</span>}
           {stage && <span className="truncate">· {stage}</span>}
-          {done && match.home_ht_score != null && <span>· MT {match.home_ht_score}-{match.away_ht_score}</span>}
+          {done && match.home_ht_score != null && !match.forfeit_team_id && <span>· MT {match.home_ht_score}-{match.away_ht_score}</span>}
           {match.penalties && <span>· TAB {match.home_pens}-{match.away_pens}</span>}
         </div>
+        {done && match.forfeit_team_id && <ForfeitBadge match={match} link={false} className="mt-1 justify-start" />}
       </div>
       <div className="pointer-events-none relative flex items-center pr-2 text-white/25 transition group-hover:text-neon"><ChevronRight className="size-5" /></div>
     </div>

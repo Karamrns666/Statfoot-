@@ -1,4 +1,4 @@
-// Liste officielle des équipes d'une saison (fonctions PURES, testées) — saison 2026-2027 : 23 équipes.
+// Liste officielle des équipes d'une saison (fonctions PURES, testées) — saison 2026-2027 : 21 équipes (Canpack 1 et 2 retirées en nov. 2026).
 // Rapprochement sans tenir compte des majuscules, accents, tirets, apostrophes ni espaces, avec alias.
 //  • équipe trouvée → GARDÉE (id, joueurs, logo personnalisé conservés), nom affiché mis à jour ;
 //  • équipe manquante → CRÉÉE ;
@@ -26,8 +26,6 @@ export const OFFICIAL_TEAMS_2026: OfficialTeam[] = [
   { name: 'Parebrise Express', short: 'PBE', aliases: ['Parebrise Express', 'Pare-Brise Express', 'PBE'], c1: '#FFC20E', c2: '#231F20' },
   { name: 'Marjane Market', short: 'MJM', aliases: ['MARJANE MARKET', 'Marjane'], c1: '#CF5014', c2: '#2A1003' },
   { name: 'Attijariwafa bank', short: 'ATW', aliases: ['ATTIJARIWAFA BANK', 'Attijariwafa'], c1: '#F39200', c2: '#2A1503' },
-  { name: 'Canpack 1', short: 'CP1', aliases: ['CANPACK 1'], c1: '#032A5A', c2: '#01112A' },
-  { name: 'Canpack 2', short: 'CP2', aliases: ['CANPACK 2'], c1: '#1E4F8F', c2: '#01112A' },
   { name: 'Distra', short: 'DST', aliases: ['DISTRA'], c1: '#8CC63F', c2: '#13240A' },
   { name: 'Michoc', short: 'MIC', aliases: ['MICHOC'], c1: '#E30613', c2: '#2A0406' },
   { name: 'BMCI', short: 'BMC', aliases: ['BMCI'], c1: '#00915A', c2: '#05241A' },

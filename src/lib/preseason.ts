@@ -26,7 +26,7 @@ export interface PreseasonConfig {
 export const PRESEASON_DEFAULTS: PreseasonConfig = {
   rounds: 4,
   points: { win: 3, draw: 1, loss: 0 },
-  masterSize: 12,
+  masterSize: 11,
   intermediateOrder: ['points', 'diff', 'gf', 'draw'],
   finalOrder: ['points', 'diff', 'gf', 'force', 'draw'],
 }

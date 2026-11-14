@@ -36,6 +36,8 @@ export interface Rules6Data {
   Competition?: Competition[]
   Match?: Match[]
   AuditLog?: BaseEntity[]
+  Club?: Club[]
+  LiveState?: BaseEntity[]
 }
 
 /**
@@ -375,7 +377,70 @@ export function applyLogoRevisions(db: Rules6Data & { Club?: Club[] }): Rules6Da
   return out
 }
 
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams, applyHideSeason2025, applyLogoRevisions]
+/**
+ * Canpack 1 et Canpack 2 retirées de la saison 2026-2027 (nov. 2026) : équipes, clubs propres à cette saison, joueurs de
+ * cette saison, matchs (PS-08) et leurs feuilles / événements. Le tirage de la J1 est conservé à l'identique, sauf :
+ * PS-08 supprimé (numéro NON réutilisé) et l'adversaire de Canpack 1 (Wafasalaf) devient l'équipe au repos à la place de
+ * Canpack 2. Pré-saison à 21 équipes : 4 journées de 10 matchs + rattrapage de 2 matchs = 42 matchs. Aucune autre saison
+ * n'est touchée. Si un match concerné a déjà été joué, rien n'est fait (correction manuelle).
+ */
+export function applyRemoveCanpack2026(db: Rules6Data): Rules6Data {
+  const season = SEASON_2026_ID
+  const comps = db.Competition ?? []
+  const seasonOf = (t: Team) => t.season_id ?? comps.find((c) => c.team_ids?.includes(t.id))?.season_id
+  const gone = new Set((db.Team ?? []).filter((t) => seasonOf(t) === season && /^canpack\s*[12]$/i.test(t.name.trim())).map((t) => t.id))
+  if (!gone.size) return {}
+  const hits = (m: Match) => m.season_id === season && (gone.has(m.home_team_id) || gone.has(m.away_team_id))
+  const removed = (db.Match ?? []).filter(hits)
+  if (removed.some((m) => isDisputed(m))) return {}
+  const out: Rules6Data = {}
+  const mids = new Set(removed.map((m) => m.id))
+  out.Team = db.Team!.filter((t) => !gone.has(t.id))
+  const clubIds = new Set(db.Team!.filter((t) => gone.has(t.id)).map((t) => t.club_id).filter(Boolean) as string[])
+  for (const t of out.Team) if (t.club_id) clubIds.delete(t.club_id) // club encore utilisé par une autre saison : conservé
+  if (db.Club?.some((c) => clubIds.has(c.id))) out.Club = db.Club.filter((c) => !clubIds.has(c.id))
+  if (db.Player?.some((p) => gone.has(p.team_id))) {
+    out.Player = db.Player.flatMap((p) => {
+      if (!gone.has(p.team_id)) return [p]
+      const other = (p.season_ids ?? []).filter((x) => x !== season)
+      return other.length ? [{ ...p, season_ids: other }] : []
+    })
+  }
+  if (removed.length) {
+    out.Match = db.Match!.filter((m) => !mids.has(m.id))
+    if (db.MatchEvent?.some((e) => mids.has(e.match_id))) out.MatchEvent = db.MatchEvent.filter((e) => !mids.has(e.match_id))
+    if (db.Lineup?.some((l) => mids.has(l.match_id))) out.Lineup = db.Lineup.filter((l) => !mids.has(l.match_id))
+    if (db.MatchTeamStats?.some((x) => mids.has(x.match_id))) out.MatchTeamStats = db.MatchTeamStats.filter((x) => !mids.has(x.match_id))
+  }
+  // l'équipe privée d'adversaire à la J1 passe au repos (à la place de l'équipe retirée)
+  const r1Orphans = removed.filter((m) => m.round === 1).flatMap((m) => [m.home_team_id, m.away_team_id]).filter((id) => !gone.has(id))
+  out.Competition = comps.map((c) => {
+    if (c.season_id !== season || !c.team_ids?.some((id) => gone.has(id))) return c
+    const team_ids = c.team_ids.filter((id) => !gone.has(id))
+    if (!c.preseason) return { ...c, team_ids }
+    const ps = c.preseason
+    const rests = { ...(ps.rests ?? {}) }
+    for (const k of Object.keys(rests)) if (rests[k] && gone.has(rests[k]!)) delete rests[k]
+    if (r1Orphans.length === 1) rests['1'] = r1Orphans[0]
+    let order = (ps.draw_order ?? []).filter((id) => !gone.has(id))
+    if (rests['1']) order = [...order.filter((id) => id !== rests['1']), rests['1']] // l'équipe au repos ferme l'ordre du tirage
+    return { ...c, team_ids, preseason: { ...ps, rests, draw_order: order, revealed: ps.revealed != null ? order.length : ps.revealed, final_ranking: ps.final_ranking?.filter((id) => !gone.has(id)), config: { ...(ps.config ?? {}), masterSize: 11 } } }
+  })
+  if (db.Draw?.some((d) => d.season_id === season)) {
+    out.Draw = db.Draw.map((d) => d.season_id !== season ? d : {
+      ...d,
+      pots: d.pots?.map((p) => ({ ...p, team_ids: p.team_ids.filter((id) => !gone.has(id)) })),
+      groups: d.groups?.map((g) => ({ ...g, team_ids: g.team_ids.filter((id) => !gone.has(id)) })),
+      fixtures: d.fixtures?.filter((f) => !gone.has((f as { home_team_id?: string }).home_team_id ?? '') && !gone.has((f as { away_team_id?: string }).away_team_id ?? '')),
+      picks: d.picks?.filter((x) => !gone.has((x as { team_id?: string }).team_id ?? '')),
+    })
+  }
+  const now = new Date().toISOString()
+  out.AuditLog = [{ id: `log_remove_canpack_${Date.now().toString(36)}`, created_date: now, action: 'teams_removed', entity: 'Team', entity_label: 'Canpack 1, Canpack 2', author_email: 'systeme', author_name: 'Mise à jour du site', details: { message: 'Canpack 1 et Canpack 2 retirées de la saison 2026-2027 ; PS-08 supprimé ; Wafasalaf au repos à la J1', equipes: [...gone], matchs_supprimes: removed.map((m) => m.number ?? m.id), equipe_au_repos_j1: r1Orphans[0] } } as BaseEntity, ...(db.AuditLog ?? [])]
+  return out
+}
+
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams, applyHideSeason2025, applyLogoRevisions, applyRemoveCanpack2026]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */

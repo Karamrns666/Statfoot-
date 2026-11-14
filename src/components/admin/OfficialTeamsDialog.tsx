@@ -1,4 +1,4 @@
-// Admin — « Liste officielle 2026-2027 » : rapproche les équipes de la saison avec les 23 équipes officielles.
+// Admin — « Liste officielle 2026-2027 » : rapproche les équipes de la saison avec les équipes officielles.
 // 1) aperçu exact (gardées / renommées / créées / retirées avec joueurs et matchs) ; 2) sauvegarde JSON obligatoire ;
 // 3) confirmation ; 4) rapport + journal. Relançable sans doublon (plan vide la 2e fois). Ne touche pas aux autres saisons.
 import { useMemo, useState } from 'react'
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { toast } from '@/components/ui/toast'
 import { downloadBlob } from '@/lib/visuals'
-import { applyOfficialPlan, planIsEmpty, planOfficialTeams, planReport } from '@/lib/officialTeams'
+import { OFFICIAL_TEAMS_2026, applyOfficialPlan, planIsEmpty, planOfficialTeams, planReport } from '@/lib/officialTeams'
 import { ENTITY_NAMES } from '@/types/entities'
 
 export function OfficialTeamsButton({ seasonId }: { seasonId: string }) {
@@ -17,7 +17,7 @@ export function OfficialTeamsButton({ seasonId }: { seasonId: string }) {
   if (seasonId !== 'season_2026') return null
   return (
     <>
-      <Button variant="outline" onClick={() => setOpen(true)}><ClipboardList />Liste officielle (23 équipes)</Button>
+      <Button variant="outline" onClick={() => setOpen(true)}><ClipboardList />Liste officielle ({OFFICIAL_TEAMS_2026.length} équipes)</Button>
       {open && <OfficialTeamsDialog seasonId={seasonId} onClose={() => setOpen(false)} />}
     </>
   )

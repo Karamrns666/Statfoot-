@@ -16,9 +16,9 @@ export const OFFICIAL_J1_2026 = [
   { number: 'PS-09', day: '2026-11-19', time: '21:00', a: 'Arrow ECS', b: 'Marjane Market' },
   { number: 'PS-10', day: '2026-11-19', time: '21:00', a: 'Atelier Vert Rabat', b: 'Attijariwafa bank' },
   { number: 'PS-11', day: '2026-11-19', time: '22:00', a: 'Parebrise Express', b: 'CTR' },
-  { number: 'PS-08', day: '2026-11-19', time: '22:00', a: 'Canpack 1', b: 'Wafasalaf' },
 ] as const
-export const OFFICIAL_J1_REST = 'Canpack 2'
+// Canpack 1 et Canpack 2 retirés de la saison (nov. 2026) : PS-08 supprimé (numéro non réutilisé), Wafasalaf au repos
+export const OFFICIAL_J1_REST = 'Wafasalaf'
 export const OFFICIAL_J1_LABEL = 'Tirage au sort officiel (saisie manuelle)'
 
 /** Identifiant d'équipe 2026-2027 à partir d'un nom du tableau officiel (via la liste officielle et ses alias). */

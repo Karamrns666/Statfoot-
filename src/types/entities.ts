@@ -516,6 +516,8 @@ export interface Settings extends BaseEntity {
   billboard_poster_url?: string
   billboard_poster_alt?: string
   billboard_poster_hidden?: boolean
+  /** rareté des badges corrigée dans l'admin (id du badge → common | rare | epic | legendary) */
+  badge_rarity?: Record<string, 'common' | 'rare' | 'epic' | 'legendary'>
   /** noms des compétitions : gold → MASTER, silver → CHALLENGER (modifiable dans l'admin) */
   competition_names?: { gold?: string; silver?: string; league_phase?: string }
   organizer?: string

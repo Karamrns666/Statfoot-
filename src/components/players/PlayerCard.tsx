@@ -9,8 +9,10 @@ import type { Position, Team } from '@/types/entities'
 import { isBrandLogo, teamLogoSvg } from '@/lib/logos'
 import { cn } from '@/lib/utils'
 import { RankDelta } from '@/components/league/Bits'
-import { BADGE_ICONS } from './BadgeMedal'
-import { TIER_LABEL, TIER_STYLE, type BadgeState } from '@/lib/badges'
+import { BadgeEmblem } from '@/components/badges/BadgeEmblem'
+import { useBadgeMeta, useSortByRarity } from '@/hooks/useBadgeMeta'
+import { RARITY_LABEL } from '@/lib/badgeCatalog'
+import type { BadgeState } from '@/lib/badges'
 import { SENIORITY_STYLE, type SeniorityTier } from '@/lib/seniority'
 import { TierRibbon, TierSurface } from '@/components/cards/TierSurface'
 import { useCardShine } from '@/hooks/useCardShine'
@@ -55,16 +57,13 @@ export interface PlayerCardProps {
 
 const HEX = 'polygon(50% 0, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)'
 
-export const medalTip = (b: BadgeState) => `${b.def.name} · ${TIER_LABEL[b.def.tier]} — ${b.def.description}`
+export const medalTip = (b: BadgeState, rarity?: string) => `${b.def.name}${rarity ? ` · ${rarity}` : ''} — ${b.def.description}`
 function MiniMedal({ b, big }: { b: BadgeState; big?: boolean }) {
-  const t = TIER_STYLE[b.def.tier]
-  const Icon = BADGE_ICONS[b.def.icon]
+  const meta = useBadgeMeta()(b.def.id)
+  const tip = medalTip(b, RARITY_LABEL[meta.rarity])
   return (
-    <span className={cn('relative inline-block shrink-0', big ? 'h-[2.75em] w-[2.55em] drop-shadow-[0_2px_3px_rgb(0_0_0/.35)]' : 'h-[2.15em] w-[2em]')} title={medalTip(b)} aria-label={medalTip(b)} role="img">
-      <span className="absolute inset-0" style={{ clipPath: HEX, background: `linear-gradient(160deg, ${t.light}, ${t.edge} 45%, ${t.dark})` }} />
-      <span className="absolute inset-[1.5px] flex items-center justify-center" style={{ clipPath: HEX, background: `radial-gradient(circle at 35% 25%, ${t.edge}, ${t.deep} 80%)` }}>
-        <Icon className="size-[1em] text-white" />
-      </span>
+    <span className={cn('relative inline-block shrink-0 drop-shadow-[0_2px_3px_rgb(0_0_0/.4)]', big ? 'w-[2.7em]' : 'w-[2.1em]')} title={tip}>
+      <BadgeEmblem fluid simple pictogram={meta.pictogram} rarity={meta.rarity} title={tip} />
     </span>
   )
 }
@@ -139,9 +138,10 @@ function cardLogo(p: PlayerCardProps) {
 }
 
 function CardFront({ p }: { p: PlayerCardProps }) {
+  const sortByRarity = useSortByRarity()
   const tier = p.tier ?? 'silver'
   const st = SENIORITY_STYLE[tier]
-  const medals = (p.medals ?? []).slice(0, 3)
+  const medals = sortByRarity(p.medals ?? []).slice(0, 3)
   const color = p.team?.primary_color ?? '#0B2E73'
   const logo = cardLogo(p)
   const teamLabel = p.team?.name ?? p.teamName ?? ''

@@ -155,14 +155,14 @@ export const BADGES: BadgeDef[] = [
   { id: 'clean_sheets_3', name: '3 Clean Sheets', group: 'Gardien', tier: 'black', icon: 'lock', description: 'Atteindre 3 matchs sans encaisser de but dans la saison', target: 3, keeperOnly: true, progress: cumul((l) => (l.clean_sheet ? 1 : 0)) },
 ]
 
-export interface BadgeState { def: BadgeDef; value: number; unlocked: boolean; unlocked_round?: number; pct: number }
+export interface BadgeState { def: BadgeDef; value: number; unlocked: boolean; unlocked_round?: number; unlocked_match?: Match; pct: number }
 
 export function playerBadges(log: PlayerMatchLine[], opts: { keeper?: boolean } = {}): BadgeState[] {
   return BADGES.filter((b) => !b.keeperOnly || opts.keeper).map((def) => {
     const p = def.progress(log)
     const value = p.at(-1) ?? 0
     const idx = p.findIndex((v) => v >= def.target)
-    return { def, value: Math.min(value, def.target), unlocked: idx >= 0, unlocked_round: idx >= 0 ? log[idx].round : undefined, pct: Math.min(100, Math.round((value / def.target) * 100)) }
+    return { def, value: Math.min(value, def.target), unlocked: idx >= 0, unlocked_round: idx >= 0 ? log[idx].round : undefined, unlocked_match: idx >= 0 ? log[idx].match : undefined, pct: Math.min(100, Math.round((value / def.target) * 100)) }
   })
 }
 /** Matière de la carte = matière du meilleur badge débloqué (null si aucun badge) */

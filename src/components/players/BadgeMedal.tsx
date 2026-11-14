@@ -2,23 +2,16 @@
 import { CircleDot, Crosshair, Crown, Flame, Footprints, Gem, Hand, Link2, Lock, Medal, Shield, Star, Zap } from 'lucide-react'
 import { TIER_COLOR, TIER_LABEL, TIER_STYLE, type BadgeIcon, type BadgeState } from '@/lib/badges'
 import { cn } from '@/lib/utils'
+import { BadgeEmblem } from '@/components/badges/BadgeEmblem'
+import { useBadgeMeta } from '@/hooks/useBadgeMeta'
 
 export const BADGE_ICONS: Record<BadgeIcon, typeof Star> = { ball: CircleDot, boot: Footprints, target: Crosshair, flame: Flame, star: Star, shield: Shield, hand: Hand, crown: Crown, bolt: Zap, medal: Medal, gem: Gem, link: Link2, lock: Lock }
 const HEX = 'polygon(50% 0, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)'
 
 export function BadgeMedal({ b, size = 64 }: { b: BadgeState; size?: number }) {
-  const color = TIER_COLOR[b.def.tier]
-  const st = TIER_STYLE[b.def.tier]
+  const meta = useBadgeMeta()(b.def.id)
   const hidden = b.def.secret && !b.unlocked
-  const Icon = hidden ? Lock : BADGE_ICONS[b.def.icon]
-  return (
-    <div className="relative shrink-0" style={{ width: size, height: size * 1.08 }} aria-hidden>
-      <div className="absolute inset-0" style={{ clipPath: HEX, background: b.unlocked ? `linear-gradient(160deg, ${st.light}, ${st.edge} 45%, ${st.dark})` : 'rgb(169 214 229 / .16)' }} />
-      <div className="absolute inset-[3px] flex items-center justify-center" style={{ clipPath: HEX, background: b.unlocked ? `radial-gradient(circle at 35% 25%, ${st.edge}, ${st.deep} 78%)` : '#071D48' }}>
-        <Icon className={cn(b.unlocked ? 'text-white' : 'text-white/25')} style={{ width: size * 0.42, height: size * 0.42, filter: b.unlocked ? `drop-shadow(0 0 8px ${color})` : undefined }} />
-      </div>
-    </div>
-  )
+  return <BadgeEmblem pictogram={hidden ? 'lock_net' : meta.pictogram} rarity={meta.rarity} level={meta.level} locked={!b.unlocked} size={size} title={hidden ? 'Badge secret' : b.def.name} />
 }
 
 export function BadgeTile({ b }: { b: BadgeState }) {

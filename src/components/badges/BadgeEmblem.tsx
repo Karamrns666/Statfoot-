@@ -147,18 +147,22 @@ export interface BadgeEmblemProps {
   /** nom du badge (texte alternatif) */
   title: string
   className?: string
+  /** occupe toute la largeur de son conteneur (tailles en em sur les cartes) */
+  fluid?: boolean
+  /** force la version simplifiée (mini) */
+  simple?: boolean
 }
 
-export function BadgeEmblem({ pictogram, rarity, level, locked = false, size = 96, title, className }: BadgeEmblemProps) {
+export function BadgeEmblem({ pictogram, rarity, level, locked = false, size = 96, title, className, fluid, simple }: BadgeEmblemProps) {
   const uid = useId().replace(/:/g, '')
-  const mini = size <= 32
+  const mini = simple ?? size <= 32
   const pal = RARITY_PALETTE[locked ? 'locked' : rarity]
   const shape = shapeFor(locked ? 'locked' : rarity, rarity)
   const outer = (props: Record<string, unknown>) => shape.circle ? <circle cx="50" cy="52" r="38" {...props} /> : shape.poly ? <polygon points={shape.poly} {...props} /> : <path d={shape.d} {...props} />
   const k = (n: string) => `${n}-${uid}`
   const showLevel = !!level && !mini
   return (
-    <svg viewBox="-12 -12 124 132" width={size} height={size * (132 / 124)} role="img" aria-label={locked ? `${title} (verrouillé)` : title}
+    <svg viewBox="-12 -12 124 132" width={fluid ? '100%' : size} height={fluid ? undefined : size * (132 / 124)} role="img" aria-label={locked ? `${title} (verrouillé)` : title}
       className={['bdg', `bdg-${locked ? 'locked' : rarity}`, mini ? 'bdg-mini' : '', className ?? ''].join(' ')} style={{ overflow: 'visible' }}>
       <title>{locked ? `${title} — verrouillé` : title}</title>
       <defs>

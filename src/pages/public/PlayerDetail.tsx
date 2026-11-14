@@ -11,29 +11,30 @@ import { useSeason } from '@/hooks/useSeason'
 import { useEffectiveSeason, useRace } from '@/hooks/useStats'
 import { EmptyState, RankDelta, RookieBadge, SectionTitle } from '@/components/league/Bits'
 import { PlayerAvatar, RoleBadge, TeamLogo } from '@/components/league/Identity'
-import { MaterialLegend, XPCard } from '@/components/players/Cards'
+import { XPCard } from '@/components/players/Cards'
 import { SeniorityBadge } from '@/components/league/SeniorityBadge'
 import { CardShareActions } from '@/components/players/CardShare'
-import { BadgeMedal, BadgeTile } from '@/components/players/BadgeMedal'
+import { BadgeMedal } from '@/components/players/BadgeMedal'
+import { BadgeCollection } from '@/components/badges/BadgeCollection'
+import { RARITY_LABEL, badgeMeta } from '@/lib/badgeCatalog'
 import { SortableTable } from '@/components/league/SortableTable'
 import { shotColumns } from '@/components/league/shotColumns'
 import { fmtAccuracy, fmtShots, fmtShotsPerGoal } from '@/lib/shots'
 import { AXIS, ChartBox, GRID, Legend, SERIES, TOOLTIP } from '@/components/charts/theme'
 import { AWARD_LABELS, computePlayerXP, isPlayed, ageAt, type XPLine } from '@/lib/stats'
-import { BADGES, RATING_RULES, TIER_LABEL, challengeResult, challengeTargets, decisiveStreak, nextBadges, playerBadges, playerMatchLog, type BadgeGroup } from '@/lib/badges'
+import { BADGES, RATING_RULES, challengeResult, challengeTargets, decisiveStreak, nextBadges, playerBadges, playerMatchLog } from '@/lib/badges'
 import { fmtDate, ordinal, playerName, playerShort } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
 const slugName = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 
-const GROUPS: BadgeGroup[] = ['Buts', 'Passes', 'Polyvalence', 'Régularité', 'Exploits', 'Défis', 'Gardien']
 const monthLabel = (m: string) => format(new Date(`${m}-01T12:00:00`), 'MMMM yyyy', { locale: fr })
 const pts = (n: number) => `${n > 0 ? '+' : ''}${n}`
 
 export default function PlayerDetail() {
   const rookie = useRookie()
   const { id } = useParams()
-  const { db, league } = useData()
+  const { db, league, settings } = useData()
   const L = useLookup()
   const { scopeSeasonId, seasons, allSeasons, hasHidden } = useSeason()
   const eff = useEffectiveSeason()
@@ -220,7 +221,7 @@ export default function PlayerDetail() {
               <div key={b.def.id} className="glass flex items-center gap-4 rounded-2xl p-4">
                 <BadgeMedal b={b} size={54} />
                 <div className="min-w-0 flex-1">
-                  <div className="font-display text-xl font-extrabold leading-none">{b.def.name} <span className="text-xs font-semibold text-muted-foreground">· {TIER_LABEL[b.def.tier]}</span></div>
+                  <div className="font-display text-xl font-extrabold leading-none">{b.def.name} <span className="text-xs font-semibold text-muted-foreground">· {RARITY_LABEL[badgeMeta(b.def.id, settings.badge_rarity).rarity]}</span></div>
                   <div className="mt-1 text-xs text-muted-foreground">{b.def.description}</div>
                   <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-neon" style={{ width: `${b.pct}%` }} /></div>
                   <div className="mt-1 text-xs"><span className="num text-sm">{b.value} / {b.def.target}</span> · {b.pct} %</div>
@@ -233,21 +234,9 @@ export default function PlayerDetail() {
 
       {/* COLLECTION */}
       <section>
-        <SectionTitle title={`Collection de badges · ${unlocked} / ${badges.length}`} subtitle="La condition de chaque badge est indiquée sous son nom" />
-        <MaterialLegend className="mb-4" />
-        <div className="space-y-6">
-          {GROUPS.map((g) => {
-            const list = badges.filter((b) => b.def.group === g)
-            if (!list.length) return null
-            return (
-              <div key={g}>
-                <h3 className="mb-2 font-display text-lg font-extrabold text-sky-soft">{g}</h3>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6">{list.map((b) => <BadgeTile key={b.def.id} b={b} />)}</div>
-              </div>
-            )
-          })}
-        </div>
-        <p className="mt-3 text-xs text-muted-foreground">{BADGES.length} badges au total, dont {BADGES.filter((b) => b.keeperOnly).length} réservés aux gardiens. {RATING_RULES}</p>
+        <SectionTitle title="Collection de badges" subtitle="Touchez un badge pour voir sa condition exacte, ses paliers et qui l’a obtenu" />
+        <BadgeCollection badges={badges} seasonId={sid} />
+        <p className="mt-3 text-xs text-muted-foreground">{BADGES.length} badges au total, dont {BADGES.filter((b) => b.keeperOnly).length} réservés aux gardiens. {RATING_RULES} Le Match des capitaines ne débloque aucun badge.</p>
       </section>
 
       {/* XP PAR JOURNÉE */}

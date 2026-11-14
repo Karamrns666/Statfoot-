@@ -23,6 +23,7 @@ import type { StandingAdjustment } from '@/types/entities'
 import { cn } from '@/lib/utils'
 
 type Snap = { rank: number; points: number; gf: number; ga: number }
+type Row = Snap & { team_id: string }
 const today = () => new Date().toISOString().slice(0, 10)
 
 export default function StandingsAdjustAdmin() {
@@ -40,13 +41,13 @@ export default function StandingsAdjustAdmin() {
   const active = activeAdjustments(all, comp?.id ?? '')
 
   /** classement de la compétition avec une liste d'ajustements donnée */
-  const rank = useMemo(() => (adjs: StandingAdjustment[]): Snap[] & { team_id: string }[] => {
+  const rank = useMemo(() => (adjs: StandingAdjustment[]): Row[] => {
     if (!comp) return []
     if (isPreseasonComp(comp) && pre) return preseasonRanking(pre.teamIds, pre.pm, { order: pre.state.finished ? pre.cfg.finalOrder : pre.cfg.intermediateOrder, drawOrder: pre.drawOrder, points: pre.cfg.points, adjustments: adjs }) as never
     return competitionStandings({ ...league, adjustments: adjs }, comp.id) as never
   }, [comp, pre, league])
   const auto = rank([]), current = rank(active)
-  const snap = (rows: (Snap & { team_id: string })[], team: string): Snap => { const r = rows.find((x) => x.team_id === team); return { rank: r?.rank ?? 0, points: r?.points ?? 0, gf: r?.gf ?? 0, ga: r?.ga ?? 0 } }
+  const snap = (rows: Row[], team: string): Snap => { const r = rows.find((x) => x.team_id === team); return { rank: r?.rank ?? 0, points: r?.points ?? 0, gf: r?.gf ?? 0, ga: r?.ga ?? 0 } }
 
   const [f, setF] = useState({ team: '', points: '', gf: '', ga: '', forced: '', reason: '', date: today() })
   const num = (s: string) => (s.trim() === '' ? 0 : Number(s))

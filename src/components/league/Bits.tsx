@@ -90,6 +90,8 @@ export function Spinner() {
   return <div className="flex min-h-[40vh] items-center justify-center"><div className="size-10 animate-spin rounded-full border-4 border-neon/20 border-t-neon" /></div>
 }
 
-export function RookieBadge() {
-  return <span className="inline-flex items-center rounded-full bg-sky-400/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-sky-300">Recrue · 1re saison</span>
+export function RookieBadge({ solid }: { solid?: boolean }) {
+  // sur une carte (argent, or, platine) : pastille pleine vert vif, lisible sur toutes les matières
+  if (solid) return <span className="inline-flex items-center rounded-full bg-[#0A8F4A] px-[.75em] py-[.2em] text-[.85em] font-black uppercase tracking-wide text-white shadow-[0_0_0_1.5px_rgb(255_255_255/.85),0_.15em_.4em_rgb(0_0_0/.35)]">Recrue · 1re saison</span>
+  return <span className="inline-flex items-center rounded-full bg-emerald-400/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-300">Recrue · 1re saison</span>
 }

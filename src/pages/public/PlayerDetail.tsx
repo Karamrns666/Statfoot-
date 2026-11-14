@@ -47,7 +47,10 @@ export default function PlayerDetail() {
   const ranking = useRace({ seasonId: sid }, 'xp')
   const scorers = useRace({ seasonId: sid }, 'top_scorer')
   const meIdx = ranking.findIndex((r) => r.item.player_id === id)
+  // joueur inscrit sans stats (aucun match joué) : carte quand même affichée, avec des stats à zéro
+  const zero = useMemo(() => (meIdx < 0 && id ? computePlayerXP(league, { seasonId: sid ?? undefined }).get(id) : undefined), [meIdx, id, league, sid])
   const me = meIdx >= 0 ? ranking[meIdx] : undefined
+  const cardRow = me ?? (zero ? { item: zero, rank: 0, previousRank: null, delta: null } : undefined)
   // historique : y compris les saisons masquées et les fiches des saisons précédentes du même joueur
   // (même personne, ou même nom dans la même entreprise — chaque saison a sa propre fiche joueur)
   const history = useMemo(() => {
@@ -117,10 +120,10 @@ export default function PlayerDetail() {
       {/* EN-TÊTE */}
       <section className="relative overflow-hidden rounded-3xl border border-white/10 p-6 sm:p-8" style={{ background: `radial-gradient(ellipse 60% 100% at 100% 0%, ${t?.primary_color}40, transparent 70%), linear-gradient(180deg,#0D2B66,#04163D)` }}>
         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center">
-          {me ? (
+          {cardRow ? (
             <div className="flex w-56 shrink-0 flex-col items-center gap-3">
-              <XPCard r={me} player={p} team={t} className="w-56" />
-              <CardShareActions card={<XPCard r={me} player={p} team={t} faceOnly />} fileName={`carte-${slugName(`${p.first_name}-${p.last_name}`)}.png`}
+              <XPCard r={cardRow} player={p} team={t} className="w-56" />
+              <CardShareActions card={<XPCard r={cardRow} player={p} team={t} faceOnly />} fileName={`carte-${slugName(`${p.first_name}-${p.last_name}`)}.png`}
                 url={`${location.origin}/joueurs/${p.id}`} text={`Ma carte ${p.first_name} ${p.last_name} · Morocco Business League`} subtitle={[t?.name, season?.name].filter(Boolean).join(' · ')} />
             </div>
           ) : <PlayerAvatar player={p} team={t} size={132} />}

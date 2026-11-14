@@ -58,7 +58,7 @@ export function TeamCard(p: TeamCardProps) {
               className={cn('relative aspect-square w-[78%] object-contain', brand ? 'rounded-[20%] bg-white p-[8%] shadow-[0_.5em_1.2em_rgb(0_0_0/.35)]' : 'drop-shadow-[0_.5em_.8em_rgb(0_0_0/.45)]')}
               style={brand && p.tier === 'platinum' ? { boxShadow: '0 0 0 2px rgb(230 236 245 / .9), 0 0 1.2em rgb(167 139 250 / .55)' } : undefined} />
           </div>
-          <div className="flex min-w-0 flex-col py-[.75em] pr-[.85em]">
+          <div className="flex min-w-0 flex-col py-[.75em] pr-[.85em] text-left">
             <div className="flex justify-end">
               <span className="inline-flex items-center gap-[.35em] rounded-full px-[.7em] py-[.25em] text-[.72em] font-black uppercase tracking-[.16em]"
                 style={{ background: st.badge, color: st.badgeText, boxShadow: p.tier === 'platinum' ? 'inset 0 0 0 1px rgb(230 236 245 / .8), 0 0 .8em rgb(167 139 250 / .5)' : 'inset 0 0 0 1px rgb(0 0 0 / .15)' }}>

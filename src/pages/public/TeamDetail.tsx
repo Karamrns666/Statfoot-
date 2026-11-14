@@ -61,9 +61,9 @@ export default function TeamDetail() {
         <ClubHistory team={team} />
       </TeamBanner>
       <section className="flex flex-col items-center gap-4 sm:flex-row sm:items-end" aria-label="Carte de l'équipe">
-        <div className="w-56 shrink-0"><SeasonTeamCard team={team} faceOnly /></div>
+        <div className="w-full max-w-[22rem] shrink-0"><SeasonTeamCard team={team} faceOnly /></div>
         <div className="w-full max-w-56">
-          <CardShareActions card={<SeasonTeamCard team={team} faceOnly />} fileName={`carte-equipe-${team.short_name.toLowerCase()}.png`} downloadLabel="Télécharger la carte"
+          <CardShareActions cardWidth={940} card={<SeasonTeamCard team={team} faceOnly />} fileName={`carte-equipe-${team.short_name.toLowerCase()}.png`} downloadLabel="Télécharger la carte"
             url={`${location.origin}/equipes/${team.id}`} text={`${team.name} · Morocco Business League`} subtitle={effSeason?.name} />
         </div>
       </section>

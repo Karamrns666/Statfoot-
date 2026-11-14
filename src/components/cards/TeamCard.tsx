@@ -1,10 +1,11 @@
-// Carte équipe : même système de niveau que la carte joueur (Platinum / Gold / Silver selon l'ancienneté du club) —
-// logo en grand, nom, badge de niveau, nombre de saisons MBL, division et 3 stats clés de la saison.
-import { useMemo } from 'react'
+// Carte équipe HORIZONTALE (design propre aux équipes, différent des cartes joueurs) : le niveau Platinum / Gold / Silver
+// se lit à la matière (fond sombre holographique / or / argent brossé) — logo en grand, nom, niveau écrit en toutes
+// lettres, nombre de saisons MBL, division et 3 stats clés de la saison.
+import { useMemo, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import type { Team } from '@/types/entities'
 import { isBrandLogo, teamLogoSvg } from '@/lib/logos'
-import { SENIORITY_STYLE, type SeniorityTier } from '@/lib/seniority'
+import { SENIORITY_LABEL, SENIORITY_STYLE, type SeniorityTier } from '@/lib/seniority'
 import { useData } from '@/hooks/useData'
 import { useSeasonCompetitions } from '@/hooks/useStats'
 import { useTeamSeniority } from '@/hooks/useSeniority'
@@ -13,7 +14,7 @@ import { useCompetitionRanking } from '@/hooks/useRanking'
 import { competitionStandings } from '@/lib/stats'
 import { competitionNames, phaseName } from '@/lib/competitionNames'
 import { cn } from '@/lib/utils'
-import { TierRibbon, TierSurface } from './TierSurface'
+import { TierIcon } from '@/components/league/SeniorityBadge'
 
 export interface TeamCardProps {
   team: Team
@@ -38,41 +39,55 @@ export function TeamCard(p: TeamCardProps) {
   const stats = [
     { label: 'PTS', value: p.points ?? 0, hint: 'Points' },
     { label: 'BUTS', value: p.goals ?? 0, hint: 'Buts marqués' },
-    { label: 'RANG', value: p.rank ? `${p.rank}e` : '–', hint: 'Classement' },
+    { label: 'RANG', value: p.rank ? (p.rank === 1 ? '1er' : `${p.rank}e`) : '–', hint: p.rank ? 'Classement' : 'Classement disponible après les premiers résultats' },
   ]
+  // carte HORIZONTALE propre aux équipes (pas la forme des cartes joueurs) : le niveau se lit à la matière
   const body = (
-    <TierSurface tier={p.tier}>
-      <TierRibbon tier={p.tier} />
-      {/* logo en grand, sur un halo aux couleurs du club */}
-      <div className="relative flex h-[50%] shrink-0 items-end justify-center pb-[2%]">
-        <div className="pointer-events-none absolute inset-0" style={{ background: `radial-gradient(48% 46% at 50% 62%, ${p.team.primary_color ?? '#0B2E73'}55, transparent 72%)` }} aria-hidden />
-        <div className="pointer-events-none absolute left-1/2 top-[18%] -translate-x-1/2 font-display text-[7.5em] font-black leading-none opacity-[.07]" aria-hidden>{p.team.short_name}</div>
-        <img src={logo} alt="" draggable={false}
-          className={cn('relative size-[52%] object-contain', brand ? 'rounded-[22%] bg-white p-[3%] shadow-[0_10px_24px_rgb(0_0_0/.35)]' : 'drop-shadow-[0_10px_16px_rgb(0_0_0/.45)]')}
-          style={brand && p.tier === 'platinum' ? { boxShadow: '0 0 0 2px rgb(230 236 245 / .9), 0 0 22px rgb(167 139 250 / .55), 0 10px 24px rgb(0 0 0 / .45)' } : undefined} />
-      </div>
-      <div className="relative z-10 px-[7%] text-center">
-        <div className="line-clamp-2 pt-[.12em] font-display text-[2em] font-black uppercase leading-[1.02]" style={{ textShadow: st.textShadow }}>{p.team.name}</div>
-        <div className="mt-[.55em] flex flex-wrap items-center justify-center gap-[.4em] text-[.82em] font-extrabold">
-          {p.division && <span className="rounded-full px-[.7em] py-[.25em] uppercase tracking-wider" style={{ background: st.bar, color: st.barText }}>{p.division}</span>}
-          <span style={{ color: st.fgSoft }}>{p.seasons} saison{p.seasons > 1 ? 's' : ''} MBL</span>
+    <div className="relative h-full rounded-[1.1em] p-[.2em]" style={{ background: st.frame, filter: `drop-shadow(0 .7em 1.1em ${st.glow})` }} data-tier={p.tier}>
+      <div className="relative h-full overflow-hidden rounded-[.95em]" style={{ background: st.bg, color: st.fg }}>
+        {st.pattern && <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: st.pattern }} aria-hidden />}
+        <div className={cn('pointer-events-none absolute inset-0', p.tier === 'platinum' && 'pcard-prism')} style={{ background: st.sheen, mixBlendMode: st.sheenBlend as CSSProperties['mixBlendMode'] }} aria-hidden />
+        {st.holo && <div className="pcard-holo pointer-events-none absolute inset-0" style={{ backgroundImage: st.holo }} aria-hidden />}
+        <div className="pointer-events-none absolute inset-[.25em] rounded-[.8em]" style={{ boxShadow: p.tier === 'platinum' ? 'inset 0 0 0 1px rgb(230 236 245 / .45)' : 'inset 0 0 0 1px rgb(255 255 255 / .55)' }} aria-hidden />
+        <div className="pcard-glare pointer-events-none absolute inset-0" aria-hidden />
+        <div className="relative grid h-full grid-cols-[38%_1fr]">
+          {/* logo en grand */}
+          <div className="relative flex items-center justify-center">
+            <div className="pointer-events-none absolute inset-0" style={{ background: `radial-gradient(60% 55% at 50% 50%, ${p.team.primary_color ?? '#0B2E73'}55, transparent 75%)` }} aria-hidden />
+            <img src={logo} alt="" draggable={false}
+              className={cn('relative aspect-square w-[78%] object-contain', brand ? 'rounded-[20%] bg-white p-[8%] shadow-[0_.5em_1.2em_rgb(0_0_0/.35)]' : 'drop-shadow-[0_.5em_.8em_rgb(0_0_0/.45)]')}
+              style={brand && p.tier === 'platinum' ? { boxShadow: '0 0 0 2px rgb(230 236 245 / .9), 0 0 1.2em rgb(167 139 250 / .55)' } : undefined} />
+          </div>
+          <div className="flex min-w-0 flex-col py-[.75em] pr-[.85em]">
+            <div className="flex justify-end">
+              <span className="inline-flex items-center gap-[.35em] rounded-full px-[.7em] py-[.25em] text-[.72em] font-black uppercase tracking-[.16em]"
+                style={{ background: st.badge, color: st.badgeText, boxShadow: p.tier === 'platinum' ? 'inset 0 0 0 1px rgb(230 236 245 / .8), 0 0 .8em rgb(167 139 250 / .5)' : 'inset 0 0 0 1px rgb(0 0 0 / .15)' }}>
+                <TierIcon tier={p.tier} className="size-[1.15em]" />{SENIORITY_LABEL[p.tier]}
+              </span>
+            </div>
+            <div className="mt-[.35em] line-clamp-2 font-display text-[1.6em] font-black uppercase leading-[1.02] [overflow-wrap:break-word]" style={{ textShadow: st.textShadow }}>{p.team.name}</div>
+            <div className="mt-[.3em] flex flex-wrap items-center gap-x-[.5em] gap-y-[.2em] text-[.8em] font-extrabold" style={{ color: st.fgSoft }}>
+              <span>{p.seasons} saison{p.seasons > 1 ? 's' : ''} MBL</span>
+              {p.division && <span className="rounded-full px-[.6em] py-[.15em] uppercase tracking-wider" style={{ background: st.bar, color: st.barText }}>{p.division}</span>}
+            </div>
+            <div className="mt-auto grid grid-cols-3 gap-[.35em] pt-[.5em]">
+              {stats.map((x) => (
+                <div key={x.label} className="rounded-[.55em] py-[.35em] text-center" style={{ background: st.bar, color: st.barText }} title={x.hint}>
+                  <div className="font-display text-[1.35em] font-extrabold leading-none">{x.value}</div>
+                  <div className="mt-[.15em] text-[.62em] font-bold tracking-wider" style={{ color: st.barLabel }}>{x.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
-      <div className="relative mt-auto grid grid-cols-3 divide-x divide-white/15 border-t-[.22em] border-[#F05A22]" style={{ background: st.bar, color: st.barText }}>
-        {stats.map((s) => (
-          <div key={s.label} className="py-[.65em] text-center" title={s.hint}>
-            <div className="font-display text-[1.9em] font-extrabold leading-none">{s.value}</div>
-            <div className="mt-[.15em] text-[.75em] font-bold" style={{ color: st.barLabel }}>{s.label}</div>
-          </div>
-        ))}
-      </div>
-    </TierSurface>
+    </div>
   )
-  const inner = <div className="pcard-inner text-[clamp(8.5px,4.6cqw,40px)]">{body}</div>
-  if (p.faceOnly || !p.href) return <div className={cn('pcard tcard aspect-[63/92] w-full', p.className)} {...(p.faceOnly ? {} : shine)}>{inner}</div>
+  const inner = <div className="h-full text-[clamp(8px,3.6cqw,30px)]">{body}</div>
+  if (p.faceOnly || !p.href) return <div className={cn('tcard aspect-[16/10] w-full [container-type:inline-size]', p.className)} {...(p.faceOnly ? {} : shine)}>{inner}</div>
   return (
-    <Link to={p.href} aria-label={`${p.team.name} — fiche de l'équipe`} className={cn('block w-full rounded-2xl outline-none transition hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neon', p.className)}>
-      <div className="pcard tcard aspect-[63/92] w-full" {...shine}>{inner}</div>
+    <Link to={p.href} aria-label={`${p.team.name} — fiche de l'équipe`} className={cn('block w-full rounded-2xl outline-none transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neon', p.className)}>
+      <div className="tcard aspect-[16/10] w-full [container-type:inline-size]" {...shine}>{inner}</div>
     </Link>
   )
 }

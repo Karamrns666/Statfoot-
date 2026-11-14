@@ -106,7 +106,7 @@ export const TIER_STYLE: Record<BadgeTier, TierStyle> = {
 /** Couleur d'accent (texte, barres de progression) — le black utilise un gris clair pour rester lisible sur fond sombre */
 export const TIER_COLOR: Record<BadgeTier, string> = { bronze: '#D08A4A', argent: '#C9D3DD', or: '#E8B931', platine: '#7FD6DF', black: '#A8A8B4' }
 export type BadgeGroup = 'Buts' | 'Passes' | 'Polyvalence' | 'Régularité' | 'Exploits' | 'Défis' | 'Gardien'
-export type BadgeIcon = 'ball' | 'boot' | 'target' | 'flame' | 'star' | 'shield' | 'hand' | 'crown' | 'bolt' | 'medal' | 'gem' | 'link'
+export type BadgeIcon = 'ball' | 'boot' | 'target' | 'flame' | 'star' | 'shield' | 'hand' | 'crown' | 'bolt' | 'medal' | 'gem' | 'link' | 'lock'
 
 export interface BadgeDef {
   id: string
@@ -151,7 +151,8 @@ export const BADGES: BadgeDef[] = [
   { id: 'hunter', name: 'Chasseur', group: 'Défis', tier: 'or', icon: 'target', description: 'Marquer 3 buts contre une équipe du top 3', target: 3, progress: cumul((l) => (l.opponent_rank != null && l.opponent_rank <= 3 ? l.goals : 0)) },
   { id: 'safe_hands', name: 'Mains sûres', group: 'Gardien', tier: 'argent', icon: 'hand', description: 'Réaliser 25 arrêts', target: 25, keeperOnly: true, progress: cumul((l) => l.saves) },
   { id: 'wall', name: 'Muraille', group: 'Gardien', tier: 'or', icon: 'shield', description: 'Réaliser 75 arrêts', target: 75, keeperOnly: true, progress: cumul((l) => l.saves) },
-  { id: 'clean_sheet', name: 'Cage inviolée', group: 'Gardien', tier: 'platine', icon: 'shield', description: 'Garder sa cage inviolée sur un match complet', target: 1, keeperOnly: true, progress: cumul((l) => (l.clean_sheet ? 1 : 0)) },
+  { id: 'clean_sheet', name: 'Clean Sheet', group: 'Gardien', tier: 'platine', icon: 'shield', description: 'Ne pas encaisser de but sur un match complet (clean sheet)', target: 1, keeperOnly: true, progress: cumul((l) => (l.clean_sheet ? 1 : 0)) },
+  { id: 'clean_sheets_3', name: '3 Clean Sheets', group: 'Gardien', tier: 'black', icon: 'lock', description: 'Atteindre 3 matchs sans encaisser de but dans la saison', target: 3, keeperOnly: true, progress: cumul((l) => (l.clean_sheet ? 1 : 0)) },
 ]
 
 export interface BadgeState { def: BadgeDef; value: number; unlocked: boolean; unlocked_round?: number; pct: number }

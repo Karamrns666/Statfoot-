@@ -47,7 +47,7 @@ export function shareLinks(url: string, text: string) {
   ]
 }
 
-export function CardShareActions({ card, fileName, url, text, subtitle, downloadLabel = 'Télécharger ma carte' }: { card: ReactNode; fileName: string; url: string; text: string; subtitle?: string; downloadLabel?: string }) {
+export function CardShareActions({ card, fileName, url, text, subtitle, downloadLabel = 'Télécharger ma carte', cardWidth = CARD_W }: { card: ReactNode; fileName: string; url: string; text: string; subtitle?: string; downloadLabel?: string; cardWidth?: number }) {
   const ref = useRef<HTMLDivElement>(null)
   const [busy, setBusy] = useState<'dl' | 'share' | null>(null)
   const sim = isSimActive()
@@ -87,7 +87,7 @@ export function CardShareActions({ card, fileName, url, text, subtitle, download
       <div aria-hidden className="pointer-events-none fixed left-[-20000px] top-0" style={{ width: W, height: H }}>
         <div ref={ref} style={{ width: W, height: H }}>
           <VisualFrame accent="#F05A22" subtitle={sim ? `SIMULATION — données fictives${subtitle ? ` · ${subtitle}` : ''}` : subtitle} height={H}>
-            <div style={{ width: CARD_W }}>{card}</div>
+            <div style={{ width: cardWidth }}>{card}</div>
           </VisualFrame>
         </div>
       </div>

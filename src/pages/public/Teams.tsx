@@ -13,7 +13,7 @@ export default function Teams() {
     <div>
       <PageHeader title="Équipes" subtitle={`${teams.length} entreprises engagées · ${season?.name ?? ''}`} />
       <TierLegendCards />
-      <div className="grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3 sm:gap-x-4 lg:grid-cols-4 xl:grid-cols-5">
+      <div className="grid grid-cols-1 gap-4 min-[520px]:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         {teams.map((t) => <SeasonTeamCard key={t.id} team={t} />)}
       </div>
     </div>

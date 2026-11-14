@@ -3,7 +3,7 @@ import { CircleDot, Crosshair, Crown, Flame, Footprints, Gem, Hand, Link2, Lock,
 import { TIER_COLOR, TIER_LABEL, TIER_STYLE, type BadgeIcon, type BadgeState } from '@/lib/badges'
 import { cn } from '@/lib/utils'
 
-export const BADGE_ICONS: Record<BadgeIcon, typeof Star> = { ball: CircleDot, boot: Footprints, target: Crosshair, flame: Flame, star: Star, shield: Shield, hand: Hand, crown: Crown, bolt: Zap, medal: Medal, gem: Gem, link: Link2 }
+export const BADGE_ICONS: Record<BadgeIcon, typeof Star> = { ball: CircleDot, boot: Footprints, target: Crosshair, flame: Flame, star: Star, shield: Shield, hand: Hand, crown: Crown, bolt: Zap, medal: Medal, gem: Gem, link: Link2, lock: Lock }
 const HEX = 'polygon(50% 0, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)'
 
 export function BadgeMedal({ b, size = 64 }: { b: BadgeState; size?: number }) {

@@ -38,7 +38,8 @@
   --color-popover: #071D48;
   --color-popover-foreground: #F3F7FC;
   --color-primary: #F85A00;
-  --color-primary-foreground: #ffffff;
+  /* texte sombre sur l'orange : contraste 5,4:1 (le blanc n'était qu'à 3,3:1) */
+  --color-primary-foreground: #04163D;
   --color-secondary: #11336F;
   --color-secondary-foreground: #F3F7FC;
   --color-muted: #0D2B66;

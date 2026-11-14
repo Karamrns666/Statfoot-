@@ -237,11 +237,13 @@ export function Billboard({ slides: content, leagueName, seasonLabel, logoUrl, p
         <div className="relative z-10 flex flex-wrap items-center gap-3 border-t border-white/10 bg-night-950/60 px-4 py-3 sm:px-6">
           <div className="-my-2 flex items-center gap-0.5">
             <button onClick={() => go(idx - 1)} className="cursor-pointer rounded-md p-2.5 text-white/60 hover:text-white" aria-label="Panneau précédent"><ChevronLeft className="size-4" /></button>
-            <div className="flex items-center gap-1.5" role="tablist" aria-label="Panneaux">
+            <div className="flex items-center" role="tablist" aria-label="Panneaux">
               {slides.map((x, k) => (
                 <button key={x.key} role="tab" aria-selected={k === idx} aria-label={'brand' in x ? 'Logo de la ligue' : x.eyebrow} onClick={() => go(k)}
-                  className={cn('relative h-2 cursor-pointer overflow-visible rounded-full bg-white/15 transition-all before:absolute before:-inset-x-2 before:-inset-y-[18px] before:content-[""]', k === idx ? 'w-10' : 'w-2 hover:bg-white/40')}>
-                  {k === idx && <span key={tk} className="absolute inset-0 origin-left overflow-hidden rounded-full bg-neon" style={{ animation: stopped ? 'none' : `board-progress ${duration}ms linear forwards`, transform: stopped ? 'scaleX(1)' : undefined }} />}
+                  className="group/dot flex h-11 cursor-pointer items-center px-1">
+                  <span className={cn('relative block h-2 overflow-hidden rounded-full bg-white/15 transition-all', k === idx ? 'w-10' : 'w-2 group-hover/dot:bg-white/40')}>
+                    {k === idx && <span key={tk} className="absolute inset-0 origin-left rounded-full bg-neon" style={{ animation: stopped ? 'none' : `board-progress ${duration}ms linear forwards`, transform: stopped ? 'scaleX(1)' : undefined }} />}
+                  </span>
                 </button>
               ))}
             </div>

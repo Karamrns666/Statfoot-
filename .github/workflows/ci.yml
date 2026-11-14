@@ -44,7 +44,12 @@ jobs:
           (npx vite preview --port 4173 --strictPort > /dev/null 2>&1 &) ; sleep 4
           for p in / /classement /joueurs /trophees; do
             n=$(echo "$p" | tr '/' '_'); npx -y lighthouse@12 "http://localhost:4173$p" --quiet --chrome-flags="--headless=new --no-sandbox" --output=json --output-path="lh$n.json" > /dev/null 2>&1
-            node -e "const r=require('./lh$n.json');console.log('LIGHTHOUSE $p', Object.values(r.categories).map(c=>c.title+' '+Math.round(c.score*100)).join(' · '))" >> e2e-report.txt 2>&1
+            node -e "const r=require('./lh$n.json');console.log('LIGHTHOUSE build $p', Object.values(r.categories).map(c=>c.title+' '+Math.round(c.score*100)).join(' · '))" >> e2e-report.txt 2>&1
+          done
+          # et sur le site en ligne (vraies données)
+          for p in / /classement /joueurs; do
+            n=$(echo "$p" | tr '/' '_'); npx -y lighthouse@12 "https://www.ardentia-foot.com$p" --quiet --chrome-flags="--headless=new --no-sandbox" --output=json --output-path="lhprod$n.json" > /dev/null 2>&1
+            node -e "const r=require('./lhprod$n.json');console.log('LIGHTHOUSE prod $p', Object.values(r.categories).map(c=>c.title+' '+Math.round(c.score*100)).join(' · '))" >> e2e-report.txt 2>&1
           done
           tail -60 e2e-report.txt
       - name: Ranger le rapport

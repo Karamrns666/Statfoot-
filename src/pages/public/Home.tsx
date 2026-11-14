@@ -264,7 +264,7 @@ export default function Home() {
             {[0, 1].map((k) => (
               <div key={k} className="flex gap-10" aria-hidden={k === 1}>
                 {db.Team.filter((t) => teamsInSeason.has(t.id)).map((t) => (
-                  <Link key={t.id} to={`/equipes/${t.id}`} className="flex w-24 flex-col items-center gap-2 opacity-80 transition hover:opacity-100">
+                  <Link key={t.id} to={`/equipes/${t.id}`} tabIndex={k === 1 ? -1 : undefined} className="flex w-24 flex-col items-center gap-2 opacity-80 transition hover:opacity-100">
                     <TeamLogo team={t} size={64} />
                     <span className="text-center text-xs font-semibold text-muted-foreground">{t.company}</span>
                   </Link>

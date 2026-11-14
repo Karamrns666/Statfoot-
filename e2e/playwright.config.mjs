@@ -14,7 +14,7 @@ export default defineConfig({
   reporter: [['list'], ['json', { outputFile: '../test-results/e2e.json' }]],
   expect: { toHaveScreenshot: { maxDiffPixelRatio: 0.02, animations: 'disabled', caret: 'hide' } },
   use: { baseURL: 'http://localhost:4173', locale: 'fr-FR', timezoneId: 'Africa/Casablanca', reducedMotion: 'reduce' },
-  webServer: { command: 'npx vite preview --port 4173 --strictPort', url: 'http://localhost:4173', reuseExistingServer: true, timeout: 60_000 },
+  webServer: { command: 'npx vite preview --port 4173 --strictPort', cwd: '..', url: 'http://localhost:4173', reuseExistingServer: true, timeout: 60_000 },
   projects: [
     { name: 'chromium-mobile', use: { ...devices['Pixel 7'] } },
     { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },

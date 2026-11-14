@@ -559,7 +559,33 @@ export interface AdminUser extends BaseEntity {
   must_change_password?: boolean
 }
 
+/** Ajustement manuel de classement (super-admin) : couche séparée, réversible, qui ne modifie jamais le calcul automatique */
+export interface StandingAdjustment extends BaseEntity {
+  competition_id: string
+  team_id: string
+  /** points ajoutés (+) ou retirés (−) */
+  points?: number
+  /** buts pour / contre ajoutés ou retirés */
+  gf?: number
+  ga?: number
+  /** ordre imposé parmi les équipes à égalité de points (1 = devant) */
+  forced_order?: number
+  /** motif obligatoire, affiché au public */
+  reason: string
+  /** date de la décision Ardentia (AAAA-MM-JJ) */
+  decision_date: string
+  /** false = annulé (« Réinitialiser au calcul automatique ») — l'historique reste */
+  active: boolean
+  created_by?: string
+  cancelled_at?: string
+  cancelled_by?: string
+  /** rang / points de l'équipe avant et après l'ajustement (journal) */
+  before?: { rank: number; points: number; gf: number; ga: number }
+  after?: { rank: number; points: number; gf: number; ga: number }
+}
+
 export interface EntityMap {
+  StandingAdjustment: StandingAdjustment
   DisciplineCase: DisciplineCase
   ProcesVerbal: ProcesVerbal
   CaptainTeam: CaptainTeam
@@ -594,5 +620,5 @@ export interface EntityMap {
 export type EntityName = keyof EntityMap
 export const ENTITY_NAMES: EntityName[] = [
   'Season', 'Competition', 'Division', 'Group', 'Venue', 'Team', 'Player', 'Match', 'MatchEvent', 'Lineup', 'LiveState',
-  'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser', 'Rulebook', 'Club', 'CaptainTeam', 'CaptainMatch', 'DisciplineCase', 'ProcesVerbal',
+  'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser', 'Rulebook', 'Club', 'CaptainTeam', 'CaptainMatch', 'DisciplineCase', 'ProcesVerbal', 'StandingAdjustment',
 ]

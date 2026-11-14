@@ -2,6 +2,7 @@
 //  StatFoot — FAÇADE UNIQUE des calculs (site public, admin, Match Center, mode TV).
 //  Classements : ./standings  ·  XP & trophées : ./xp  ·  Match en direct : ./matchEngine
 // ============================================================================
+import type { StandingAdjustment } from '@/types/entities'
 import type { AwardCategory, Competition, Division, Group, Match, MatchEvent, MatchTeamStats, Position } from '@/types/entities'
 import { REGLEMENT } from './reglement'
 import { addShots, emptyShots, teamMatchShots, type ShotTotals } from './shots'
@@ -12,7 +13,7 @@ export * from './standings'
 export * from './xp'
 export * from './shots'
 
-export interface LeagueData extends XPData { divisions?: Division[]; groups?: Group[]; /** stats d'équipe saisies sur la feuille de match */ teamStats?: MatchTeamStats[] }
+export interface LeagueData extends XPData { divisions?: Division[]; groups?: Group[]; /** stats d'équipe saisies sur la feuille de match */ teamStats?: MatchTeamStats[]; /** ajustements manuels de classement (super-admin) */ adjustments?: StandingAdjustment[] }
 
 // ---------------------------------------------------------------------------
 //  Classement général de la saison (Gold devant Silver), et classement par périmètre

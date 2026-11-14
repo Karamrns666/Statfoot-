@@ -150,7 +150,7 @@ function ActionCard({ v, seasonName }: { v: PreseasonView; seasonName: string })
   }
   const generate = async () => {
     try {
-      const plan = generateNextRound(v.teamIds, v.pm, v.rests, v.cfg, v.drawOrder)
+      const plan = generateNextRound(v.teamIds, v.pm, v.rests, v.cfg, v.drawOrder, v.adjustments)
       await save(v.comp, { pending: { round: plan.round, rest: plan.rest, pairs: plan.pairs.map((p) => ({ home: p.home, away: p.away, reason: p.reason ?? '' })) } })
       base44.logActivity('preseason_generate', 'Competition', { id: v.comp.id, name: v.comp.name } as never, { journee: v.shortLabel(plan.round), repos: plan.rest ? name(plan.rest) : '—' })
       toast.success(`${v.roundLabel(plan.round)} générée — vérifiez l’aperçu puis publiez`)

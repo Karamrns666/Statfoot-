@@ -1,5 +1,6 @@
 // Classements, forme, confrontations — fonctions pures.
-import type { Competition, Match, MatchEvent, MatchStage, Settings } from '@/types/entities'
+import { activeAdjustments, applyAdjustments, applyForcedOrder } from './adjustments'
+import type { Competition, Match, MatchEvent, MatchStage, Settings, StandingAdjustment } from '@/types/entities'
 import { REGLEMENT, isDisputed, rankTable, type TiebreakReason } from './reglement'
 
 export const KNOCKOUT_STAGES: MatchStage[] = ['round_of_16', 'quarter', 'semi', 'third_place', 'final']
@@ -45,6 +46,8 @@ export interface StandingRow {
   gf: number; ga: number; gd: number; points: number; yellow: number; red: number; form: Result[]
   /** pourquoi l'équipe est derrière celle du dessus à égalité de points (Art. 17.3) */
   tiebreak?: TiebreakReason
+  /** ajustements manuels actifs appliqués à cette équipe (icône + infobulle publiques) */
+  adjustments?: StandingAdjustment[]
 }
 const emptyRow = (team_id: string): StandingRow => ({ team_id, rank: 0, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, gd: 0, points: 0, yellow: 0, red: 0, form: [] })
 
@@ -78,10 +81,11 @@ export function computeTable(matches: Match[], teamIds: string[], settings?: Par
 }
 
 /** Classement trié selon l'Art. 17.3 (rang + raison du départage). */
-export function computeStandings(matches: Match[], teamIds: string[], _settings?: Partial<Settings> | null, events: MatchEvent[] = [], order?: (a: string, b: string) => number, drawOrder: string[] = []): StandingRow[] {
+export function computeStandings(matches: Match[], teamIds: string[], _settings?: Partial<Settings> | null, events: MatchEvent[] = [], order?: (a: string, b: string) => number, drawOrder: string[] = [], adjustments: StandingAdjustment[] = []): StandingRow[] {
   void _settings
   const table = computeTable(matches, teamIds, null, events)
-  const rows = [...table.values()].map(({ results: _r, ...row }) => { void _r; return row as StandingRow })
+  // ajustements manuels (couche séparée) : appliqués sur une copie, le calcul automatique reste intact
+  const rows = applyAdjustments([...table.values()].map(({ results: _r, ...row }) => { void _r; return row as StandingRow }), adjustments)
   const played = matches.filter(isPlayed)
   const mini = (ids: string[]) => {
     const set = new Set(ids)
@@ -90,18 +94,26 @@ export function computeStandings(matches: Match[], teamIds: string[], _settings?
   // ordre provisoire en cas d'égalité parfaite sans tirage : `order` (nom d'équipe) sinon identifiant
   const sorted = [...rows].sort((a, b) => (order ? order(a.team_id, b.team_id) : a.team_id.localeCompare(b.team_id)))
   const names = new Map(sorted.map((r, i) => [r.team_id, String(i).padStart(4, '0')]))
-  return rankTable(rows, mini, drawOrder, (id) => names.get(id) ?? id).map(({ row, reason }, i) => ({ ...row, rank: i + 1, tiebreak: reason }))
+  const ranked = rankTable(rows, mini, drawOrder, (id) => names.get(id) ?? id).map(({ row, reason }) => ({ ...row, tiebreak: reason }))
+  // à égalité de points avec un ordre imposé, la raison du départage automatique ne s'applique plus
+  const forcedPts = new Set(adjustments.filter((a) => a.forced_order != null).map((a) => ranked.find((r) => r.team_id === a.team_id)?.points))
+  return applyForcedOrder(ranked, adjustments).map((r, i) => {
+    const mine = adjustments.filter((a) => a.team_id === r.team_id)
+    return { ...r, rank: i + 1, tiebreak: forcedPts.has(r.points) ? undefined : r.tiebreak, ...(mine.length ? { adjustments: mine } : {}) }
+  })
 }
 
-export interface StandingsInput { competitions: Competition[]; matches: Match[]; events: MatchEvent[]; settings: Partial<Settings>; teams: { id: string; name: string }[] }
+export interface StandingsInput { competitions: Competition[]; matches: Match[]; events: MatchEvent[]; settings: Partial<Settings>; teams: { id: string; name: string }[]; /** ajustements manuels du super-admin */ adjustments?: StandingAdjustment[] }
 
 /** Classement d'une compétition (hors phase finale). `beforeRound` : classement avant une journée donnée. */
-export function competitionStandings(data: StandingsInput, competitionId: string, opts: { beforeRound?: number; teamIds?: string[] } = {}): StandingRow[] {
+export function competitionStandings(data: StandingsInput, competitionId: string, opts: { beforeRound?: number; teamIds?: string[]; /** false = calcul automatique seul */ adjusted?: boolean } = {}): StandingRow[] {
   const comp = data.competitions.find((c) => c.id === competitionId)
   const teamIds = opts.teamIds ?? comp?.team_ids ?? []
   const ms = data.matches.filter((m) => m.competition_id === competitionId && !isKnockout(m) && (opts.beforeRound == null || (m.round ?? 0) < opts.beforeRound))
   const name = new Map(data.teams.map((t) => [t.id, t.name]))
-  return computeStandings(ms, teamIds, data.settings, data.events, (a, b) => (name.get(a) ?? a).localeCompare(name.get(b) ?? b), comp?.draw_order)
+  // les ajustements valent pour le classement courant (pas pour un classement « avant la journée N »)
+  const adj = opts.adjusted === false || opts.beforeRound != null ? [] : activeAdjustments(data.adjustments, competitionId)
+  return computeStandings(ms, teamIds, data.settings, data.events, (a, b) => (name.get(a) ?? a).localeCompare(name.get(b) ?? b), comp?.draw_order, adj)
 }
 
 export function teamForm(matches: Match[], teamId: string, n = 5): Result[] {

@@ -11,7 +11,7 @@ export function leagueFromDb(db: DBLike, settings: Settings): LeagueData {
   return {
     seasons: db.Season, competitions: db.Competition, divisions: db.Division, groups: db.Group, teams: db.Team,
     players: db.Player, matches: db.Match, events: db.MatchEvent, lineups: db.Lineup, xpRules: db.XPRule,
-    suspensions: db.Suspension, monthlyAwards: db.MonthlyAward, settings, teamStats: db.MatchTeamStats,
+    suspensions: db.Suspension, monthlyAwards: db.MonthlyAward, settings, teamStats: db.MatchTeamStats, adjustments: db.StandingAdjustment ?? [],
   }
 }
 export function disciplineFromDb(db: Pick<DBLike, 'Match' | 'MatchEvent' | 'Lineup' | 'Player' | 'Suspension'>): DisciplineData {

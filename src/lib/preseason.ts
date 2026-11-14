@@ -11,6 +11,8 @@
 //     que le classement final (après le rattrapage) — exactement comme le fichier de référence.
 //   Le départage des championnats (MASTER / CHALLENGER) est celui du règlement (Art. 17.3 : `rankTable`).
 // ============================================================================
+import { applyAdjustments, applyForcedOrder } from './adjustments'
+import type { StandingAdjustment } from '@/types/entities'
 import { seededRng } from './draw'
 
 export type PreseasonCriterion = 'points' | 'diff' | 'gf' | 'force' | 'draw'
@@ -76,12 +78,14 @@ export function round1FromOrder(order: string[]) {
 export interface PreseasonRow {
   team_id: string; rank: number; played: number; won: number; drawn: number; lost: number
   gf: number; ga: number; diff: number; points: number; force: number; opponents: string[]
+  /** ajustements manuels actifs (icône + infobulle publiques) */
+  adjustments?: StandingAdjustment[]
 }
 /**
  * Départage SPÉCIFIQUE à la pré-saison (pas de confrontation directe, pas de cartons).
  * `drawOrder` : ordre du tirage au sort Ardentia (critère 5) — par défaut l'ordre du tirage de la J1.
  */
-export function preseasonRanking(teamIds: string[], matches: PMatch[], opts: { order?: PreseasonCriterion[]; drawOrder?: string[]; points?: PreseasonConfig['points'] } = {}): PreseasonRow[] {
+export function preseasonRanking(teamIds: string[], matches: PMatch[], opts: { order?: PreseasonCriterion[]; drawOrder?: string[]; points?: PreseasonConfig['points']; /** ajustements manuels actifs de cette pré-saison */ adjustments?: StandingAdjustment[] } = {}): PreseasonRow[] {
   const pts = opts.points ?? PRESEASON_DEFAULTS.points
   const order = opts.order ?? PRESEASON_DEFAULTS.finalOrder
   const rows = new Map<string, PreseasonRow>(teamIds.map((id) => [id, { team_id: id, rank: 0, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, diff: 0, points: 0, force: 0, opponents: [] }]))
@@ -93,14 +97,16 @@ export function preseasonRanking(teamIds: string[], matches: PMatch[], opts: { o
       if (f > a) { r.won++; r.points += pts.win } else if (f === a) { r.drawn++; r.points += pts.draw } else { r.lost++; r.points += pts.loss }
     }
   }
+  const adj = opts.adjustments ?? []
+  if (adj.length) for (const r of applyAdjustments([...rows.values()], adj, 'diff')) rows.set(r.team_id, r)
   for (const r of rows.values()) { r.diff = r.gf - r.ga; r.force = r.opponents.reduce((s, o) => s + (rows.get(o)?.points ?? 0), 0) }
   const drawRank = new Map((opts.drawOrder ?? []).map((id, i) => [id, i]))
   const value = (r: PreseasonRow, c: PreseasonCriterion) => (c === 'points' ? -r.points : c === 'diff' ? -r.diff : c === 'gf' ? -r.gf : c === 'force' ? -r.force : drawRank.get(r.team_id) ?? 1e6)
-  const list = [...rows.values()].sort((a, b) => {
+  const list = applyForcedOrder([...rows.values()].sort((a, b) => {
     for (const c of order) { const d = value(a, c) - value(b, c); if (d) return d }
     return a.team_id.localeCompare(b.team_id)
-  })
-  list.forEach((r, i) => { r.rank = i + 1 })
+  }), adj)
+  list.forEach((r, i) => { r.rank = i + 1; const mine = adj.filter((a) => a.team_id === r.team_id); if (mine.length) r.adjustments = mine })
   return list
 }
 
@@ -178,7 +184,7 @@ export interface PreseasonState {
   finished: boolean
   ranking: PreseasonRow[]
 }
-export function preseasonState(teamIds: string[], matches: PMatch[], rests: Record<number, string | undefined>, cfg: PreseasonConfig, drawOrder: string[]): PreseasonState {
+export function preseasonState(teamIds: string[], matches: PMatch[], rests: Record<number, string | undefined>, cfg: PreseasonConfig, drawOrder: string[], adjustments: StandingAdjustment[] = []): PreseasonState {
   const format = preseasonFormat(teamIds.length, cfg.rounds)
   const total = cfg.rounds + (format.catchup ? 1 : 0)
   const byRound = (r: number) => matches.filter((m) => m.round === r)
@@ -187,17 +193,17 @@ export function preseasonState(teamIds: string[], matches: PMatch[], rests: Reco
   let nextRound: number | null = null
   for (let r = 1; r <= total; r++) if (!byRound(r).length) { nextRound = r; break }
   const finished = nextRound === null && completedRounds.length === total
-  const ranking = preseasonRanking(teamIds, matches, { order: finished ? cfg.finalOrder : cfg.intermediateOrder, drawOrder, points: cfg.points })
+  const ranking = preseasonRanking(teamIds, matches, { order: finished ? cfg.finalOrder : cfg.intermediateOrder, drawOrder, points: cfg.points, adjustments })
   return { format, rests, completedRounds, nextRound, finished, ranking }
 }
 
 /** Génère la journée suivante (J1 exclue : tirage). Exige que toutes les journées précédentes soient jouées. */
-export function generateNextRound(teamIds: string[], matches: PMatch[], rests: Record<number, string | undefined>, cfg: PreseasonConfig, drawOrder: string[]): RoundPlan {
-  const st = preseasonState(teamIds, matches, rests, cfg, drawOrder)
+export function generateNextRound(teamIds: string[], matches: PMatch[], rests: Record<number, string | undefined>, cfg: PreseasonConfig, drawOrder: string[], adjustments: StandingAdjustment[] = []): RoundPlan {
+  const st = preseasonState(teamIds, matches, rests, cfg, drawOrder, adjustments)
   if (st.nextRound == null) throw new Error('Toutes les journées sont déjà générées.')
   if (st.nextRound === 1) throw new Error('La journée 1 se fait par tirage au sort.')
   for (let r = 1; r < st.nextRound; r++) if (!st.completedRounds.includes(r)) throw new Error(`Tous les résultats de la journée ${r} doivent être validés avant de générer la suivante.`)
-  const ranked = preseasonRanking(teamIds, matches, { order: cfg.intermediateOrder, drawOrder, points: cfg.points })
+  const ranked = preseasonRanking(teamIds, matches, { order: cfg.intermediateOrder, drawOrder, points: cfg.points, adjustments })
   const rested = Object.values(rests).filter(Boolean) as string[]
   return st.nextRound > cfg.rounds ? pairCatchup(st.nextRound, ranked, rested, matches) : pairRound(st.nextRound, ranked, rested, matches)
 }

@@ -1,6 +1,6 @@
 // Classement de la pré-saison (admin + site) : Rang, Équipe, J, V, N, D, Buts +, Buts −, Diff., Points,
 // Force des adversaires, Division (zone MASTER / CHALLENGER, provisoire tant que la pré-saison n'est pas close).
-import { InfoTip } from '@/components/league/InfoTip'
+import { AdjustmentMark, InfoTip } from '@/components/league/InfoTip'
 import { Link } from 'react-router-dom'
 import { useLookup } from '@/hooks/useData'
 import { TeamLogo } from '@/components/league/Identity'
@@ -51,7 +51,7 @@ export function PreseasonTable({ rows, masterSize, final = false, compact = fals
             return (
               <tr key={r.team_id} className={cn('border-t border-white/5', cut && 'border-b-[3px] border-b-white/70', highlight === r.team_id && 'outline outline-2 -outline-offset-2 outline-neon')} style={{ background: anyPlayed || final ? DIVISION_STYLE[div].bg : undefined }}>
                 <td className={cn(td, 'relative text-base font-black')}><span className="absolute inset-y-1 left-0 w-1 rounded-full" style={{ background: anyPlayed || final ? DIVISION_STYLE[div].color : 'transparent' }} />{r.rank}</td>
-                <td className="px-1.5 py-1.5"><Link to={`/equipes/${r.team_id}`} className="flex min-w-0 items-center gap-2 font-semibold hover:text-neon"><TeamLogo team={t} size={26} /><span className="leading-tight [overflow-wrap:break-word]">{t?.name ?? r.team_id}</span></Link></td>
+                <td className="px-1.5 py-1.5"><Link to={`/equipes/${r.team_id}`} className="flex min-w-0 items-center gap-2 font-semibold hover:text-neon"><TeamLogo team={t} size={26} /><span className="leading-tight [overflow-wrap:break-word]">{t?.name ?? r.team_id}</span><AdjustmentMark list={r.adjustments} /></Link></td>
                 <td className={td}>{r.played}</td><td className={td}>{r.won}</td><td className={td}>{r.drawn}</td><td className={td}>{r.lost}</td>
                 {!compact && <><td className={td}>{r.gf}</td><td className={td}>{r.ga}</td></>}
                 <td className={cn(td, r.diff > 0 ? 'text-win' : r.diff < 0 ? 'text-red-300' : '')}>{r.diff > 0 ? `+${r.diff}` : r.diff}</td>

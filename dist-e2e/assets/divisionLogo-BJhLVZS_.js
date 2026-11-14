@@ -1,0 +1,1 @@
+function e(e){if(e)return e.logo_url?e.logo_url:e.phase===`gold`?`/brand/logo-master.png`:e.phase===`silver`?`/brand/logo-challenger.png`:void 0}export{e as t};

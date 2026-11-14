@@ -30,12 +30,12 @@ export function InfoTip({ id, className, label }: { id: GlossaryId; className?: 
     <>
       <button ref={btn} type="button" data-tip={tipId} aria-label={`${label ?? g.term} : définition`} aria-expanded={open} aria-describedby={open ? tipId : undefined}
         onClick={(e) => { stop(e); show() }} onMouseEnter={show} onMouseLeave={(e) => { if (!(e.relatedTarget as Element)?.closest?.(`[data-tip="${tipId}"]`)) setOpen(false) }} onFocus={show} onBlur={() => setOpen(false)}
-        className={cn('relative inline-flex size-[1.1em] min-h-0 shrink-0 cursor-help items-center justify-center rounded-full border border-current align-middle text-[.75em] font-black italic leading-none opacity-70 transition hover:opacity-100 before:absolute before:-inset-3 before:content-[""]', className)}>
+        className={cn('relative inline-flex size-[max(1.1em,14px)] min-h-0 shrink-0 cursor-help items-center justify-center rounded-full border border-current align-middle text-[.75em] font-black italic leading-none opacity-70 transition hover:opacity-100 before:absolute before:-inset-[14px] before:content-[""]', className)}>
         i
       </button>
       {open && createPortal(
         <div id={tipId} role="tooltip" data-tip={tipId} onMouseLeave={() => setOpen(false)}
-          className="fixed z-[100] w-[min(18rem,calc(100vw-1.5rem))] -translate-x-1/2 rounded-xl border border-white/15 bg-night-950/95 p-3 text-left text-[13px] font-normal normal-case leading-snug tracking-normal text-white shadow-2xl backdrop-blur"
+          className="fixed z-[100] w-[min(18rem,calc(100vw-1.5rem))] rounded-xl border border-white/15 bg-night-950/95 p-3 text-left text-[13px] font-normal normal-case leading-snug tracking-normal text-white shadow-2xl backdrop-blur"
           style={{ left: pos.x, top: pos.y, transform: `translate(-50%, ${pos.up ? '-100%' : '0'})` }}>
           <div className="font-bold text-neon">{g.term}</div>
           <p className="mt-1 text-white/85">{g.short}</p>

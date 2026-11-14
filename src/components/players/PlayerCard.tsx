@@ -146,7 +146,7 @@ function cardLogo(p: PlayerCardProps) {
 function TrimmedLogo({ src, alt }: { src: string; alt: string }) {
   const t = useTrimmedImage(src)
   const [ratio, setRatio] = useState(1)
-  const AREA = 14, MAX_H = 2.9, MAX_W = 9.5 // en em
+  const AREA = 15, MAX_H = 2.9, MAX_W = 10.4 // en em
   let h = Math.min(MAX_H, Math.sqrt(AREA / ratio)), w = h * ratio
   if (w > MAX_W) { w = MAX_W; h = w / ratio }
   return <img src={t} alt={alt} draggable={false} onLoad={(e) => { const i = e.currentTarget; if (i.naturalWidth && i.naturalHeight) setRatio(i.naturalWidth / i.naturalHeight) }}

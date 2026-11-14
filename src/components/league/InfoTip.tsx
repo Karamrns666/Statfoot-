@@ -29,7 +29,7 @@ export function InfoTip({ id, className, label }: { id: GlossaryId; className?: 
   return (
     <>
       <button ref={btn} type="button" data-tip={tipId} aria-label={`${label ?? g.term} : définition`} aria-expanded={open} aria-describedby={open ? tipId : undefined}
-        onClick={(e) => { stop(e); if (open) setOpen(false); else show() }} onMouseEnter={show} onMouseLeave={(e) => { if (!(e.relatedTarget as Element)?.closest?.(`[data-tip="${tipId}"]`)) setOpen(false) }} onFocus={show} onBlur={() => setOpen(false)}
+        onClick={(e) => { stop(e); show() }} onMouseEnter={show} onMouseLeave={(e) => { if (!(e.relatedTarget as Element)?.closest?.(`[data-tip="${tipId}"]`)) setOpen(false) }} onFocus={show} onBlur={() => setOpen(false)}
         className={cn('relative inline-flex size-[1.1em] min-h-0 shrink-0 cursor-help items-center justify-center rounded-full border border-current align-middle text-[.75em] font-black italic leading-none opacity-70 transition hover:opacity-100 before:absolute before:-inset-3 before:content-[""]', className)}>
         i
       </button>

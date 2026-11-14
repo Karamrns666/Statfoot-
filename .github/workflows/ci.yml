@@ -31,10 +31,27 @@ jobs:
           npx vite build --mode e2e --outDir dist-e2e > /dev/null 2>&1 || true
           cat ci-report.txt
           if grep -q "exit=[1-9]" ci-report.txt; then echo "failed=1" >> "$GITHUB_OUTPUT"; fi
+      - name: Tests de bout en bout (Chromium, Firefox, WebKit) + Lighthouse
+        # informatif : ne bloque pas le déploiement ; résultats dans e2e-report.txt et test-results/
+        continue-on-error: true
+        run: |
+          set +e
+          npm i --no-save @playwright/test@1.63.0 > /dev/null 2>&1
+          npx playwright install --with-deps chromium firefox webkit > /dev/null 2>&1
+          npx playwright test -c e2e/playwright.config.mjs --update-snapshots=missing > e2e-report.txt 2>&1
+          echo "exit=$?" >> e2e-report.txt
+          # Lighthouse (téléphone simulé) sur le build servi localement
+          (npx vite preview --port 4173 --strictPort > /dev/null 2>&1 &) ; sleep 4
+          for p in / /classement /joueurs /trophees; do
+            n=$(echo "$p" | tr '/' '_'); npx -y lighthouse@12 "http://localhost:4173$p" --quiet --chrome-flags="--headless=new --no-sandbox" --output=json --output-path="lh$n.json" > /dev/null 2>&1
+            node -e "const r=require('./lh$n.json');console.log('LIGHTHOUSE $p', Object.values(r.categories).map(c=>c.title+' '+Math.round(c.score*100)).join(' · '))" >> e2e-report.txt 2>&1
+          done
+          tail -60 e2e-report.txt
       - name: Ranger le rapport
         if: always()
         run: |
           mkdir -p /tmp/out && cp ci-report.txt /tmp/out/ && { [ -d dist ] && cp -r dist /tmp/out/ || true; } && { [ -d dist-e2e ] && cp -r dist-e2e /tmp/out/ || true; }
+          cp e2e-report.txt /tmp/out/ 2>/dev/null; cp -r test-results /tmp/out/ 2>/dev/null; cp -r e2e/__screenshots__ /tmp/out/screenshots 2>/dev/null; cp lh*.json /tmp/out/ 2>/dev/null; true
           cd /tmp/out && git init -q && git config user.name ci && git config user.email ci@users.noreply.github.com
           git add -A && git commit -qm "CI ${GITHUB_SHA}"
           git push -qf "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/ci/${GITHUB_REF_NAME}"

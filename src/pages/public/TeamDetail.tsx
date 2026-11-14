@@ -15,6 +15,7 @@ import { CompetitionBadge, EmptyState, FormPills, SectionTitle, StatTile } from 
 import { PlayerAvatar, RoleBadge } from '@/components/league/Identity'
 import { TeamBanner } from '@/components/league/TeamBanner'
 import { SeasonTeamCard } from '@/components/cards/TeamCard'
+import { RANK_PENDING, rankLabel, useCompetitionRanking } from '@/hooks/useRanking'
 import { CardShareActions } from '@/components/players/CardShare'
 import { MatchCard } from '@/components/match/MatchCard'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -22,7 +23,7 @@ import { SortableTable } from '@/components/league/SortableTable'
 import { shotColumns } from '@/components/league/shotColumns'
 import type { Player } from '@/types/entities'
 import { AXIS, ChartBox, GRID, Legend, SERIES, TOOLTIP } from '@/components/charts/theme'
-import { competitionStandings, teamForm } from '@/lib/stats'
+import { teamForm } from '@/lib/stats'
 import { playerName } from '@/lib/format'
 import { fmtAccuracy, fmtShots, fmtShotsPerGoal } from '@/lib/shots'
 
@@ -31,7 +32,7 @@ const POS_ORDER: Record<string, number> = { GK: 0, FIELD: 1 }
 
 export default function TeamDetail() {
   const { id } = useParams()
-  const { db, league } = useData()
+  const { db } = useData()
   const L = useLookup()
   const { scopeSeasonId, seasons, hasHidden } = useSeason()
   const comps = useSeasonCompetitions()
@@ -49,13 +50,12 @@ export default function TeamDetail() {
   const matches = db.Match.filter((m) => (m.home_team_id === id || m.away_team_id === id) && (!scopeSeasonId || m.season_id === scopeSeasonId)).sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''))
   if (!team) return <EmptyState title="Équipe introuvable" />
   const cup = comps.find((c) => (c.phase === 'gold' || c.phase === 'silver') && c.team_ids?.includes(team.id)) ?? comps.find((c) => c.team_ids?.includes(team.id))
-  const row = cup ? competitionStandings(league, cup.id).find((r) => r.team_id === team.id) : undefined
   const timeline = ts?.timeline ?? []
   return (
     <div className="space-y-8">
       <TeamBanner team={team}>
         <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-white/85">
-          {team.company_logo_url && <img src={team.company_logo_url} alt={team.company ?? ''} className={team.company_logo_url.startsWith('/logos/') ? 'h-9 w-auto rounded-lg bg-white' : 'size-6 rounded'} />}<span>{team.company}</span><SeniorityBadge teamId={team.id} size="md" showSeasons /><CompetitionBadge competition={cup} />{row && <span className="font-semibold">{row.rank}e · {row.points} pts</span>}
+          {team.company_logo_url && <img src={team.company_logo_url} alt={team.company ?? ''} className={team.company_logo_url.startsWith('/logos/') ? 'h-9 w-auto rounded-lg bg-white' : 'size-6 rounded'} />}<span>{team.company}</span><SeniorityBadge teamId={team.id} size="md" showSeasons /><CompetitionBadge competition={cup} /><TeamRank teamId={team.id} competitionId={cup?.id} />
         </div>
         <div className="mt-3"><FormPills form={teamForm(matches, team.id)} size="md" /></div>
         <ClubHistory team={team} />
@@ -126,4 +126,11 @@ export default function TeamDetail() {
       <SectionTitle title="" className="hidden" />
     </div>
   )
+}
+
+/** Rang de l'équipe : même calcul que la page Classement ; « – » avant les premiers résultats */
+function TeamRank({ teamId, competitionId }: { teamId: string; competitionId?: string }) {
+  const r = useCompetitionRanking(competitionId)
+  if (!competitionId) return null
+  return r.started ? <span className="font-semibold">{rankLabel(r.byTeam.get(teamId), true)}</span> : <span className="text-white/70">Rang – · {RANK_PENDING}</span>
 }

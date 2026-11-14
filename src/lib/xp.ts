@@ -466,4 +466,10 @@ export function raceWithEvolution(data: XPData, scope: XPScope, key: RaceKey): R
   return cur.map((r) => { const p = pr.get(r.item.player_id) ?? null; return { ...r, previousRank: p, delta: p == null ? null : p - r.rank } })
 }
 
-export const isRookie = (p: Pick<Player, 'season_ids' | 'rookie'>) => p.rookie ?? (p.season_ids?.length ?? 0) <= 1
+/**
+ * Recrue = joueur RÉELLEMENT nouveau dans la MBL : coché « Recrue » dans l'admin, ou (case non renseignée) sans aucun
+ * historique approuvé (pas de lien vers une fiche d'une saison précédente) ET dans une équipe nouvelle (1re saison MBL).
+ * Sans information sur l'équipe : pas de mention (par défaut, on ne l'affiche pas).
+ */
+export const isRookie = (p: Pick<Player, 'season_ids' | 'rookie' | 'link'>, teamSeasons?: number) =>
+  p.rookie === true || (p.rookie !== false && !p.link && (p.season_ids?.length ?? 0) <= 1 && teamSeasons === 1)

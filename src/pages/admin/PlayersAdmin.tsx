@@ -45,6 +45,7 @@ export default function PlayersAdmin() {
     // 6 contre 6 : pas de postes, seulement deux rôles
     { key: 'is_goalkeeper', label: 'Gardien', type: 'boolean' },
     { key: 'is_captain', label: 'Capitaine', type: 'boolean', help: 'Un seul capitaine par équipe : l’ancien capitaine perd le brassard.' },
+    { key: 'rookie', label: 'Recrue (1re saison en MBL)', type: 'boolean', help: 'Affiche « RECRUE · Nouvelle saison » sur sa carte. Non coché : la mention n’apparaît que pour un joueur sans historique dans une équipe nouvelle.' },
     { key: 'birth_date', label: 'Date de naissance', type: 'date' }, { key: 'photo_url', label: 'Photo du joueur', type: 'custom', full: true, render: (v, patch) => <PlayerPhotoField value={v} patch={patch} /> },
     { key: 'status', label: 'Statut', type: 'select', options: [{ value: 'active', label: 'Actif' }, { value: 'injured', label: 'Blessé' }, { value: 'inactive', label: 'Inactif' }] },
     { key: 'email', label: 'Email du compte joueur (accès à sa carte)', type: 'email', full: true },
@@ -73,6 +74,7 @@ export default function PlayersAdmin() {
     <>
       <Button variant="outline" size="sm" className="h-9" onClick={() => setBulkCut(true)}><Scissors />Détourer toutes les photos existantes</Button>
       <FilterSelect value={team} onChange={setTeam} allLabel="Toutes équipes" options={seasonTeams.map((t) => ({ value: t.id, label: t.name })).sort((a, b) => a.label.localeCompare(b.label))} />
+      {team && <RookieBulk teamId={team} />}
       <FilterSelect value={docFilter} onChange={setDocFilter} allLabel="Tous dossiers" options={[{ value: 'ok', label: 'Dossier complet' }, { value: 'ko', label: 'Documents à traiter' }]} />
       <label className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-input px-3 text-xs hover:bg-white/5" title="Nom de fichier : prenom-nom.jpg (ou numéro.jpg si une équipe est filtrée)"><ImageUp className="size-4" />Photos en masse<input type="file" accept="image/*" multiple className="hidden" onChange={(e) => bulkPhotos(e.target.files)} /></label>
       <div className="flex rounded-lg border border-input p-0.5">{(['list', 'grid'] as const).map((v) => <button key={v} onClick={() => setView(v)} className={`rounded-md p-1.5 cursor-pointer ${view === v ? 'bg-neon/20 text-neon' : 'text-muted-foreground'}`} title={v === 'list' ? 'Liste' : 'Trombinoscope'}>{v === 'list' ? <List className="size-4" /> : <Grid2x2 className="size-4" />}</button>)}</div>
@@ -146,5 +148,25 @@ function DocsDialog({ player, onClose }: { player: Player; onClose: () => void }
         <DialogFooter><Button variant="outline" onClick={onClose}>Annuler</Button><Button onClick={async () => { await base44.entities.Player.update(player.id, { documents: d }); toast.success('Documents enregistrés'); onClose() }}>Enregistrer</Button></DialogFooter>
       </DialogContent>
     </Dialog>
+  )
+}
+
+/** Action groupée : marquer / démarquer « Recrue » tous les joueurs de l'équipe filtrée */
+function RookieBulk({ teamId }: { teamId: string }) {
+  const { db } = useData()
+  const { seasonId } = useAdminScope()
+  const [busy, setBusy] = useState(false)
+  const list = db.Player.filter((p) => p.team_id === teamId && (!seasonId || p.season_ids?.includes(seasonId)))
+  const apply = async (rookie: boolean) => {
+    setBusy(true)
+    try { for (const p of list) if (p.rookie !== rookie) await base44.entities.Player.update(p.id, { rookie }); toast.success(`${list.length} joueur(s) : ${rookie ? 'recrues' : 'pas recrues'}`) }
+    catch (e) { toast.error((e as Error).message) } finally { setBusy(false) }
+  }
+  return (
+    <div className="inline-flex h-9 items-center gap-1 rounded-lg border border-input px-2 text-xs" title="Mention « RECRUE » pour toute l’équipe filtrée">
+      Recrues :
+      <button disabled={busy} onClick={() => apply(true)} className="cursor-pointer rounded px-1.5 py-0.5 font-semibold hover:bg-white/10">toutes</button>
+      <button disabled={busy} onClick={() => apply(false)} className="cursor-pointer rounded px-1.5 py-0.5 font-semibold hover:bg-white/10">aucune</button>
+    </div>
   )
 }

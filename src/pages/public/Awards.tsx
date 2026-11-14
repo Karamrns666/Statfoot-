@@ -1,3 +1,4 @@
+import { useRookie } from '@/hooks/useSeniority'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { phaseName } from '@/lib/competitionNames'
@@ -16,7 +17,7 @@ import { PlayerAvatar, RoleBadge, TeamLogo } from '@/components/league/Identity'
 import { AWARD_STYLE, TrophyBadge } from '@/components/awards/TrophyBadge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { competitionStandings, generalStandings, isRookie, race, AWARD_LABELS, type PhaseFilter, type PlayerXP, type Ranked, type RaceKey, type StandingRow } from '@/lib/stats'
+import { competitionStandings, generalStandings, race, AWARD_LABELS, type PhaseFilter, type PlayerXP, type Ranked, type RaceKey, type StandingRow } from '@/lib/stats'
 import { playerName } from '@/lib/format'
 import type { AwardCategory } from '@/types/entities'
 import { cn } from '@/lib/utils'
@@ -61,6 +62,7 @@ function metric(key: RaceKey, s: PlayerXP) {
 }
 
 function PlayerRace({ scope, raceKey, category }: { scope: { seasonId: string | null; phase: PhaseFilter }; raceKey: RaceKey; category: AwardCategory }) {
+  const rookie = useRookie()
   const L = useLookup()
   const list = useRace(scope, raceKey)
   const st = AWARD_STYLE[category]
@@ -82,7 +84,7 @@ function PlayerRace({ scope, raceKey, category }: { scope: { seasonId: string | 
                   <Link key={r.item.player_id} to={`/joueurs/${r.item.player_id}`} className="flex items-center gap-3 rounded-lg px-2 py-2.5 hover:bg-white/[.03]">
                     <div className="w-8 text-center"><div className="num text-xl" style={{ color: r.rank === 1 ? st.color : undefined }}>{r.rank}</div><RankDelta delta={r.delta} /></div>
                     <PlayerAvatar player={p} team={t} size={38} />
-                    <div className="min-w-0 flex-1"><div className="truncate font-semibold">{playerName(p)}</div><div className="flex items-center gap-1.5 text-xs text-muted-foreground"><TeamLogo team={t} size={14} />{t?.short_name}{p && isRookie(p) && <RookieBadge />}</div></div>
+                    <div className="min-w-0 flex-1"><div className="truncate font-semibold">{playerName(p)}</div><div className="flex items-center gap-1.5 text-xs text-muted-foreground"><TeamLogo team={t} size={14} />{t?.short_name}{p && rookie(p) && <RookieBadge />}</div></div>
                     {raceKey === 'golden_glove'
                       ? <div className="grid grid-cols-4 gap-2 text-center text-[10px] uppercase text-muted-foreground"><div><div className="num text-base text-white">{r.item.gk_matches}</div>MJ</div><div><div className="num text-base text-white">{r.item.clean_sheets}</div>CS</div><div><div className="num text-base text-white">{r.item.saves}</div>Arr.</div><div><div className="num text-base text-white">{r.item.conceded}</div>BC</div></div>
                       : <div className="hidden gap-3 text-center text-[10px] uppercase text-muted-foreground sm:flex"><div><div className="num text-base text-white">{r.item.matches}</div>MJ</div><div><div className="num text-base text-white">{r.item.goals}</div>Buts</div><div><div className="num text-base text-white">{r.item.assists}</div>Passes</div></div>}
@@ -99,6 +101,7 @@ function PlayerRace({ scope, raceKey, category }: { scope: { seasonId: string | 
 }
 
 function HeroCard({ r, raceKey, color }: { r: Ranked<PlayerXP>; raceKey: RaceKey; color: string }) {
+  const rookie = useRookie()
   const L = useLookup()
   const p = L.player.get(r.item.player_id), t = L.team.get(r.item.team_id), m = metric(raceKey, r.item)
   return (
@@ -108,7 +111,7 @@ function HeroCard({ r, raceKey, color }: { r: Ranked<PlayerXP>; raceKey: RaceKey
         <PlayerAvatar player={p} team={t} size={112} />
         <div className="title-caps mt-4 text-3xl leading-none">{p?.first_name}<br /><span style={{ color }}>{p?.last_name}</span></div>
         <div className="mt-2 flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground"><TeamLogo team={t} size={20} />{t?.name}{p && <RoleBadge position={p.position} captain={p.is_captain} />}</div>
-        {p && isRookie(p) && <div className="mt-2"><RookieBadge /></div>}
+        {p && rookie(p) && <div className="mt-2"><RookieBadge /></div>}
         <div className="mt-4 grid w-full grid-cols-4 gap-2 rounded-2xl bg-black/20 p-3 text-center">
           {raceKey === 'golden_glove'
             ? [['MJ', r.item.gk_matches], ['CS', r.item.clean_sheets], ['Arrêts', r.item.saves], ['BC', r.item.conceded]].map(([l, v]) => <div key={l}><div className="num text-2xl">{v}</div><div className="text-[10px] uppercase text-muted-foreground">{l}</div></div>)

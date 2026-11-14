@@ -1,3 +1,4 @@
+import { useRookie } from '@/hooks/useSeniority'
 import { useMemo, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { PlayerDisciplineCard, SuspendedBadge, useIsSuspended } from '@/components/reglement/PlayerDisciplineCard'
@@ -18,7 +19,7 @@ import { SortableTable } from '@/components/league/SortableTable'
 import { shotColumns } from '@/components/league/shotColumns'
 import { fmtAccuracy, fmtShots, fmtShotsPerGoal } from '@/lib/shots'
 import { AXIS, ChartBox, GRID, Legend, SERIES, TOOLTIP } from '@/components/charts/theme'
-import { AWARD_LABELS, computePlayerXP, isPlayed, isRookie, ageAt, type XPLine } from '@/lib/stats'
+import { AWARD_LABELS, computePlayerXP, isPlayed, ageAt, type XPLine } from '@/lib/stats'
 import { BADGES, RATING_RULES, TIER_LABEL, challengeResult, challengeTargets, decisiveStreak, nextBadges, playerBadges, playerMatchLog, type BadgeGroup } from '@/lib/badges'
 import { fmtDate, ordinal, playerName, playerShort } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -30,6 +31,7 @@ const monthLabel = (m: string) => format(new Date(`${m}-01T12:00:00`), 'MMMM yyy
 const pts = (n: number) => `${n > 0 ? '+' : ''}${n}`
 
 export default function PlayerDetail() {
+  const rookie = useRookie()
   const { id } = useParams()
   const { db, league } = useData()
   const L = useLookup()
@@ -123,7 +125,7 @@ export default function PlayerDetail() {
           ) : <PlayerAvatar player={p} team={t} size={132} />}
           <div className="min-w-0 flex-1 text-center sm:text-left">
             <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-              <RoleBadge long position={p.position} captain={p.is_captain || t?.captain_player_id === p.id} />{isRookie(p) && <RookieBadge />}<SuspendedBadge remaining={suspendedLeft} />{motmCount > 0 && <span className="inline-flex items-center gap-1 rounded-full bg-neon/15 px-2.5 py-0.5 text-[11px] font-extrabold uppercase text-neon" title="Nombre de fois homme du match (toutes saisons)"><Trophy className="size-3" aria-hidden />Homme du match ×{motmCount}</span>}
+              <RoleBadge long position={p.position} captain={p.is_captain || t?.captain_player_id === p.id} />{rookie(p) && <RookieBadge />}<SuspendedBadge remaining={suspendedLeft} />{motmCount > 0 && <span className="inline-flex items-center gap-1 rounded-full bg-neon/15 px-2.5 py-0.5 text-[11px] font-extrabold uppercase text-neon" title="Nombre de fois homme du match (toutes saisons)"><Trophy className="size-3" aria-hidden />Homme du match ×{motmCount}</span>}
               <SeniorityBadge teamId={t?.id} showSeasons />
             </div>
             <h1 className="title-caps mt-2 text-4xl sm:text-6xl">{p.first_name} <span className="text-neon">{p.last_name}</span></h1>

@@ -7,7 +7,14 @@ import { isBrandLogo, teamLogoSvg } from '@/lib/logos'
 export function TeamLogo({ team, size = 32, className }: { team?: Team | null; size?: number; className?: string }) {
   const src = team?.logo_url || teamLogoSvg(team?.short_name ?? '?', team?.primary_color, team?.secondary_color)
   const brand = isBrandLogo(team?.logo_url)
-  return <img src={src} alt={team?.name ?? ''} width={size} height={size} style={{ width: size, height: size }} className={cn('shrink-0 object-contain', brand ? 'rounded-[22%] bg-white shadow-[0_2px_10px_rgba(0,0,0,.35)] ring-1 ring-black/5' : 'drop-shadow-[0_2px_8px_rgba(0,0,0,.5)]', className)} loading="lazy" />
+  // cadre CARRÉ identique pour toutes les équipes : taille fixe (jamais écrasée par la largeur disponible),
+  // logo entier visible (object-fit: contain) avec une marge interne, sans déformation
+  return (
+    <span role="img" aria-label={team?.name ?? ''} style={{ width: size, height: size, minWidth: size, padding: brand ? Math.max(1, Math.round(size * 0.1)) : 0 }}
+      className={cn('inline-flex shrink-0 items-center justify-center overflow-hidden', brand ? 'rounded-[22%] bg-white shadow-[0_2px_10px_rgba(0,0,0,.35)] ring-1 ring-black/5' : 'drop-shadow-[0_2px_8px_rgba(0,0,0,.5)]', className)}>
+      <img src={src} alt="" className="block size-full max-w-none object-contain" loading="lazy" draggable={false} />
+    </span>
+  )
 }
 
 export function TeamName({ team, link = true, short = false, className }: { team?: Team | null; link?: boolean; short?: boolean; className?: string }) {

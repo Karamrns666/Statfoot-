@@ -101,6 +101,8 @@ export interface Club extends BaseEntity {
   history?: string
   /** correction manuelle du nombre de saisons MBL (badge d'ancienneté), journalisée */
   seasons_override?: number
+  seasons_override_reason?: string
+  seasons_override_at?: string
 }
 
 export interface Team extends BaseEntity {

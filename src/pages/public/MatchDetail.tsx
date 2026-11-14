@@ -4,6 +4,7 @@ import { ArrowLeft, CalendarDays, MapPin, Star, Vote, ArrowRightLeft, Share2, Sh
 import { useData, useLookup } from '@/hooks/useData'
 import { useNow } from '@/hooks/useNow'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { RANK_PENDING, rankLabel, useCompetitionRanking } from '@/hooks/useRanking'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CompetitionBadge, EmptyState, FormPills } from '@/components/league/Bits'
@@ -20,7 +21,7 @@ import { TeamStatsBars } from '@/components/match/TeamStatsBars'
 import { fmtDate, playerShort, STATUS_LABEL } from '@/lib/format'
 import { fmtDay, fmtHour } from '@/lib/matchTime'
 import { STAGE_LABELS } from '@/lib/schedule'
-import { byDate, competitionStandings, headToHead, isPlayed, matchScorers, resultFor, computePlayerXP } from '@/lib/stats'
+import { byDate, headToHead, isPlayed, matchScorers, resultFor, computePlayerXP } from '@/lib/stats'
 import { fmtMinute, fmtScore, keeperMatchStats, possession, timelineByPeriod, PERIOD_LABEL } from '@/lib/matchEngine'
 import type { Match, MatchEvent, Player } from '@/types/entities'
 import { cn } from '@/lib/utils'
@@ -232,19 +233,21 @@ function StatsTab({ match, events, now }: { match: Match; events: MatchEvent[]; 
 }
 
 function PreMatch({ match }: { match: Match }) {
-  const { db, league } = useData()
+  const { db } = useData()
   const L = useLookup()
-  const before = db.Match.filter((x) => isPlayed(x) && (x.date ?? '') < (match.date ?? '')).sort(byDate)
+  // forme récente : matchs de la même saison uniquement
+  const before = db.Match.filter((x) => x.season_id === match.season_id && isPlayed(x) && (x.date ?? '') < (match.date ?? '')).sort(byDate)
   const formOf = (tid: string) => before.filter((x) => x.home_team_id === tid || x.away_team_id === tid).slice(-5)
   const h2h = headToHead(db.Match.filter((x) => x.id !== match.id), match.home_team_id, match.away_team_id)
-  const table = competitionStandings(league, match.competition_id)
+  // même classement que la page Classement (pré-saison : classement suisse)
+  const ranking = useCompetitionRanking(match.competition_id)
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       {[match.home_team_id, match.away_team_id].map((tid) => {
-        const t = L.team.get(tid), f = formOf(tid), r = table.find((x) => x.team_id === tid)
+        const t = L.team.get(tid), f = formOf(tid), r = ranking.byTeam.get(tid)
         return (
           <Card key={tid}>
-            <CardHeader className="flex-row items-center gap-3"><TeamLogo team={t} size={36} /><div><CardTitle>{t?.name}</CardTitle><div className="text-xs text-muted-foreground">{r ? `${r.rank}e · ${r.points} pts · ${r.gd > 0 ? '+' : ''}${r.gd}` : '—'}</div></div><div className="ml-auto"><FormPills form={f.map((x) => resultFor(x, tid)!)} size="md" /></div></CardHeader>
+            <CardHeader className="flex-row items-center gap-3"><TeamLogo team={t} size={36} /><div><CardTitle>{t?.name}</CardTitle><div className="text-xs text-muted-foreground">{ranking.started ? rankLabel(r, true) : <>Rang – · <span className="text-white/60">{RANK_PENDING}</span></>}</div></div><div className="ml-auto"><FormPills form={f.map((x) => resultFor(x, tid)!)} size="md" /></div></CardHeader>
             <CardContent className="space-y-1">
               {f.slice().reverse().map((x) => {
                 const opp = L.team.get(x.home_team_id === tid ? x.away_team_id : x.home_team_id), res = resultFor(x, tid)

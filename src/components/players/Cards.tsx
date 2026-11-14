@@ -3,29 +3,30 @@ import { RookieBadge } from '@/components/league/Bits'
 import { useLookup } from '@/hooks/useData'
 import { usePlayerBadges } from '@/hooks/useStats'
 import { SEASON_2025_ID } from '@/api/seed/season2025'
-import { isRookie, type PlayerXP, type Ranked } from '@/lib/stats'
+import type { PlayerXP, Ranked } from '@/lib/stats'
 import { IPG_RANKING, splitName, type IPGEntry } from '@/lib/ipg'
 import { useSeason } from '@/hooks/useSeason'
 import type { Player, Team } from '@/types/entities'
-import { useTeamSeniority } from '@/hooks/useSeniority'
+import { useRookie, useTeamSeniority } from '@/hooks/useSeniority'
 import { SeniorityLegend } from '@/components/league/SeniorityBadge'
 
 /** Carte d'un joueur au classement XP */
-export function XPCard({ r, player: p, team: t, className, faceOnly }: { r: Ranked<PlayerXP>; player: Player; team?: Team | null; className?: string; faceOnly?: boolean }) {
+export function XPCard({ r, player: p, team: t, className, faceOnly, ipg: ipgOverride }: { r: Ranked<PlayerXP>; player: Player; team?: Team | null; className?: string; faceOnly?: boolean; ipg?: number | string }) {
   const s = r.item
   const gk = p.position === 'GK'
   const bs = usePlayerBadges().get(p.id)
   const { scopeSeasonId } = useSeason()
   const tier = useTeamSeniority(t?.id)?.tier
+  const rookie = useRookie()
   // l'IPG n'existe que pour la saison 2025-2026 (fichier de la ligue)
-  const ipg = scopeSeasonId === SEASON_2025_ID ? IPG_RANKING.find((e) => e.player_id === p.id)?.ipg : undefined
+  const ipg = ipgOverride ?? (scopeSeasonId === SEASON_2025_ID ? IPG_RANKING.find((e) => e.player_id === p.id)?.ipg : undefined)
   return (
     <PlayerCard
       className={className} faceOnly={faceOnly}
       tier={tier} medals={bs?.unlocked} badgeTotal={bs?.total}
       firstName={p.first_name} lastName={p.last_name} position={p.position} captain={p.is_captain || t?.captain_player_id === p.id} team={t} photoUrl={p.photo_url} cutoutUrl={p.photo_card_mode === 'original' ? undefined : p.photo_cutout_url} ipg={ipg}
       rating={s.xp} ratingLabel="XP" rank={r.rank || undefined} delta={r.delta}
-      badge={isRookie(p) ? <RookieBadge /> : undefined}
+      badge={rookie(p) ? <RookieBadge /> : undefined}
       front={gk
         ? [{ label: 'MJ', value: s.matches }, { label: 'ARR', value: s.saves, hint: 'Arrêts' }, { label: 'CS', value: s.clean_sheets, hint: 'Clean sheets' }, { label: 'BE', value: s.conceded, hint: 'Buts encaissés' }]
         : [{ label: 'MJ', value: s.matches }, { label: 'BUT', value: s.goals }, { label: 'PAS', value: s.assists, hint: 'Passes décisives' }, { label: 'CJ', value: s.yellow, hint: 'Cartons jaunes' }]}

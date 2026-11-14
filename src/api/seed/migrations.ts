@@ -440,7 +440,23 @@ export function applyRemoveCanpack2026(db: Rules6Data): Rules6Data {
   return out
 }
 
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams, applyHideSeason2025, applyLogoRevisions, applyRemoveCanpack2026]
+/**
+ * Corrections de niveau demandées par Ardentia (nov. 2026) — la MBL en est à sa 4e saison mais le site n'a l'historique
+ * que de 2025-2026 : nombre de saisons saisi à la main (Club.seasons_override), motif « correction manuelle Ardentia ».
+ *  · Atelier Vert Casa (AVC) → 2 saisons = GOLD ; · CAC → 3 saisons = PLATINUM.
+ */
+export function applyTierCorrections2026(db: Rules6Data): Rules6Data {
+  const want: Record<string, number> = { AVC: 2, CAC: 3 }
+  const clubOf = (short: string) => db.Team?.find((t) => t.season_id === SEASON_2026_ID && t.short_name === short)?.club_id
+  const changes = Object.entries(want).map(([short, n]) => ({ short, n, club: clubOf(short) })).filter((x) => x.club && db.Club?.find((c) => c.id === x.club)?.seasons_override !== x.n)
+  if (!changes.length || !db.Club) return {}
+  const now = new Date().toISOString()
+  const Club = db.Club.map((c) => { const x = changes.find((y) => y.club === c.id); return x ? { ...c, seasons_override: x.n, seasons_override_reason: 'correction manuelle Ardentia', seasons_override_at: now } : c })
+  const logs = changes.map((x) => ({ id: `log_tier_${x.short}_${Date.now().toString(36)}`, created_date: now, action: 'seniority_override', entity: 'Club', entity_id: x.club, entity_label: x.short, author_email: 'systeme', author_name: 'Mise à jour du site', details: { motif: 'correction manuelle Ardentia', avant: db.Club!.find((c) => c.id === x.club)?.seasons_override ?? 'calcul automatique', apres: x.n } } as BaseEntity))
+  return { Club, AuditLog: [...logs, ...(db.AuditLog ?? [])] }
+}
+
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams, applyHideSeason2025, applyLogoRevisions, applyRemoveCanpack2026, applyTierCorrections2026]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */

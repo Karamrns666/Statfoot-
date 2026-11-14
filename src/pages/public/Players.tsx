@@ -1,10 +1,12 @@
+import { useRookie } from '@/hooks/useSeniority'
 import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { phaseName } from '@/lib/competitionNames'
 import { LayoutGrid, ListOrdered, Search, Sparkles } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
 import { useSeason } from '@/hooks/useSeason'
-import { useRace } from '@/hooks/useStats'
+import { useRace, useSeasonCompetitions } from '@/hooks/useStats'
+import { SEASON_2025_ID } from '@/api/seed/season2025'
 import { computePlayerXP } from '@/lib/xp'
 import { PageHeader, RankDelta, RookieBadge } from '@/components/league/Bits'
 import { FilterSelect } from '@/components/league/FilterSelect'
@@ -16,7 +18,7 @@ import { Button } from '@/components/ui/button'
 import { SortableTable } from '@/components/league/SortableTable'
 import { shotColumns } from '@/components/league/shotColumns'
 import { XPExplainer } from '@/components/players/XPExplainer'
-import { isRookie, type PhaseFilter } from '@/lib/stats'
+import type { PhaseFilter } from '@/lib/stats'
 import { playerName } from '@/lib/format'
 import { IPG_RANKING } from '@/lib/ipg'
 import { cn } from '@/lib/utils'
@@ -30,6 +32,7 @@ const VIEWS: { value: View; label: string; icon: typeof LayoutGrid }[] = [
 ]
 
 export default function Players() {
+  const rookie = useRookie()
   const { db, league } = useData()
   const L = useLookup()
   const { scopeSeasonId } = useSeason()
@@ -117,7 +120,7 @@ export default function Players() {
                 { key: 'name', label: 'Joueur', sort: (r) => playerName(L.player.get(r.item.player_id)), render: (r) => { const p = L.player.get(r.item.player_id)!; return (
                   <Link to={`/joueurs/${p.id}`} className="flex items-center gap-3 hover:text-neon">
                     <PlayerAvatar player={p} team={L.team.get(p.team_id)} size={36} />
-                    <div className="min-w-0"><div className="flex items-center gap-2 font-semibold">{playerName(p)}</div><div className="flex items-center gap-1.5"><RoleBadge position={p.position} captain={p.is_captain || L.team.get(p.team_id)?.captain_player_id === p.id} />{isRookie(p) && <RookieBadge />}</div></div>
+                    <div className="min-w-0"><div className="flex items-center gap-2 font-semibold">{playerName(p)}</div><div className="flex items-center gap-1.5"><RoleBadge position={p.position} captain={p.is_captain || L.team.get(p.team_id)?.captain_player_id === p.id} />{rookie(p) && <RookieBadge />}</div></div>
                   </Link>) } },
                 { key: 'team', label: 'Équipe', headClassName: 'hidden sm:table-cell', className: 'hidden sm:table-cell', sort: (r) => L.team.get(r.item.team_id)?.name, render: (r) => { const t = L.team.get(r.item.team_id); return <span className="flex items-center gap-2 text-sm"><TeamLogo team={t} size={20} />{t?.name}</span> } },
                 { key: 'mj', label: 'MJ', title: 'Matchs joués', headClassName: 'text-center', className: 'num text-center text-base', sort: (r) => r.item.matches, render: (r) => r.item.matches },
@@ -136,6 +139,9 @@ export default function Players() {
 }
 
 function IPGView() {
+  const { scopeSeasonId } = useSeason()
+  // Top 25 IPG fourni par la ligue : uniquement pour la saison 2025-2026 (consultable via le sélecteur de saison)
+  if (scopeSeasonId !== SEASON_2025_ID) return <SeasonIPG seasonId={scopeSeasonId} />
   const [top, rest] = [IPG_RANKING.slice(0, 3), IPG_RANKING.slice(3)]
   return (
     <div className="space-y-8">
@@ -148,6 +154,31 @@ function IPGView() {
       <div className="glass rounded-2xl p-5 text-sm text-muted-foreground">
         <h2 className="font-display text-xl font-black text-white">Comment l’IPG est calculé</h2>
         <p className="mt-2 max-w-3xl">L’Indice de Performance Globale combine les buts et passes décisives, la part du joueur dans les buts de son équipe, le taux de victoires de l’équipe, les actions décisives (buts et passes qui changent le score) et le niveau des adversaires, moins une pénalité pour les cartons. L’indice est ramené sur 100 : le meilleur joueur obtient 100.</p>
+      </div>
+    </div>
+  )
+}
+
+/** Saison en cours : uniquement les joueurs RÉELLEMENT inscrits ; IPG « – » tant qu'aucun match n'est joué, tri par équipe puis par nom */
+function SeasonIPG({ seasonId }: { seasonId: string | null }) {
+  const { db, league } = useData()
+  const L = useLookup()
+  const comps = useSeasonCompetitions()
+  const items = useMemo(() => {
+    const teamIds = new Set(comps.flatMap((c) => c.team_ids ?? []))
+    const xp = computePlayerXP(league, { seasonId })
+    return db.Player
+      .filter((p) => p.season_ids?.includes(seasonId ?? '') && teamIds.has(p.team_id) && p.status !== 'inactive')
+      .map((p) => ({ p, t: L.team.get(p.team_id), x: xp.get(p.id) }))
+      .filter((x) => x.x)
+      .sort((a, b) => (a.t?.name ?? '').localeCompare(b.t?.name ?? '') || `${a.p.last_name} ${a.p.first_name}`.localeCompare(`${b.p.last_name} ${b.p.first_name}`))
+  }, [db.Player, league, comps, seasonId, L.team])
+  if (!items.length) return <SeasonNotStarted what="Les effectifs et l’Indice de Performance Globale" />
+  return (
+    <div className="space-y-5">
+      <p className="glass rounded-2xl px-4 py-3 text-sm text-muted-foreground"><b className="text-white">IPG « – » :</b> indice calculé après le premier match. {items.length} joueurs inscrits, classés par équipe puis par nom.</p>
+      <div className="grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3 sm:gap-x-4 lg:grid-cols-4 xl:grid-cols-5">
+        {items.map(({ p, t, x }) => <XPCard key={p.id} r={{ item: x!, rank: 0, previousRank: null, delta: null }} player={p} team={t} ipg="–" />)}
       </div>
     </div>
   )

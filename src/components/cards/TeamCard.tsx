@@ -9,6 +9,7 @@ import { useData } from '@/hooks/useData'
 import { useSeasonCompetitions } from '@/hooks/useStats'
 import { useTeamSeniority } from '@/hooks/useSeniority'
 import { useCardShine } from '@/hooks/useCardShine'
+import { useCompetitionRanking } from '@/hooks/useRanking'
 import { competitionStandings } from '@/lib/stats'
 import { competitionNames, phaseName } from '@/lib/competitionNames'
 import { cn } from '@/lib/utils'
@@ -81,16 +82,18 @@ export function useTeamCardData(teamId: string) {
   const { league } = useData()
   const comps = useSeasonCompetitions()
   const sen = useTeamSeniority(teamId)
+  const div = comps.find((c) => (c.phase === 'gold' || c.phase === 'silver') && c.team_ids?.includes(teamId))
+  const comp = div ?? comps.find((c) => c.team_ids?.includes(teamId))
+  const ranking = useCompetitionRanking(comp?.id) // même rang que la page Classement
   return useMemo(() => {
-    const div = comps.find((c) => (c.phase === 'gold' || c.phase === 'silver') && c.team_ids?.includes(teamId))
-    const comp = div ?? comps.find((c) => c.team_ids?.includes(teamId))
     const row = comp ? competitionStandings(league, comp.id).find((r) => r.team_id === teamId) : undefined
+    const rk = ranking.byTeam.get(teamId)
     return {
       tier: sen?.tier ?? 'silver' as SeniorityTier, seasons: sen?.seasons ?? 1,
       division: div ? phaseName(div.phase) : comp?.phase === 'league_phase' ? competitionNames().league_phase : comp ? phaseName(comp.phase) : undefined,
-      points: row?.points ?? 0, goals: row?.gf ?? 0, rank: row && row.played ? row.rank : undefined,
+      points: rk?.points ?? 0, goals: row?.gf ?? 0, rank: ranking.started && rk ? rk.rank : undefined,
     }
-  }, [league, comps, sen, teamId])
+  }, [league, comp, div, ranking, sen, teamId])
 }
 
 /** Carte d'une équipe de la saison affichée (données calculées) */

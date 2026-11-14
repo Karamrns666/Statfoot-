@@ -31,7 +31,8 @@ export interface PlayerCardProps {
   /** photo détourée (PNG transparent) : affichée en grand, posée sur la carte */
   cutoutUrl?: string
   /** indice de performance (IPG), affiché en pastille s'il existe */
-  ipg?: number
+  /** IPG : nombre, ou « – » tant qu'il n'est pas calculé */
+  ipg?: number | string
   rating: ReactNode
   ratingLabel: string
   rank?: number
@@ -159,7 +160,7 @@ function CardFront({ p }: { p: PlayerCardProps }) {
             {(p.position === 'GK' || p.captain) && <div className="mt-[.35em] font-display text-[1.35em] font-extrabold leading-none" title={[p.position === 'GK' && 'Gardien', p.captain && 'Capitaine'].filter(Boolean).join(' · ')}>{[p.position === 'GK' && 'GB', p.captain && 'C'].filter(Boolean).join(' · ')}</div>}
             <div className="my-[.45em] h-[2px] w-[2.2em] rounded-full bg-[#F05A22]" />
             {logo && <img src={logo} alt="" className={cn('size-[2.6em] object-contain', isBrandLogo(logo) ? 'rounded-[22%] bg-white shadow-[0_3px_10px_rgba(0,0,0,.3)] ring-1 ring-black/5' : 'drop-shadow-[0_3px_6px_rgba(0,0,0,.35)]')} />}
-            {p.ipg != null && <div className="mt-[.45em] rounded-md px-[.4em] py-[.15em] text-center font-display text-[.95em] font-black leading-none" style={{ background: st.chip, color: st.chipText }} title="Indice de performance globale">{Math.round(p.ipg)}<span className="block text-[.6em] font-extrabold tracking-wider">IPG</span></div>}
+            {p.ipg != null && <div className="mt-[.45em] rounded-md px-[.4em] py-[.15em] text-center font-display text-[.95em] font-black leading-none" style={{ background: st.chip, color: st.chipText }} title={typeof p.ipg === 'number' ? 'Indice de performance globale' : 'Indice calculé après le premier match'}>{typeof p.ipg === 'number' ? Math.round(p.ipg) : p.ipg}<span className="block text-[.6em] font-extrabold tracking-wider">IPG</span></div>}
           </div>
           {/* coin haut droit : 3 meilleurs badges de performance (plus rare d'abord) */}
           {medals.length > 0 && (

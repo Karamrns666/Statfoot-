@@ -146,7 +146,7 @@ function TeamBlock({ id }: { id: string }) {
     <Link to={`/equipes/${id}`} className="flex min-w-0 flex-col items-center gap-2 text-center">
       <TeamLogo team={team} size={72} className="sm:scale-[1.22] sm:my-2" />
       <div className="title-caps w-full text-base leading-tight [overflow-wrap:anywhere] [hyphens:auto] sm:text-2xl">{team?.name ?? 'À déterminer'}</div>
-      {team?.company && <div className="text-xs text-muted-foreground">{team.company}</div>}
+      {team?.company && team.company !== team.name && <div className="text-xs text-muted-foreground">{team.company}</div>}
     </Link>
   )
 }

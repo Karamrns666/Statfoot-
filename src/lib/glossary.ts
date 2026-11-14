@@ -32,7 +32,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     short: 'Points d’expérience : chaque action du joueur en match rapporte ou retire des points.',
     formula: `But +${X.goal} × multiplicateur adversaire (×${n(X.mult_top3)} contre un 1er–3e, ×${n(X.mult_4_6)} contre un 4e–6e, ×${n(X.mult_7plus)} ensuite) · passe décisive +${X.assist} (même multiplicateur) · victoire +${X.win} · défaite ${X.loss} · homme du match +${X.motm} · jaune ${X.yellow} · deux jaunes ${X.double_yellow_total} au total · rouge direct ${X.red_direct} · par match de suspension ${X.per_suspension_match} · gardien : clean sheet +${X.clean_sheet_gk}, arrêt +${X.save}, penalty arrêté +${X.penalty_saved}, tir au but arrêté +${X.shootout_saved}, but encaissé ${X.goal_conceded_gk} · joueur du mois +${X.player_of_month}, équipe du mois +${X.team_of_month}, but du mois +${X.goal_of_month}.`,
     example: `2 buts contre le 2e (2 × ${X.goal} × ${n(X.mult_top3)} = ${2 * X.goal * X.mult_top3}) + 1 passe contre le 2e (${X.assist} × ${n(X.mult_top3)} = ${X.assist * X.mult_top3}) + victoire (${X.win}) + 1 jaune (${X.yellow}) = ${2 * X.goal * X.mult_top3 + X.assist * X.mult_top3 + X.win + X.yellow} XP.`,
-    note: 'Barème par défaut ; l’admin peut l’ajuster pour une saison (Admin → Barème XP), le site applique alors le barème de la saison.',
+    note: 'Barème par défaut ; l’admin peut l’ajuster pour une saison dans l’espace admin ; le site applique alors le barème de la saison.',
   },
   {
     id: 'note', term: 'Note de match', group: 'Joueurs',

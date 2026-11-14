@@ -18,8 +18,12 @@ export default function Glossary() {
   const meta = useBadgeMeta()
   useEffect(() => {
     if (!hash) return
-    const el = document.getElementById(decodeURIComponent(hash.slice(1)))
-    if (el) { el.scrollIntoView({ block: 'start' }); el.classList.add('ring-2', 'ring-neon'); const t = setTimeout(() => el.classList.remove('ring-2', 'ring-neon'), 2200); return () => clearTimeout(t) }
+    // après le retour en haut de page fait par la mise en page au changement de page
+    const t = setTimeout(() => {
+      const el = document.getElementById(decodeURIComponent(hash.slice(1))); if (!el) return
+      el.scrollIntoView({ block: 'start' }); el.classList.add('ring-2', 'ring-neon'); setTimeout(() => el.classList.remove('ring-2', 'ring-neon'), 2200)
+    }, 80)
+    return () => clearTimeout(t)
   }, [hash])
   const badges = BADGES.slice().sort((a, b) => CATEGORY_ORDER.indexOf(meta(a.id).category) - CATEGORY_ORDER.indexOf(meta(b.id).category))
   return (

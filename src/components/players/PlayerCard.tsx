@@ -139,9 +139,18 @@ function cardLogo(p: PlayerCardProps) {
   return p.team?.logo_url || (p.teamName ? teamLogoSvg(p.teamName.replace(/[^A-Za-zÀ-ÿ ]/g, '').split(/\s+/).map((w) => w[0]).join('').slice(0, 3).toUpperCase(), '#6CB4CC', '#0B2E73') : undefined)
 }
 
+/**
+ * Logo d'équipe à taille VISUELLE égale : marges retirées, puis même surface pour tous les logos
+ * (un logo très large devient moins haut, un logo carré plus haut), dans la limite du cartouche.
+ */
 function TrimmedLogo({ src, alt }: { src: string; alt: string }) {
   const t = useTrimmedImage(src)
-  return <img src={t} alt={alt} draggable={false} className="h-[2.9em] w-full object-contain" />
+  const [ratio, setRatio] = useState(1)
+  const AREA = 14, MAX_H = 2.9, MAX_W = 9.5 // en em
+  let h = Math.min(MAX_H, Math.sqrt(AREA / ratio)), w = h * ratio
+  if (w > MAX_W) { w = MAX_W; h = w / ratio }
+  return <img src={t} alt={alt} draggable={false} onLoad={(e) => { const i = e.currentTarget; if (i.naturalWidth && i.naturalHeight) setRatio(i.naturalWidth / i.naturalHeight) }}
+    className="block object-contain" style={{ width: `${w}em`, height: `${h}em` }} />
 }
 
 function CardFront({ p }: { p: PlayerCardProps }) {
@@ -178,7 +187,10 @@ function CardFront({ p }: { p: PlayerCardProps }) {
         <div className="relative z-10 -mt-[1.5em] px-[6%] text-center">
           <div className="truncate text-[.9em] font-bold" style={{ color: st.fgSoft }}>{p.firstName}</div>
           <div className="truncate font-display text-[2.15em] font-black uppercase leading-[.92]" style={{ textShadow: st.textShadow }}>{p.lastName}</div>
-          <div className="mt-[.15em] flex items-center justify-center gap-1.5 text-[.9em] font-semibold" style={{ color: st.fgSoft }}><span className="truncate">{teamLabel}</span>{p.delta !== undefined && <RankDelta delta={p.delta} />}</div>
+          <div className="mt-[.15em] flex justify-center text-[.9em] font-semibold" style={{ color: st.fgSoft }}>
+            {/* nom de l'équipe centré ; la progression au classement est posée à droite sans décaler le nom */}
+            <span className="relative min-w-0 max-w-[80%]"><span className="block truncate">{teamLabel}</span>{p.delta !== undefined && <span className="absolute left-full top-1/2 ml-1.5 -translate-y-1/2"><RankDelta delta={p.delta} /></span>}</span>
+          </div>
           {!medals.length && p.badge && <div className="mt-[.3em] flex justify-center">{p.badge}</div>}
         </div>
         {/* grand cartouche du logo de l'équipe (remplit l'espace entre le nom et les stats) */}

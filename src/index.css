@@ -267,3 +267,8 @@
    une marge négative. Pour les petits liens et boutons (bandeau des scores, pied de page, liens d'articles…). */
 .tap { padding-block: 12px; margin-block: -12px; }
 .tap-sm { padding-block: 8px; margin-block: -8px; }
+
+/* apparition douce de la photo du joueur (cadre déjà réservé : aucun saut) */
+@keyframes card-photo-in { from { opacity: 0 } to { opacity: 1 } }
+.card-photo-in { animation: card-photo-in .35s ease-out both }
+@media (prefers-reduced-motion: reduce) { .card-photo-in { animation: none } }

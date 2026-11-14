@@ -501,7 +501,15 @@ export function applyRulesEmployees2026(db: Rules6Data): Rules6Data {
   return { Rulebook, AuditLog: [log, ...(db.AuditLog ?? [])] }
 }
 
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams, applyHideSeason2025, applyLogoRevisions, applyRemoveCanpack2026, applyTierCorrections2026, applyTagline2026, applyRulesEmployees2026]
+/** Parebrise Express : logo clair conçu pour un fond noir → « Fond du logo : Noir » (si l'admin n'a rien choisi) */
+export function applyLogoBgPbe(db: Rules6Data): Rules6Data {
+  const teams = (db.Team ?? []) as unknown as { id: string; short_name?: string; name?: string; logo_bg?: string }[]
+  const hit = teams.filter((t) => !t.logo_bg && (t.short_name === 'PBE' || /pare-?brise/i.test(t.name ?? '')))
+  if (!hit.length) return {}
+  return { Team: teams.map((t) => hit.includes(t) ? { ...t, logo_bg: 'black' } : t) } as unknown as Rules6Data
+}
+
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams, applyHideSeason2025, applyLogoRevisions, applyRemoveCanpack2026, applyTierCorrections2026, applyTagline2026, applyRulesEmployees2026, applyLogoBgPbe]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */

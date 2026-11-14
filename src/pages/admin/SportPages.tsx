@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { LOGO_BG_LABEL, type LogoBg } from '@/lib/logoPlate'
 import { Lock, CheckCircle2, AlertTriangle, Images } from 'lucide-react'
 import { teamSeasonId } from '@/lib/clubs'
 import { OfficialTeamsButton } from '@/components/admin/OfficialTeamsDialog'
@@ -133,6 +134,7 @@ export function Teams() {
     { key: 'name', label: 'Nom', required: true }, { key: 'short_name', label: 'Nom court (3 lettres)', required: true },
     { key: 'company', label: 'Entreprise / marque' }, { key: 'status', label: 'Statut', type: 'select', options: [{ value: 'active', label: 'Active' }, { value: 'pending', label: 'En attente' }, { value: 'inactive', label: 'Inactive' }] },
     { key: 'logo_url', label: 'Logo équipe', type: 'image', full: true }, { key: 'company_logo_url', label: 'Logo entreprise', type: 'image', full: true },
+    { key: 'logo_bg', label: 'Fond du logo (cartes, classements, visuels)', type: 'select', options: (Object.keys(LOGO_BG_LABEL) as LogoBg[]).map((k) => ({ value: k, label: LOGO_BG_LABEL[k] })), help: 'Noir pour un logo clair sur fond sombre (ex. Parebrise Express). Les marges vides autour du logo sont retirées automatiquement.' },
     { key: 'primary_color', label: 'Couleur principale', type: 'color' }, { key: 'secondary_color', label: 'Couleur secondaire', type: 'color' },
     { key: 'division_id', label: 'Série', type: 'select', options: db.Division.map((d) => ({ value: d.id, label: d.name })) },
     { key: 'group_id', label: 'Groupe', type: 'select', options: db.Group.map((g) => ({ value: g.id, label: g.name })) },

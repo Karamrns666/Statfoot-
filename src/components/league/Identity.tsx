@@ -1,17 +1,22 @@
 import { Link } from 'react-router-dom'
+import { useTrimmedImage } from '@/hooks/useTrimmedImage'
+import { logoPlate } from '@/lib/logoPlate'
 import type { Player, Position, Team } from '@/types/entities'
 import { cn } from '@/lib/utils'
 import { initials, playerName } from '@/lib/format'
-import { isBrandLogo, teamLogoSvg } from '@/lib/logos'
+import { teamLogoSvg } from '@/lib/logos'
 
 export function TeamLogo({ team, size = 32, className }: { team?: Team | null; size?: number; className?: string }) {
-  const src = team?.logo_url || teamLogoSvg(team?.short_name ?? '?', team?.primary_color, team?.secondary_color)
-  const brand = isBrandLogo(team?.logo_url)
+  const raw = team?.logo_url || teamLogoSvg(team?.short_name ?? '?', team?.primary_color, team?.secondary_color)
+  // marges vides retirées (les logos larges remplissent leur cadre) ; fond choisi dans l'admin équipe
+  const src = useTrimmedImage(team?.logo_url ? raw : null) ?? raw
+  const plate = logoPlate(team)
+  const brand = !!plate.bg
   // cadre CARRÉ identique pour toutes les équipes : taille fixe (jamais écrasée par la largeur disponible),
   // logo entier visible (object-fit: contain) avec une marge interne, sans déformation
   return (
-    <span role="img" aria-label={team?.name ?? ''} style={{ width: size, height: size, minWidth: size, padding: brand ? Math.max(1, Math.round(size * 0.1)) : 0 }}
-      className={cn('inline-flex shrink-0 items-center justify-center overflow-hidden', brand ? 'rounded-[22%] bg-white shadow-[0_2px_10px_rgba(0,0,0,.35)] ring-1 ring-black/5' : 'drop-shadow-[0_2px_8px_rgba(0,0,0,.5)]', className)}>
+    <span role="img" aria-label={team?.name ?? ''} style={{ width: size, height: size, minWidth: size, padding: brand ? Math.max(1, Math.round(size * 0.1)) : 0, background: plate.bg ?? undefined }}
+      className={cn('inline-flex shrink-0 items-center justify-center overflow-hidden', brand ? 'rounded-[22%] shadow-[0_2px_10px_rgba(0,0,0,.35)] ring-1 ring-black/5' : 'drop-shadow-[0_2px_8px_rgba(0,0,0,.5)]', className)}>
       <img src={src} alt="" className="block size-full max-w-none object-contain" loading="lazy" draggable={false} />
     </span>
   )

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { Team } from '@/types/entities'
 import { useData } from '@/hooks/useData'
-import { teamLogoSvg } from '@/lib/logos'
+import { TeamLogo } from '@/components/league/Identity'
 import { ARDENTIA_LOGO_LIGHT, MBL_LOGO } from '@/components/layout/Logo'
 
 /** Cadre commun des visuels 1080×1350 (style MBL : bleu nuit, orange, projecteurs) */
@@ -34,7 +34,7 @@ export function VisualTeam({ team, big }: { team?: Team; big?: boolean }) {
   const s = big ? 300 : 200
   return (
     <div className="flex flex-col items-center gap-4" style={{ width: s + 40 }}>
-      <img src={team?.logo_url || teamLogoSvg(team?.short_name ?? '?')} width={s} height={s} alt="" style={{ borderRadius: '22%' }} />
+      <TeamLogo team={team} size={s} />
       <div className="title-caps text-white" style={{ fontSize: big ? 52 : 40 }}>{team?.short_name}</div>
     </div>
   )

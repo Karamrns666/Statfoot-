@@ -26,16 +26,17 @@ export function TierSurface({ tier, children, className, style }: { tier: Senior
 }
 
 /** Libellé du niveau en toutes lettres, avec son icône, en haut de la carte */
-export function TierRibbon({ tier, extra }: { tier: SeniorityTier; extra?: ReactNode }) {
+export function TierRibbon({ tier, extra, aside }: { tier: SeniorityTier; extra?: ReactNode; /** posé à côté du niveau (ex. « RECRUE ») */ aside?: ReactNode }) {
   const st = SENIORITY_STYLE[tier]
   return (
-    <div className="absolute inset-x-0 top-[2.4%] z-10 flex justify-center">
+    <div className="absolute inset-x-0 top-[2.4%] z-10 flex items-center justify-center gap-[.4em]">
       <div className="flex items-center gap-[.35em] rounded-full px-[.7em] py-[.22em] text-[.7em] font-black uppercase leading-none tracking-[.2em]"
         style={{ background: st.badge, color: st.badgeText, boxShadow: tier === 'platinum' ? 'inset 0 0 0 1px rgb(230 236 245 / .8), 0 0 12px rgb(167 139 250 / .55)' : 'inset 0 0 0 1px rgb(0 0 0 / .15), 0 1px 3px rgb(0 0 0 / .2)' }}>
         <TierIcon tier={tier} className="size-[1.15em]" />
         <span>{SENIORITY_LABEL[tier]}</span>
         {extra}
       </div>
+      {aside}
     </div>
   )
 }

@@ -2,6 +2,8 @@
 // note (XP ou IPG), rôle, logo du club, nom et stats principales. La couleur suit le badge d'ancienneté
 // du club (Platinum nacré · Gold · Silver) ; en haut à droite, jusqu'à 3 badges de performance, du plus
 // rare au plus courant. Verso blanc, retournement 3D au clic (ou Entrée / Espace).
+import { logoPlate } from '@/lib/logoPlate'
+import { useBakedPhoto } from '@/hooks/useBakedPhoto'
 import { useTrimmedImage } from '@/hooks/useTrimmedImage'
 import { InfoTip } from '@/components/league/InfoTip'
 import type { GlossaryId } from '@/lib/glossary'
@@ -43,6 +45,8 @@ export interface PlayerCardProps {
   rank?: number
   delta?: number | null
   badge?: ReactNode
+  /** joueur dans sa 1re saison MBL : mention « RECRUE » en haut de la carte, à côté du niveau */
+  rookie?: boolean
   front: CardStat[]
   backTitle: string
   back: CardStat[]
@@ -77,40 +81,32 @@ function MiniMedal({ b, big }: { b: BadgeState; big?: boolean }) {
  *  - sinon photo originale recadrée proprement dans une fenêtre arrondie (secours) ;
  *  - sinon silhouette aux couleurs du club.
  */
-// images déjà en échec (mémorisé pour toute la visite : la carte ne redemande pas sans fin une photo introuvable)
-const FAILED = new Set<string>()
-function CardPhoto({ cutout: cutoutIn, photo: photoIn, initials, color }: { cutout?: string; photo?: string; initials: string; color: string }) {
-  const [failed, setFailed0] = useState<string | null>(null)
-  const setFailed = (u: string) => { FAILED.add(u); setFailed0(u) }
-  const cutout = cutoutIn && !FAILED.has(cutoutIn) ? cutoutIn : undefined
-  const photo = photoIn && !FAILED.has(photoIn) ? photoIn : undefined
-  const fade = 'linear-gradient(to bottom, #000 80%, transparent 100%)'
-  if (cutout && failed !== cutout) {
-    return (
-      <>
-        {/* ombre au sol sous le joueur */}
-        <div className="pointer-events-none absolute bottom-[1%] right-[4%] h-[9%] w-[56%] rounded-[50%] bg-black/55 blur-[6px]" aria-hidden />
-        <img src={cutout} alt="" onError={() => setFailed(cutout)} draggable={false}
-          className="absolute bottom-0 right-[-4%] h-[104%] w-[72%] object-contain object-bottom [filter:drop-shadow(0_8px_10px_rgb(0_0_0/.45))_drop-shadow(0_0_1px_rgb(0_0_0/.4))]"
-          style={{ maskImage: fade, WebkitMaskImage: fade }} />
-      </>
-    )
-  }
-  if (photo && failed !== photo) {
-    const m = 'linear-gradient(to bottom, #000 70%, transparent 100%)'
-    return (
-      <div className="absolute bottom-0 right-[5%] h-[90%] w-[60%] overflow-hidden rounded-t-[999px] shadow-[0_10px_24px_rgb(0_0_0/.45)] ring-2 ring-white/15" style={{ maskImage: m, WebkitMaskImage: m }}>
-        <img src={photo} alt="" onError={() => setFailed(photo)} draggable={false} className="size-full object-cover object-[50%_18%]" />
-      </div>
-    )
-  }
+/**
+ * Photo du joueur dans la carte. Cadre fixe (dimensions réservées : rien ne saute au chargement), silhouette pendant
+ * le chargement puis fondu d'apparition, image préparée dans un canvas (fondu + ombre dessinés dedans, voir
+ * useBakedPhoto) : même rendu sur iPhone, Android, ordinateur et dans le PNG téléchargé.
+ * Ordre des couches : la photo reste SOUS la note, l'IPG, les badges, le nom et les stats (z-0 contre z-10).
+ */
+function CardPhoto({ cutout, photo, initials, color }: { cutout?: string; photo?: string; initials: string; color: string }) {
+  const cut = useBakedPhoto(cutout, 'cutout')
+  const arch = useBakedPhoto(cut.status === 'error' ? photo : undefined, 'arch')
+  const shown = cut.status === 'ready' ? cut : arch.status === 'ready' ? arch : null
+  const loading = (cutout && cut.status === 'loading') || (cut.status === 'error' && photo && arch.status === 'loading')
   return (
-    <div className="absolute bottom-0 right-[2%] flex h-[80%] w-[60%] items-end justify-center" aria-hidden>
-      <svg viewBox="0 0 100 110" className="h-full w-full" style={{ color }}>
-        <defs><linearGradient id="sil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="currentColor" stopOpacity=".75" /><stop offset="1" stopColor="currentColor" stopOpacity="0" /></linearGradient></defs>
-        <circle cx="50" cy="34" r="19" fill="url(#sil)" /><path d="M10 110c2-30 18-46 40-46s38 16 40 46z" fill="url(#sil)" />
-      </svg>
-      <span className="absolute top-[22%] font-display text-[2.4em] font-black text-white/85">{initials}</span>
+    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
+      {/* silhouette : affichée sans photo, et pendant le chargement */}
+      <div className={cn('absolute bottom-0 right-[2%] flex h-[80%] w-[60%] items-end justify-center transition-opacity duration-300', shown ? 'opacity-0' : loading ? 'opacity-40' : 'opacity-100')}>
+        <svg viewBox="0 0 100 110" className="h-full w-full" style={{ color }}>
+          <defs><linearGradient id="sil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="currentColor" stopOpacity=".75" /><stop offset="1" stopColor="currentColor" stopOpacity="0" /></linearGradient></defs>
+          <circle cx="50" cy="34" r="19" fill="url(#sil)" /><path d="M10 110c2-30 18-46 40-46s38 16 40 46z" fill="url(#sil)" />
+        </svg>
+        {!loading && <span className="absolute top-[22%] font-display text-[2.4em] font-black text-white/85">{initials}</span>}
+      </div>
+      {shown && (shown === cut
+        // détouré : même cadre pour tous (le détourage normalise déjà le buste à la même hauteur)
+        ? <img src={shown.src} alt="" draggable={false} className="card-photo-in absolute bottom-0 right-[-6%] h-[100%] w-[78%] object-contain object-bottom" />
+        // photo simple : arche, tête en haut
+        : <img src={shown.src} alt="" draggable={false} className="card-photo-in absolute bottom-0 right-[5%] h-[90%] w-[60%] object-cover" />)}
     </div>
   )
 }
@@ -165,10 +161,12 @@ function CardFront({ p }: { p: PlayerCardProps }) {
   const medals = sortByRarity(p.medals ?? []).slice(0, 3)
   const color = p.team?.primary_color ?? '#0B2E73'
   const logo = cardLogo(p)
+  const plate = p.team?.logo_url ? logoPlate(p.team) : { bg: logo && isBrandLogo(logo) ? '#FFFFFF' : null, dark: false }
   const teamLabel = p.team?.name ?? p.teamName ?? ''
   return (
     <TierSurface tier={tier} className="group-focus-visible:outline-2 group-focus-visible:outline-neon">
-        <TierRibbon tier={tier} extra={p.rank != null && <span className="ml-[.2em] rounded-full px-[.5em] py-[.12em] tracking-normal" style={{ background: st.bar, color: st.barText }}>N°{p.rank}</span>} />
+        <TierRibbon tier={tier} extra={p.rank != null && <span className="ml-[.2em] rounded-full px-[.5em] py-[.12em] tracking-normal" style={{ background: st.bar, color: st.barText }}>N°{p.rank}</span>}
+          aside={p.rookie && <span className="rounded-full bg-[#0A8F4A] px-[.75em] py-[.3em] text-[.7em] font-black uppercase leading-none tracking-[.14em] text-white shadow-[0_0_0_1.5px_rgb(255_255_255/.85),0_1px_3px_rgb(0_0_0/.3)]">Recrue</span>} />
         {/* zone photo : le joueur détouré est posé sur le fond de la carte */}
         <div className="relative h-[61%] shrink-0">
           <div className="pointer-events-none absolute inset-0" style={{ background: `radial-gradient(58% 52% at 60% 60%, ${color}44, transparent 70%)` }} />
@@ -196,12 +194,11 @@ function CardFront({ p }: { p: PlayerCardProps }) {
             {/* nom de l'équipe centré ; la progression au classement est posée à droite sans décaler le nom */}
             <span className="relative min-w-0 max-w-[80%]"><span className="block truncate">{teamLabel}</span>{p.delta !== undefined && <span className="absolute left-full top-1/2 ml-1.5 -translate-y-1/2"><RankDelta delta={p.delta} /></span>}</span>
           </div>
-          {!medals.length && p.badge && <div className="mt-[.3em] flex justify-center">{p.badge}</div>}
         </div>
         {/* grand cartouche du logo de l'équipe (remplit l'espace entre le nom et les stats) */}
         {logo && (
           <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center px-[9%] py-[.35em]">
-            <div className={cn('flex h-[3.5em] w-full items-center justify-center overflow-hidden rounded-[.7em] px-[.6em] py-[.2em]', isBrandLogo(logo) ? 'bg-white shadow-[0_.25em_.8em_rgb(0_0_0/.3)] ring-1 ring-black/5' : 'bg-white/10 ring-1 ring-white/20')}>
+            <div className={cn('flex h-[3.5em] w-full items-center justify-center overflow-hidden rounded-[.7em] px-[.6em] py-[.2em]', plate.bg ? 'shadow-[0_.25em_.8em_rgb(0_0_0/.3)] ring-1 ring-black/5' : 'bg-white/10 ring-1 ring-white/20')} style={{ background: plate.bg ?? undefined }}>
               <TrimmedLogo src={logo} alt={teamLabel} />
             </div>
           </div>

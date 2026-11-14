@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fr" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/brand/mbl-logo-192.png" />
+    <link rel="apple-touch-icon" href="/brand/mbl-logo-192.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#04163D" />
+    <link rel="preload" href="/fonts/big-shoulders-display-var.woff" as="font" type="font/woff" crossorigin />
+    <link rel="preload" href="/fonts/manrope-var.woff" as="font" type="font/woff" crossorigin />
+    <title>Morocco Business League — 1ère ligue de football inter-entreprises au Maroc</title>
+    <meta name="description" content="Morocco Business League — 1ère ligue de football inter-entreprises au Maroc. الدوري الوطني للشركات لكرة القدم. Résultats, classements, joueurs et meilleures performances, organisé par Ardentia." />
+      <link rel="preconnect" href="http://localhost:54321" crossorigin />
+    <!-- Données du site demandées dès le chargement de la page, en parallèle du JavaScript (premier affichage plus rapide).
+         Visiteurs uniquement (un admin connecté passe par son propre jeton). La clé « anon » est publique par nature. -->
+    <script>
+      (function () {
+        try {
+          var u = 'http://localhost:54321', k = 'e2e-anon-key'
+          if (!u || u.charAt(0) === '%' || !k || k.charAt(0) === '%' || localStorage.getItem('statfoot:cloud-session')) return
+          var q = '/rest/v1/entity_rows?select=entity,id,data,deleted,updated_at&deleted=is.false&order=updated_at.asc,entity.asc,id.asc&limit=1000&offset=0'
+          window.__mblPrefetch = { path: q, res: fetch(u.replace(/\/$/, '') + q, { headers: { apikey: k, Authorization: 'Bearer ' + k } }).then(function (r) { return r.ok ? r.json() : null }).catch(function () { return null }) }
+        } catch (e) { /* pas de préchargement */ }
+      })()
+    </script>
+    <script type="module" crossorigin src="/assets/index-BoQLyCxB.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-COiEfhsA.js">
+    <link rel="modulepreload" crossorigin href="/assets/matchTime-plbU0zIc.js">
+    <link rel="modulepreload" crossorigin href="/assets/clubs-Dau_Tvbx.js">
+    <link rel="modulepreload" crossorigin href="/assets/format-ConSPhzH.js">
+    <link rel="modulepreload" crossorigin href="/assets/migrations-XfYEhaj1.js">
+    <link rel="modulepreload" crossorigin href="/assets/cloud-RCiZ7c74.js">
+    <link rel="modulepreload" crossorigin href="/assets/xp-CQC76N1M.js">
+    <link rel="modulepreload" crossorigin href="/assets/leagueData-BFoqyeYw.js">
+    <link rel="modulepreload" crossorigin href="/assets/preload-helper-BLdHbfdN.js">
+    <link rel="modulepreload" crossorigin href="/assets/fileStore-et2cbMZm.js">
+    <link rel="modulepreload" crossorigin href="/assets/useData-HH-rxsI3.js">
+    <link rel="modulepreload" crossorigin href="/assets/react-dom-FmjS9faB.js">
+    <link rel="modulepreload" crossorigin href="/assets/dist-DXyAuGLA.js">
+    <link rel="modulepreload" crossorigin href="/assets/dist-CUZhLzbv.js">
+    <link rel="modulepreload" crossorigin href="/assets/dist-Cc_nbK47.js">
+    <link rel="modulepreload" crossorigin href="/assets/divisionLogo-BJhLVZS_.js">
+    <link rel="modulepreload" crossorigin href="/assets/forfeit-LNW2VaMv.js">
+    <link rel="modulepreload" crossorigin href="/assets/visuals-Ckj0QmcA.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-CN9hXMUb.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

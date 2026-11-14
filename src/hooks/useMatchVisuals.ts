@@ -44,10 +44,10 @@ const bare = (u?: string) => u?.split('?')[0]
 export async function generateAndStoreVisuals(league: LeagueData, match: Match, cfg: VisualsConfig) {
   const plan = matchVisualPlan(league, match, cfg)
   const [res, mvp] = await Promise.all([renderMatchPng('resultat', league, match, cfg), plan.mvp ? renderMatchPng('mvp', league, match, cfg) : Promise.resolve(null)])
-  const { saveFile } = await import('@/api/fileStore')
+  const { storeFile } = await import('@/api/fileStore')
   const version = (match.visuals?.version ?? 0) + 1
-  const resultat_url = res ? `${await saveFile(res, 'visuel-resultat')}?v=${version}` : undefined
-  const mvp_url = mvp ? `${await saveFile(mvp, 'visuel-mvp')}?v=${version}` : undefined
+  const resultat_url = res ? `${await storeFile(res, 'visuel-resultat')}?v=${version}` : undefined
+  const mvp_url = mvp ? `${await storeFile(mvp, 'visuel-mvp')}?v=${version}` : undefined
   const old = match.visuals
   await base44.entities.Match.update(match.id, { visuals: { hash: plan.hash, version, resultat_url, mvp_url, generated_at: new Date().toISOString() } })
   void deleteFile(bare(old?.resultat_url)); void deleteFile(bare(old?.mvp_url))

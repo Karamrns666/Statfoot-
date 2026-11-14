@@ -11,6 +11,9 @@ import { registerFileWorker } from '@/api/fileStore'
 
 // sert les images importées (photos, posters) depuis IndexedDB
 void registerFileWorker()
+// image introuvable (ex. fichier importé sur un autre appareil) : on la masque plutôt que d'afficher l'icône cassée
+addEventListener('error', (e) => { const t = e.target; if (t instanceof HTMLImageElement) t.style.visibility = 'hidden' }, true)
+addEventListener('load', (e) => { const t = e.target; if (t instanceof HTMLImageElement && t.style.visibility === 'hidden') t.style.visibility = '' }, true)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

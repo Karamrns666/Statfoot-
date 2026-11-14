@@ -51,6 +51,12 @@ export async function saveFile(blob: Blob, hint = 'f'): Promise<string> {
   return toDataUrl(blob)
 }
 
+/** Range une image là où TOUS les visiteurs la verront : stockage Supabase sur le site en ligne, sinon IndexedDB (mode local). */
+export async function storeFile(blob: Blob, hint = 'f'): Promise<string> {
+  const { cloudEnabled, uploadMedia } = await import('./cloud')
+  return cloudEnabled ? uploadMedia(blob, hint) : saveFile(blob, hint)
+}
+
 /** Supprime un fichier rangé par saveFile (sans effet sur les autres URL). */
 export async function deleteFile(url?: string | null) {
   if (!url?.startsWith(FILE_PREFIX)) return

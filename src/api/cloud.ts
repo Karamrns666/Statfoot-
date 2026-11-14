@@ -200,3 +200,18 @@ export async function adminRest(path: string, init: RequestInit = {}) {
 }
 export const canWrite = () => !!(session && profile && profile.status === 'active')
 export type { EntityName }
+
+// ---------------------------------------------------------------------------------------------------------
+//  Images (Supabase Storage, bucket public « media »)
+// ---------------------------------------------------------------------------------------------------------
+/** Envoie une image et renvoie son URL publique (visible par tous les visiteurs). */
+export async function uploadMedia(blob: Blob, hint = 'f'): Promise<string> {
+  const t = await accessToken()
+  if (!t) throw new Error('Connexion admin requise pour envoyer une image')
+  const res = await fetch('/api/media', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${t}` }, body: JSON.stringify({ type: blob.type, hint }) })
+  const d = await res.json().catch(() => ({})) as { upload_url?: string; public_url?: string; error?: string }
+  if (!res.ok || !d.upload_url || !d.public_url) throw new Error(d.error ?? `Envoi de l'image impossible (${res.status})`)
+  const up = await fetch(d.upload_url, { method: 'PUT', headers: { 'Content-Type': blob.type, 'x-upsert': 'false' }, body: blob })
+  if (!up.ok) throw new Error(`Envoi de l'image impossible (${up.status})`)
+  return d.public_url
+}

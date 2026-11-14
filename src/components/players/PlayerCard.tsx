@@ -160,7 +160,6 @@ function CardFront({ p }: { p: PlayerCardProps }) {
             <div className="mt-[.25em] text-[.85em] font-extrabold tracking-wider" style={{ color: st.fgSoft }}>{p.ratingLabel}</div>
             {(p.position === 'GK' || p.captain) && <div className="mt-[.35em] font-display text-[1.35em] font-extrabold leading-none" title={[p.position === 'GK' && 'Gardien', p.captain && 'Capitaine'].filter(Boolean).join(' · ')}>{[p.position === 'GK' && 'GB', p.captain && 'C'].filter(Boolean).join(' · ')}</div>}
             <div className="my-[.45em] h-[2px] w-[2.2em] rounded-full bg-[#F05A22]" />
-            {logo && <img src={logo} alt="" className={cn('size-[2.6em] object-contain', isBrandLogo(logo) ? 'rounded-[22%] bg-white shadow-[0_3px_10px_rgba(0,0,0,.3)] ring-1 ring-black/5' : 'drop-shadow-[0_3px_6px_rgba(0,0,0,.35)]')} />}
             {p.ipg != null && <div className="mt-[.45em] rounded-md px-[.4em] py-[.15em] text-center font-display text-[.95em] font-black leading-none" style={{ background: st.chip, color: st.chipText }} title={typeof p.ipg === 'number' ? 'Indice de performance globale' : 'Indice calculé après le premier match'}>{typeof p.ipg === 'number' ? Math.round(p.ipg) : p.ipg}<span className="block text-[.6em] font-extrabold tracking-wider">IPG</span></div>}
           </div>
           {/* coin haut droit : 3 meilleurs badges de performance (plus rare d'abord) */}
@@ -176,6 +175,14 @@ function CardFront({ p }: { p: PlayerCardProps }) {
           <div className="mt-[.15em] flex items-center justify-center gap-1.5 text-[.9em] font-semibold" style={{ color: st.fgSoft }}><span className="truncate">{teamLabel}</span>{p.delta !== undefined && <RankDelta delta={p.delta} />}</div>
           {!medals.length && p.badge && <div className="mt-[.3em] flex justify-center">{p.badge}</div>}
         </div>
+        {/* grand cartouche du logo de l'équipe (remplit l'espace entre le nom et les stats) */}
+        {logo && (
+          <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center px-[9%] py-[.45em]">
+            <div className={cn('flex h-full max-h-[4.2em] min-h-[2.4em] w-full items-center justify-center rounded-[.7em] px-[.8em] py-[.35em]', isBrandLogo(logo) ? 'bg-white shadow-[0_.25em_.8em_rgb(0_0_0/.3)] ring-1 ring-black/5' : 'bg-white/10 ring-1 ring-white/20')}>
+              <img src={logo} alt={teamLabel} draggable={false} className="h-full max-h-[3.4em] w-full object-contain" onError={(e) => { e.currentTarget.style.visibility = 'hidden' }} />
+            </div>
+          </div>
+        )}
         <div className="relative mt-auto grid grid-cols-4 divide-x divide-white/15 border-t-[.22em] border-[#F05A22]" style={{ background: st.bar, color: st.barText }}>
           {p.front.slice(0, 4).map((s) => (
             <div key={s.label} className="py-[.6em] text-center" title={s.hint}>

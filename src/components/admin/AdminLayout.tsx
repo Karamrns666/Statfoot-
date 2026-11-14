@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { migrateLocalFiles } from '@/api/migrateFiles'
+import { isSimActive } from '@/sim/simMode'
 import { SimBanner } from '@/components/sim/SimBanner'
 import { Link, Navigate, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { Image as ImageIcon, Gavel, Scale, Swords, Sparkles, CalendarClock,
@@ -8,6 +10,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useAutoCutouts } from '@/hooks/useAutoCutouts'
 import { useAutoVisuals } from '@/hooks/useMatchVisuals'
 import { useData } from '@/hooks/useData'
+import { toast } from '@/components/ui/toast'
 import { AdminScopeProvider, useAdminScope } from '@/hooks/useAdminScope'
 import { can, ROLE_LABEL, type Area } from '@/lib/permissions'
 import { Logo } from '@/components/layout/Logo'
@@ -73,6 +76,7 @@ export function AdminLayout() {
   // détourage automatique des photos joueurs (pas pendant la saisie d'un match en direct)
   const inMatch = loc.pathname.startsWith('/admin/match-center/')
   const cut = useAutoCutouts(!!user && user.role !== 'operator' && !inMatch)
+  useMigrateLocalFiles(!!user && user.role !== 'operator' && !inMatch)
   // visuels réseaux sociaux : générés dès qu'un match passe « Terminé », régénérés après correction
   useAutoVisuals(!!user && user.role !== 'operator')
   if (loading) return <Spinner />
@@ -143,4 +147,20 @@ export function AdminPage({ title, subtitle, actions, children }: { title: strin
       {children}
     </div>
   )
+}
+
+/** Met en ligne (stockage partagé) les images encore rangées seulement dans CE navigateur — une fois par session */
+let migrated = false
+function useMigrateLocalFiles(enabled: boolean) {
+  const { db } = useData()
+  useEffect(() => {
+    if (!enabled || migrated || isSimActive() || !db.Player?.length) return
+    const t = setTimeout(() => {
+      migrated = true
+      migrateLocalFiles(db as never).then((r) => {
+        if (r.uploaded) toast.success(`${r.uploaded} image(s) mise(s) en ligne : elles s’affichent maintenant pour tous les visiteurs`)
+      }).catch(() => { migrated = false })
+    }, 4000)
+    return () => clearTimeout(t)
+  }, [enabled, db])
 }

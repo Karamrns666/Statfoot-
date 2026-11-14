@@ -464,7 +464,44 @@ export function applyTagline2026(db: Rules6Data): Rules6Data {
   return { Settings: db.Settings.map((x) => ({ ...x, tagline: OLD_FR.includes(x.tagline ?? '') ? LEAGUE.tagline : x.tagline, tagline_ar: OLD_AR.includes(x.tagline_ar ?? '') ? LEAGUE.taglineAr : x.tagline_ar })) }
 }
 
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams, applyHideSeason2025, applyLogoRevisions, applyRemoveCanpack2026, applyTierCorrections2026, applyTagline2026]
+/**
+ * Règlement (nov. 2026, validé par Ardentia) : joueurs obligatoirement salariés de l'entreprise (Art. 2.3) et
+ * sanction d'une réserve confirmée pour joueur non salarié : défaite 3-0 (Art. 2.3 et 17.4).
+ * Ajouts insérés dans le règlement en vigueur (le reste du texte, éventuellement modifié dans l'admin, est conservé).
+ */
+export const RULE_EMPLOYEE = 'Les joueurs doivent obligatoirement être salariés de l\'entreprise qu\'ils représentent. Ardentia peut demander un justificatif (attestation de travail ou document équivalent).'
+export const RULE_RESERVE = 'Si une réserve est déposée contre une équipe qui a fait jouer un joueur non salarié de l\'entreprise et qu\'elle est confirmée par Ardentia, l\'équipe fautive perd le match sur le score de 3-0.'
+export function patchRulebookEmployees(content: string): string {
+  if (content.includes('obligatoirement être salariés')) return content
+  const sec = (title: RegExp) => { const m = content.match(title); if (!m || m.index == null) return null; const start = m.index; const next = content.slice(start + m[0].length).search(/\n#{1,2} /); return { start, end: next < 0 ? content.length : start + m[0].length + next } }
+  let out = content
+  const a = sec(/^## 2\.3[^\n]*$/m)
+  if (a) {
+    const body = out.slice(a.start, a.end)
+    const paras = body.split(/\n\n/)
+    // après le 1er paragraphe de texte (index 1 : le titre est l'index 0), et la sanction à la fin de l'article
+    paras.splice(2, 0, RULE_EMPLOYEE)
+    const rebuilt = paras.join('\n\n').replace(/\s*$/, '') + `\n\n${RULE_RESERVE}\n`
+    out = out.slice(0, a.start) + rebuilt + out.slice(a.end)
+  }
+  const b = (() => { const m = out.match(/^## 17\.4[^\n]*$/m); if (!m || m.index == null) return null; const next = out.slice(m.index + m[0].length).search(/\n#{1,2} /); return { start: m.index, end: next < 0 ? out.length : m.index + m[0].length + next } })()
+  if (b) {
+    const paras = out.slice(b.start, b.end).split(/\n\n/)
+    paras.splice(2, 0, RULE_RESERVE)
+    out = out.slice(0, b.start) + paras.join('\n\n') + out.slice(b.end)
+  }
+  return out
+}
+export function applyRulesEmployees2026(db: Rules6Data): Rules6Data {
+  const cur = db.Rulebook?.find((r) => r.status === 'current')
+  if (!cur || cur.content.includes('obligatoirement être salariés')) return {}
+  const now = new Date().toISOString()
+  const Rulebook = db.Rulebook!.map((r) => r.id === cur.id ? { ...r, content: patchRulebookEmployees(r.content), changes: [r.changes, 'Nov. 2026 : joueurs salariés de l’entreprise obligatoires (Art. 2.3) ; réserve confirmée pour joueur non salarié = défaite 3-0 (Art. 2.3 et 17.4).'].filter(Boolean).join('\n') } : r)
+  const log = { id: `log_rules_salaries_${Date.now().toString(36)}`, created_date: now, action: 'rulebook_update', entity: 'Rulebook', entity_id: cur.id, entity_label: cur.version, author_email: 'systeme', author_name: 'Mise à jour du site', details: { articles: '2.3, 17.4', validation: 'Ardentia (14/11/2026)' } } as BaseEntity
+  return { Rulebook, AuditLog: [log, ...(db.AuditLog ?? [])] }
+}
+
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams, applyHideSeason2025, applyLogoRevisions, applyRemoveCanpack2026, applyTierCorrections2026, applyTagline2026, applyRulesEmployees2026]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */

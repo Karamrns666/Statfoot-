@@ -1,17 +1,17 @@
 // Détourage d'une photo joueur enregistrée + verrou partagé entre onglets (un seul détourage à la fois :
 // le modèle IA est lourd, on évite d'en faire tourner plusieurs en parallèle).
-import { loadBlob, saveFile } from '@/api/fileStore'
+import { loadBlob, storeFile } from '@/api/fileStore'
 import { finishCutout, removePhotoBackground, type CutoutProgress } from './bgRemoval'
 
 /** Détoure la photo (URL enregistrée) et renvoie l'URL de la version détourée (WebP transparent). */
 export async function cutoutFromUrl(url: string, onProgress?: CutoutProgress) {
   const out = await removePhotoBackground(await loadBlob(url), onProgress)
-  return saveFile(out, 'cutout')
+  return storeFile(out, 'cutout')
 }
 
 /** PNG/WebP déjà détouré (préparé dans un autre outil) → même post-traitement (cadrage, bords, 800 px). */
 export async function cutoutFromFile(file: Blob) {
-  return saveFile(await finishCutout(file), 'cutout')
+  return storeFile(await finishCutout(file), 'cutout')
 }
 
 const LOCK = 'statfoot:cutout-lock'

@@ -235,19 +235,19 @@ export function Billboard({ slides: content, leagueName, seasonLabel, logoUrl, p
 
         {/* rail bas : navigation, progression, pause */}
         <div className="relative z-10 flex flex-wrap items-center gap-3 border-t border-white/10 bg-night-950/60 px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-1.5">
-            <button onClick={() => go(idx - 1)} className="cursor-pointer rounded-md p-1 text-white/60 hover:text-white" aria-label="Panneau précédent"><ChevronLeft className="size-4" /></button>
+          <div className="-my-2 flex items-center gap-0.5">
+            <button onClick={() => go(idx - 1)} className="cursor-pointer rounded-md p-2.5 text-white/60 hover:text-white" aria-label="Panneau précédent"><ChevronLeft className="size-4" /></button>
             <div className="flex items-center gap-1.5" role="tablist" aria-label="Panneaux">
               {slides.map((x, k) => (
                 <button key={x.key} role="tab" aria-selected={k === idx} aria-label={'brand' in x ? 'Logo de la ligue' : x.eyebrow} onClick={() => go(k)}
-                  className={cn('relative h-2 cursor-pointer overflow-hidden rounded-full bg-white/15 transition-all', k === idx ? 'w-10' : 'w-2 hover:bg-white/40')}>
-                  {k === idx && <span key={tk} className="absolute inset-0 origin-left rounded-full bg-neon" style={{ animation: stopped ? 'none' : `board-progress ${duration}ms linear forwards`, transform: stopped ? 'scaleX(1)' : undefined }} />}
+                  className={cn('relative h-2 cursor-pointer overflow-visible rounded-full bg-white/15 transition-all before:absolute before:-inset-x-2 before:-inset-y-[18px] before:content-[""]', k === idx ? 'w-10' : 'w-2 hover:bg-white/40')}>
+                  {k === idx && <span key={tk} className="absolute inset-0 origin-left overflow-hidden rounded-full bg-neon" style={{ animation: stopped ? 'none' : `board-progress ${duration}ms linear forwards`, transform: stopped ? 'scaleX(1)' : undefined }} />}
                 </button>
               ))}
             </div>
-            <button onClick={() => go(idx + 1)} className="cursor-pointer rounded-md p-1 text-white/60 hover:text-white" aria-label="Panneau suivant"><ChevronRight className="size-4" /></button>
+            <button onClick={() => go(idx + 1)} className="cursor-pointer rounded-md p-2.5 text-white/60 hover:text-white" aria-label="Panneau suivant"><ChevronRight className="size-4" /></button>
             {n > 1 && !reduced && (
-              <button onClick={() => setPaused((p) => !p)} className="ml-1 cursor-pointer rounded-md p-1 text-white/60 hover:text-white" aria-label={paused ? 'Reprendre le défilement' : 'Mettre en pause'} aria-pressed={paused}>
+              <button onClick={() => setPaused((p) => !p)} className="cursor-pointer rounded-md p-2.5 text-white/60 hover:text-white" aria-label={paused ? 'Reprendre le défilement' : 'Mettre en pause'} aria-pressed={paused}>
                 {paused ? <Play className="size-3.5" /> : <Pause className="size-3.5" />}
               </button>
             )}

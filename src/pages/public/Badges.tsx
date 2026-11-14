@@ -45,7 +45,7 @@ export default function Badges() {
                 <p className="mt-1 text-xs text-muted-foreground">{o?.count ? <>Obtenu par <b className="text-white">{Math.max(1, Math.round(o.pct))} %</b> des joueurs ({o.count})</> : 'Personne ne l’a encore débloqué.'}</p>
                 {!!o?.players.length && (
                   <div className="mt-2 flex flex-wrap gap-x-2 gap-y-1 text-xs">
-                    {o.players.slice(0, 12).map((pid) => <Link key={pid} to={`/joueurs/${pid}`} className="rounded-full bg-white/5 px-2 py-0.5 hover:text-neon">{playerName(L.player.get(pid))}</Link>)}
+                    {o.players.slice(0, 12).map((pid) => <Link key={pid} to={`/joueurs/${pid}`} className="tap-sm rounded-full bg-white/5 px-2 py-0.5 hover:text-neon">{playerName(L.player.get(pid))}</Link>)}
                     {o.players.length > 12 && <span className="text-muted-foreground">+{o.players.length - 12}</span>}
                   </div>
                 )}

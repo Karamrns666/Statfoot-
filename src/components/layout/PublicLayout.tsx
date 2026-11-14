@@ -57,7 +57,7 @@ export function PublicLayout() {
             <SeasonSelector className="hidden sm:flex" />
             <Link to="/tv" title="Mode TV" className="hidden rounded-lg p-2 text-muted-foreground hover:bg-white/10 hover:text-white sm:block"><Tv className="size-5" /></Link>
             <Link to="/admin" title="Espace admin" className="hidden rounded-lg p-2 text-muted-foreground hover:bg-white/10 hover:text-white sm:block"><Lock className="size-5" /></Link>
-            <button className="rounded-lg p-2 hover:bg-white/10 xl:hidden cursor-pointer" onClick={() => setOpen(!open)} aria-label="Menu">{open ? <X /> : <Menu />}</button>
+            <button className="cursor-pointer rounded-lg p-2.5 hover:bg-white/10 xl:hidden" onClick={() => setOpen(!open)} aria-label="Menu">{open ? <X /> : <Menu />}</button>
           </div>
         </div>
         {open && (
@@ -96,15 +96,15 @@ function Footer() {
             <div className="font-display text-2xl font-black uppercase leading-none">{L.name}</div>
             <p className="mt-2 max-w-xs text-sm text-muted-foreground">{L.tagline.replace('INTER-', 'INTER\u2011')}</p>
             <p className="mt-1 max-w-xs text-sm text-muted-foreground" dir="rtl" lang="ar" style={{ fontFamily: "'Tajawal', 'Segoe UI', Tahoma, sans-serif", textAlign: 'left' }}>{L.taglineAr}</p>
-            <a href={o.website} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2.5 text-sm text-muted-foreground hover:text-white">Organisé par <img src={o.logo} alt={o.name} className="h-7 w-auto" /></a>
+            <a href={o.website} target="_blank" rel="noreferrer" className="tap-sm mt-4 inline-flex items-center gap-2.5 text-sm text-muted-foreground hover:text-white">Organisé par <img src={o.logo} alt={o.name} className="h-7 w-auto" /></a>
           </div>
         </div>
-        <address className="space-y-2.5 text-sm not-italic">
+        <address className="flex flex-col gap-2.5 text-sm not-italic">
           <div className="title-caps text-base">Contact</div>
-          <a href={`mailto:${o.email}`} className="flex items-center gap-2 text-muted-foreground hover:text-neon"><Mail className="size-4 shrink-0" />{o.email}</a>
-          <a href={telHref(o.phone)} className="flex items-center gap-2 text-muted-foreground hover:text-neon"><Phone className="size-4 shrink-0" />{o.phone}</a>
-          <a href={mapsHref(o.address)} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-muted-foreground hover:text-neon"><MapPin className="mt-0.5 size-4 shrink-0" />{o.address}</a>
-          <a href={o.website} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-muted-foreground hover:text-neon"><Globe className="size-4 shrink-0" />{o.website.replace(/^https?:\/\//, '')}</a>
+          <a href={`mailto:${o.email}`} className="flex items-center gap-2 text-muted-foreground hover:text-neon tap"><Mail className="size-4 shrink-0" />{o.email}</a>
+          <a href={telHref(o.phone)} className="flex items-center gap-2 text-muted-foreground hover:text-neon tap"><Phone className="size-4 shrink-0" />{o.phone}</a>
+          <a href={mapsHref(o.address)} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-muted-foreground hover:text-neon tap"><MapPin className="mt-0.5 size-4 shrink-0" />{o.address}</a>
+          <a href={o.website} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-muted-foreground hover:text-neon tap"><Globe className="size-4 shrink-0" />{o.website.replace(/^https?:\/\//, '')}</a>
           <div className="flex flex-wrap gap-2 pt-2">
             <a href={whatsappHref(o.phone)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-2 text-sm font-bold text-[#06210f] hover:brightness-110"><IconWhatsapp className="size-4" />WhatsApp</a>
             <a href={telHref(o.phone)} className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-bold hover:bg-white/10"><Phone className="size-4" />Appeler</a>
@@ -114,10 +114,10 @@ function Footer() {
           <div className="title-caps text-base">Suivez-nous</div>
           <ul className="space-y-2">
             {socials.map((x) => (
-              <li key={x.label}><a href={x.href} target="_blank" rel="noreferrer" aria-label={x.label} className="flex items-center gap-2.5 text-sm text-muted-foreground hover:text-neon"><span className="glass rounded-lg p-2"><x.icon className="size-4" /></span>{x.icon === IconLinkedin ? 'LinkedIn' : 'Instagram'} · {x.short}</a></li>
+              <li key={x.label}><a href={x.href} target="_blank" rel="noreferrer" aria-label={x.label} className="flex min-h-11 items-center gap-2.5 text-sm text-muted-foreground hover:text-neon"><span className="glass rounded-lg p-2"><x.icon className="size-4" /></span>{x.icon === IconLinkedin ? 'LinkedIn' : 'Instagram'} · {x.short}</a></li>
             ))}
           </ul>
-          <div className="flex flex-wrap gap-x-4 gap-y-1 pt-2 text-sm"><Link to="/reglement" className="text-muted-foreground hover:text-neon">Règlement</Link><Link to="/discipline" className="text-muted-foreground hover:text-neon">Discipline</Link><Link to="/historique" className="text-muted-foreground hover:text-neon">Historique</Link><Link to="/pre-saison" className="text-muted-foreground hover:text-neon">Pré-saison</Link><Link to="/equipe-type" className="text-muted-foreground hover:text-neon">Équipe type</Link><Link to="/badges" className="text-muted-foreground hover:text-neon">Badges</Link><Link to="/glossaire" className="text-muted-foreground hover:text-neon">Glossaire</Link><Link to="/match-des-capitaines" className="text-muted-foreground hover:text-neon">Match des capitaines</Link><Link to="/media" className="text-muted-foreground hover:text-neon">Média</Link><Link to="/admin" className="text-muted-foreground hover:text-neon">Espace admin</Link></div>
+          <div className="flex flex-wrap gap-x-4 gap-y-3 pt-2 text-sm"><Link to="/reglement" className="tap-sm inline-flex text-muted-foreground hover:text-neon">Règlement</Link><Link to="/discipline" className="tap-sm inline-flex text-muted-foreground hover:text-neon">Discipline</Link><Link to="/historique" className="tap-sm inline-flex text-muted-foreground hover:text-neon">Historique</Link><Link to="/pre-saison" className="tap-sm inline-flex text-muted-foreground hover:text-neon">Pré-saison</Link><Link to="/equipe-type" className="tap-sm inline-flex text-muted-foreground hover:text-neon">Équipe type</Link><Link to="/badges" className="tap-sm inline-flex text-muted-foreground hover:text-neon">Badges</Link><Link to="/glossaire" className="tap-sm inline-flex text-muted-foreground hover:text-neon">Glossaire</Link><Link to="/match-des-capitaines" className="tap-sm inline-flex text-muted-foreground hover:text-neon">Match des capitaines</Link><Link to="/media" className="tap-sm inline-flex text-muted-foreground hover:text-neon">Média</Link><Link to="/admin" className="tap-sm inline-flex text-muted-foreground hover:text-neon">Espace admin</Link></div>
         </div>
       </div>
       <div className="border-t border-white/5 py-4 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} {L.name} · organisée par {o.name}</div>

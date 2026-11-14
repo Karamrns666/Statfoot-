@@ -29,8 +29,8 @@ export function SimBanner({ compact = false }: { compact?: boolean }) {
       <span>SIMULATION — données fictives</span>
       {!compact && <>
         <span className="hidden font-semibold normal-case tracking-normal sm:inline">Visible uniquement par les admins · lecture seule</span>
-        <Link to="/admin/simulation" className="rounded-full bg-[#1A0A00] px-2.5 py-0.5 text-[11px] font-bold normal-case tracking-normal text-white hover:bg-black">Gérer</Link>
-        <button onClick={leaveSimulation} className="cursor-pointer rounded-full border border-[#1A0A00]/40 px-2.5 py-0.5 text-[11px] font-bold normal-case tracking-normal hover:bg-[#1A0A00]/10">Quitter</button>
+        <Link to="/admin/simulation" className="tap-sm rounded-full bg-[#1A0A00] px-2.5 py-0.5 text-[11px] font-bold normal-case tracking-normal text-white hover:bg-black">Gérer</Link>
+        <button onClick={leaveSimulation} className="tap-sm cursor-pointer rounded-full border border-[#1A0A00]/40 px-2.5 py-0.5 text-[11px] font-bold normal-case tracking-normal hover:bg-[#1A0A00]/10">Quitter</button>
       </>}
     </div>
   )

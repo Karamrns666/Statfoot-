@@ -47,7 +47,7 @@ export default function Discipline() {
       <PageHeader title="Discipline" subtitle={`${season?.name ?? ''} · cartons et suspensions`}>
         <div className="flex flex-wrap gap-1.5" role="group" aria-label="Compétition">
           {[{ id: 'all', label: 'Toutes' }, ...comps.map((c) => ({ id: c.id, label: phaseLabel(c) }))].map((c) => (
-            <button key={c.id} onClick={() => setCompId(c.id)} aria-pressed={compId === c.id} className={cn('cursor-pointer rounded-full border px-3 py-1 text-xs font-bold uppercase', compId === c.id ? 'border-neon bg-neon/15 text-neon' : 'border-white/10 text-muted-foreground')}>{c.label}</button>
+            <button key={c.id} onClick={() => setCompId(c.id)} aria-pressed={compId === c.id} className={cn('min-h-9 tap-sm cursor-pointer rounded-full border px-3 py-1 text-xs font-bold uppercase', compId === c.id ? 'border-neon bg-neon/15 text-neon' : 'border-white/10 text-muted-foreground')}>{c.label}</button>
           ))}
         </div>
       </PageHeader>

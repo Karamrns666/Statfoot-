@@ -259,7 +259,7 @@ export default function PlayerDetail() {
       <section className="glass rounded-2xl p-2 sm:p-4">
         <h2 className="px-2 pt-2 font-display text-2xl font-black">Détail de l’XP</h2>
         <SortableTable rows={xpRows} rowKey={(r) => r.m.id} initial={{ key: 'date', dir: 'asc' }} columns={[
-          { key: 'date', label: 'Date', first: 'asc', className: 'whitespace-nowrap text-xs text-muted-foreground', sort: (r) => r.m.date ?? '', render: (r) => <Link to={`/matchs/${r.m.id}`} className="hover:text-neon">{fmtDate(r.m.date, 'dd/MM')} · J{r.m.round}</Link> },
+          { key: 'date', label: 'Date', first: 'asc', className: 'whitespace-nowrap text-xs text-muted-foreground', sort: (r) => r.m.date ?? '', render: (r) => <Link to={`/matchs/${r.m.id}`} className="tap-sm inline-block hover:text-neon">{fmtDate(r.m.date, 'dd/MM')} · J{r.m.round}</Link> },
           { key: 'opp', label: 'Adversaire', sort: (r) => r.opp?.name, render: (r) => <span className="flex items-center gap-2 text-sm"><TeamLogo team={r.opp} size={18} /><span className="truncate">{r.opp?.name}</span>{r.oppRank ? <span className="text-xs text-muted-foreground">({ordinal(r.oppRank)})</span> : null}</span> },
           { key: 'goals', label: 'B', title: 'Buts', headClassName: 'text-center', className: 'num text-center', sort: (r) => r.goals, render: (r) => r.goals },
           { key: 'assists', label: 'PD', title: 'Passes décisives', headClassName: 'text-center', className: 'num text-center', sort: (r) => r.assists, render: (r) => r.assists },

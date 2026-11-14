@@ -69,7 +69,7 @@ export default function TeamDetail() {
       </section>
       {pre && pre.teamIds.includes(team.id) && pre.matches.length > 0 && (
         <section>
-          <SectionTitle title="Parcours en pré-saison" action={<Link to="/pre-saison?onglet=parcours" className="text-sm font-semibold text-neon hover:underline">Toutes les équipes</Link>} />
+          <SectionTitle title="Parcours en pré-saison" action={<Link to="/pre-saison?onglet=parcours" className="tap text-sm font-semibold text-neon hover:underline">Toutes les équipes</Link>} />
           <div className="max-w-xl"><TeamPathCard v={pre} teamId={team.id} /></div>
         </section>
       )}

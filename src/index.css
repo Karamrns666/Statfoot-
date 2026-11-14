@@ -261,3 +261,8 @@
 .bdg .bdg-spark { animation: bdg-spark 2.8s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 @keyframes bdg-spark { 0% { opacity: 0; transform: translateY(4px) scale(.4); } 40% { opacity: 1; transform: translateY(-3px) scale(1); } 100% { opacity: 0; transform: translateY(-10px) scale(.3); } }
 @media (prefers-reduced-motion: reduce) { .bdg .bdg-shine, .bdg .bdg-halo, .bdg .bdg-holo, .bdg .bdg-spark { animation: none; } .bdg .bdg-shine { display: none; } }
+
+/* Zone de toucher agrandie (≥ 44 px de haut) SANS changer la mise en page : le padding ajouté est compensé par
+   une marge négative. Pour les petits liens et boutons (bandeau des scores, pied de page, liens d'articles…). */
+.tap { padding-block: 12px; margin-block: -12px; }
+.tap-sm { padding-block: 8px; margin-block: -8px; }

@@ -18,7 +18,7 @@ export function ScoreTicker() {
   const row = items.map((m) => {
     const h = L.team.get(m.home_team_id), a = L.team.get(m.away_team_id)
     return (
-      <Link key={m.id} to={`/matchs/${m.id}`} className="flex shrink-0 items-center gap-2 px-4 text-sm hover:text-neon">
+      <Link key={m.id} to={`/matchs/${m.id}`} className="tap flex shrink-0 items-center gap-2 px-4 text-sm hover:text-neon">
         {m.status === 'live' && <TickerLive m={m} />}
         <span className="font-display font-bold uppercase tracking-wide">{h?.short_name}</span>
         <span className="num rounded bg-white/10 px-1.5 text-base">{m.home_score}-{m.away_score}</span>

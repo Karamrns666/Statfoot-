@@ -91,7 +91,7 @@ export function CaptainMatchCard({ m, teams, defaultOpen = false }: { m: Captain
       {done && (
         <>
           <div className="mt-3 flex items-center justify-center gap-4">
-            <button onClick={() => setOpen((o) => !o)} aria-expanded={open} className="flex cursor-pointer items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-neon">Feuille de match<ChevronDown className={cn('size-4 transition', open && 'rotate-180')} /></button>
+            <button onClick={() => setOpen((o) => !o)} aria-expanded={open} className="tap flex cursor-pointer items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-neon">Feuille de match<ChevronDown className={cn('size-4 transition', open && 'rotate-180')} /></button>
             <CaptainVisualButton m={m} teams={teams} />
           </div>
           {open && <div className="mt-3"><CaptainSheet m={m} teams={teams} /></div>}
@@ -112,7 +112,7 @@ export function CaptainVisualButton({ m, teams, label = 'Visuel' }: { m: Captain
   }
   return (
     <>
-      <button onClick={() => setOpen(true)} className="flex cursor-pointer items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-neon"><ImageIcon className="size-3.5" />{label}</button>
+      <button onClick={() => setOpen(true)} className="tap flex cursor-pointer items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-neon"><ImageIcon className="size-3.5" />{label}</button>
       {open && <VisualShareDialog open={open} onOpenChange={setOpen} title="Match des capitaines" description="Visuel 1080 × 1080 aux couleurs officielles." fileName={`mbl-capitaines-${m.date.slice(0, 10)}.png`}
         caption={`⚔️ MATCH DES CAPITAINES | ${teams.orange.name} ${s.orange} - ${s.bleue} ${teams.bleue.name}\n#MoroccoBusinessLeague #MBL`} render={render} />}
     </>

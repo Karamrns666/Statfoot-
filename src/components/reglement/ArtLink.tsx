@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 
 export function ArtLink({ art, children, className }: { art: string; children?: React.ReactNode; className?: string }) {
   return (
-    <Link to={artHref(art)} className={cn('inline-flex items-center gap-1 text-xs font-semibold text-neon/90 underline-offset-2 hover:text-neon hover:underline', className)} title={`Lire l’${artLabel(art).replace('Art.', 'article')} du règlement`}>
+    <Link to={artHref(art)} className={cn('tap-sm inline-flex items-center gap-1 text-xs font-semibold text-neon/90 underline-offset-2 hover:text-neon hover:underline', className)} title={`Lire l’${artLabel(art).replace('Art.', 'article')} du règlement`}>
       <BookOpen className="size-3.5" aria-hidden />{children ?? artLabel(art)}
     </Link>
   )

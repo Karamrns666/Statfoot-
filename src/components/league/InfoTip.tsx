@@ -33,7 +33,7 @@ function TipButton({ ariaLabel, className, children, content }: { ariaLabel: str
     <>
       <button ref={btn} type="button" data-tip={tipId} aria-label={ariaLabel} aria-expanded={open} aria-describedby={open ? tipId : undefined}
         onClick={(e) => { stop(e); show() }} onMouseEnter={show} onMouseLeave={(e) => { if (!(e.relatedTarget as Element)?.closest?.(`[data-tip="${tipId}"]`)) setOpen(false) }} onFocus={show} onBlur={() => setOpen(false)}
-        className={cn('relative inline-flex shrink-0 cursor-help items-center justify-center align-middle leading-none transition before:absolute before:-inset-[14px] before:content-[""]', className)}>
+        className={cn('relative inline-flex shrink-0 cursor-help items-center justify-center align-middle leading-none transition before:absolute before:-inset-[16px] before:content-[""]', className)}>
         {children}
       </button>
       {open && createPortal(

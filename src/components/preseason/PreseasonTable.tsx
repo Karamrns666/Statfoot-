@@ -1,5 +1,6 @@
 // Classement de la pré-saison (admin + site) : Rang, Équipe, J, V, N, D, Buts +, Buts −, Diff., Points,
 // Force des adversaires, Division (zone MASTER / CHALLENGER, provisoire tant que la pré-saison n'est pas close).
+import { InfoTip } from '@/components/league/InfoTip'
 import { Link } from 'react-router-dom'
 import { useLookup } from '@/hooks/useData'
 import { TeamLogo } from '@/components/league/Identity'
@@ -37,8 +38,8 @@ export function PreseasonTable({ rows, masterSize, final = false, compact = fals
             <th className={cn(th, 'w-10')}>Rang</th><th className={cn(th, 'text-left')}>Équipe</th>
             <th className={th} title="Matchs joués">J</th><th className={th}>V</th><th className={th}>N</th><th className={th}>D</th>
             {!compact && <><th className={th}>Buts +</th><th className={th}>Buts −</th></>}
-            <th className={th}>Diff.</th><th className={th}>Points</th>
-            <th className={th} title="Total des points actuels des adversaires déjà rencontrés">Force adv.</th>
+            <th className={th}><span className="whitespace-nowrap">Diff. <InfoTip id="diff" /></span></th><th className={th}><span className="whitespace-nowrap">Points <InfoTip id="points" /></span></th>
+            <th className={th}><span className="whitespace-nowrap">Force adv. <InfoTip id="force" /></span></th>
             {!compact && <th className={cn(th, 'text-left')}>Division{!final && anyPlayed ? ' (prov.)' : ''}</th>}
           </tr>
         </thead>

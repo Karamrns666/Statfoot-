@@ -32,10 +32,11 @@ export function XPCard({ r, player: p, team: t, className, faceOnly, ipg: ipgOve
         : [{ label: 'MJ', value: s.matches }, { label: 'BUT', value: s.goals }, { label: 'PAS', value: s.assists, hint: 'Passes décisives' }, { label: 'CJ', value: s.yellow, hint: 'Cartons jaunes' }]}
       backTitle={gk ? 'Gardien' : 'Statistiques'}
       back={[
+        { label: 'XP de la saison', value: s.xp, tip: 'xp' as const },
         { label: 'V / N / D', value: `${s.wins} / ${s.draws} / ${s.losses}`, hint: 'Victoires / nuls / défaites' },
         { label: 'Buts', value: s.goals },
         { label: 'Passes décisives', value: s.assists },
-        ...(gk || s.gk_matches ? [{ label: 'Arrêts', value: s.saves }, { label: 'Clean sheets', value: s.clean_sheets }, { label: 'Buts encaissés', value: s.conceded }] : []),
+        ...(gk || s.gk_matches ? [{ label: 'Arrêts', value: s.saves }, { label: 'Clean Sheets', value: s.clean_sheets, tip: 'clean_sheet' as const }, { label: 'Buts encaissés', value: s.conceded }] : []),
         { label: 'Cartons J / R', value: `${s.yellow} / ${s.red}`, hint: 'Cartons jaunes / rouges' },
       ]}
       href={`/joueurs/${p.id}`}
@@ -59,13 +60,13 @@ export function IPGCard({ e, className }: { e: IPGEntry; className?: string }) {
       front={[{ label: 'BUT', value: e.goals }, { label: 'PAS', value: e.assists, hint: 'Passes décisives' }, { label: 'CONT', value: `${Math.round(e.contribution)}%`, hint: 'Part des buts de l’équipe' }, { label: 'VIC', value: `${Math.round(e.win_pct)}%`, hint: 'Victoires de l’équipe' }]}
       backTitle="Indice de performance"
       back={[
-        { label: 'Buts / passes', value: `${e.goals} / ${e.assists}` },
-        { label: 'Contribution aux buts', value: `${e.contribution.toFixed(1)} %` },
-        { label: 'Victoires de l’équipe', value: `${e.win_pct.toFixed(1)} %` },
-        { label: 'Buts / passes décisifs', value: `${e.clutch_goals} / ${e.clutch_assists}`, hint: 'Actions « clutch »' },
-        { label: 'Adversité', value: `${e.adversity.toFixed(0)} %` },
-        { label: 'Pénalité cartons', value: `−${e.card_penalty}` },
-        { label: 'IPG brut', value: Math.round(e.raw) },
+        { label: 'Buts / passes', value: `${e.goals} / ${e.assists}`, tip: 'buts_passes' },
+        { label: 'Contribution aux buts', value: `${e.contribution.toFixed(1)} %`, tip: 'contribution' },
+        { label: 'Victoires de l’équipe', value: `${e.win_pct.toFixed(1)} %`, tip: 'victoires' },
+        { label: 'Buts / passes gagnants', value: `${e.clutch_goals} / ${e.clutch_assists}`, tip: 'gagnants' },
+        { label: 'Adversité', value: `${e.adversity.toFixed(0)} %`, tip: 'adversite' },
+        { label: 'Pénalité cartons', value: `−${e.card_penalty}`, tip: 'penalite_cartons' },
+        { label: 'IPG brut', value: Math.round(e.raw), tip: 'ipg_brut' },
       ]}
       backNote={bs?.unlocked.length ? undefined : 'IPG ramené sur 100 (le meilleur joueur = 100).'}
       href={player ? `/joueurs/${player.id}` : undefined}

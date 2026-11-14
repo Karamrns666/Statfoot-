@@ -23,6 +23,7 @@ export const PUBLIC_NAV = [
   { to: '/trophees', label: 'Trophées' },
   { to: '/match-des-capitaines', label: 'Capitaines', more: true },
   { to: '/badges', label: 'Badges', more: true },
+  { to: '/glossaire', label: 'Glossaire', more: true },
   { to: '/statistiques', label: 'Stats', more: true },
   { to: '/media', label: 'Média', more: true },
   { to: '/historique', label: 'Historique', more: true },
@@ -116,7 +117,7 @@ function Footer() {
               <li key={x.label}><a href={x.href} target="_blank" rel="noreferrer" aria-label={x.label} className="flex items-center gap-2.5 text-sm text-muted-foreground hover:text-neon"><span className="glass rounded-lg p-2"><x.icon className="size-4" /></span>{x.icon === IconLinkedin ? 'LinkedIn' : 'Instagram'} · {x.short}</a></li>
             ))}
           </ul>
-          <div className="flex flex-wrap gap-x-4 gap-y-1 pt-2 text-sm"><Link to="/reglement" className="text-muted-foreground hover:text-neon">Règlement</Link><Link to="/discipline" className="text-muted-foreground hover:text-neon">Discipline</Link><Link to="/historique" className="text-muted-foreground hover:text-neon">Historique</Link><Link to="/pre-saison" className="text-muted-foreground hover:text-neon">Pré-saison</Link><Link to="/equipe-type" className="text-muted-foreground hover:text-neon">Équipe type</Link><Link to="/badges" className="text-muted-foreground hover:text-neon">Badges</Link><Link to="/match-des-capitaines" className="text-muted-foreground hover:text-neon">Match des capitaines</Link><Link to="/media" className="text-muted-foreground hover:text-neon">Média</Link><Link to="/admin" className="text-muted-foreground hover:text-neon">Espace admin</Link></div>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 pt-2 text-sm"><Link to="/reglement" className="text-muted-foreground hover:text-neon">Règlement</Link><Link to="/discipline" className="text-muted-foreground hover:text-neon">Discipline</Link><Link to="/historique" className="text-muted-foreground hover:text-neon">Historique</Link><Link to="/pre-saison" className="text-muted-foreground hover:text-neon">Pré-saison</Link><Link to="/equipe-type" className="text-muted-foreground hover:text-neon">Équipe type</Link><Link to="/badges" className="text-muted-foreground hover:text-neon">Badges</Link><Link to="/glossaire" className="text-muted-foreground hover:text-neon">Glossaire</Link><Link to="/match-des-capitaines" className="text-muted-foreground hover:text-neon">Match des capitaines</Link><Link to="/media" className="text-muted-foreground hover:text-neon">Média</Link><Link to="/admin" className="text-muted-foreground hover:text-neon">Espace admin</Link></div>
         </div>
       </div>
       <div className="border-t border-white/5 py-4 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} {L.name} · organisée par {o.name}</div>

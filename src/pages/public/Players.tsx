@@ -1,4 +1,5 @@
 import { useRookie } from '@/hooks/useSeniority'
+import { InfoTip } from '@/components/league/InfoTip'
 import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { phaseName } from '@/lib/competitionNames'
@@ -176,7 +177,7 @@ function SeasonIPG({ seasonId }: { seasonId: string | null }) {
   if (!items.length) return <SeasonNotStarted what="Les effectifs et l’Indice de Performance Globale" />
   return (
     <div className="space-y-5">
-      <p className="glass rounded-2xl px-4 py-3 text-sm text-muted-foreground"><b className="text-white">IPG « – » :</b> indice calculé après le premier match. {items.length} joueurs inscrits, classés par équipe puis par nom.</p>
+      <p className="glass rounded-2xl px-4 py-3 text-sm text-muted-foreground"><b className="text-white">IPG <InfoTip id="ipg" /> « – » :</b> indice calculé après le premier match. {items.length} joueurs inscrits, classés par équipe puis par nom.</p>
       <div className="grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3 sm:gap-x-4 lg:grid-cols-4 xl:grid-cols-5">
         {items.map(({ p, t, x }) => <XPCard key={p.id} r={{ item: x!, rank: 0, previousRank: null, delta: null }} player={p} team={t} ipg="–" />)}
       </div>

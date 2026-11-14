@@ -2,6 +2,8 @@
 // note (XP ou IPG), rôle, logo du club, nom et stats principales. La couleur suit le badge d'ancienneté
 // du club (Platinum nacré · Gold · Silver) ; en haut à droite, jusqu'à 3 badges de performance, du plus
 // rare au plus courant. Verso blanc, retournement 3D au clic (ou Entrée / Espace).
+import { InfoTip } from '@/components/league/InfoTip'
+import type { GlossaryId } from '@/lib/glossary'
 import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { RotateCw } from 'lucide-react'
@@ -17,7 +19,7 @@ import { SENIORITY_STYLE, type SeniorityTier } from '@/lib/seniority'
 import { TierRibbon, TierSurface } from '@/components/cards/TierSurface'
 import { useCardShine } from '@/hooks/useCardShine'
 
-export interface CardStat { label: string; value: ReactNode; hint?: string }
+export interface CardStat { label: string; value: ReactNode; hint?: string; /** bouton « i » relié au glossaire */ tip?: GlossaryId }
 
 export interface PlayerCardProps {
   firstName: string
@@ -209,7 +211,7 @@ function CardBack({ p }: { p: PlayerCardProps }) {
         <dl className="mt-[.2em] min-h-0 flex-1 divide-y divide-ink/10 overflow-hidden">
           {p.back.map((s) => (
             <div key={s.label} className="flex items-center justify-between gap-2 py-[.32em] text-[.98em] leading-tight" title={s.hint}>
-              <dt className="truncate text-ink/70">{s.label}</dt>
+              <dt className="flex min-w-0 items-center gap-[.35em] text-ink/70"><span className="truncate">{s.label}</span>{s.tip && !p.faceOnly && <InfoTip id={s.tip} label={s.label} />}</dt>
               <dd className="shrink-0 font-display text-[1.35em] font-extrabold leading-none">{s.value}</dd>
             </div>
           ))}

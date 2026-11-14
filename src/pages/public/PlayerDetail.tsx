@@ -1,4 +1,6 @@
 import { useRookie } from '@/hooks/useSeniority'
+import { InfoTip } from '@/components/league/InfoTip'
+import type { GlossaryId } from '@/lib/glossary'
 import { useMemo, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { PlayerDisciplineCard, SuspendedBadge, useIsSuspended } from '@/components/reglement/PlayerDisciplineCard'
@@ -139,10 +141,10 @@ export default function PlayerDetail() {
             </div>
             {titles.length > 0 && <div className="mt-3 flex flex-wrap justify-center gap-2 sm:justify-start">{titles.slice(0, 3).map((x) => <span key={x.key} className="rounded-full bg-award-gold/15 px-3 py-1 text-xs font-bold text-award-gold">★ {x.label}</span>)}</div>}
             <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-              <HeroStat label="XP saison" value={s?.xp ?? 0} accent />
+              <HeroStat label="XP saison" value={s?.xp ?? 0} accent tip="xp" />
               <HeroStat label="Rang joueurs" value={me ? ordinal(me.rank) : '—'} sub={me ? <span className="inline-flex items-center gap-1">Top {Math.max(1, Math.ceil((me.rank / ranking.length) * 100))} % · <RankDelta delta={me.delta} /></span> : undefined} />
               <HeroStat label="Rang buteurs" value={scorerRank ? ordinal(scorerRank.rank) : '—'} sub={`${s?.goals ?? 0} buts`} />
-              <HeroStat label="Badges" value={`${unlocked} / ${badges.length}`} sub={next[0] ? `Prochain : ${next[0].def.name}` : undefined} />
+              <HeroStat label="Badges" tip="badges" value={`${unlocked} / ${badges.length}`} sub={next[0] ? `Prochain : ${next[0].def.name}` : undefined} />
             </div>
           </div>
         </div>
@@ -151,11 +153,11 @@ export default function PlayerDetail() {
       {/* STATS */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         {keeper
-          ? <><Tile label="Arrêts" value={s?.saves ?? 0} /><Tile label="Clean sheets" value={s?.clean_sheets ?? 0} /></>
+          ? <><Tile label="Arrêts" value={s?.saves ?? 0} /><Tile label="Clean Sheets" value={s?.clean_sheets ?? 0} tip="clean_sheet" /></>
           : <><Tile label="Buts" value={s?.goals ?? 0} /><Tile label="Passes décisives" value={s?.assists ?? 0} /></>}
         <Tile label="Matchs avec stats" value={log.length} />
         <Tile label="Série en cours" value={streak.current} sub={`record ${streak.record} · matchs décisifs d'affilée`} icon={<Flame className="size-4 text-neon" />} />
-        <Tile label="Meilleure note" value={best ? best.toFixed(1).replace('.', ',') : '—'} sub="sur 10" />
+        <Tile label="Meilleure note" tip="note" value={best ? best.toFixed(1).replace('.', ',') : '—'} sub="sur 10" />
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -292,20 +294,20 @@ export default function PlayerDetail() {
   )
 }
 
-function HeroStat({ label, value, sub, accent }: { label: string; value: ReactNode; sub?: ReactNode; accent?: boolean }) {
+function HeroStat({ label, value, sub, accent, tip }: { label: string; value: ReactNode; sub?: ReactNode; accent?: boolean; tip?: GlossaryId }) {
   return (
     <div className="rounded-xl bg-black/20 px-3 py-2.5 text-left">
-      <div className="text-[11px] font-semibold text-muted-foreground">{label}</div>
+      <div className="flex items-center gap-1 text-[11px] font-semibold text-muted-foreground">{label}{tip && <InfoTip id={tip} label={label} />}</div>
       <div className={cn('num text-2xl leading-tight', accent && 'text-neon')}>{value}</div>
       {sub && <div className="truncate text-[11px] text-muted-foreground">{sub}</div>}
     </div>
   )
 }
 
-function Tile({ label, value, sub, icon }: { label: string; value: ReactNode; sub?: string; icon?: ReactNode }) {
+function Tile({ label, value, sub, icon, tip }: { label: string; value: ReactNode; sub?: string; icon?: ReactNode; tip?: GlossaryId }) {
   return (
     <div className="glass rounded-2xl p-4">
-      <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">{icon}{label}</div>
+      <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">{icon}{label}{tip && <InfoTip id={tip} label={label} />}</div>
       <div className="num mt-1 text-3xl">{value}</div>
       {sub && <div className="text-[11px] text-muted-foreground">{sub}</div>}
     </div>

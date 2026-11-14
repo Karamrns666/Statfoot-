@@ -15,6 +15,7 @@ const P = {
   Standings: lazy(() => import('@/pages/public/Standings')),
   Teams: lazy(() => import('@/pages/public/Teams')),
   Badges: lazy(() => import('@/pages/public/Badges')),
+  Glossary: lazy(() => import('@/pages/public/Glossary')),
   TeamDetail: lazy(() => import('@/pages/public/TeamDetail')),
   Players: lazy(() => import('@/pages/public/Players')),
   PlayerDetail: lazy(() => import('@/pages/public/PlayerDetail')),
@@ -117,6 +118,7 @@ export default function App() {
           <Route path="silver-cup" element={<Navigate to="/classement/silver-cup" replace />} />
           <Route path="equipes" element={<P.Teams />} />
           <Route path="badges" element={<P.Badges />} />
+          <Route path="glossaire" element={<P.Glossary />} />
           <Route path="equipes/:id" element={<P.TeamDetail />} />
           <Route path="joueurs" element={<P.Players />} />
           <Route path="joueurs/:id" element={<P.PlayerDetail />} />

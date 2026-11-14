@@ -31,8 +31,8 @@ export function StandingsTable({ rows, compact = false, zones: zonesIn = [], hig
       { key: 'yellow', label: 'CJ', title: 'Cartons jaunes (départage, critère 5)', headClassName: 'text-center hidden md:table-cell', className: cn(n, 'hidden md:table-cell text-amber-300/90'), sort: (r) => r.yellow, render: (r) => r.yellow },
       { key: 'red', label: 'CR', title: 'Cartons rouges (départage, critère 6)', headClassName: 'text-center hidden md:table-cell', className: cn(n, 'hidden md:table-cell text-red-300/90'), sort: (r) => r.red, render: (r) => r.red },
     ] as SortColumn<StandingRow>[] : []),
-    { key: 'gd', label: 'Diff', title: 'Différence de buts', headClassName: 'text-center', sort: (r) => r.gd, className: 'num text-center text-base', render: (r) => <span className={r.gd > 0 ? 'text-win' : r.gd < 0 ? 'text-loss' : 'text-muted-foreground'}>{r.gd > 0 ? `+${r.gd}` : r.gd}</span> },
-    { key: 'points', label: 'Pts', title: 'Points', headClassName: 'text-center', className: 'num text-center text-xl text-white', sort: (r) => r.points, render: (r) => r.points },
+    { key: 'gd', label: 'Diff', title: 'Différence de buts', tip: 'diff', headClassName: 'text-center', sort: (r) => r.gd, className: 'num text-center text-base', render: (r) => <span className={r.gd > 0 ? 'text-win' : r.gd < 0 ? 'text-loss' : 'text-muted-foreground'}>{r.gd > 0 ? `+${r.gd}` : r.gd}</span> },
+    { key: 'points', label: 'Pts', title: 'Points', tip: 'points', headClassName: 'text-center', className: 'num text-center text-xl text-white', sort: (r) => r.points, render: (r) => r.points },
     { key: 'form', label: 'Forme', title: '5 derniers matchs (victoire 3, nul 1)', headClassName: cn(compact && 'hidden sm:table-cell'), className: cn(compact && 'hidden sm:table-cell'), sort: (r) => formPoints(r), render: (r) => <FormPills form={r.form} /> },
   ]
   return (

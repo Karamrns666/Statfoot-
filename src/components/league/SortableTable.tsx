@@ -1,6 +1,8 @@
 // Tableau triable : clic sur un en-tête pour trier, nouveau clic pour inverser, flèche ↑ / ↓ sur la colonne active.
 // Au chargement, l'ordre fourni (tri par défaut de la page) est conservé tel quel.
 // Les valeurs vides (null / undefined, affichées « – ») restent toujours en bas, quel que soit le sens.
+import { InfoTip } from '@/components/league/InfoTip'
+import type { GlossaryId } from '@/lib/glossary'
 import { useMemo, useState, type ReactNode } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
@@ -11,6 +13,8 @@ export type SortDir = 'asc' | 'desc'
 export interface SortColumn<T> {
   key: string
   label: ReactNode
+  /** bouton « i » relié au glossaire, à côté du titre de colonne */
+  tip?: GlossaryId
   /** info-bulle de l'en-tête (abréviations) */
   title?: string
   render: (row: T, index: number) => ReactNode
@@ -56,18 +60,20 @@ export function useSort<T>(rows: T[], columns: SortColumn<T>[], initial?: { key:
   return { rows: sorted, state, toggle }
 }
 
-export function SortHead({ col, state, onSort }: { col: { key: string; label: ReactNode; title?: string; headClassName?: string; sortable: boolean }; state: SortState | null; onSort: (key: string) => void }) {
+export function SortHead({ col, state, onSort }: { col: { key: string; label: ReactNode; title?: string; headClassName?: string; sortable: boolean; tip?: GlossaryId }; state: SortState | null; onSort: (key: string) => void }) {
   const active = state?.key === col.key
-  if (!col.sortable) return <TableHead className={col.headClassName} title={col.title}>{col.label}</TableHead>
+  const tip = col.tip && <InfoTip id={col.tip} className="ml-0.5 text-muted-foreground" />
+  if (!col.sortable) return <TableHead className={col.headClassName} title={col.title}>{col.label}{tip}</TableHead>
   const right = /text-(center|right)/.exec(col.headClassName ?? '')?.[1]
   return (
-    <TableHead className={cn(col.headClassName, 'p-0')} aria-sort={active ? (state!.dir === 'asc' ? 'ascending' : 'descending') : 'none'}>
+    <TableHead className={cn(col.headClassName, 'p-0', tip && 'whitespace-nowrap')} aria-sort={active ? (state!.dir === 'asc' ? 'ascending' : 'descending') : 'none'}>
       <button type="button" onClick={() => onSort(col.key)} title={col.title ? `${col.title} — trier` : 'Trier'}
-        className={cn('inline-flex h-9 w-full cursor-pointer items-center gap-1 px-2 uppercase tracking-wider transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-neon',
+        className={cn(tip ? 'w-auto' : 'w-full', 'inline-flex h-9 cursor-pointer items-center gap-1 px-2 uppercase tracking-wider transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-neon',
           right === 'center' && 'justify-center', right === 'right' && 'justify-end', active && 'text-neon')}>
         <span>{col.label}</span>
         {active && <span aria-hidden className="text-[11px] leading-none">{state!.dir === 'asc' ? '↑' : '↓'}</span>}
       </button>
+      {tip && <span className="-ml-1 inline-flex pr-1 align-middle">{tip}</span>}
     </TableHead>
   )
 }

@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
 // Légende des 3 niveaux de carte, côte à côte (page Équipes, page Joueurs)
+import { InfoTip } from '@/components/league/InfoTip'
 import { SENIORITY_LABEL, SENIORITY_ORDER, SENIORITY_RULE, SENIORITY_STYLE } from '@/lib/seniority'
 import { TierIcon } from '@/components/league/SeniorityBadge'
 import { useCardShine } from '@/hooks/useCardShine'
@@ -30,7 +31,7 @@ function LegendCard({ tier }: { tier: (typeof SENIORITY_ORDER)[number] }) {
 export function TierLegendCards({ className, title = 'Niveau de la carte = ancienneté du club' }: { className?: string; title?: string }) {
   return (
     <section className={cn('mb-6', className)} aria-label="Légende des niveaux de carte">
-      <p className="mb-2 text-xs text-muted-foreground">{title}</p>
+      <p className="mb-2 flex items-center gap-1 text-xs text-muted-foreground">{title}<InfoTip id="niveaux" /></p>
       <div className="grid max-w-xl grid-cols-3 gap-2 sm:gap-4">
         {SENIORITY_ORDER.map((t) => <LegendCard key={t} tier={t} />)}
       </div>

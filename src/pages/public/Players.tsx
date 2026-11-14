@@ -84,7 +84,7 @@ export default function Players() {
       <PageHeader title="Joueurs" subtitle={view === 'ipg' ? (scopeSeasonId === SEASON_2025_ID ? 'Indice de Performance Globale — les 25 joueurs les plus complets de la saison 2025-2026' : 'Indice de Performance Globale — calculé après le premier match de la saison') : 'Touchez une carte pour la retourner. Classement mis à jour après chaque match.'}>
         <div className="glass flex rounded-xl p-1" role="tablist" aria-label="Affichage">
           {VIEWS.map((v) => (
-            <button key={v.value} role="tab" aria-selected={view === v.value} onClick={() => setView(v.value)} className={cn('flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold transition', view === v.value ? 'bg-neon text-white' : 'text-muted-foreground hover:text-white')}>
+            <button key={v.value} role="tab" aria-selected={view === v.value} onClick={() => setView(v.value)} className={cn('flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold transition', view === v.value ? 'bg-neon text-night-950' : 'text-muted-foreground hover:text-white')}>
               <v.icon className="size-4" />{v.label}
             </button>
           ))}

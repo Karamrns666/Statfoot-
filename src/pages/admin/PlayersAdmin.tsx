@@ -137,7 +137,7 @@ function DocsDialog({ player, onClose }: { player: Player; onClose: () => void }
               <div key={doc.key} className="rounded-xl bg-white/5 p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="font-semibold">{doc.label}</span>
-                  <div className="flex gap-1">{(Object.keys(DOC_STATUS) as DocStatus[]).map((s) => <button key={s} onClick={() => set(doc.key, { status: s })} className={`rounded-full px-2.5 py-1 text-xs cursor-pointer ${cur?.status === s ? 'bg-neon text-white' : 'bg-white/5 text-muted-foreground'}`}>{DOC_STATUS[s].label}</button>)}</div>
+                  <div className="flex gap-1">{(Object.keys(DOC_STATUS) as DocStatus[]).map((s) => <button key={s} onClick={() => set(doc.key, { status: s })} className={`rounded-full px-2.5 py-1 text-xs cursor-pointer ${cur?.status === s ? 'bg-neon text-night-950' : 'bg-white/5 text-muted-foreground'}`}>{DOC_STATUS[s].label}</button>)}</div>
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {cur?.file_url && <a href={cur.file_url} target="_blank" rel="noreferrer" className="text-xs text-neon underline">Voir le fichier</a>}

@@ -44,7 +44,7 @@ export default function DrawSwiss() {
         <div className="space-y-6">
           <div className="flex flex-wrap gap-2" role="tablist" aria-label="Compétition">
             {comps.map((c) => (
-              <button key={c.id} role="tab" aria-selected={c.id === comp?.id} onClick={() => setCompId(c.id)} className={cn('cursor-pointer rounded-xl border px-4 py-2 text-sm font-bold transition', c.id === comp?.id ? 'border-neon bg-neon text-white' : 'border-white/15 text-muted-foreground hover:text-white')}>
+              <button key={c.id} role="tab" aria-selected={c.id === comp?.id} onClick={() => setCompId(c.id)} className={cn('cursor-pointer rounded-xl border px-4 py-2 text-sm font-bold transition', c.id === comp?.id ? 'border-neon bg-neon text-night-950' : 'border-white/15 text-muted-foreground hover:text-white')}>
                 {c.name} <span className="ml-1 text-xs opacity-75">{c.team_ids?.length ?? 0} équipes</span>
               </button>
             ))}

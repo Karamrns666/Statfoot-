@@ -240,7 +240,7 @@ export function Billboard({ slides: content, leagueName, seasonLabel, logoUrl, p
             <div className="flex items-center" role="tablist" aria-label="Panneaux">
               {slides.map((x, k) => (
                 <button key={x.key} role="tab" aria-selected={k === idx} aria-label={'brand' in x ? 'Logo de la ligue' : x.eyebrow} onClick={() => go(k)}
-                  className="group/dot flex h-11 cursor-pointer items-center px-1">
+                  className="group/dot flex h-11 min-w-6 cursor-pointer items-center justify-center px-1">
                   <span className={cn('relative block h-2 overflow-hidden rounded-full bg-white/15 transition-all', k === idx ? 'w-10' : 'w-2 group-hover/dot:bg-white/40')}>
                     {k === idx && <span key={tk} className="absolute inset-0 origin-left rounded-full bg-neon" style={{ animation: stopped ? 'none' : `board-progress ${duration}ms linear forwards`, transform: stopped ? 'scaleX(1)' : undefined }} />}
                   </span>

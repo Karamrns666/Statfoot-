@@ -105,11 +105,11 @@ export default function Matches() {
       {base.length === 0 ? <SeasonNotStarted what="Le calendrier et les résultats" /> : <>
       {/* journées */}
       <div ref={strip} className="scrollbar-none -mx-4 mb-3 flex gap-2 overflow-x-auto px-4 pb-1" role="tablist" aria-label="Journées">
-        <button role="tab" aria-selected={round == null} onClick={() => set('journee', 'toutes')} className={cn('shrink-0 cursor-pointer rounded-xl border px-4 py-2 text-left transition', round == null ? 'border-neon bg-neon text-white' : 'border-white/10 bg-white/[.03] text-muted-foreground hover:text-white')}>
+        <button role="tab" aria-selected={round == null} onClick={() => set('journee', 'toutes')} className={cn('shrink-0 cursor-pointer rounded-xl border px-4 py-2 text-left transition', round == null ? 'border-neon bg-neon text-night-950' : 'border-white/10 bg-white/[.03] text-muted-foreground hover:text-white')}>
           <div className="font-display text-lg font-black leading-none">Toutes</div><div className="mt-0.5 text-[11px] opacity-80">{base.length} matchs</div>
         </button>
         {rounds.map((r) => (
-          <button key={r.round} role="tab" aria-selected={round === r.round} aria-current={round === r.round} onClick={() => set('journee', String(r.round))} className={cn('relative shrink-0 cursor-pointer rounded-xl border px-4 py-2 text-left transition', round === r.round ? 'border-neon bg-neon text-white' : 'border-white/10 bg-white/[.03] text-muted-foreground hover:text-white')}>
+          <button key={r.round} role="tab" aria-selected={round === r.round} aria-current={round === r.round} onClick={() => set('journee', String(r.round))} className={cn('relative shrink-0 cursor-pointer rounded-xl border px-4 py-2 text-left transition', round === r.round ? 'border-neon bg-neon text-night-950' : 'border-white/10 bg-white/[.03] text-muted-foreground hover:text-white')}>
             {r.live && <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-red-500 animate-pulse-live" />}
             <div className="font-display text-lg font-black leading-none">{r.label ? STAGE_LABELS[r.label] : `J${r.round}`}</div>
             <div className="mt-0.5 whitespace-nowrap text-[11px] opacity-80">{r.date ? format(new Date(r.date), 'd MMM', { locale: fr }) : '—'}</div>

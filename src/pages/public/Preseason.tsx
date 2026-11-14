@@ -91,7 +91,7 @@ function Rounds({ v }: { v: PreseasonView }) {
     <div className="space-y-5">
       <div className="flex flex-wrap gap-2" role="tablist" aria-label="Journée">
         {Array.from({ length: v.totalRounds }, (_, i) => i + 1).map((r) => (
-          <button key={r} role="tab" aria-selected={r === round} disabled={!published.includes(r)} onClick={() => setSel(r)} className={cn('cursor-pointer rounded-xl border px-4 py-2 font-display text-lg font-black uppercase leading-none transition disabled:cursor-not-allowed disabled:opacity-35', r === round ? 'border-neon bg-neon text-white' : 'border-white/15 text-muted-foreground hover:text-white')}>{v.shortLabel(r)}</button>
+          <button key={r} role="tab" aria-selected={r === round} disabled={!published.includes(r)} onClick={() => setSel(r)} className={cn('cursor-pointer rounded-xl border px-4 py-2 font-display text-lg font-black uppercase leading-none transition disabled:cursor-not-allowed disabled:opacity-35', r === round ? 'border-neon bg-neon text-night-950' : 'border-white/15 text-muted-foreground hover:text-white')}>{v.shortLabel(r)}</button>
         ))}
       </div>
       <section>

@@ -77,8 +77,13 @@ function MiniMedal({ b, big }: { b: BadgeState; big?: boolean }) {
  *  - sinon photo originale recadrée proprement dans une fenêtre arrondie (secours) ;
  *  - sinon silhouette aux couleurs du club.
  */
-function CardPhoto({ cutout, photo, initials, color }: { cutout?: string; photo?: string; initials: string; color: string }) {
-  const [failed, setFailed] = useState<string | null>(null)
+// images déjà en échec (mémorisé pour toute la visite : la carte ne redemande pas sans fin une photo introuvable)
+const FAILED = new Set<string>()
+function CardPhoto({ cutout: cutoutIn, photo: photoIn, initials, color }: { cutout?: string; photo?: string; initials: string; color: string }) {
+  const [failed, setFailed0] = useState<string | null>(null)
+  const setFailed = (u: string) => { FAILED.add(u); setFailed0(u) }
+  const cutout = cutoutIn && !FAILED.has(cutoutIn) ? cutoutIn : undefined
+  const photo = photoIn && !FAILED.has(photoIn) ? photoIn : undefined
   const fade = 'linear-gradient(to bottom, #000 80%, transparent 100%)'
   if (cutout && failed !== cutout) {
     return (

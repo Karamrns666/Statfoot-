@@ -71,7 +71,7 @@ export default function Planning() {
       <div className="space-y-4">
         <div className="flex flex-wrap items-end gap-2">
           <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Jour">
-            {days.map((d) => <button key={d} role="tab" aria-selected={d === day} onClick={() => setDay(d)} className={cn('cursor-pointer rounded-xl border px-3 py-1.5 text-sm font-semibold', d === day ? 'border-neon bg-neon text-white' : 'border-white/15 text-muted-foreground hover:text-white')}>{fmtDay(`${d}T12:00:00Z`)}</button>)}
+            {days.map((d) => <button key={d} role="tab" aria-selected={d === day} onClick={() => setDay(d)} className={cn('cursor-pointer rounded-xl border px-3 py-1.5 text-sm font-semibold', d === day ? 'border-neon bg-neon text-night-950' : 'border-white/15 text-muted-foreground hover:text-white')}>{fmtDay(`${d}T12:00:00Z`)}</button>)}
           </div>
           <div className="ml-auto flex items-end gap-2">
             <div><Label htmlFor="pl-day" className="text-xs">Autre jour</Label><Input id="pl-day" type="date" value={day} onChange={(e) => e.target.value && setDay(e.target.value)} className="h-9 w-40" /></div>

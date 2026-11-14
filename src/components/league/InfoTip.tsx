@@ -49,12 +49,12 @@ function TipButton({ ariaLabel, className, children, content }: { ariaLabel: str
 export function InfoTip({ id, className, label }: { id: GlossaryId; className?: string; label?: string }) {
   const g = glossary(id)
   return (
-    <TipButton ariaLabel={`${label ?? g.term} : définition`} className={cn('size-[max(1.1em,14px)] min-h-0 rounded-full border border-current text-[.75em] font-black italic opacity-70 hover:opacity-100', className)}
+    <TipButton ariaLabel={`${label ?? g.term} : définition`} className={cn('-m-[5px] size-6 min-h-0 opacity-70 hover:opacity-100', className)}
       content={(close) => <>
         <div className="font-bold text-neon">{g.term}</div>
         <p className="mt-1 text-white/85">{g.short}</p>
         <Link to={`/glossaire#${g.id}`} onClick={close} className="mt-2 inline-block text-xs font-bold text-sky-soft underline underline-offset-2">Formule et exemple dans le glossaire</Link>
-      </>}>i</TipButton>
+      </>}><span aria-hidden className="inline-flex size-[max(1.1em,14px)] items-center justify-center rounded-full border border-current text-[.75em] font-black italic leading-none">i</span></TipButton>
   )
 }
 

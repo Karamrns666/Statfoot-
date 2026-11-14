@@ -197,7 +197,7 @@ function CardFront({ p }: { p: PlayerCardProps }) {
             </div>
           ))}
         </div>
-        {!p.faceOnly && <RotateCw className="absolute bottom-[17%] right-[5%] size-[1.1em] opacity-40 transition group-hover:opacity-80" aria-hidden />}
+        {!p.faceOnly && <RotateCw className="absolute right-[5%] top-[2.6%] size-[1.1em] opacity-40 transition group-hover:opacity-80" aria-hidden />}
     </TierSurface>
   )
 }

@@ -1,5 +1,5 @@
 import { useRookie } from '@/hooks/useSeniority'
-import { useMemo, useState, type ReactNode } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
@@ -39,7 +39,6 @@ export default function Awards() {
       {!sec.available ? <SectionPending section={sec} seasonId={seasonId} /> : (
         <Tabs defaultValue="race">
           <TabsList><TabsTrigger value="race">Course aux trophées</TabsTrigger><TabsTrigger value="rewards">Meilleure performance</TabsTrigger><TabsTrigger value="stats">Statistiques</TabsTrigger><TabsTrigger value="palmares">Palmarès</TabsTrigger></TabsList>
-          <TabSubtitle>{sec.label} · {sec.note}</TabSubtitle>
           <TabsContent value="rewards">{seasonId ? <RewardsByPeriod seasonId={seasonId} comps={sec.key === 'master' || sec.key === 'challenger' ? sec.comps.filter((c) => c.phase !== 'league_phase') : sec.comps} /> : null}</TabsContent>
           <TabsContent value="race" className="space-y-10">
             <PlayerRace scope={sec.scope} raceKey="ballon_or" category="ballon_or" />
@@ -54,10 +53,6 @@ export default function Awards() {
       )}
     </div>
   )
-}
-
-function TabSubtitle({ children }: { children: ReactNode }) {
-  return <p className="mb-4 mt-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{children}</p>
 }
 
 function metric(key: RaceKey, s: PlayerXP) {

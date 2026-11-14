@@ -22,6 +22,7 @@ import { cn } from '@/lib/utils'
 import { REGLEMENT, TIEBREAKERS, TIEBREAK_ART, coherenceWarnings } from '@/lib/reglement'
 import { DEFAULT_COMPETITION_NAMES, LEGACY_COMPETITION_NAMES, resolveCompetitionNames } from '@/lib/competitionNames'
 import { ArtLink } from '@/components/reglement/ArtLink'
+import { BadgeRarityEditor } from '@/components/admin/BadgeRarityEditor'
 
 // ---------------------------------------------------------------------------
 export function MediaAdmin() {
@@ -188,6 +189,7 @@ export function SettingsPage() {
             <ol className="space-y-1">{TIEBREAKERS.map((t, i) => <li key={t.key} className="flex gap-2 rounded-lg bg-white/5 px-3 py-1.5"><span className="num w-4 text-neon">{i + 1}</span>{t.label}</li>)}</ol>
             <ArtLink art={TIEBREAK_ART} />
           </CardContent></Card>
+          <BadgeRarityEditor />
           <Card><CardHeader><CardTitle>Données locales</CardTitle></CardHeader><CardContent>
             <p className="mb-3 text-xs text-muted-foreground">Recharge les données officielles (archive 2025-2026, équipes 2026-2027) et efface les modifications faites dans ce navigateur.</p>
             <Button variant="destructive" onClick={() => { if (confirm('Effacer les modifications locales et recharger les données officielles ?')) { resetLeagueData(); location.reload() } }}><RotateCcw />Recharger les données officielles</Button>

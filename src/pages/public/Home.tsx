@@ -20,6 +20,8 @@ import { IPG_RANKING } from '@/lib/ipg'
 import { SEASON_2025_ID } from '@/api/seed/season2025'
 import { initials, playerShort } from '@/lib/format'
 import { Link } from 'react-router-dom'
+import { RecentBadges } from '@/components/badges/RecentBadges'
+import { useRecentUnlocks } from '@/hooks/useBadgeOwnership'
 import { Hand } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
 import { useSeason } from '@/hooks/useSeason'
@@ -76,6 +78,7 @@ export default function Home() {
   const teamStatsAll = useTeamStats({ seasonId: refSid })
   const lastPlayedRound = useMemo(() => (refSid ? seasonRounds(league, refSid).at(-1) : undefined), [league, refSid])
   const tow = useTeamOfWeek(refSid, lastPlayedRound)
+  const hasUnlocks = useRecentUnlocks(sid ?? null, 1).length > 0
 
   // billboard : joueurs et équipes mis en avant, en alternance
   const slides = useMemo<BillboardSlide[]>(() => {
@@ -245,6 +248,13 @@ export default function Home() {
           </Card>
         </div>
       </section>}
+
+      {hasUnlocks && (
+        <section>
+          <SectionTitle title="Derniers badges débloqués" subtitle="Touchez un badge pour télécharger ou partager le visuel" accent="#FF7A1F" action={<Button asChild variant="ghost" size="sm"><Link to="/badges">Tous les badges →</Link></Button>} />
+          <RecentBadges seasonId={sid ?? null} />
+        </section>
+      )}
 
       {/* LOGOS */}
       <section>

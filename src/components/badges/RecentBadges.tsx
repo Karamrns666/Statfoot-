@@ -69,7 +69,7 @@ export function RecentBadges({ seasonId }: { seasonId: string | null }) {
         <Dialog open onOpenChange={(o) => !o && setOpen(null)}>
           <DialogContent className="max-w-sm">
             <DialogHeader><DialogTitle>{open.badge.def.name}</DialogTitle><DialogDescription>Débloqué par <Link className="font-bold text-neon" to={`/joueurs/${open.playerId}`}>{playerName(sel.p)}</Link></DialogDescription></DialogHeader>
-            <div className="overflow-hidden rounded-2xl" style={{ height: 300 }}><div style={{ transform: 'scale(.32)', transformOrigin: 'top left', width: 900 }}><BadgeUnlockedCard b={open.badge} player={sel.p} team={sel.t} date={open.match.date} /></div></div>
+            <div className="mx-auto overflow-hidden rounded-2xl" style={{ width: 288 }}><div style={{ zoom: 0.32, width: 900 }}><BadgeUnlockedCard b={open.badge} player={sel.p} team={sel.t} date={open.match.date} /></div></div>
             <CardShareActions cardWidth={900} card={<BadgeUnlockedCard b={open.badge} player={sel.p} team={sel.t} date={open.match.date} />}
               fileName={`badge-${open.badge.def.id}-${slugName(playerName(sel.p))}.png`} downloadLabel="Télécharger le visuel"
               url={`${location.origin}/joueurs/${open.playerId}`} text={`${playerName(sel.p)} débloque le badge ${open.badge.def.name} · Morocco Business League`} />

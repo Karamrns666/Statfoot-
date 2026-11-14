@@ -12,6 +12,6 @@ for (const route of SHOTS) {
     await page.waitForTimeout(600)
     const name = (route === '/' ? 'accueil' : route.slice(1).replace(/\//g, '-')) + '.png'
     // zones qui bougent d'elles-mêmes (bandeau défilant, carrousel) masquées
-    await expect(page).toHaveScreenshot(name, { fullPage: true, mask: [page.locator('[data-ticker], .marquee, [aria-roledescription="carousel"]')] })
+    await expect(page).toHaveScreenshot(name, { fullPage: false, mask: [page.locator('[data-ticker], .marquee, [aria-roledescription="carousel"]')] })
   })
 }

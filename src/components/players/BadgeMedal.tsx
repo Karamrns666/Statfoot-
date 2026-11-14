@@ -1,12 +1,11 @@
 // Médaille de badge : écusson hexagonal à la couleur du rang (commun → légendaire), grisé tant qu'il est verrouillé.
 import { CircleDot, Crosshair, Crown, Flame, Footprints, Gem, Hand, Link2, Lock, Medal, Shield, Star, Zap } from 'lucide-react'
-import { TIER_COLOR, TIER_LABEL, TIER_STYLE, type BadgeIcon, type BadgeState } from '@/lib/badges'
+import { TIER_COLOR, TIER_LABEL, type BadgeIcon, type BadgeState } from '@/lib/badges'
 import { cn } from '@/lib/utils'
 import { BadgeEmblem } from '@/components/badges/BadgeEmblem'
 import { useBadgeMeta } from '@/hooks/useBadgeMeta'
 
 export const BADGE_ICONS: Record<BadgeIcon, typeof Star> = { ball: CircleDot, boot: Footprints, target: Crosshair, flame: Flame, star: Star, shield: Shield, hand: Hand, crown: Crown, bolt: Zap, medal: Medal, gem: Gem, link: Link2, lock: Lock }
-const HEX = 'polygon(50% 0, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)'
 
 export function BadgeMedal({ b, size = 64 }: { b: BadgeState; size?: number }) {
   const meta = useBadgeMeta()(b.def.id)

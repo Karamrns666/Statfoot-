@@ -55,7 +55,6 @@ export interface PlayerCardProps {
   faceOnly?: boolean
 }
 
-const HEX = 'polygon(50% 0, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)'
 
 export const medalTip = (b: BadgeState, rarity?: string) => `${b.def.name}${rarity ? ` · ${rarity}` : ''} — ${b.def.description}`
 function MiniMedal({ b, big }: { b: BadgeState; big?: boolean }) {

@@ -2,6 +2,7 @@
 // note (XP ou IPG), rôle, logo du club, nom et stats principales. La couleur suit le badge d'ancienneté
 // du club (Platinum nacré · Gold · Silver) ; en haut à droite, jusqu'à 3 badges de performance, du plus
 // rare au plus courant. Verso blanc, retournement 3D au clic (ou Entrée / Espace).
+import { useTrimmedImage } from '@/hooks/useTrimmedImage'
 import { InfoTip } from '@/components/league/InfoTip'
 import type { GlossaryId } from '@/lib/glossary'
 import { useState, type ReactNode } from 'react'
@@ -138,6 +139,11 @@ function cardLogo(p: PlayerCardProps) {
   return p.team?.logo_url || (p.teamName ? teamLogoSvg(p.teamName.replace(/[^A-Za-zÀ-ÿ ]/g, '').split(/\s+/).map((w) => w[0]).join('').slice(0, 3).toUpperCase(), '#6CB4CC', '#0B2E73') : undefined)
 }
 
+function TrimmedLogo({ src, alt }: { src: string; alt: string }) {
+  const t = useTrimmedImage(src)
+  return <img src={t} alt={alt} draggable={false} className="h-[2.9em] w-full object-contain" />
+}
+
 function CardFront({ p }: { p: PlayerCardProps }) {
   const sortByRarity = useSortByRarity()
   const tier = p.tier ?? 'silver'
@@ -179,7 +185,7 @@ function CardFront({ p }: { p: PlayerCardProps }) {
         {logo && (
           <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center px-[9%] py-[.35em]">
             <div className={cn('flex h-[3.5em] w-full items-center justify-center overflow-hidden rounded-[.7em] px-[.6em] py-[.2em]', isBrandLogo(logo) ? 'bg-white shadow-[0_.25em_.8em_rgb(0_0_0/.3)] ring-1 ring-black/5' : 'bg-white/10 ring-1 ring-white/20')}>
-              <img src={logo} alt={teamLabel} draggable={false} className="h-[3.1em] w-full object-contain" onError={(e) => { e.currentTarget.style.visibility = 'hidden' }} />
+              <TrimmedLogo src={logo} alt={teamLabel} />
             </div>
           </div>
         )}

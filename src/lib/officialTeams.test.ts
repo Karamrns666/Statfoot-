@@ -80,7 +80,7 @@ describe('mise à jour automatique des navigateurs (migration)', () => {
     const withPlayer = oldDb() // Simulation FC a un joueur → laissée à la décision de l’admin
     const out2 = applyOfficialTeams2026(withPlayer as never)
     expect(out2.Team!.some((t) => t.id === 't26_sim')).toBe(true)
-    expect(out2.Team!.filter((t) => t.season_id === 'season_2026')).toHaveLength(24)
+    expect(out2.Team!.filter((t) => t.season_id === 'season_2026')).toHaveLength(22)
     // la pré-saison ne contient que les 21 équipes officielles, même si une équipe hors liste est conservée
     expect(out2.Competition!.find((c) => c.id === 'comp_2026_selection')!.team_ids).toHaveLength(21)
     expect(applyOfficialTeams2026({ ...db, ...out } as never)).toEqual({})

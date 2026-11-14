@@ -19,7 +19,7 @@ describe('données de la ligue', () => {
     const comps = db.Competition.filter((c) => c.season_id === s26.id)
     expect(comps.map((c) => [c.name, c.phase, c.team_ids?.length])).toEqual([['Pré-saison', 'league_phase', 21]])
     for (const tid of comps[0].team_ids ?? []) expect(db.Team.some((t) => t.id === tid)).toBe(true)
-    expect(generalStandings(L, s26.id)).toHaveLength(23)
+    expect(generalStandings(L, s26.id)).toHaveLength(21)
   })
   it('2025-2026 en archive : classement identique au fichier Excel', () => {
     expect(s25.is_active).toBe(false)

@@ -214,7 +214,7 @@ export function Billboard({ slides: content, leagueName, seasonLabel, logoUrl, p
         <div className="relative z-10 flex items-center gap-3 border-b border-white/10 bg-night-950/60 px-4 py-2.5 sm:px-6">
           <img src={logo} alt="" className="h-9 w-auto sm:h-10" />
           <div className="min-w-0 leading-tight">
-            <div className="truncate font-display text-lg font-black uppercase text-white sm:text-2xl">{leagueName}</div>
+            <div className="truncate font-display text-[clamp(15px,4.6vw,24px)] font-black uppercase text-white">{leagueName}</div>
             <div className="text-xs font-semibold capitalize text-sky-soft">{seasonLabel}</div>
           </div>
           <OrganizedBy size="sm" className="ml-auto hidden md:inline-flex" />

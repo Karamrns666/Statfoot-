@@ -246,3 +246,15 @@
 .table-scroll .sticky-col-last { box-shadow: 8px 0 10px -8px rgb(0 0 0 / .7); white-space: normal; overflow-wrap: break-word; hyphens: auto; min-width: 7.5rem; }
 .table-scroll.sticky-head thead th { position: sticky; top: 0; z-index: 3; background: #0a1838; }
 .table-scroll.sticky-head thead th.sticky-col { z-index: 4; }
+
+/* Badges : reflet qui passe à intervalles réguliers, halo, holographique et particules (légendaire) */
+.bdg .bdg-shine { animation: bdg-shine 5.5s ease-in-out infinite; }
+@keyframes bdg-shine { 0%, 55% { transform: rotate(20deg) translateX(0); } 85%, 100% { transform: rotate(20deg) translateX(170px); } }
+.bdg-legendary .bdg-shine { animation-duration: 3.8s; }
+.bdg .bdg-halo { animation: bdg-halo 3.2s ease-in-out infinite alternate; transform-origin: 50px 52px; }
+@keyframes bdg-halo { from { opacity: .14; } to { opacity: .32; } }
+.bdg .bdg-holo { animation: bdg-holo 6s linear infinite alternate; }
+@keyframes bdg-holo { from { transform: translate(-30px, -20px); } to { transform: translate(30px, 20px); } }
+.bdg .bdg-spark { animation: bdg-spark 2.8s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes bdg-spark { 0% { opacity: 0; transform: translateY(4px) scale(.4); } 40% { opacity: 1; transform: translateY(-3px) scale(1); } 100% { opacity: 0; transform: translateY(-10px) scale(.3); } }
+@media (prefers-reduced-motion: reduce) { .bdg .bdg-shine, .bdg .bdg-halo, .bdg .bdg-holo, .bdg .bdg-spark { animation: none; } .bdg .bdg-shine { display: none; } }

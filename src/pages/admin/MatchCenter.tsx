@@ -2,6 +2,7 @@
 //  Match Center — écran live opérateur (mobile au bord du terrain, 2 colonnes sur desktop)
 //  Toute la logique de calcul vient de src/lib/matchEngine.ts (même moteur que le public et le mode TV).
 // ============================================================================
+import { ForfeitBadge } from '@/components/match/ForfeitBadge'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
@@ -205,6 +206,7 @@ export default function MatchCenter() {
             <div className="flex flex-col items-center">
               <div className="num text-6xl leading-none sm:text-8xl">{score.home}<span className="text-white/30">-</span>{score.away}</div>
               {(so.home.length + so.away.length > 0) && <div className="num text-lg text-neon">({so.home_score}-{so.away_score} tab)</div>}
+              {m.forfeit_team_id && <ForfeitBadge match={m} detailed className="mt-1" />}
               <div className={cn('mt-1 rounded-lg px-3 py-0.5 font-display text-2xl font-black tabular-nums', ls?.running ? 'bg-red-500 text-white' : 'bg-white/10')}>
                 {isPlaying(period) ? (fm!.added ? `${fm!.minute}+${fm!.added}'` : fmtClock(ms + (period === '2H' ? d.half * 60000 : period === 'ET1' ? 2 * d.half * 60000 : period === 'ET2' ? (2 * d.half + d.et) * 60000 : 0))) : { pre: 'À venir', HT: 'Mi-temps', ET_BREAK: 'Pause', PENS: 'Tirs au but', FT: 'Terminé' }[period] ?? ''}
               </div>

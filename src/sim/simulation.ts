@@ -187,7 +187,7 @@ export function buildSimulation(real: RealDb, opts: { seed?: number; generatedAt
     const m: Match = tag({ id, season_id: SIM_SEASON_ID, competition_id: comp.id, round, stage, date, pitch: when.pitch, home_team_id: home, away_team_id: away, status: 'finished', published: true, validated: true, validated_at: date, validated_by: 'simulation', source: 'match_center', half_duration_min: 20, ...o.extra } as Match)
     ctx.matches.push(m)
     if (o.forfeit) {
-      m.forfeit_team_id = o.forfeit
+      m.forfeit_team_id = o.forfeit; m.forfeit_reason = '14.1'
       m.home_score = o.forfeit === home ? 0 : 3; m.away_score = o.forfeit === home ? 3 : 0
       return m
     }

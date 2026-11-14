@@ -45,6 +45,8 @@ export default function PlayersAdmin() {
     // 6 contre 6 : pas de postes, seulement deux rôles
     { key: 'is_goalkeeper', label: 'Gardien', type: 'boolean' },
     { key: 'is_captain', label: 'Capitaine', type: 'boolean', help: 'Un seul capitaine par équipe : l’ancien capitaine perd le brassard.' },
+    { key: 'employment_verified', label: 'Salarié vérifié (Art. 2.3)', type: 'boolean', help: 'Ardentia a vérifié que le joueur est salarié de l’entreprise qu’il représente. Information interne, jamais affichée sur le site public.' },
+    { key: 'employment_proof', label: 'Justificatif fourni (attestation de travail ou équivalent)', type: 'boolean' },
     { key: 'rookie', label: 'Recrue (1re saison en MBL)', type: 'boolean', help: 'Affiche « RECRUE · Nouvelle saison » sur sa carte. Non coché : la mention n’apparaît que pour un joueur sans historique dans une équipe nouvelle.' },
     { key: 'birth_date', label: 'Date de naissance', type: 'date' }, { key: 'photo_url', label: 'Photo du joueur', type: 'custom', full: true, render: (v, patch) => <PlayerPhotoField value={v} patch={patch} /> },
     { key: 'status', label: 'Statut', type: 'select', options: [{ value: 'active', label: 'Actif' }, { value: 'injured', label: 'Blessé' }, { value: 'inactive', label: 'Inactif' }] },
@@ -96,6 +98,7 @@ export default function PlayersAdmin() {
             { label: 'Rôle', render: (p) => <RoleBadge position={p.position} captain={p.is_captain} /> },
             { label: 'Équipe', render: (p) => <span className="flex items-center gap-1.5"><TeamLogo team={L.team.get(p.team_id)} size={18} />{L.team.get(p.team_id)?.short_name}</span>, className: 'hidden md:table-cell' },
             { label: 'Documents', render: docBadge },
+            { label: 'Salarié (2.3)', render: (p) => <span className={p.employment_verified ? 'text-xs font-bold text-win' : 'text-xs text-muted-foreground'} title={p.employment_proof ? 'Justificatif fourni' : 'Pas de justificatif'}>{p.employment_verified ? 'Vérifié' : 'À vérifier'}{p.employment_proof ? ' · justificatif' : ''}</span> },
             { label: 'Saison précédente', render: (p) => <SeasonLinkControl kind="player" item={p} />, className: 'hidden md:table-cell' },
             { label: 'Compte', render: (p) => p.email ? <span className="text-xs text-muted-foreground">{p.email}</span> : '—', className: 'hidden lg:table-cell' },
           ]} />

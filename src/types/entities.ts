@@ -144,6 +144,9 @@ export interface PlayerDoc { status: DocStatus; file_url?: string; reason?: stri
 export interface Player extends BaseEntity {
   first_name: string
   last_name: string
+  /** Art. 2.3 : salarié de l'entreprise vérifié par Ardentia / justificatif (attestation de travail…) fourni — admin uniquement */
+  employment_verified?: boolean
+  employment_proof?: boolean
   /** photo originale (gardée en secours, utilisée en rond : avatars, équipe type) */
   photo_url?: string
   /** photo détourée (PNG transparent) pour la carte joueur */
@@ -218,6 +221,13 @@ export interface Match extends BaseEntity {
   postponed_reason?: string
   /** forfait (tapis vert, Art. 14) : équipe forfait — score officiel 3-0 pour l'adversaire */
   forfeit_team_id?: string
+  /** motif officiel du forfait (liste fermée, src/lib/forfeit.ts) et précision libre */
+  forfeit_reason?: '14.1' | '14.2' | '18.1' | '2.7' | '2.3_unregistered' | '2.3_not_employee' | 'other'
+  forfeit_note?: string
+  /** réserve (Art. 17.4) : équipe visée, issue décidée par Ardentia */
+  reserve_against_team_id?: string
+  reserve_outcome?: 'pending' | 'rejected' | 'confirmed_not_employee' | 'confirmed_unregistered'
+  reserve_note?: string
   /** numéro officiel du match (« PS-01 »…), jamais réutilisé */
   number?: string
   /** pré-saison : « Pourquoi ce match ? » (Tirage au sort, Même total de points…) et modification manuelle */

@@ -1,6 +1,7 @@
 // Données des visuels « Résultat » et « Homme du match » (fonctions PURES, testées) :
 // buteurs groupés, ligne t.a.b. / tapis vert, choix automatique de l'homme du match, texte de publication,
 // empreinte (hash) qui change dès que le score, les buteurs, l'homme du match ou la mise en page changent.
+import { forfeitText } from '@/lib/forfeit'
 import type { Competition, Match, MatchEvent, Player, Team } from '@/types/entities'
 import { matchXPLines, xpConfig, type XPData } from '@/lib/xp'
 import { playerMatchShots } from '@/lib/shots'
@@ -15,7 +16,7 @@ export interface ResultModel {
   home: { name: string; short: string; logo?: string }
   away: { name: string; short: string; logo?: string }
   homeScore: number; awayScore: number
-  /** « t.a.b. 4-3 » ou « TAPIS VERT » */
+  /** « t.a.b. 4-3 » ou « FORFAIT — JOUEUR NON SALARIÉ (ART. 2.3) » */
   sub?: string
   forfeit: boolean
   homeScorers: string[]; awayScorers: string[]
@@ -129,7 +130,7 @@ export function buildResultModel({ match: m, teams, players, competition, events
     home: { name: upper(h?.name ?? 'Domicile'), short: h?.short_name ?? '', logo: h?.logo_url },
     away: { name: upper(a?.name ?? 'Extérieur'), short: a?.short_name ?? '', logo: a?.logo_url },
     homeScore: hs, awayScore: as,
-    sub: forfeit ? 'TAPIS VERT' : pens,
+    sub: forfeit ? forfeitText(m, true) || 'FORFAIT' : pens,
     forfeit,
     homeScorers: scorerLines(m, events, m.home_team_id, players),
     awayScorers: scorerLines(m, events, m.away_team_id, players),
@@ -205,7 +206,7 @@ export function captionText(d: VisualData, motm?: Player) {
   const r = buildResultModel(d)
   const h = teams.get(m.home_team_id), a = teams.get(m.away_team_id)
   const comp = [competition?.name, m.stage && KNOCKOUT_LABEL[m.stage] ? KNOCKOUT_LABEL[m.stage] : m.round ? `J${m.round}` : ''].filter(Boolean).join(' · ')
-  const lines = [`🔥 RÉSULTAT | ${comp}`, `${h?.name ?? ''} ${r.homeScore} - ${r.awayScore} ${a?.name ?? ''}${r.sub && !r.forfeit ? ` (${r.sub.toLowerCase()})` : ''}`]
+  const lines = [`🔥 RÉSULTAT | ${comp}`, `${h?.name ?? ''} ${r.homeScore} - ${r.awayScore} ${a?.name ?? ''}${r.sub ? ` (${r.sub.toLowerCase()})` : ''}`]
   if (r.forfeit) lines.push(`🟩 Victoire sur tapis vert (forfait : ${teams.get(m.forfeit_team_id!)?.name ?? '—'})`)
   const list = (teamId: string) => {
     const by = new Map<string, number>()

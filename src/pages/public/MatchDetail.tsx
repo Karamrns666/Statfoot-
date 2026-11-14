@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { ForfeitBadge } from '@/components/match/ForfeitBadge'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, CalendarDays, MapPin, Star, Vote, ArrowRightLeft, Share2, ShieldAlert, User, Hand, Image as ImageIcon, Play } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
@@ -73,13 +74,14 @@ export default function MatchDetail() {
                 : m.date ? <div className="num text-4xl text-neon sm:text-6xl">{fmtHour(m.date)}</div> : <div className="text-center text-sm font-bold text-amber-200">Horaire à définir</div>}
               {m.status === 'scheduled' && <div className="hidden sm:block"><Countdown to={m.date} now={now} /></div>}
               {m.penalties && <div className="mt-1 rounded bg-white/10 px-2 text-xs font-semibold">{fmtScore(m)}</div>}
-              {m.home_ht_score != null && showScore && <div className="mt-1 text-xs text-muted-foreground">MT {m.home_ht_score}-{m.away_ht_score}</div>}
+              {m.home_ht_score != null && showScore && !m.forfeit_team_id && <div className="mt-1 text-xs text-muted-foreground">MT {m.home_ht_score}-{m.away_ht_score}</div>}
               {m.extra_time && <div className="mt-1 text-[11px] text-muted-foreground">après prolongation</div>}
             </div>
             <TeamBlock id={m.away_team_id} />
           </div>
           {/* téléphone : compte à rebours sous les deux équipes (les deux restent visibles) */}
           {m.status === 'scheduled' && <div className="mt-3 flex justify-center sm:hidden"><Countdown to={m.date} now={now} /></div>}
+          {m.forfeit_team_id && <div className="mt-3 flex justify-center"><ForfeitBadge match={m} detailed /></div>}
           {showScore && (
             <div className="mt-4 grid grid-cols-2 gap-4 text-xs sm:text-sm">
               <ScorerList list={scorers.home} align="right" />

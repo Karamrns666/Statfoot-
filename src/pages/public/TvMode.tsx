@@ -4,6 +4,7 @@ import { SimBanner } from '@/components/sim/SimBanner'
 //  · Match en direct : score, chrono, buteurs avec minute, cartons, stats live (tirs, tirs cadrés, arrêts, possession).
 //  · Mise à jour automatique sans recharger : la page lit les mêmes données que le Match Center
 //    (chaque action saisie est diffusée aux autres onglets/écrans ouverts dans le navigateur).
+import { ForfeitBadge } from '@/components/match/ForfeitBadge'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Maximize, Pause, Play, RotateCw, X } from 'lucide-react'
@@ -125,6 +126,7 @@ function MatchTab({ m, active, onClick }: { m: Match; active: boolean; onClick: 
           <span className="num rounded-md bg-black/40 px-2">{m.status === 'scheduled' ? fmtHour(m.date) : `${m.home_score ?? 0}-${m.away_score ?? 0}`}</span>
           {a?.short_name}<TeamLogo team={a} size={28} />
         </div>
+        {m.forfeit_team_id && <ForfeitBadge match={m} link={false} className="mt-1" />}
       </div>
     </button>
   )
@@ -157,6 +159,7 @@ function Board({ m, now }: { m: Match; now: number }) {
           <div className={cn('mt-[1vh] rounded-full px-[1.6vw] py-[.4vh] font-display text-[clamp(1.3rem,min(2.8vw,5vh),3.4rem)] font-black uppercase', live ? 'bg-red-600 text-white' : 'bg-white/10')}>
             {live && <span className="mr-3 inline-block size-[.5em] rounded-full bg-white align-middle animate-pulse-live" />}{label}
           </div>
+          {m.forfeit_team_id && <ForfeitBadge match={m} detailed link={false} className="mt-[1vh] scale-150" />}
         </div>
         <TeamSide team={a} />
       </div>

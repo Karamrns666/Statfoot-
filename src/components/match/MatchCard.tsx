@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { ForfeitBadge } from './ForfeitBadge'
 import { MapPin, Clock } from 'lucide-react'
 import type { Match } from '@/types/entities'
 import { useLookup } from '@/hooks/useData'
@@ -42,7 +43,8 @@ export function MatchCard({ match, compact = false }: { match: Match; compact?: 
             match.date ? <div className="num text-2xl text-neon">{fmtHour(match.date)}</div> : <div className="text-center text-xs font-bold text-amber-200">Horaire<br />à définir</div>
           )}
           {done && match.penalties && <span className="text-[10px] text-muted-foreground">{fmtScore(match).split(' ').slice(1).join(' ')}</span>}
-          {done && match.home_ht_score != null && !match.penalties && <span className="text-[10px] text-muted-foreground">MT {match.home_ht_score}-{match.away_ht_score}</span>}
+          {done && match.home_ht_score != null && !match.penalties && !match.forfeit_team_id && <span className="text-[10px] text-muted-foreground">MT {match.home_ht_score}-{match.away_ht_score}</span>}
+          {done && <ForfeitBadge match={match} link={false} className="mt-1 max-w-[9rem]" />}
         </div>
         <div className="flex min-w-0 flex-col items-center gap-1.5 text-center">
           <TeamLogo team={away} size={compact ? 36 : 44} />

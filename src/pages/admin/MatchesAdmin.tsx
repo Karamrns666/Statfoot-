@@ -1,4 +1,5 @@
 import { PITCHES } from '@/config/pitches'
+import { FORFEIT_REASONS, RESERVE_OUTCOMES } from '@/lib/forfeit'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ClipboardList, FileText, Plus, Radio, Trash2, Wand2, Network, Eye, EyeOff, Pencil, ListChecks } from 'lucide-react'
@@ -51,6 +52,11 @@ export default function MatchesAdmin() {
     { key: 'referee', label: 'Arbitre' }, { key: 'half_duration_min', label: 'Durée mi-temps (min)', type: 'number' },
     { key: 'operator_user_id', label: 'Opérateur de saisie', type: 'select', options: db.AdminUser.filter((u) => u.status !== 'disabled').map((u) => ({ value: u.id, label: `${u.full_name ?? u.email}` })) },
     { key: 'forfeit_team_id', label: 'Forfait — tapis vert (équipe forfait)', type: 'select', options: [edit?.home_team_id, edit?.away_team_id].filter(Boolean).map((t) => ({ value: t as string, label: db.Team.find((x) => x.id === t)?.name ?? '' })) },
+    { key: 'forfeit_reason', label: 'Motif officiel du forfait (obligatoire en cas de forfait)', type: 'select', options: FORFEIT_REASONS.map((r) => ({ value: r.key, label: `${r.label}${r.art ? ` — Art. ${r.art}` : ''}` })) },
+    { key: 'forfeit_note', label: 'Précision sur le forfait (facultatif, publique)' },
+    { key: 'reserve_against_team_id', label: 'Réserve (Art. 17.4) — équipe visée', type: 'select', options: [edit?.home_team_id, edit?.away_team_id].filter(Boolean).map((t) => ({ value: t as string, label: db.Team.find((x) => x.id === t)?.name ?? '' })) },
+    { key: 'reserve_outcome', label: 'Réserve — décision d’Ardentia', type: 'select', options: RESERVE_OUTCOMES.map((r) => ({ value: r.key, label: r.label })) },
+    { key: 'reserve_note', label: 'Réserve — précisions (joueur concerné, pièces…)' },
     { key: 'published', label: 'Publié', type: 'boolean' },
   ]
   const save = async () => {
@@ -59,14 +65,23 @@ export default function MatchesAdmin() {
     const { id, created_date: _c, updated_date: _u, ...rest } = edit
     void _c; void _u
     const data = { ...rest, season_id: seasonId, date: rest.date ? new Date(rest.date as string).toISOString() : undefined } as Partial<Match>
+    // réserve confirmée (joueur non salarié / non inscrit) : l'équipe visée perd 3-0 (forfait appliqué automatiquement)
+    const ro = RESERVE_OUTCOMES.find((r) => r.key === data.reserve_outcome)
+    if (ro?.forfeit) {
+      if (data.reserve_against_team_id !== data.home_team_id && data.reserve_against_team_id !== data.away_team_id) { toast.error('Réserve confirmée : choisissez l’équipe visée'); return }
+      data.forfeit_team_id = data.reserve_against_team_id; data.forfeit_reason = ro.forfeit
+    }
     // forfait (Art. 14.1) : défaite 3-0 sur tapis vert, match terminé ; buts attribués à aucun joueur
     if (data.forfeit_team_id !== data.home_team_id && data.forfeit_team_id !== data.away_team_id) data.forfeit_team_id = undefined
+    if (data.forfeit_team_id && !data.forfeit_reason) { toast.error('Forfait : choisissez le motif officiel'); return }
+    if (!data.forfeit_team_id) { data.forfeit_reason = undefined; data.forfeit_note = undefined }
     if (data.forfeit_team_id) {
       const homeLost = data.forfeit_team_id === data.home_team_id
       Object.assign(data, { status: 'finished', home_score: homeLost ? 0 : 3, away_score: homeLost ? 3 : 0, validated: true, validated_at: data.validated_at ?? new Date().toISOString() })
     }
     if (id) await base44.entities.Match.update(id as string, data); else await base44.entities.Match.create(data as Match)
-    toast.success('Match enregistré'); setEdit(null)
+    if (ro?.forfeit) base44.logActivity('reserve_confirmed', 'Match', { id, ...data } as never, { decision: ro.label, equipe: db.Team.find((t) => t.id === data.reserve_against_team_id)?.name, note: data.reserve_note })
+    toast.success(ro?.forfeit ? 'Réserve confirmée : défaite 3-0 appliquée' : 'Match enregistré'); setEdit(null)
   }
 
   return (

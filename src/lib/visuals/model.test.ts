@@ -31,11 +31,11 @@ describe('visuel Résultat', () => {
     expect(r.home.name).toBe('ÉQUIPE A')
     expect(r.footer).toMatch(/^[A-ZÉÛ]+\. \d+ [A-ZÉÛ]+\.? · \d{2}:\d{2} · TERRAIN 1$/)
   })
-  it('tirs au but : ligne « T.A.B. 4-3 » ; forfait : 3-0 « TAPIS VERT » sans buteur', () => {
+  it('tirs au but : ligne « T.A.B. 4-3 » ; forfait : 3-0 « FORFAIT » (+ motif) sans buteur', () => {
     const pens = buildResultModel(data({ ...matches[1], penalties: true, home_pens: 4, away_pens: 3 }))
     expect(pens.sub).toBe('T.A.B. 4-3')
     const ff = buildResultModel(data({ ...matches[0], forfeit_team_id: 'A', home_score: 0, away_score: 3 }))
-    expect([ff.homeScore, ff.awayScore, ff.sub, ff.forfeit]).toEqual([0, 3, 'TAPIS VERT', true])
+    expect([ff.homeScore, ff.awayScore, ff.sub, ff.forfeit]).toEqual([0, 3, 'FORFAIT', true])
     expect(ff.homeScorers.concat(ff.awayScorers)).toEqual([])
     const knock = buildResultModel(data({ ...matches[0], stage: 'semi' }))
     expect(knock.competition).toBe('MASTER · DEMI-FINALE')

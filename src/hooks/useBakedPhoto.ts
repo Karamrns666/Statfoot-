@@ -26,6 +26,13 @@ async function bakeCutout(url: string): Promise<string | null> {
   const a = document.createElement('canvas'); a.width = W; a.height = H
   const ca = a.getContext('2d')!
   ca.drawImage(img, 0, 0, W, H)
+  // halo du détourage : les pixels presque transparents (liseré clair autour du joueur) sont retirés,
+  // les bords à demi-transparents sont légèrement resserrés
+  try {
+    const d = ca.getImageData(0, 0, W, H), px = d.data
+    for (let i = 3; i < px.length; i += 4) { const a = px[i]; px[i] = a < 48 ? 0 : a < 200 ? Math.round((a - 48) * 255 / 152) : a }
+    ca.putImageData(d, 0, 0)
+  } catch { /* image d'un autre site sans autorisation : on garde tel quel */ }
   ca.globalCompositeOperation = 'destination-in'
   const g = ca.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#000'); g.addColorStop(0.82, '#000'); g.addColorStop(1, 'rgba(0,0,0,0)')
   ca.fillStyle = g; ca.fillRect(0, 0, W, H)

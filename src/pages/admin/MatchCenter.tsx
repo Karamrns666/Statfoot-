@@ -188,6 +188,7 @@ export default function MatchCenter() {
         <div className="ml-auto flex items-center gap-1">
           <Button asChild variant="ghost" size="sm"><Link to={`/matchs/${m.id}`} target="_blank"><ExternalLink />Public</Link></Button>
           <Button asChild variant="ghost" size="sm"><Link to={`/admin/matchs/${m.id}/feuille`}><ClipboardList />Feuille</Link></Button>
+          {m.status === 'finished' && <Button asChild variant="ghost" size="sm"><Link to={`/admin/feuille/${m.id}`}><ClipboardList />Feuille PDF</Link></Button>}
           <Button variant="ghost" size="icon" onClick={() => setBright(!bright)} title="Mode haute luminosité">{bright ? <Moon /> : <Sun />}</Button>
         </div>
       </div>

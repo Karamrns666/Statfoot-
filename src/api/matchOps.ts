@@ -49,8 +49,8 @@ async function enqueue(p: Pending) {
 if (typeof window !== 'undefined') window.addEventListener('online', () => { outbox.flush() })
 
 // ---------------------------------------------------------------------------
-export async function addAction(match: Match, existing: MatchEvent[], action: Omit<NewEvent, 'match_id'>) {
-  const rows = buildAction(match, existing, { ...action, match_id: match.id, client_id: action.client_id ?? newId(), client_ts: action.client_ts ?? now() } as NewEvent, newId)
+export async function addAction(match: Match, existing: MatchEvent[], action: Omit<NewEvent, 'match_id'>, opts: { shooter?: string } = {}) {
+  const rows = buildAction(match, existing, { ...action, match_id: match.id, client_id: action.client_id ?? newId(), client_ts: action.client_ts ?? now() } as NewEvent, newId, opts)
   await enqueue({ kind: 'create', rows })
   await syncLiveScore(match.id)
   return rows

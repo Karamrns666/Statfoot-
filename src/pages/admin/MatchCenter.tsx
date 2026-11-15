@@ -53,6 +53,7 @@ type Flow =
   | { kind: 'goal'; team: string; step: 'type' | 'scorer' | 'assist'; goal_kind?: GoalKind | 'own_goal'; scorer?: string; free?: string }
   | { kind: 'card'; team: string; type: 'yellow_card' | 'red_card' }
   | { kind: 'shot'; team: string; type: 'shot_on_target' | 'shot_off_target' }
+  | { kind: 'save'; team: string }
   | { kind: 'player_menu'; team: string; player: string }
   | { kind: 'sub'; team: string; out?: string }
   | { kind: 'gk'; team: string }
@@ -106,12 +107,12 @@ export default function MatchCenter() {
     await saveLive(fn(cur, Date.now()))
   }, [db.LiveState, id])
 
-  const act = useCallback(async (team: string, type: EventType, extra: Partial<MatchEvent> = {}) => {
+  const act = useCallback(async (team: string, type: EventType, extra: Partial<MatchEvent> = {}, opts: { shooter?: string } = {}) => {
     if (!m || !ls || !canWrite) return
     const cm = currentMinute(ls, d, Date.now())
     let player_id = extra.player_id
     if ((type === 'save' || type === 'penalty_saved') && !player_id) player_id = goalkeeperAt(db.Lineup.find((l) => l.match_id === m.id && l.team_id === team), events, team, cm.minute, cm.period)
-    const rows = await addAction(m, events, { team_id: team, type, period: cm.period, minute: cm.minute, added_minute: cm.added || undefined, clock_ms: cm.clock_ms, operator: user?.full_name ?? user?.email, ...extra, player_id })
+    const rows = await addAction(m, events, { team_id: team, type, period: cm.period, minute: cm.minute, added_minute: cm.added || undefined, clock_ms: cm.clock_ms, operator: user?.full_name ?? user?.email, ...extra, player_id }, opts)
     vibrate()
     const after = possessionAfter(m, { type, team_id: team })
     if (after && ls.running) await mutateLive((s, t) => setPossession(s, after, t))
@@ -271,7 +272,7 @@ export default function MatchCenter() {
               {[m.home_team_id, m.away_team_id].map((tid) => (
                 <ActionPad key={tid} teamId={tid} events={events} disabled={!canWrite || !(isPlaying(period) || period === 'HT' || period === 'ET_BREAK')}
                   onGoal={() => setFlow({ kind: 'goal', team: tid, step: 'type' })}
-                  onAction={(type) => (type === 'yellow_card' || type === 'red_card' ? setFlow({ kind: 'card', team: tid, type }) : type === 'shot_on_target' || type === 'shot_off_target' ? setFlow({ kind: 'shot', team: tid, type }) : act(tid, type))}
+                  onAction={(type) => (type === 'yellow_card' || type === 'red_card' ? setFlow({ kind: 'card', team: tid, type }) : type === 'shot_on_target' || type === 'shot_off_target' ? setFlow({ kind: 'shot', team: tid, type }) : type === 'save' ? setFlow({ kind: 'save', team: tid }) : act(tid, type))}
                   onMore={() => setFlow({ kind: 'more', team: tid })} />
               ))}
             </div>
@@ -505,7 +506,7 @@ function PlayerGrid({ match, teamId, events, onPick, includeBench = true, onlyGk
   )
 }
 
-function FlowDialog({ flow, setFlow, match, events, act, ls }: { flow: Flow; setFlow: (f: Flow | null) => void; match: Match; events: MatchEvent[]; act: (team: string, type: EventType, extra?: Partial<MatchEvent>) => Promise<MatchEvent | undefined>; ls?: LiveState }) {
+function FlowDialog({ flow, setFlow, match, events, act, ls }: { flow: Flow; setFlow: (f: Flow | null) => void; match: Match; events: MatchEvent[]; act: (team: string, type: EventType, extra?: Partial<MatchEvent>, opts?: { shooter?: string }) => Promise<MatchEvent | undefined>; ls?: LiveState }) {
   const { db, league, settings } = useData()
   const L = useLookup()
   const { user } = useAuth()
@@ -554,6 +555,13 @@ function FlowDialog({ flow, setFlow, match, events, act, ls }: { flow: Flow; set
       body = <div className="space-y-3"><p className="text-sm text-muted-foreground">Qui a tiré ? (obligatoire — compté dans les statistiques du joueur et de l’équipe)</p><PlayerGrid match={match} teamId={flow.team} events={events} includeBench={false} onPick={async (p) => { setFlow(null); await act(flow.team, flow.type, { player_id: p }) }} />
 </div>
       break
+    case 'save': {
+      const shooterTeam = opp(flow.team)
+      title = `Arrêt — ${teamName(flow.team)}`
+      body = <div className="space-y-3"><p className="text-sm text-muted-foreground">Qui a tiré ? ({teamName(shooterTeam)} — compté comme tir cadré du joueur et de l’équipe)</p><PlayerGrid match={match} teamId={shooterTeam} events={events} includeBench={false} onPick={async (p) => { setFlow(null); await act(flow.team, 'save', {}, { shooter: p }) }} />
+</div>
+      break
+    }
     case 'player_for':
       title = `${EVENT_LABEL[flow.type]} — ${teamName(flow.team)}`
       body = <PlayerGrid match={match} teamId={flow.team} events={events} onPick={async (p) => { setFlow(null); await act(flow.team, flow.type, { player_id: p }) }} />

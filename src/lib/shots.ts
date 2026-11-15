@@ -16,8 +16,10 @@ export interface ShotTotals {
 export const emptyShots = (): ShotTotals => ({ shots: 0, on_target: 0, goals: 0, matches: 0 })
 export const addShots = (a: ShotTotals, b: ShotTotals): ShotTotals => ({ shots: a.shots + b.shots, on_target: a.on_target + b.on_target, goals: a.goals + b.goals, matches: a.matches + b.matches })
 
-/** Tir saisi à la main (les tirs cadrés automatiques d'un but ou d'un arrêt ne comptent pas comme saisie). */
-const isManualShot = (e: MatchEvent) => (e.type === 'shot_on_target' && !e.auto) || e.type === 'shot_off_target' || e.type === 'penalty_missed'
+/** Tir saisi à la main (le tir cadré automatique d'un but ne compte pas ; celui d'un arrêt compte s'il porte le tireur). */
+const isManualShot = (e: MatchEvent) => (e.type === 'shot_on_target' && (!e.auto || !!e.player_id)) || e.type === 'shot_off_target' || e.type === 'penalty_missed'
+/** Tir cadré à créditer au tireur : saisi, ou automatique d'un arrêt avec le tireur renseigné */
+const playerOnTarget = (e: MatchEvent) => e.type === 'shot_on_target' && (!e.auto || !!e.player_id)
 
 /** Tirs par joueur d'une équipe sur un match, ou null si aucun tir n'a été saisi par joueur. */
 export function playerMatchShots(events: MatchEvent[], teamId: string): Map<string, ShotTotals> | null {
@@ -28,7 +30,7 @@ export function playerMatchShots(events: MatchEvent[], teamId: string): Map<stri
   for (const e of mine) {
     if (!e.player_id) continue
     if (e.type === 'goal') { const s = get(e.player_id); s.shots++; s.on_target++; s.goals++ }
-    else if (e.type === 'shot_on_target' && !e.auto) { const s = get(e.player_id); s.shots++; s.on_target++ }
+    else if (playerOnTarget(e)) { const s = get(e.player_id); s.shots++; s.on_target++ }
     else if (e.type === 'shot_off_target' || e.type === 'penalty_missed') get(e.player_id).shots++
   }
   return out

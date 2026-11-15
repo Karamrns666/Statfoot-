@@ -58,3 +58,21 @@ describe('explication des XP', () => {
     expect(RACE_CRITERIA.xp.map((c) => c.label)).toEqual(['XP', 'buts', 'passes décisives', 'moins de matchs joués'])
   })
 })
+
+describe('arrêt du gardien = tir cadré du tireur adverse', () => {
+  it('le tir cadré automatique porte le tireur et compte dans ses stats, une seule fois', async () => {
+    const { buildAction } = await import('./matchEngine')
+    const m = { id: 'M', home_team_id: 'A', away_team_id: 'B' }
+    let n = 0
+    const rows = buildAction(m, [], { match_id: 'M', team_id: 'B', type: 'save', player_id: 'GK_B', period: '1H', minute: 5 } as never, () => `id${n++}`, { shooter: 'P_A' }) as MatchEvent[]
+    expect(rows).toHaveLength(2)
+    expect(rows[1]).toMatchObject({ type: 'shot_on_target', team_id: 'A', player_id: 'P_A', auto: true, parent_event_id: rows[0].id })
+    const shots = playerMatchShots(rows, 'A')!
+    expect(shots.get('P_A')).toMatchObject({ shots: 1, on_target: 1 })
+    // stats d'équipe : 1 tir cadré (l'arrêt adverse), pas 2
+    expect(teamLiveShots(rows, 'A', m)).toMatchObject({ shots: 1, on_target: 1 })
+    // un but : son tir automatique ne double pas le tir du buteur
+    const g = buildAction(m, [], { match_id: 'M', team_id: 'A', type: 'goal', player_id: 'P_A', period: '1H', minute: 9 } as never, () => `g${n++}`) as MatchEvent[]
+    expect(playerMatchShots([...rows, ...g], 'A')!.get('P_A')).toMatchObject({ shots: 2, on_target: 2, goals: 1 })
+  })
+})

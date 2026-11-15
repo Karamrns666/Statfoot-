@@ -173,7 +173,8 @@ export interface NewEvent extends Omit<MatchEvent, 'id'> { id?: string }
  *  - 2e jaune du même joueur → type 'second_yellow' (vaut rouge).
  * Les événements automatiques portent `auto: true` et `parent_event_id` → supprimés avec le parent.
  */
-export function buildAction(m: Pick<Match, 'id' | 'home_team_id' | 'away_team_id'>, existing: MatchEvent[], action: NewEvent, makeId: () => string): NewEvent[] {
+/** `opts.shooter` : tireur adverse d'un arrêt → porté par le tir cadré automatique (compté dans ses stats). */
+export function buildAction(m: Pick<Match, 'id' | 'home_team_id' | 'away_team_id'>, existing: MatchEvent[], action: NewEvent, makeId: () => string, opts: { shooter?: string } = {}): NewEvent[] {
   const main: NewEvent = { ...action, id: action.id ?? makeId(), match_id: m.id }
   if (main.type === 'yellow_card' && main.player_id && existing.some((e) => e.player_id === main.player_id && e.type === 'yellow_card')) {
     main.type = 'second_yellow'
@@ -185,7 +186,7 @@ export function buildAction(m: Pick<Match, 'id' | 'home_team_id' | 'away_team_id
     period: main.period, minute: main.minute, added_minute: main.added_minute, clock_ms: main.clock_ms, client_ts: main.client_ts, operator: main.operator,
   })
   if (main.type === 'goal') out.push(auto(main.team_id))
-  if (main.type === 'save' || main.type === 'penalty_saved') out.push(auto(otherTeam(m, main.team_id)))
+  if (main.type === 'save' || main.type === 'penalty_saved') out.push({ ...auto(otherTeam(m, main.team_id)), ...(opts.shooter ? { player_id: opts.shooter } : {}) })
   return out
 }
 

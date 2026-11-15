@@ -180,6 +180,9 @@
 @keyframes bb-ball-x { from { transform: translateX(0) } to { transform: translateX(100%) } }
 @keyframes bb-ball-hop { 0% { transform: translate(-100%, -50%) } 30% { transform: translate(-100%, -95%) } 55% { transform: translate(-100%, -40%) } 78% { transform: translate(-100%, -70%) } 100% { transform: translate(-100%, -50%); opacity: 0 } }
 @keyframes bb-spin { to { transform: rotate(900deg) } }
+/* premier panneau au chargement : affiché d'emblée, sans attendre l'animation d'entrée */
+.bb-still, .bb-still * { animation: none !important; }
+.bb-still .bb-ring { opacity: .35; transform: scale(1.35); }
 /* logo MBL : apparition avec halo */
 .bb-brand-in { animation: bb-fade .5s ease-out both; }
 @keyframes bb-fade { from { opacity: 0 } to { opacity: 1 } }

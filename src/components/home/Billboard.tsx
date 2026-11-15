@@ -127,9 +127,9 @@ function SlideView({ s, phase }: { s: BillboardSlide; phase: 'in' | 'out' }) {
   )
 }
 
-function BrandView({ logo, leagueName, seasonLabel, phase }: { logo: string; leagueName: string; seasonLabel: string; phase: 'in' | 'out' }) {
+function BrandView({ logo, leagueName, seasonLabel, phase, still }: { logo: string; leagueName: string; seasonLabel: string; phase: 'in' | 'out'; still?: boolean }) {
   return (
-    <div className={cn('bb-slide flex flex-col items-center justify-center text-center', phase === 'in' ? 'bb-brand-in' : 'bb-wipe-out')} aria-hidden={phase === 'out'}>
+    <div className={cn('bb-slide flex flex-col items-center justify-center text-center', phase === 'in' ? (still ? 'bb-still' : 'bb-brand-in') : 'bb-wipe-out')} aria-hidden={phase === 'out'}>
       <div className="relative">
         <div className="bb-ring absolute -inset-8 rounded-full" />
         <img src={logo} alt="" className="bb-logo relative h-28 w-auto sm:h-36" />
@@ -194,7 +194,7 @@ export function Billboard({ slides: content, leagueName, seasonLabel, logoUrl, p
   const render = (k: number, phase: 'in' | 'out') => {
     const s = slides[k]
     return 'brand' in s
-      ? <BrandView key={`${s.key}-${phase}-${tk}`} logo={logo} leagueName={leagueName} seasonLabel={seasonLabel} phase={phase} />
+      ? <BrandView key={`${s.key}-${phase}-${tk}`} logo={logo} leagueName={leagueName} seasonLabel={seasonLabel} phase={phase} still={phase === 'in' && tk === 0 && prev === null} />
       : 'poster' in s ? <PosterView key={`${s.key}-${phase}-${tk}`} poster={s.poster} phase={phase} />
       : <SlideView key={`${s.key}-${phase}-${tk}`} s={s} phase={phase} />
   }

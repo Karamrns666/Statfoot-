@@ -223,6 +223,9 @@ export interface Match extends BaseEntity {
   postponed_reason?: string
   /** forfait (tapis vert, Art. 14) : équipe forfait — score officiel 3-0 pour l'adversaire */
   forfeit_team_id?: string
+  /** arbitre du match (fiche privée Referee) et son nom, affiché sur la fiche publique */
+  referee_id?: string
+  referee_name?: string
   /** motif officiel du forfait (liste fermée, src/lib/forfeit.ts) et précision libre */
   forfeit_reason?: '14.1' | '14.2' | '18.1' | '2.7' | '2.3_unregistered' | '2.3_not_employee' | 'other'
   forfeit_note?: string
@@ -361,7 +364,9 @@ export interface DisciplineCase extends BaseEntity {
 /** Art. 17.7 — procès-verbal d'une décision (discipline, réclamation, forfait…), texte et / ou PDF. */
 export interface ProcesVerbal extends BaseEntity {
   season_id: string
-  kind: 'discipline' | 'reclamation' | 'forfait' | 'autre'
+  kind: 'discipline' | 'reclamation' | 'forfait' | 'autre' | 'feuille'
+  /** feuille de match complète figée à la fin du match */
+  sheet?: Record<string, unknown>
   title: string
   date: string
   text?: string
@@ -599,7 +604,25 @@ export interface StandingAdjustment extends BaseEntity {
 /** Erreur JavaScript remontée par le site en ligne (lecture réservée aux admins) */
 export interface ClientError extends BaseEntity { message: string; stack?: string; url: string; ua: string; kind?: string; release?: string }
 
+/** Arbitre (fiche PRIVÉE : téléphone) */
+export interface Referee extends BaseEntity { first_name: string; last_name: string; phone?: string; association?: string; active?: boolean }
+/** Évaluation de l'arbitre après un match — PRIVÉE (admin uniquement), modifiable 24 h puis verrouillée */
+export interface RefereeEvaluation extends BaseEntity {
+  match_id: string
+  referee_id?: string
+  referee_name?: string
+  /** notes de 1 à 5 */
+  scores: Record<'game' | 'discipline' | 'rules' | 'communication' | 'punctuality', number>
+  overall: number
+  comment?: string
+  author_email?: string
+  submitted_at: string
+  updated_by?: string
+}
+
 export interface EntityMap {
+  Referee: Referee
+  RefereeEvaluation: RefereeEvaluation
   ClientError: ClientError
   StandingAdjustment: StandingAdjustment
   DisciplineCase: DisciplineCase
@@ -636,5 +659,5 @@ export interface EntityMap {
 export type EntityName = keyof EntityMap
 export const ENTITY_NAMES: EntityName[] = [
   'Season', 'Competition', 'Division', 'Group', 'Venue', 'Team', 'Player', 'Match', 'MatchEvent', 'Lineup', 'LiveState',
-  'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser', 'Rulebook', 'Club', 'CaptainTeam', 'CaptainMatch', 'DisciplineCase', 'ProcesVerbal', 'StandingAdjustment', 'ClientError',
+  'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser', 'Rulebook', 'Club', 'CaptainTeam', 'CaptainMatch', 'DisciplineCase', 'ProcesVerbal', 'StandingAdjustment', 'ClientError', 'Referee', 'RefereeEvaluation',
 ]

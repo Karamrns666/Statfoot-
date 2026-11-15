@@ -3,7 +3,7 @@ import { migrateLocalFiles } from '@/api/migrateFiles'
 import { isSimActive } from '@/sim/simMode'
 import { SimBanner } from '@/components/sim/SimBanner'
 import { Link, Navigate, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Image as ImageIcon, Gavel, Scale, Swords, Sparkles, CalendarClock,
+import { Image as ImageIcon, Gavel, Scale, Megaphone as Whistle, Swords, Sparkles, CalendarClock,
   LayoutDashboard, CalendarRange, Trophy, Layers, Shield, Users, Grid3x3, Shuffle, CalendarDays, Radio, Zap, BarChart3, Award, Image, Upload,
   ScrollText, UserCog, Settings, BookOpen, LogOut, Menu, X, ExternalLink, QrCode, Star, Scissors, Loader2, FlaskConical } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
@@ -40,6 +40,7 @@ export const ADMIN_NAV: { group: string; items: { to: string; label: string; ico
   ] },
   { group: 'XP & trophées', items: [
     { to: '/admin/discipline', label: 'Conseil de discipline', icon: Gavel, area: 'sport' },
+    { to: '/admin/arbitres', label: 'Arbitres', icon: Whistle, area: 'sport' },
     { to: '/admin/ajustements-classement', label: 'Ajustements de classement', icon: Scale, area: 'derogation' },
     { to: '/admin/visuels', label: 'Visuels réseaux', icon: ImageIcon, area: 'media' },
     { to: '/admin/visuels-semaine', label: 'Visuels de la semaine', icon: CalendarRange, area: 'media' },

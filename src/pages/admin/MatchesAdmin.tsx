@@ -52,6 +52,7 @@ export default function MatchesAdmin() {
     { key: 'referee', label: 'Arbitre' }, { key: 'half_duration_min', label: 'Durée mi-temps (min)', type: 'number' },
     { key: 'operator_user_id', label: 'Opérateur de saisie', type: 'select', options: db.AdminUser.filter((u) => u.status !== 'disabled').map((u) => ({ value: u.id, label: `${u.full_name ?? u.email}` })) },
     { key: 'forfeit_team_id', label: 'Forfait — tapis vert (équipe forfait)', type: 'select', options: [edit?.home_team_id, edit?.away_team_id].filter(Boolean).map((t) => ({ value: t as string, label: db.Team.find((x) => x.id === t)?.name ?? '' })) },
+    { key: 'referee_id', label: 'Arbitre', type: 'select', options: (db.Referee ?? []).filter((r) => r.active !== false || r.id === edit?.referee_id).map((r) => ({ value: r.id, label: `${r.first_name} ${r.last_name}` })) },
     { key: 'forfeit_reason', label: 'Motif officiel du forfait (obligatoire en cas de forfait)', type: 'select', options: FORFEIT_REASONS.map((r) => ({ value: r.key, label: `${r.label}${r.art ? ` — Art. ${r.art}` : ''}` })) },
     { key: 'forfeit_note', label: 'Précision sur le forfait (facultatif, publique)' },
     { key: 'reserve_against_team_id', label: 'Réserve (Art. 17.4) — équipe visée', type: 'select', options: [edit?.home_team_id, edit?.away_team_id].filter(Boolean).map((t) => ({ value: t as string, label: db.Team.find((x) => x.id === t)?.name ?? '' })) },
@@ -65,6 +66,8 @@ export default function MatchesAdmin() {
     const { id, created_date: _c, updated_date: _u, ...rest } = edit
     void _c; void _u
     const data = { ...rest, season_id: seasonId, date: rest.date ? new Date(rest.date as string).toISOString() : undefined } as Partial<Match>
+    // nom de l'arbitre recopié pour la fiche publique (la fiche de l'arbitre, avec son téléphone, reste privée)
+    { const r = (db.Referee ?? []).find((x) => x.id === data.referee_id); data.referee_name = r ? `${r.first_name} ${r.last_name}` : undefined }
     // réserve confirmée (joueur non salarié / non inscrit) : l'équipe visée perd 3-0 (forfait appliqué automatiquement)
     const ro = RESERVE_OUTCOMES.find((r) => r.key === data.reserve_outcome)
     if (ro?.forfeit) {
@@ -120,6 +123,7 @@ export default function MatchesAdmin() {
                       <Button asChild size="sm" variant="ghost" className="h-8 px-2" title="Saisie rapide"><Link to={`/admin/matchs/${m.id}/saisie`}><ListChecks />Saisie</Link></Button>
                       <Button asChild size="sm" variant="ghost" className="h-8 px-2" title="Match Center"><Link to={`/admin/match-center/${m.id}`}><Radio />Live</Link></Button>
                       <Button asChild size="sm" variant="ghost" className="h-8 px-2" title="Feuille de match"><Link to={`/admin/matchs/${m.id}/feuille`}><ClipboardList />Feuille</Link></Button>
+                      {m.status === 'finished' && <Button asChild size="sm" variant="ghost" className="h-8 px-2" title="Feuille de match complète (PDF)"><Link to={`/admin/feuille/${m.id}`}><FileText />PDF</Link></Button>}
                       <Button asChild size="icon" variant="ghost" className="size-8" title="PDF"><Link to={`/admin/matchs/${m.id}/feuille?print=1`}><FileText /></Link></Button>
                       <Button size="icon" variant="ghost" className="size-8" title="Modifier" onClick={() => setEdit({ ...m, date: m.date ? toLocalInput(m.date) : '' })}><Pencil /></Button>
                       {confirmDel === m.id

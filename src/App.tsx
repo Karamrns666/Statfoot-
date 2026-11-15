@@ -56,6 +56,8 @@ const A = {
   XP: lazy(() => import('@/pages/admin/XPRules')),
   Discipline: lazy(() => import('@/pages/admin/DisciplineAdmin')),
   Adjust: lazy(() => import('@/pages/admin/StandingsAdjustAdmin')),
+  Referees: lazy(() => import('@/pages/admin/RefereesAdmin')),
+  SheetPrint: lazy(() => import('@/pages/admin/MatchSheetPrint')),
   Visuels: lazy(() => import('@/pages/admin/VisualsAdmin')),
   TeamOfWeek: lazy(() => import('@/pages/admin/TeamOfWeekAdmin')),
   Stats: named(misc, 'StatsAdmin'), Awards: named(misc, 'AwardsAdmin'), Import: named(misc, 'ImportCsv'), Broadcast: named(misc, 'Broadcast'),
@@ -95,6 +97,8 @@ export default function App() {
           <Route path="xp" element={guard('xp', <A.XP />)} />
           <Route path="ajustements-classement" element={guard('derogation', <A.Adjust />)} />
           <Route path="discipline" element={guard('sport', <A.Discipline />)} />
+          <Route path="arbitres" element={guard('sport', <A.Referees />)} />
+          <Route path="feuille/:id" element={guard('sport', <A.SheetPrint />)} />
           <Route path="visuels" element={guard('media', <A.Visuels />)} />
           <Route path="visuels-semaine" element={guard('media', <A.WeeklyVisuals />)} />
           <Route path="equipe-type" element={guard('sport', <A.TeamOfWeek />)} />

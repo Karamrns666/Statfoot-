@@ -98,6 +98,7 @@ export default function MatchDetail() {
             {m.number && <span className="font-bold">{m.number}</span>}
             <span className="inline-flex items-center gap-1.5"><CalendarDays className="size-4" />{m.date ? `${fmtDay(m.date)} · ${fmtHour(m.date)}` : 'Horaire à définir'}</span>
             <span className="inline-flex items-center gap-1.5"><MapPin className="size-4" />{m.pitch ?? '—'}</span>
+            {m.referee_name && <span className="inline-flex items-center gap-1.5">Arbitre : {m.referee_name}</span>}
             {m.referee && <span className="inline-flex items-center gap-1.5"><User className="size-4" />{m.referee}</span>}
           </div>
         </div>

@@ -2,6 +2,8 @@
 //  Match Center — écran live opérateur (mobile au bord du terrain, 2 colonnes sur desktop)
 //  Toute la logique de calcul vient de src/lib/matchEngine.ts (même moteur que le public et le mode TV).
 // ============================================================================
+import { RefereeEvaluationForm, RefereePicker } from '@/components/admin/RefereeBits'
+import { saveMatchSheet } from '@/lib/matchSheet'
 import { ForfeitBadge } from '@/components/match/ForfeitBadge'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
@@ -59,6 +61,8 @@ type Flow =
   | { kind: 'suspension'; player: string; event: string }
   | { kind: 'edit'; event: MatchEvent }
   | { kind: 'close' }
+  | { kind: 'referee' }
+  | { kind: 'evaluate' }
   | { kind: 'shootout'; team: string }
 
 export default function MatchCenter() {
@@ -161,6 +165,7 @@ export default function MatchCenter() {
 
   const runStep = async () => {
     if (!step || !canWrite) return
+    if (step.action === 'kickoff' && !m.referee_id) { setFlow({ kind: 'referee' }); toast.error('Choisissez l’arbitre avant le coup d’envoi'); return }
     if (step.action === 'kickoff') { if (!lineupsOk) { setLineupsOpen(true); toast.error('Validez les deux compositions avant le coup d’envoi'); return } await base44.entities.Match.update(m.id, { status: 'live', source: 'match_center', half_duration_min: d.half }); await mutateLive((s, t) => startPeriod(s, '1H', t)) }
     else if (step.action === 'halftime') await mutateLive((s, t) => endPeriod(s, 'HT', t))
     else if (step.action === 'second_half') await mutateLive((s, t) => startPeriod(s, '2H', t))
@@ -215,6 +220,11 @@ export default function MatchCenter() {
             <ScoreSide team={away} scorers={events.filter((e) => (e.type === 'goal' && e.team_id === m.away_team_id) || (e.type === 'own_goal' && e.team_id === m.home_team_id))} xp={xpBy} align="right" />
           </div>
           <InferiorityBar list={inferiority} home={home?.short_name} away={away?.short_name} />
+          <div className="mt-2 flex justify-center">
+            <button type="button" disabled={!canWrite} onClick={() => setFlow({ kind: 'referee' })} className={cn('min-h-9 cursor-pointer rounded-full border px-3 text-xs font-bold', m.referee_id ? 'border-white/15 text-muted-foreground hover:text-white' : 'border-amber-400/60 bg-amber-400/10 text-amber-200')}>
+              {m.referee_id ? `Arbitre : ${m.referee_name}` : 'Arbitre à choisir (obligatoire)'}
+            </button>
+          </div>
           {canWrite && (
             <div className="mt-3 flex flex-wrap justify-center gap-2">
               {step && <Button size="lg" className="h-14 min-w-44 text-base" onClick={runStep}>{step.action === 'kickoff' ? <Play /> : <Flag />}{step.label}</Button>}
@@ -540,8 +550,8 @@ function FlowDialog({ flow, setFlow, match, events, act, ls }: { flow: Flow; set
       break
     case 'shot':
       title = `${flow.type === 'shot_on_target' ? 'Tir cadré' : 'Tir non cadré'} — ${teamName(flow.team)}`
-      body = <div className="space-y-3"><p className="text-sm text-muted-foreground">Tireur (sert aux statistiques de tirs du joueur)</p><PlayerGrid match={match} teamId={flow.team} events={events} includeBench={false} onPick={async (p) => { setFlow(null); await act(flow.team, flow.type, { player_id: p }) }} />
-        <Button variant="outline" className="w-full" onClick={async () => { setFlow(null); await act(flow.team, flow.type) }}>Sans joueur (tir de l’équipe)</Button></div>
+      body = <div className="space-y-3"><p className="text-sm text-muted-foreground">Qui a tiré ? (obligatoire — compté dans les statistiques du joueur et de l’équipe)</p><PlayerGrid match={match} teamId={flow.team} events={events} includeBench={false} onPick={async (p) => { setFlow(null); await act(flow.team, flow.type, { player_id: p }) }} />
+</div>
       break
     case 'player_for':
       title = `${EVENT_LABEL[flow.type]} — ${teamName(flow.team)}`
@@ -623,6 +633,14 @@ function FlowDialog({ flow, setFlow, match, events, act, ls }: { flow: Flow; set
       }} />
       break
     }
+    case 'referee':
+      title = 'Arbitre du match'
+      body = <RefereePicker match={match} onDone={close} />
+      break
+    case 'evaluate':
+      title = 'Évaluation de l’arbitre'
+      body = <RefereeEvaluationForm match={db.Match.find((x) => x.id === match.id) ?? match} onSaved={close} />
+      break
     case 'close': {
       const items = closureChecklist({ ...match, home_score: scoreFromEvents(match, events).home, away_score: scoreFromEvents(match, events).away }, events, db.Lineup.filter((l) => l.match_id === match.id), { knockout: isKnockout(match) })
       const blocking = items.some((i) => i.blocking && !i.ok)
@@ -635,7 +653,9 @@ function FlowDialog({ flow, setFlow, match, events, act, ls }: { flow: Flow; set
           const fresh = db.Match.find((x) => x.id === match.id)!
           if (ls) await saveLive({ ...pause(ls, Date.now()), period: 'FT' })
           await closeMatch(league, fresh, user, { voteMinutes: settings.motm_vote_minutes_after })
-          toast.success('Match clôturé — XP, classements, forme, trophées et stats recalculés'); close()
+          await saveMatchSheet(match.id).catch(() => toast.error('Feuille de match : enregistrement à refaire depuis l’admin'))
+          toast.success('Match clôturé — XP, classements, forme, trophées et stats recalculés')
+          setFlow({ kind: 'evaluate' })
         }}><Flag />Terminer le match</Button>
       </div>
       break

@@ -1,6 +1,6 @@
 // Chargement des entités via la couche src/api (mock Base44) + rafraîchissement automatique.
 // Dans Base44 : remplacer par des hooks react-query autour de base44.entities.X.list().
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { createContext, startTransition, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { applyCompetitionNames } from '@/lib/competitionNames'
 import { base44, store } from '@/api/base44Client'
 import { ensureSeeded } from '@/api/seed'
@@ -29,8 +29,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const first = Promise.race([startCloudSync(), new Promise((r) => setTimeout(r, 12000))])
     first.then(() => Promise.all(ENTITY_NAMES.map(async (n) => [n, await base44.entities[n].list()] as const))).then((pairs) => {
       if (!alive) return
-      setDb(Object.fromEntries(pairs) as unknown as DB)
-      setReady(true)
+      // premier rendu avec les données : en transition (React découpe le travail → page qui reste réactive)
+      startTransition(() => {
+        setDb(Object.fromEntries(pairs) as unknown as DB)
+        setReady(true)
+      })
       resumeSimulation()
     })
     const unsub = store.subscribe(async (name) => {

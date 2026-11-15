@@ -16,7 +16,6 @@ import { competitionStandings, generalStandings } from '@/lib/stats'
 import { REGLEMENT } from '@/lib/reglement'
 import { TiebreakNote } from '@/components/reglement/TiebreakNote'
 import { competitionZones } from '@/lib/zones'
-import { exportStandingsPdf } from '@/lib/pdf'
 import { TournamentView } from '@/components/standings/TournamentView'
 
 
@@ -51,7 +50,7 @@ export default function Standings() {
   return (
     <div>
       <PageHeader title="Classement" subtitle={`${season?.name} · Victoire ${pc.win} pts · Nul ${pc.draw} pt · Défaite ${pc.loss} pt`}>
-        <Button variant="outline" size="sm" onClick={() => exportStandingsPdf(`Classement ${current.label}`, `${settings.league_name} · ${season?.name}`, current.rows, (id) => L.team.get(id)?.name ?? id)}><FileDown />PDF</Button>
+        <Button variant="outline" size="sm" onClick={() => void import('@/lib/pdf').then(({ exportStandingsPdf }) => exportStandingsPdf(`Classement ${current.label}`, `${settings.league_name} · ${season?.name}`, current.rows, (id) => L.team.get(id)?.name ?? id))}><FileDown />PDF</Button>
       </PageHeader>
       <Tabs value={tabValue} onValueChange={setTab}>
         <TabsList>{tabs.map((t) => <TabsTrigger key={t.id} value={t.id}>{t.label}</TabsTrigger>)}{tournaments.map((c) => <TabsTrigger key={c.id} value={c.id}>{c.name}</TabsTrigger>)}</TabsList>

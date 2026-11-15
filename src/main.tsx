@@ -25,7 +25,12 @@ const PAGE: Record<string, () => Promise<unknown>> = {
 }
 void PAGE[location.pathname.replace(/\/$/, '') || '/']?.().catch(() => undefined)
 
-createRoot(document.getElementById('root')!).render(
+// Le site remplace la coquille statique d'index.html juste APRÈS qu'elle a été affichée (premier affichage immédiat)
+let mounted = false
+const mount = () => {
+  if (mounted) return
+  mounted = true
+  createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <DataProvider>
@@ -39,3 +44,7 @@ createRoot(document.getElementById('root')!).render(
     </BrowserRouter>
   </StrictMode>,
 )
+}
+requestAnimationFrame(() => setTimeout(mount, 0))
+setTimeout(mount, 120) // onglet en arrière-plan (pas d'image affichée) : on monte quand même
+

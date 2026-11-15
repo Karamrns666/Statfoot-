@@ -251,8 +251,11 @@
 .table-scroll .sticky-col { position: sticky; z-index: 2; background: #0b1c45; }
 .table-scroll tr:hover .sticky-col { background: #102452; }
 .table-scroll .sticky-col-last { box-shadow: 8px 0 10px -8px rgb(0 0 0 / .7); white-space: normal; overflow-wrap: break-word; hyphens: auto; min-width: 7.5rem; }
-.table-scroll.sticky-head thead th { position: sticky; top: 0; z-index: 3; background: #0a1838; }
-.table-scroll.sticky-head thead th.sticky-col { z-index: 4; }
+.table-scroll { touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; }
+/* en-tête figé seulement là où le tableau a son propre défilement (tablette / ordinateur) ; sur téléphone le tableau suit la page */
+@media (min-width: 768px) { .table-scroll.sticky-head thead th { position: sticky; top: 0; z-index: 3; background: #0a1838; } }
+.table-scroll.sticky-head thead th { background: #0a1838; }
+@media (min-width: 768px) { .table-scroll.sticky-head thead th.sticky-col { z-index: 4; } }
 
 /* Badges : reflet qui passe à intervalles réguliers, halo, holographique et particules (légendaire) */
 .bdg .bdg-shine { animation: bdg-shine 5.5s ease-in-out infinite; }

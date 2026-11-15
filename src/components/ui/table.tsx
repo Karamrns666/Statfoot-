@@ -36,7 +36,7 @@ export const Table = ({ className, stickyCols = 0, stickyHeader = false, ...p }:
     return () => { ro?.disconnect(); mo.disconnect() }
   }, [stickyCols])
   return (
-    <div className={cn('table-scroll relative w-full overflow-x-auto', stickyHeader && 'sticky-head max-h-[min(78vh,900px)] overflow-y-auto overscroll-x-contain')}>
+    <div className={cn('table-scroll relative w-full overflow-x-auto overscroll-x-contain', stickyHeader && 'sticky-head md:max-h-[min(78vh,900px)] md:overflow-y-auto')}>
       <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...p} />
     </div>
   )

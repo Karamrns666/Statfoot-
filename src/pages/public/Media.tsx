@@ -69,7 +69,7 @@ export default function Media() {
               <button key={m.id} onClick={() => openItem(m)} className={cn('group relative cursor-pointer overflow-hidden rounded-2xl bg-night-950 text-left', featured ? 'col-span-2 row-span-2 aspect-[4/3]' : 'aspect-[4/3]')}>
                 {k === 'lien' && !m.thumbnail_url
                   ? <div className="flex size-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-mbl to-night-950"><FileText className="size-10 text-sky" /></div>
-                  : <img src={m.thumbnail_url ?? m.url} alt="" className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />}
+                  : <img src={m.thumbnail_url ?? m.url} alt="" className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" decoding="async" />}
                 <div className="absolute inset-0 bg-gradient-to-t from-night-950 via-night-950/20 to-transparent" />
                 {k === 'video' && <span className="absolute left-1/2 top-1/2 flex size-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-neon/90 shadow-lg transition group-hover:scale-110"><Play className="size-6 fill-white text-white" /></span>}
                 <span className="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[11px] font-bold backdrop-blur">{k === 'video' ? <><Play className="size-3" />Vidéo</> : k === 'lien' ? <><ExternalLink className="size-3" />Lien</> : <><Image className="size-3" />Photo</>}</span>

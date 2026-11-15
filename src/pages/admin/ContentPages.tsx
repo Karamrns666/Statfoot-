@@ -25,6 +25,7 @@ import { DEFAULT_COMPETITION_NAMES, LEGACY_COMPETITION_NAMES, resolveCompetition
 import { ArtLink } from '@/components/reglement/ArtLink'
 import { BadgeRarityEditor } from '@/components/admin/BadgeRarityEditor'
 import { BackupsCard, ErrorsCard } from '@/components/admin/OpsCards'
+import { MediaDropzone } from '@/components/admin/MediaDropzone'
 
 // ---------------------------------------------------------------------------
 export function MediaAdmin() {
@@ -52,6 +53,7 @@ export function MediaAdmin() {
   }
   return (
     <AdminPage title="Médiathèque" subtitle="Photos, vidéos, articles — tags par équipe et par journée">
+      <MediaDropzone seasonId={seasonId} />
       <Card className="mb-4"><CardContent className="flex flex-col gap-2 pt-4 sm:flex-row">
         <Input placeholder="Coller des liens de partage Google Drive (un par ligne ou séparés par des espaces)" value={drive} onChange={(e) => setDrive(e.target.value)} />
         <Button variant="outline" onClick={importDrive} disabled={!drive}><Link2 />Importer depuis Google Drive</Button>

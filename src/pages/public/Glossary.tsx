@@ -30,7 +30,7 @@ export default function Glossary() {
     <div className="mx-auto max-w-3xl">
       <PageHeader title="Glossaire des statistiques" subtitle="Ce que mesure chaque chiffre du site, comment il est calculé, avec un exemple." />
       <nav aria-label="Rubriques" className="mb-6 flex flex-wrap gap-2">
-        {GROUPS.map((g) => <a key={g} href={`#g-${g}`} className="rounded-full border border-white/15 px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-white">{g}</a>)}
+        {GROUPS.map((g) => <a key={g} href={`#g-${g}`} className="inline-flex min-h-10 items-center rounded-full border border-white/15 px-3 text-xs font-bold text-muted-foreground hover:text-white">{g}</a>)}
       </nav>
       {GROUPS.map((g) => (
         <section key={g} id={`g-${g}`} className="mb-8 scroll-mt-24">

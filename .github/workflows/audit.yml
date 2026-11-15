@@ -1,0 +1,42 @@
+name: Audit complet
+
+# Audit de mise en page (LOT 4) : pages publiques + admin, 13 tailles d'écran, Chromium / Firefox / WebKit.
+# Lancé à la demande (push sur la branche `audit-complet`). Rapport rangé dans `refs/ci/audit-<moteur>`.
+on:
+  push:
+    branches: ['audit-complet']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx vite build > /dev/null
+      - name: Audit ${{ matrix.engine }}
+        continue-on-error: true
+        run: |
+          npm i --no-save @playwright/test@1.63.0 > /dev/null 2>&1
+          npx playwright install --with-deps ${{ matrix.engine }} > /dev/null 2>&1
+          (npx vite preview --port 4173 --strictPort > /dev/null 2>&1 &) ; sleep 4
+          node e2e/audit-full.mjs ${{ matrix.engine }} > audit-log.txt 2>&1; echo "exit=$?" >> audit-log.txt
+          tail -20 audit-log.txt
+      - name: Ranger le rapport
+        if: always()
+        run: |
+          mkdir -p /tmp/out && cp -r audit-out /tmp/out/ 2>/dev/null || true; cp audit-log.txt /tmp/out/ 2>/dev/null || true
+          cd /tmp/out && git init -q && git config user.name ci && git config user.email ci@users.noreply.github.com
+          git add -A && git commit -qm "Audit ${{ matrix.engine }} ${GITHUB_SHA}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/ci/audit-${{ matrix.engine }}"

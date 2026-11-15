@@ -79,7 +79,7 @@ export default function Planning() {
           </div>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <div className="grid gap-4 [&>*]:min-w-0 lg:grid-cols-[minmax(0,1fr)_280px]">
           <Card><CardContent className="overflow-x-auto pt-4">
             <h2 className="mb-2 flex items-center gap-2 font-display text-lg font-black uppercase"><CalendarDays className="size-5 text-neon" />{fmtDay(`${day}T12:00:00Z`)}</h2>
             <table className="w-full min-w-[520px] table-fixed border-separate border-spacing-2 text-sm">

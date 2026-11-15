@@ -117,19 +117,19 @@ export default function MatchesAdmin() {
                   <TableCell className="hidden text-xs md:table-cell">{c?.name} · {isKnockout(m) ? STAGE_LABELS[m.stage!] : `J${m.round}`}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1"><Badge variant={STATUS_V[m.status]}>{STATUS_LABEL[m.status]}</Badge>
-                      <button onClick={() => base44.entities.Match.update(m.id, { published: m.published === false })} title={m.published === false ? 'Brouillon — publier' : 'Publié — dépublier'} className="text-muted-foreground hover:text-white">{m.published === false ? <EyeOff className="size-4" /> : <Eye className="size-4 text-win" />}</button></div>
+                      <button onClick={() => base44.entities.Match.update(m.id, { published: m.published === false })} title={m.published === false ? 'Brouillon — publier' : 'Publié — dépublier'} aria-label={m.published === false ? 'Publier le match' : 'Dépublier le match'} className="flex size-10 items-center justify-center rounded-lg text-muted-foreground hover:bg-white/5 hover:text-white lg:size-8">{m.published === false ? <EyeOff className="size-4" /> : <Eye className="size-4 text-win" />}</button></div>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap justify-end gap-1">
-                      <Button asChild size="sm" variant="ghost" className="h-8 px-2" title="Saisie rapide"><Link to={`/admin/matchs/${m.id}/saisie`}><ListChecks />Saisie</Link></Button>
-                      <Button asChild size="sm" variant="ghost" className="h-8 px-2" title="Match Center"><Link to={`/admin/match-center/${m.id}`}><Radio />Live</Link></Button>
-                      <Button asChild size="sm" variant="ghost" className="h-8 px-2" title="Feuille de match"><Link to={`/admin/matchs/${m.id}/feuille`}><ClipboardList />Feuille</Link></Button>
-                      {m.status === 'finished' && <Button asChild size="sm" variant="ghost" className="h-8 px-2" title="Feuille de match complète (PDF)"><Link to={`/admin/feuille/${m.id}`}><FileText />PDF</Link></Button>}
-                      <Button asChild size="icon" variant="ghost" className="size-8" title="PDF"><Link to={`/admin/matchs/${m.id}/feuille?print=1`}><FileText /></Link></Button>
-                      <Button size="icon" variant="ghost" className="size-8" title="Modifier" onClick={() => setEdit({ ...m, date: m.date ? toLocalInput(m.date) : '' })}><Pencil /></Button>
+                      <Button asChild size="sm" variant="ghost" className="h-10 px-2 lg:h-8" title="Saisie rapide"><Link to={`/admin/matchs/${m.id}/saisie`}><ListChecks />Saisie</Link></Button>
+                      <Button asChild size="sm" variant="ghost" className="h-10 px-2 lg:h-8" title="Match Center"><Link to={`/admin/match-center/${m.id}`}><Radio />Live</Link></Button>
+                      <Button asChild size="sm" variant="ghost" className="h-10 px-2 lg:h-8" title="Feuille de match"><Link to={`/admin/matchs/${m.id}/feuille`}><ClipboardList />Feuille</Link></Button>
+                      {m.status === 'finished' && <Button asChild size="sm" variant="ghost" className="h-10 px-2 lg:h-8" title="Feuille de match complète (PDF)"><Link to={`/admin/feuille/${m.id}`}><FileText />PDF</Link></Button>}
+                      <Button asChild size="icon" variant="ghost" className="size-10 lg:size-8" title="PDF"><Link to={`/admin/matchs/${m.id}/feuille?print=1`}><FileText /></Link></Button>
+                      <Button size="icon" variant="ghost" className="size-10 lg:size-8" title="Modifier" onClick={() => setEdit({ ...m, date: m.date ? toLocalInput(m.date) : '' })}><Pencil /></Button>
                       {confirmDel === m.id
-                        ? <Button size="sm" variant="destructive" className="h-8" onClick={async () => { for (const e of db.MatchEvent.filter((x) => x.match_id === m.id)) await base44.entities.MatchEvent.delete(e.id); await base44.entities.Match.delete(m.id); setConfirmDel(null); toast.success('Match supprimé') }}>Confirmer</Button>
-                        : <Button size="icon" variant="ghost" className="size-8 text-red-400" title="Supprimer" onClick={() => setConfirmDel(m.id)}><Trash2 /></Button>}
+                        ? <Button size="sm" variant="destructive" className="h-10 lg:h-8" onClick={async () => { for (const e of db.MatchEvent.filter((x) => x.match_id === m.id)) await base44.entities.MatchEvent.delete(e.id); await base44.entities.Match.delete(m.id); setConfirmDel(null); toast.success('Match supprimé') }}>Confirmer</Button>
+                        : <Button size="icon" variant="ghost" className="size-10 text-red-400 lg:size-8" title="Supprimer" onClick={() => setConfirmDel(m.id)}><Trash2 /></Button>}
                     </div>
                   </TableCell>
                 </TableRow>

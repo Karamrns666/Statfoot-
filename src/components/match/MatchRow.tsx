@@ -55,7 +55,7 @@ function TeamLine({ team, score, winner, loser, live, fav, onFav }: { team?: Tea
       <TeamLogo team={team} size={24} />
       <span className={cn('min-w-0 flex-1 truncate text-[15px]', winner ? 'font-bold text-white' : loser ? 'text-muted-foreground' : 'font-semibold')}>{team?.name ?? 'À déterminer'}</span>
       {onFav && team && (
-        <button type="button" onClick={onFav} aria-pressed={fav} aria-label={fav ? `Retirer ${team.name} des favoris` : `Ajouter ${team.name} aux favoris`} className="pointer-events-auto relative z-10 cursor-pointer rounded p-1 text-white/25 hover:text-award-gold">
+        <button type="button" onClick={onFav} aria-pressed={fav} aria-label={fav ? `Retirer ${team.name} des favoris` : `Ajouter ${team.name} aux favoris`} className="hit pointer-events-auto relative z-10 cursor-pointer rounded p-1 text-white/25 hover:text-award-gold">
           <Star className={cn('size-4', fav && 'fill-award-gold text-award-gold')} />
         </button>
       )}

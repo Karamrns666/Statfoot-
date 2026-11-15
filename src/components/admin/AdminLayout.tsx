@@ -111,13 +111,13 @@ export function AdminLayout() {
         {open && <div className="fixed inset-0 z-50 bg-black/60 lg:hidden" onClick={() => setOpen(false)}><aside className="h-full w-72 overflow-y-auto bg-night-900 p-4" onClick={(e) => e.stopPropagation()}><div className="mb-6 flex items-center justify-between"><Logo to="/admin" subtitle="Admin" /><button onClick={() => setOpen(false)}><X /></button></div>{nav}</aside></div>}
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="sticky top-[var(--sim-h,0px)] z-30 flex h-14 items-center gap-2 border-b border-white/5 bg-night-900/90 px-3 backdrop-blur sm:px-5">
-            <button className={cn('rounded-lg p-2 hover:bg-white/10', !live && 'lg:hidden')} onClick={() => setOpen(true)} aria-label="Menu"><Menu className="size-5" /></button>
+            <button className={cn('flex size-11 items-center justify-center rounded-lg hover:bg-white/10', !live && 'lg:hidden')} onClick={() => setOpen(true)} aria-label="Menu"><Menu className="size-5" /></button>
             {user.role !== 'operator' && <ScopeSelectors />}
             <div className="ml-auto flex items-center gap-2">
               {cut.pending > 0 && <span className="hidden items-center gap-1.5 rounded-full bg-neon/10 px-2.5 py-1 text-[11px] font-semibold text-neon md:inline-flex" role="status" title="Le fond des photos joueurs est supprimé automatiquement pour les cartes"><Scissors className="size-3.5" />{cut.current ? <Loader2 className="size-3 animate-spin" /> : null}Détourage : {cut.pending} photo{cut.pending > 1 ? 's' : ''}</span>}
               <Link to="/" target="_blank" className="hidden items-center gap-1 rounded-lg px-2 py-1.5 text-xs text-muted-foreground hover:bg-white/5 sm:flex"><ExternalLink className="size-3.5" />Site public</Link>
               <div className="hidden text-right sm:block"><div className="text-xs font-semibold">{user.full_name ?? user.email}</div><div className="text-[10px] text-neon">{ROLE_LABEL[user.role]}</div></div>
-              <button onClick={logout} className="rounded-lg p-2 hover:bg-white/10" title="Déconnexion"><LogOut className="size-4" /></button>
+              <button onClick={logout} className="flex size-11 items-center justify-center rounded-lg hover:bg-white/10" title="Déconnexion" aria-label="Déconnexion"><LogOut className="size-4" /></button>
             </div>
           </header>
           <main className={cn('flex-1', live ? 'p-0' : 'p-3 sm:p-6')}><Outlet /></main>

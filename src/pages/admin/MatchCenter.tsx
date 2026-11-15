@@ -378,7 +378,7 @@ function LineupPanel({ match, teamId, events, onPlayer, onEdit }: { match: Match
   }
   return (
     <div className="glass rounded-2xl p-2">
-      <div className="mb-1 flex items-center justify-between px-1"><span className="text-xs font-bold uppercase text-muted-foreground">{L.team.get(teamId)?.short_name} · 6 contre 6</span><button className="text-xs text-neon cursor-pointer" onClick={onEdit}><Pencil className="inline size-3" /> compo</button></div>
+      <div className="mb-1 flex items-center justify-between px-1"><span className="text-xs font-bold uppercase text-muted-foreground">{L.team.get(teamId)?.short_name} · 6 contre 6</span><button className="-my-2 inline-flex min-h-11 cursor-pointer items-center rounded-lg px-3 text-xs font-semibold text-neon hover:bg-white/5" onClick={onEdit}><Pencil className="inline size-3" /> compo</button></div>
       {lu ? <>{(lu.starter_ids ?? []).map((p) => row(p, false))}<div className="my-1 border-t border-white/5" />{(lu.substitute_ids ?? []).map((p) => row(p, true))}</> : <p className="p-2 text-xs text-muted-foreground">Composition non saisie</p>}
     </div>
   )
@@ -404,8 +404,8 @@ function SummaryPanel({ match, events, canEdit, onEdit, onDelete }: { match: Mat
                 <div className="flex items-center gap-1"><span className="num w-12 text-center text-xs">{fmtMinute(e.minute, e.added_minute)}</span></div>
                 <div className="flex items-center gap-1">{!home && txt}
                   {canEdit && <span className={cn('ml-auto flex gap-0.5', home && 'order-first mr-auto ml-0')}>
-                    <button className="p-1 text-muted-foreground hover:text-white" onClick={() => onEdit(e)} title="Corriger"><Pencil className="size-3.5" /></button>
-                    <button className={cn('p-1', confirm?.id === e.id ? 'text-red-300' : 'text-muted-foreground hover:text-red-400')} title="Supprimer (double confirmation)"
+                    <button className="flex size-10 items-center justify-center rounded-lg text-muted-foreground hover:bg-white/5 hover:text-white lg:size-8" onClick={() => onEdit(e)} title="Corriger" aria-label="Corriger"><Pencil className="size-3.5" /></button>
+                    <button className={cn('flex h-10 min-w-10 items-center justify-center rounded-lg px-1 lg:h-8 lg:min-w-8', confirm?.id === e.id ? 'text-red-300' : 'text-muted-foreground hover:text-red-400')} title="Supprimer (double confirmation)" aria-label="Supprimer"
                       onClick={() => { if (confirm?.id === e.id && confirm.n >= 1) { onDelete(e); setConfirm(null) } else setConfirm({ id: e.id, n: (confirm?.id === e.id ? confirm.n : 0) + 1 }) }}>
                       {confirm?.id === e.id ? <span className="text-[10px] font-bold">Confirmer ?</span> : <Trash2 className="size-3.5" />}</button>
                   </span>}

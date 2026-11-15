@@ -131,7 +131,7 @@ function Section({ s, q, version }: { s: RuleSection; q: string; version?: strin
         <H className={cn(s.level === 1 ? 'title-caps border-b border-white/10 pb-2 text-2xl sm:text-3xl' : 'font-display text-lg font-extrabold uppercase text-neon sm:text-xl')}>
           <Mark text={s.level === 1 ? prettyTitle(s.title) : s.title} q={q} />
         </H>
-        <a href={`#${s.id}`} onClick={copy} className="mt-1 shrink-0 rounded p-1 text-muted-foreground opacity-60 hover:text-neon group-hover:opacity-100 focus-visible:opacity-100" aria-label={`Copier le lien vers ${s.level === 1 ? s.title : `l’article ${s.ref}`}`} title="Copier le lien de cet article">
+        <a href={`#${s.id}`} onClick={copy} className="hit mt-1 shrink-0 rounded p-1 text-muted-foreground opacity-60 hover:text-neon group-hover:opacity-100 focus-visible:opacity-100" aria-label={`Copier le lien vers ${s.level === 1 ? s.title : `l’article ${s.ref}`}`} title="Copier le lien de cet article">
           {copied ? <Check className="size-4 text-win" /> : <Link2 className="size-4" />}
         </a>
       </div>

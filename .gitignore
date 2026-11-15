@@ -7,3 +7,4 @@ dist
 !.env.e2e
 
 test-results/
+audit-out/

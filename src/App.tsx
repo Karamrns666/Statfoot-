@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useLayoutEffect } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { PublicLayout } from '@/components/layout/PublicLayout'
 import { Spinner } from '@/components/league/Bits'
@@ -67,7 +67,9 @@ const guard = (area: Area, el: React.ReactNode) => <RequireArea area={area}>{el}
 
 export default function App() {
   const { ready } = useData()
-  if (!ready) return <Spinner />
+  // la coquille statique d'index.html reste affichée jusqu'à ce que la page soit prête (pas d'écran vide entre les deux)
+  useLayoutEffect(() => { if (ready) document.getElementById('app-shell')?.remove() }, [ready])
+  if (!ready) return document.getElementById('app-shell') ? null : <Spinner />
   return (
     <Suspense fallback={<Spinner />}>
       <Routes>

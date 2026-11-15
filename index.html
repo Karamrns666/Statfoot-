@@ -31,6 +31,11 @@
         try {
           var u = '%VITE_SUPABASE_URL%', k = '%VITE_SUPABASE_ANON_KEY%'
           if (!u || u.charAt(0) === '%' || !k || k.charAt(0) === '%' || localStorage.getItem('statfoot:cloud-session')) return
+          // site en ligne : un seul instantané compressé, servi en cache par Vercel (/api/snapshot)
+          if (!/^(localhost|127\.)/.test(location.hostname)) {
+            window.__mblSnapshot = fetch('/api/snapshot').then(function (r) { return r.ok ? r.json() : null }).catch(function () { return null })
+            return
+          }
           var q = '/rest/v1/entity_rows?select=entity,id,data,deleted,updated_at&deleted=is.false&order=updated_at.asc,entity.asc,id.asc&limit=1000&offset=0'
           window.__mblPrefetch = { path: q, res: fetch(u.replace(/\/$/, '') + q, { headers: { apikey: k, Authorization: 'Bearer ' + k } }).then(function (r) { return r.ok ? r.json() : null }).catch(function () { return null }) }
         } catch (e) { /* pas de préchargement */ }
@@ -42,8 +47,8 @@
     </script>
   </head>
   <body>
-    <div id="root"><div id="app-shell" aria-hidden="true" style="min-height:100vh;background:#04163D;color:#fff;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif">
-      <!-- Premier affichage immédiat (avant le JavaScript) : remplacé par le site dès qu'il est prêt -->
+    <div id="app-shell" aria-hidden="true" style="min-height:100vh;background:#04163D;color:#fff;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif">
+      <!-- Premier affichage immédiat (avant le JavaScript) : retirée par le site quand la page demandée est prête -->
       <div style="height:64px;display:flex;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid rgba(255,255,255,.06);max-width:1280px;margin:0 auto">
         <img src="/brand/mbl-logo-192.png" width="41" height="44" alt="" style="height:44px;width:auto" />
         <span style="font-family:'Arial Narrow','Roboto Condensed','sans-serif-condensed',system-ui,sans-serif;font-weight:800;font-size:22px;letter-spacing:.02em">MBL</span>
@@ -53,7 +58,8 @@
         <p style="margin:18px 0 0;max-width:36em;color:#AFC3E6;font-size:17px;line-height:1.5">1ère ligue de football inter-entreprises au Maroc · résultats, classements et joueurs en direct.</p>
         <div style="margin-top:28px;height:4px;width:160px;border-radius:4px;background:linear-gradient(90deg,#F85A00,#F26B1D);opacity:.85"></div>
       </div>
-    </div></div>
+    </div>
+    <div id="root"></div>
     <script>if (/^\/(admin|tv|live)/.test(location.pathname)) { var sh = document.getElementById('app-shell'); if (sh) sh.remove() }</script>
     <script type="module" src="/src/main.tsx"></script>
   </body>

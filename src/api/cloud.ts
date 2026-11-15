@@ -177,6 +177,13 @@ export async function pullRows(since?: string): Promise<CloudRow[]> {
   const token = (await accessToken()) ?? ANON
   // chargement complet : les enregistrements supprimés sont inutiles (la copie locale est remplacée en entier)
   const q = (offset: number) => `/rest/v1/entity_rows?select=entity,id,data,deleted,updated_at${since ? `&updated_at=gt.${encodeURIComponent(since)}` : '&deleted=is.false'}&order=updated_at.asc,entity.asc,id.asc&limit=1000&offset=${offset}`
+  // site en ligne, visiteur : instantané complet déjà demandé par index.html (une seule réponse, en cache Vercel)
+  const snap = (window as { __mblSnapshot?: Promise<CloudRow[] | null> }).__mblSnapshot
+  if (!since && snap && token === ANON) {
+    (window as { __mblSnapshot?: unknown }).__mblSnapshot = undefined
+    const rows = await snap
+    if (Array.isArray(rows) && rows.length) return rows
+  }
   // 1re page déjà demandée par index.html (visiteur, avant le chargement du JavaScript) : on la réutilise
   const pre = (window as { __mblPrefetch?: { path: string; res: Promise<CloudRow[] | null> } }).__mblPrefetch
   let first: CloudRow[] | null = null

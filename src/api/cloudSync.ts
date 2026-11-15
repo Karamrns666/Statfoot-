@@ -4,6 +4,7 @@
 //  · chaque écriture d'un admin connecté : envoi immédiat (regroupé) ; suppression = ligne marquée deleted.
 //  · migrations de données : appliquées une fois sur Supabase par le premier admin connecté (version dans __meta).
 import { store, setWriteHook } from './localStore'
+import { FILE_PREFIX } from './fileStore'
 import { META, canWrite, cloudEnabled, isSynced, onAuthChange, pullRows, pushRows, type CloudRow } from './cloud'
 import { ENTITY_NAMES, type BaseEntity, type EntityName } from '@/types/entities'
 import { PRIVATE_ENTITY, PRIVATE_FIELDS, hasPrivate, keepPrivate } from './privateFields'
@@ -48,6 +49,14 @@ async function flush() {
   emit()
 }
 
+/** Visiteurs : une image restée dans le navigateur de l'admin qui l'a importée (/_files/…) n'existe pas pour eux →
+ *  on l'ignore (silhouette affichée, pas de requête en erreur). Les admins gardent l'adresse pour pouvoir la reprendre. */
+function withoutLocalFiles(d: BaseEntity): BaseEntity {
+  let out: Record<string, unknown> | null = null
+  for (const [k, v] of Object.entries(d)) if (typeof v === 'string' && v.startsWith(FILE_PREFIX)) (out ??= { ...d })[k] = undefined
+  return (out ?? d) as unknown as BaseEntity
+}
+
 function apply(rows: CloudRow[], full: boolean) {
   const by = new Map<string, CloudRow[]>()
   // lignes privées (reçues seulement par un admin connecté) : champs à réassembler dans les fiches
@@ -61,6 +70,7 @@ function apply(rows: CloudRow[], full: boolean) {
     }
     if (r.entity !== META.entity) { const l = by.get(r.entity) ?? []; l.push(r); by.set(r.entity, l) }
   }
+  const writer = canWrite()
   applying = true
   try {
     store.batch(() => {
@@ -68,7 +78,8 @@ function apply(rows: CloudRow[], full: boolean) {
         if (!isSynced(name)) continue
         const list = by.get(name) ?? []
         const priv = PRIVATE_FIELDS[name] ? privByRef.get(name) : undefined
-        const withPriv = (d: BaseEntity, old?: BaseEntity) => {
+        const withPriv = (d0: BaseEntity, old?: BaseEntity) => {
+          const d = writer ? d0 : withoutLocalFiles(d0)
           const p = priv?.get(d.id)
           const base = keepPrivate(name, d as unknown as Record<string, unknown>, old as unknown as Record<string, unknown>)
           return (p ? { ...base, ...p } : base) as unknown as BaseEntity

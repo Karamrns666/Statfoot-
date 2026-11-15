@@ -228,11 +228,11 @@ function CardBack({ p }: { p: PlayerCardProps }) {
           {logo && <img src={logo} alt="" className={cn('size-[2.8em] object-contain', isBrandLogo(logo) && 'rounded-[22%] ring-1 ring-black/10')} />}
           <div className="min-w-0">
             <div className="truncate font-display text-[1.8em] font-black uppercase leading-none">{p.lastName}</div>
-            <div className="truncate text-[.95em] text-ink/60">{p.firstName} · {teamLabel}</div>
+            <div className="truncate text-[.95em] text-ink/70">{p.firstName} · {teamLabel}</div>
           </div>
         </div>
         <div className="mt-[.8em] flex items-end justify-between gap-2 border-b-2 border-[#F05A22] pb-[.4em]">
-          <span className="min-w-0 text-[.95em] font-bold leading-tight text-ink/65">{p.backTitle}</span>
+          <span className="min-w-0 text-[.95em] font-bold leading-tight text-ink/70">{p.backTitle}</span>
           <span className="shrink-0 font-display text-[2.2em] font-black leading-none text-mbl">{p.rating}<span className="ml-0.5 text-[.4em] text-ink/75">{p.ratingLabel}</span></span>
         </div>
         <dl className="mt-[.2em] min-h-0 flex-1 divide-y divide-ink/10 overflow-hidden">
@@ -246,12 +246,12 @@ function CardBack({ p }: { p: PlayerCardProps }) {
         {medals.length > 0 && (
           <div className="mt-[.4em] flex flex-wrap items-center gap-[.2em]" aria-label="Badges débloqués">
             {medals.slice(0, 8).map((b) => <MiniMedal key={b.def.id} b={b} />)}
-            <span className="ml-auto text-[.9em] font-bold text-ink/60">{medals.length}{p.badgeTotal ? ` / ${p.badgeTotal}` : ''} badges</span>
+            <span className="ml-auto text-[.9em] font-bold text-ink/70">{medals.length}{p.badgeTotal ? ` / ${p.badgeTotal}` : ''} badges</span>
           </div>
         )}
-        {p.backNote && <p className="mt-[.3em] text-[.85em] leading-snug text-ink/55">{p.backNote}</p>}
+        {p.backNote && <p className="mt-[.3em] text-[.85em] leading-snug text-ink/70">{p.backNote}</p>}
         {p.href && (
-          <Link to={p.href} onClick={(e) => e.stopPropagation()} className="mt-[.6em] rounded-lg bg-[#0B2E73] py-[.65em] text-center text-[1em] font-bold text-white transition hover:bg-neon">
+          <Link to={p.href} onClick={(e) => e.stopPropagation()} className="mt-[.6em] flex min-h-6 items-center justify-center rounded-lg bg-[#0B2E73] py-[.65em] text-center text-[1em] font-bold text-white transition hover:bg-neon">
             Voir la fiche
           </Link>
         )}

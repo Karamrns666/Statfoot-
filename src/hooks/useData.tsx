@@ -3,8 +3,8 @@
 import { createContext, startTransition, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { applyCompetitionNames } from '@/lib/competitionNames'
 import { base44, store } from '@/api/base44Client'
-import { ensureSeeded } from '@/api/seed'
 import { startCloudSync } from '@/api/cloudSync'
+import { cloudEnabled } from '@/api/cloud'
 import { ENTITY_NAMES, type EntityMap, type EntityName, type Settings } from '@/types/entities'
 import type { LeagueData } from '@/lib/stats'
 import { leagueFromDb } from '@/lib/leagueData'
@@ -23,10 +23,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [sim, setSim] = useState(simState())
   useEffect(() => onSimChange(() => setSim(simState())), [])
   useEffect(() => {
-    ensureSeeded()
     let alive = true
+    if (cloudEnabled && store.all('AdminUser').length) store.replace('AdminUser', []) // anciens comptes de démonstration locaux
+    // Données locales de la ligue (jeu de départ) : chargées seulement hors Supabase, ou en secours si Supabase
+    // ne répond pas et que ce navigateur n'a encore aucune donnée → le visiteur ne calcule plus toute la ligue pour rien.
+    const seedLocal = () => import('@/api/seed').then((m) => { m.ensureSeeded() })
     // Supabase : on attend la première copie des données partagées (12 s maximum, sinon données locales)
-    const first = Promise.race([startCloudSync(), new Promise((r) => setTimeout(r, 12000))])
+    const first = cloudEnabled
+      ? Promise.race([startCloudSync(), new Promise((r) => setTimeout(r, 12000))]).then(() => (store.all('Team').length ? undefined : seedLocal()))
+      : seedLocal()
     first.then(() => Promise.all(ENTITY_NAMES.map(async (n) => [n, await base44.entities[n].list()] as const))).then((pairs) => {
       if (!alive) return
       // premier rendu avec les données : en transition (React découpe le travail → page qui reste réactive)

@@ -3,6 +3,7 @@
 //  • Saison 2026-2027 — saison en cours : 20 entreprises, Gold Cup et Silver Cup (./season2026.ts).
 //    Matchs et effectifs : import du fichier de la ligue ou saisie dans l'admin.
 // Pur : renvoie { Entité: lignes[] }.
+import { cloudEnabled } from '../cloud'
 import type { AdminUser, Award, EntityMap, EntityName, Settings, Venue, XPRule } from '@/types/entities'
 import { DEFAULT_COMPETITION_NAMES } from '@/lib/competitionNames'
 import { computeAwards, computePlayerXP, teamRankBefore, XP_DEFAULTS, XP_KEYS, type LeagueData } from '@/lib/stats'
@@ -71,7 +72,8 @@ export function generateLeagueData(now = new Date()): DB {
 
   // ---- administrateurs (à remplacer par les vrais comptes au lancement) -----------
   const ts = new Date(now.getTime() - 30 * 86400000).toISOString()
-  db.AdminUser.push(
+  // comptes de démonstration : mode local uniquement (en production, les comptes sont ceux de Supabase)
+  if (!cloudEnabled) db.AdminUser.push(
     { id: 'user_super', email: 'superadmin@mbl.ma', full_name: 'Super Admin', role: 'super_admin', status: 'active', activated_at: ts, password: 'mbl2026' } as AdminUser,
     { id: 'user_admin', email: 'admin@mbl.ma', full_name: 'Admin Ligue', role: 'admin', status: 'active', activated_at: ts, password: 'mbl2026' } as AdminUser,
     { id: 'user_operator', email: 'operateur@mbl.ma', full_name: 'Opérateur de saisie', role: 'operator', status: 'active', activated_at: ts, password: 'mbl2026' } as AdminUser,

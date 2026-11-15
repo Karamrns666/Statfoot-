@@ -132,7 +132,7 @@ export default function Matches() {
       {/* onglets */}
       <div className="mb-6 flex flex-wrap items-center gap-2">
         {TABS.map((t) => (
-          <button key={t.v} onClick={() => set('statut', t.v === 'tous' ? '' : t.v)} aria-pressed={tab === t.v} className={cn('inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm font-bold transition', tab === t.v ? 'border-white bg-white text-ink' : 'border-white/15 text-muted-foreground hover:text-white')}>
+          <button key={t.v} onClick={() => set('statut', t.v === 'tous' ? '' : t.v)} aria-pressed={tab === t.v} className={cn('inline-flex min-h-10 cursor-pointer items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm font-bold transition', tab === t.v ? 'border-white bg-white text-ink' : 'border-white/15 text-muted-foreground hover:text-white')}>
             {t.v === 'direct' && <span className={cn('size-2 rounded-full', liveCount ? 'bg-red-500 animate-pulse-live' : 'bg-white/25')} />}
             {t.v === 'favoris' && <Star className={cn('size-3.5', fav.size && 'fill-award-gold text-award-gold')} />}
             {t.label}{t.v === 'direct' && <span className="num text-sm">{liveCount}</span>}

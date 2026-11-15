@@ -47,7 +47,7 @@ export default function MatchSheetPrint() {
         <section><h3 className="font-black">Cartons</h3>
           <ul className="text-sm">{sheet.cards.map((c, i) => <li key={i}>{c.minute} {c.team} — {c.player} ({c.type})</li>)}{!sheet.cards.length && <li>—</li>}</ul>
         </section>
-        <div className="grid gap-4 md:grid-cols-2"><T t={sheet.home} /><T t={sheet.away} /></div>
+        <div className="grid gap-4 md:grid-cols-2 [&>*]:min-w-0"><T t={sheet.home} /><T t={sheet.away} /></div>
         {priv && (sheet.reserve || sheet.notes) && <section><h3 className="font-black">Réserves et incidents</h3><p className="text-sm">{sheet.reserve}{sheet.reserve && sheet.notes ? ' · ' : ''}{sheet.notes}</p></section>}
         {priv && (
           <section className="rounded-lg border border-black/30 p-3"><h3 className="font-black">Évaluation de l’arbitre (privée)</h3>

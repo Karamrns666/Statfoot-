@@ -4,7 +4,7 @@ import { COUNCIL, sanctionLabel, voteClosesAt, votingTeams } from './reglement'
 import type { Competition, DisciplineCase, Match, Player, ProcesVerbal, Team } from '@/types/entities'
 
 export const PV_KIND_LABEL: Record<ProcesVerbal['kind'], string> = {
-  discipline: 'Conseil de discipline', reclamation: 'Réclamation', forfait: 'Forfait', autre: 'Décision d’Ardentia',
+  discipline: 'Conseil de discipline', reclamation: 'Réclamation', forfait: 'Forfait', feuille: 'Feuille de match', autre: 'Décision d’Ardentia',
 }
 
 /** Équipes MASTER / CHALLENGER de la saison (compétitions créées à la répartition de la pré-saison). */

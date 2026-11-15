@@ -1,5 +1,6 @@
 import { lazy, Suspense, useState } from 'react'
 import { cloudEnabled } from '@/api/cloud'
+import { store } from '@/api/localStore'
 import { AlertTriangle, Check, Link2, Plus, RotateCcw, Save, Send, Upload } from 'lucide-react'
 import { base44 } from '@/api/base44Client'
 import { resetLeagueData } from '@/api/seed'
@@ -195,8 +196,14 @@ export function SettingsPage() {
           <ErrorsCard />
           <BadgeRarityEditor />
           <Card><CardHeader><CardTitle>Données locales</CardTitle></CardHeader><CardContent>
-            <p className="mb-3 text-xs text-muted-foreground">Recharge les données officielles (archive 2025-2026, équipes 2026-2027) et efface les modifications faites dans ce navigateur.</p>
-            <Button variant="destructive" onClick={() => { if (confirm('Effacer les modifications locales et recharger les données officielles ?')) { resetLeagueData(); location.reload() } }}><RotateCcw />Recharger les données officielles</Button>
+            {cloudEnabled ? <>
+              {/* site en ligne : on vide seulement la copie de ce navigateur, la base Supabase n'est jamais modifiée */}
+              <p className="mb-3 text-xs text-muted-foreground">Vide la copie des données gardée dans ce navigateur et la recharge depuis la base en ligne. Les données de la ligue ne sont pas modifiées.</p>
+              <Button variant="outline" className="h-auto min-h-10 whitespace-normal text-left" onClick={() => { if (confirm('Vider la copie locale et recharger les données depuis la base en ligne ?')) { store.clearAll(); location.reload() } }}><RotateCcw />Recharger depuis la base en ligne</Button>
+            </> : <>
+              <p className="mb-3 text-xs text-muted-foreground">Recharge les données officielles (archive 2025-2026, équipes 2026-2027) et efface les modifications faites dans ce navigateur.</p>
+              <Button variant="destructive" className="h-auto min-h-10 whitespace-normal text-left" onClick={() => { if (confirm('Effacer les modifications locales et recharger les données officielles ?')) { resetLeagueData(); location.reload() } }}><RotateCcw />Recharger les données officielles</Button>
+            </>}
           </CardContent></Card>
         </div>
       </div>

@@ -9,7 +9,9 @@ for (const route of SHOTS) {
     test.skip(browserName === 'webkit' && route === '/equipes', 'capture instable sur WebKit (reflets animés des cartes)')
     await page.clock.setFixedTime(FROZEN)
     await page.goto(route)
-    await page.waitForLoadState('networkidle')
+    // Firefox (CI) n'atteint parfois jamais « réseau inactif » : on plafonne l'attente, puis on attend le contenu
+    await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {})
+    await page.locator('main').first().waitFor({ timeout: 20_000 })
     await page.evaluate(() => document.fonts.ready)
     await page.waitForTimeout(600)
     const name = (route === '/' ? 'accueil' : route.slice(1).replace(/\//g, '-')) + '.png'

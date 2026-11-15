@@ -17,10 +17,10 @@ export default function MatchSheetPrint() {
     <section className="break-inside-avoid">
       <h3 className="mb-1 text-lg font-black">{t.name}</h3>
       <p className="text-xs">Titulaires : {t.starters.join(', ') || '—'}<br />Remplaçants : {t.substitutes.join(', ') || '—'}<br />Gardien : {t.goalkeeper || '—'} · Capitaine : {t.captain || '—'}</p>
-      <table className="mt-2 w-full border-collapse text-xs">
+      <div className="mt-2 overflow-x-auto"><table className="w-full border-collapse text-xs">
         <thead><tr>{['N°', 'Joueur', 'Buts', 'Passes', 'Tirs', 'Cadrés', 'Arrêts', 'J', 'R'].map((h) => <th key={h} className="border border-black/30 px-1 py-0.5 text-left">{h}</th>)}</tr></thead>
         <tbody>{t.players.map((p) => <tr key={p.name}>{[p.number ?? '', p.name, p.goals, p.assists, p.shots, p.on_target, p.saves, p.yellow, p.red].map((v, i) => <td key={i} className="border border-black/30 px-1 py-0.5">{v || (i > 1 ? '' : v)}</td>)}</tr>)}</tbody>
-      </table>
+      </table></div>
     </section>
   )
   return (

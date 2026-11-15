@@ -9,7 +9,9 @@ for (const route of ROUTES) {
     page.on('response', (r) => { if (r.status() >= 400 && new URL(r.url()).origin === 'http://localhost:4173') errors.push(`${r.status()} ${r.url()}`) })
     await page.clock.setFixedTime(FROZEN)
     await page.goto(route)
-    await page.waitForLoadState('networkidle')
+    // Firefox (CI) n'atteint parfois jamais « réseau inactif » : on plafonne l'attente, puis on attend le contenu
+    await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {})
+    await page.locator('main').first().waitFor({ timeout: 20_000 })
     await page.waitForTimeout(800)
     const r = await page.evaluate(() => {
       const vw = document.documentElement.clientWidth

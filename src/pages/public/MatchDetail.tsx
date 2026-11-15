@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { usePageMeta } from '@/lib/pageMeta'
 import { ForfeitBadge } from '@/components/match/ForfeitBadge'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, CalendarDays, MapPin, Star, Vote, ArrowRightLeft, Share2, ShieldAlert, User, Hand, Image as ImageIcon, Play } from 'lucide-react'
@@ -37,6 +38,8 @@ export default function MatchDetail() {
   const [share, setShare] = useState(false)
   const m = db.Match.find((x) => x.id === id)
   const events = useMemo(() => db.MatchEvent.filter((e) => e.match_id === id), [db.MatchEvent, id])
+  { const h = m && L.team.get(m.home_team_id)?.name, a = m && L.team.get(m.away_team_id)?.name
+    usePageMeta(m ? `${h} – ${a}${m.status === 'finished' ? ` ${m.home_score ?? ''}-${m.away_score ?? ''}` : ''}${m.number ? ` (${m.number})` : ''}` : undefined, m ? `Match ${m.number ?? ''} de la Morocco Business League : ${h} contre ${a}. Score, buteurs, compositions et statistiques.` : undefined) }
   if (!m) return <EmptyState title="Match introuvable"><Link to="/matchs" className="text-neon">Retour aux matchs</Link></EmptyState>
   const home = L.team.get(m.home_team_id), away = L.team.get(m.away_team_id)
   const comp = L.competition.get(m.competition_id)

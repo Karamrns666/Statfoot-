@@ -11,6 +11,7 @@ import { ScoreTicker } from '@/components/match/ScoreTicker'
 import { cn } from '@/lib/utils'
 import { SimBanner } from '@/components/sim/SimBanner'
 import { useEffect } from 'react'
+import { routeMeta } from '@/lib/pageMeta'
 
 export const PUBLIC_NAV = [
   { to: '/', label: 'Accueil', end: true },
@@ -33,7 +34,7 @@ export const PUBLIC_NAV = [
 export function PublicLayout() {
   const [open, setOpen] = useState(false)
   const loc = useLocation()
-  useEffect(() => { setOpen(false); window.scrollTo({ top: 0 }) }, [loc.pathname])
+  useEffect(() => { setOpen(false); window.scrollTo({ top: 0 }); routeMeta(loc.pathname) }, [loc.pathname])
   return (
     <div className="flex min-h-screen flex-col overflow-x-clip">
       <SimBanner />

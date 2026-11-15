@@ -73,7 +73,7 @@ export function AdminLayout() {
   const { user, loading, logout } = useAuth()
   const loc = useLocation()
   const [open, setOpen] = useState(false)
-  useEffect(() => setOpen(false), [loc.pathname])
+  useEffect(() => { setOpen(false); document.title = 'Administration — Morocco Business League' }, [loc.pathname])
   // détourage automatique des photos joueurs (pas pendant la saisie d'un match en direct)
   const inMatch = loc.pathname.startsWith('/admin/match-center/')
   const cut = useAutoCutouts(!!user && user.role !== 'operator' && !inMatch)

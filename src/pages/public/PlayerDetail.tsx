@@ -1,4 +1,5 @@
 import { useRookie } from '@/hooks/useSeniority'
+import { usePageMeta } from '@/lib/pageMeta'
 import { InfoTip } from '@/components/league/InfoTip'
 import type { GlossaryId } from '@/lib/glossary'
 import { useMemo, type ReactNode } from 'react'
@@ -45,6 +46,7 @@ export default function PlayerDetail() {
   const raw = L.player.get(id ?? '')
   // joueur uniquement présent dans des saisons masquées : introuvable sur le site public
   const p = raw && (!hasHidden || !raw.season_ids?.length || raw.season_ids.some((x) => seasons.some((s) => s.id === x))) ? raw : undefined
+  usePageMeta(p ? `${p.first_name} ${p.last_name}` : undefined, p ? `Carte et statistiques de ${p.first_name} ${p.last_name}${p.team_id ? ` (${L.team.get(p.team_id)?.name ?? ''})` : ''} en Morocco Business League.` : undefined)
   // même fonction que Trophées et l'accueil : raceWithEvolution → computePlayerXP
   const ranking = useRace({ seasonId: sid }, 'xp')
   const scorers = useRace({ seasonId: sid }, 'top_scorer')

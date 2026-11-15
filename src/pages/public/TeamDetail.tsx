@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { usePageMeta } from '@/lib/pageMeta'
 import { Link, useParams } from 'react-router-dom'
 import { ClubHistory } from '@/components/league/ClubHistory'
 import { usePreseason } from '@/hooks/usePreseason'
@@ -40,6 +41,7 @@ export default function TeamDetail() {
   const rawSeason = raw ? raw.season_id ?? db.Competition.find((c) => c.team_ids?.includes(raw.id))?.season_id : undefined
   // équipe d'une saison masquée : introuvable sur le site public
   const team = raw && (!hasHidden || !rawSeason || seasons.some((s) => s.id === rawSeason)) ? raw : undefined
+  usePageMeta(team?.name, team ? `${team.name} en Morocco Business League : effectif, matchs, résultats et statistiques.` : undefined)
   const pre = usePreseason(team?.season_id ?? scopeSeasonId)
   const ts = useTeamStats({ seasonId: scopeSeasonId }).get(id ?? '')
   const xp = usePlayerXP({ seasonId: scopeSeasonId })

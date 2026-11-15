@@ -58,6 +58,7 @@ export default function MatchesAdmin() {
     { key: 'reserve_against_team_id', label: 'Réserve (Art. 17.4) — équipe visée', type: 'select', options: [edit?.home_team_id, edit?.away_team_id].filter(Boolean).map((t) => ({ value: t as string, label: db.Team.find((x) => x.id === t)?.name ?? '' })) },
     { key: 'reserve_outcome', label: 'Réserve — décision d’Ardentia', type: 'select', options: RESERVE_OUTCOMES.map((r) => ({ value: r.key, label: r.label })) },
     { key: 'reserve_note', label: 'Réserve — précisions (joueur concerné, pièces…)' },
+    { key: 'notes', label: 'Incidents du match (feuille de match, non publié)', type: 'textarea' },
     { key: 'published', label: 'Publié', type: 'boolean' },
   ]
   const save = async () => {

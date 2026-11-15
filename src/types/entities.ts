@@ -226,6 +226,8 @@ export interface Match extends BaseEntity {
   /** arbitre du match (fiche privée Referee) et son nom, affiché sur la fiche publique */
   referee_id?: string
   referee_name?: string
+  /** incidents du match (feuille de match, admin) */
+  notes?: string
   /** motif officiel du forfait (liste fermée, src/lib/forfeit.ts) et précision libre */
   forfeit_reason?: '14.1' | '14.2' | '18.1' | '2.7' | '2.3_unregistered' | '2.3_not_employee' | 'other'
   forfeit_note?: string

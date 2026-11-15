@@ -233,7 +233,7 @@ function CardBack({ p }: { p: PlayerCardProps }) {
         </div>
         <div className="mt-[.8em] flex items-end justify-between gap-2 border-b-2 border-[#F05A22] pb-[.4em]">
           <span className="min-w-0 text-[.95em] font-bold leading-tight text-ink/65">{p.backTitle}</span>
-          <span className="shrink-0 font-display text-[2.2em] font-black leading-none text-mbl">{p.rating}<span className="ml-0.5 text-[.4em] text-ink/50">{p.ratingLabel}</span></span>
+          <span className="shrink-0 font-display text-[2.2em] font-black leading-none text-mbl">{p.rating}<span className="ml-0.5 text-[.4em] text-ink/75">{p.ratingLabel}</span></span>
         </div>
         <dl className="mt-[.2em] min-h-0 flex-1 divide-y divide-ink/10 overflow-hidden">
           {p.back.map((s) => (

@@ -9,6 +9,8 @@ import { AuthProvider } from '@/hooks/useAuth'
 import { Toaster } from '@/components/ui/toast'
 import { registerFileWorker } from '@/api/fileStore'
 
+import { installErrorReport } from '@/lib/errorReport'
+installErrorReport()
 // sert les images importées (photos, posters) depuis IndexedDB
 void registerFileWorker()
 // image introuvable (ex. fichier importé sur un autre appareil) : on la masque plutôt que d'afficher l'icône cassée

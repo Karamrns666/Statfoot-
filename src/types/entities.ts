@@ -596,7 +596,11 @@ export interface StandingAdjustment extends BaseEntity {
   after?: { rank: number; points: number; gf: number; ga: number }
 }
 
+/** Erreur JavaScript remontée par le site en ligne (lecture réservée aux admins) */
+export interface ClientError extends BaseEntity { message: string; stack?: string; url: string; ua: string; kind?: string; release?: string }
+
 export interface EntityMap {
+  ClientError: ClientError
   StandingAdjustment: StandingAdjustment
   DisciplineCase: DisciplineCase
   ProcesVerbal: ProcesVerbal
@@ -632,5 +636,5 @@ export interface EntityMap {
 export type EntityName = keyof EntityMap
 export const ENTITY_NAMES: EntityName[] = [
   'Season', 'Competition', 'Division', 'Group', 'Venue', 'Team', 'Player', 'Match', 'MatchEvent', 'Lineup', 'LiveState',
-  'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser', 'Rulebook', 'Club', 'CaptainTeam', 'CaptainMatch', 'DisciplineCase', 'ProcesVerbal', 'StandingAdjustment',
+  'MatchTeamStats', 'XPRule', 'Suspension', 'MonthlyAward', 'Award', 'Draw', 'Media', 'MotmVote', 'TeamOfWeek', 'Settings', 'Page', 'AuditLog', 'AdminUser', 'Rulebook', 'Club', 'CaptainTeam', 'CaptainMatch', 'DisciplineCase', 'ProcesVerbal', 'StandingAdjustment', 'ClientError',
 ]

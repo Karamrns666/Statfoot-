@@ -6,6 +6,7 @@
 import { store, setWriteHook } from './localStore'
 import { META, canWrite, cloudEnabled, isSynced, onAuthChange, pullRows, pushRows, type CloudRow } from './cloud'
 import { ENTITY_NAMES, type BaseEntity, type EntityName } from '@/types/entities'
+import { PRIVATE_ENTITY, PRIVATE_FIELDS, hasPrivate, keepPrivate } from './privateFields'
 
 type Pending = { entity: string; id: string; data: unknown; deleted: boolean }
 const queue = new Map<string, Pending>()
@@ -49,20 +50,38 @@ async function flush() {
 
 function apply(rows: CloudRow[], full: boolean) {
   const by = new Map<string, CloudRow[]>()
-  for (const r of rows) if (r.entity !== META.entity) { const l = by.get(r.entity) ?? []; l.push(r); by.set(r.entity, l) }
+  // lignes privées (reçues seulement par un admin connecté) : champs à réassembler dans les fiches
+  const privByRef = new Map<string, Map<string, Record<string, unknown>>>()
+  for (const r of rows) {
+    if (r.entity === PRIVATE_ENTITY) {
+      if (r.deleted) continue
+      const { ref_entity, ref_id, id: _i, ...rest } = r.data as unknown as Record<string, unknown> & { ref_entity: string; ref_id: string }; void _i
+      const m = privByRef.get(ref_entity) ?? new Map(); m.set(ref_id, rest); privByRef.set(ref_entity, m)
+      continue
+    }
+    if (r.entity !== META.entity) { const l = by.get(r.entity) ?? []; l.push(r); by.set(r.entity, l) }
+  }
   applying = true
   try {
     store.batch(() => {
       for (const name of ENTITY_NAMES) {
         if (!isSynced(name)) continue
         const list = by.get(name) ?? []
-        if (full) { store.replace(name, list.filter((r) => !r.deleted).map((r) => r.data)); continue }
-        if (!list.length) continue
+        const priv = PRIVATE_FIELDS[name] ? privByRef.get(name) : undefined
+        const withPriv = (d: BaseEntity, old?: BaseEntity) => {
+          const p = priv?.get(d.id)
+          const base = keepPrivate(name, d as unknown as Record<string, unknown>, old as unknown as Record<string, unknown>)
+          return (p ? { ...base, ...p } : base) as unknown as BaseEntity
+        }
+        if (full) { store.replace(name, list.filter((r) => !r.deleted).map((r) => withPriv(r.data))); continue }
+        if (!list.length && !priv?.size) continue
         const cur = new Map(store.all(name).map((r) => [r.id, r]))
         for (const r of list) {
           if (queue.has(key(name, r.id))) continue // modification locale pas encore envoyée : elle gagne
-          if (r.deleted) cur.delete(r.id); else cur.set(r.id, r.data)
+          if (r.deleted) cur.delete(r.id); else cur.set(r.id, withPriv(r.data, cur.get(r.id)))
         }
+        // partie privée modifiée seule (admin) : réassemblée dans la fiche existante
+        if (priv) for (const [id, p] of priv) { const c = cur.get(id); if (c && !queue.has(key(name, id))) cur.set(id, { ...c, ...p } as BaseEntity) }
         store.replace(name, [...cur.values()])
       }
     })
@@ -82,6 +101,17 @@ async function fullPull() {
   cloudState.lastSync = new Date().toISOString(); cloudState.error = ''
   emit()
   if (cloudState.initialized) await migrateCloud()
+  if (cloudState.initialized && canWrite()) await movePrivateFields(rows)
+}
+
+/** Une fois : les fiches encore publiques qui contiennent des champs privés sont renvoyées (et donc séparées) */
+async function movePrivateFields(rows: CloudRow[]) {
+  const todo = rows.filter((r) => !r.deleted && hasPrivate(r.entity, r.data))
+  if (!todo.length) return
+  try {
+    const local = (e: string, id: string) => (store.all(e as EntityName) as BaseEntity[]).find((x) => x.id === id)
+    await pushRows(todo.map((r) => ({ entity: r.entity, id: r.id, data: local(r.entity, r.id) ?? r.data, deleted: false })))
+  } catch (e) { cloudState.error = (e as Error).message; emit() }
 }
 
 async function migrateCloud() {

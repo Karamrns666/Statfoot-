@@ -61,7 +61,7 @@ create trigger entity_rows_touch before insert or update on public.entity_rows f
 -- lecture publique, sauf les données internes (journal, conseil de discipline et ses votes, PV)
 drop policy if exists "lecture" on public.entity_rows;
 create policy "lecture" on public.entity_rows for select using (
-  entity not in ('AdminUser', 'AuditLog', 'DisciplineCase', 'ProcesVerbal') or public.is_admin()
+  entity not in ('AdminUser', 'AuditLog', 'DisciplineCase', 'ProcesVerbal', '__private', 'RefereeEvaluation', 'Referee', 'ClientError') or public.is_admin()
 );
 drop policy if exists "écriture admins" on public.entity_rows;
 create policy "écriture admins" on public.entity_rows for insert with check (public.is_admin() and entity <> 'AdminUser');

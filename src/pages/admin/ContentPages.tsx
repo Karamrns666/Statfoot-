@@ -23,6 +23,7 @@ import { REGLEMENT, TIEBREAKERS, TIEBREAK_ART, coherenceWarnings } from '@/lib/r
 import { DEFAULT_COMPETITION_NAMES, LEGACY_COMPETITION_NAMES, resolveCompetitionNames } from '@/lib/competitionNames'
 import { ArtLink } from '@/components/reglement/ArtLink'
 import { BadgeRarityEditor } from '@/components/admin/BadgeRarityEditor'
+import { BackupsCard, ErrorsCard } from '@/components/admin/OpsCards'
 
 // ---------------------------------------------------------------------------
 export function MediaAdmin() {
@@ -150,6 +151,7 @@ export function RulesEditor() {
 // ---------------------------------------------------------------------------
 export function SettingsPage() {
   const { settings, db } = useData()
+  const { user } = useAuth()
   const names = resolveCompetitionNames(settings)
   const [v, setV] = useState<Record<string, unknown>>({ ...settings, ...Object.fromEntries(Object.entries(settings.socials ?? {}).map(([k, x]) => [`social_${k}`, x])), comp_gold: settings.competition_names?.gold ?? '', comp_silver: settings.competition_names?.silver ?? '', comp_league_phase: settings.competition_names?.league_phase ?? '' })
   const fields: Field[] = [
@@ -189,6 +191,8 @@ export function SettingsPage() {
             <ol className="space-y-1">{TIEBREAKERS.map((t, i) => <li key={t.key} className="flex gap-2 rounded-lg bg-white/5 px-3 py-1.5"><span className="num w-4 text-neon">{i + 1}</span>{t.label}</li>)}</ol>
             <ArtLink art={TIEBREAK_ART} />
           </CardContent></Card>
+          <BackupsCard superAdmin={user?.role === 'super_admin'} />
+          <ErrorsCard />
           <BadgeRarityEditor />
           <Card><CardHeader><CardTitle>Données locales</CardTitle></CardHeader><CardContent>
             <p className="mb-3 text-xs text-muted-foreground">Recharge les données officielles (archive 2025-2026, équipes 2026-2027) et efface les modifications faites dans ce navigateur.</p>

@@ -171,6 +171,7 @@ export async function adminApi<T = unknown>(action: string, body: Record<string,
 // ---------------------------------------------------------------------------------------------------------
 //  Données partagées
 // ---------------------------------------------------------------------------------------------------------
+import { PRIVATE_ENTITY, PRIVATE_FIELDS, privateId, splitPrivate } from './privateFields'
 export interface CloudRow { entity: string; id: string; data: BaseEntity; deleted: boolean; updated_at: string }
 export async function pullRows(since?: string): Promise<CloudRow[]> {
   const token = (await accessToken()) ?? ANON
@@ -189,9 +190,15 @@ export async function pullRows(since?: string): Promise<CloudRow[]> {
   }
   return out
 }
-export async function pushRows(rows: { entity: string; id: string; data: unknown; deleted: boolean }[]) {
+export async function pushRows(rowsIn: { entity: string; id: string; data: unknown; deleted: boolean }[]) {
   const token = await accessToken()
   if (!token) throw new Error('Non connecté')
+  // champs privés (CIN, date de naissance, contacts…) retirés de la ligne publique et envoyés dans une ligne admin
+  const rows = rowsIn.flatMap((r) => {
+    if (!PRIVATE_FIELDS[r.entity] || !r.data || typeof r.data !== 'object') return [r]
+    const { pub, priv } = splitPrivate(r.entity, r.data as Record<string, unknown>)
+    return [{ ...r, data: pub }, { entity: PRIVATE_ENTITY, id: privateId(r.entity, r.id), data: { id: privateId(r.entity, r.id), ref_entity: r.entity, ref_id: r.id, ...priv }, deleted: r.deleted }]
+  })
   for (let i = 0; i < rows.length; i += 400) {
     await call('/rest/v1/entity_rows?on_conflict=entity,id', { method: 'POST', token, headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify(rows.slice(i, i + 400)) })
   }

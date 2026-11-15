@@ -1,0 +1,1 @@
+import{r as e}from"./reglement-BZnRRoHL.js";var t=e.format.playersOnPitch;t-1,`${t}${t}`;export{t};

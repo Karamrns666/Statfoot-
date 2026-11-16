@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { cn } from '@/lib/utils'
 import { FileDown } from 'lucide-react'
 import { competitionSlug, legacySlugPhase, phaseName, slugify } from '@/lib/competitionNames'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -38,6 +39,7 @@ export default function Standings() {
   }, [slug, legacy, navigate])
   const defaultTab = fromSlug?.id ?? comps.find((c) => c.phase === 'gold')?.id ?? comps[0]?.id ?? 'general'
   const [picked, setTab] = useState<string | undefined>(undefined)
+  const [fullView, setFullView] = useState(false)
   const tab = picked ?? defaultTab
   const general = useMemo(() => (season ? generalStandings(league, season.id) : []), [league, season])
   const pre = usePreseason(season?.id)
@@ -54,17 +56,23 @@ export default function Standings() {
       </PageHeader>
       <Tabs value={tabValue} onValueChange={setTab}>
         <TabsList>{tabs.map((t) => <TabsTrigger key={t.id} value={t.id}>{t.label}</TabsTrigger>)}{tournaments.map((c) => <TabsTrigger key={c.id} value={c.id}>{c.name}</TabsTrigger>)}</TabsList>
+        {!tournaments.some((c) => c.id === tabValue) && (
+          <div className="mb-3 mt-1 inline-flex rounded-xl border border-white/10 p-1 text-sm" role="group" aria-label="Affichage du classement">
+            <button type="button" aria-pressed={!fullView} onClick={() => setFullView(false)} className={cn('min-h-9 rounded-lg px-3 font-semibold', !fullView ? 'bg-white/10 text-white' : 'text-muted-foreground')}>Vue compacte</button>
+            <button type="button" aria-pressed={fullView} onClick={() => setFullView(true)} className={cn('min-h-9 rounded-lg px-3 font-semibold', fullView ? 'bg-white/10 text-white' : 'text-muted-foreground')}>Tableau complet</button>
+          </div>
+        )}
         {tournaments.map((c) => <TabsContent key={c.id} value={c.id}><TournamentView comp={c} /></TabsContent>)}
         {tabs.map((t) => (
           <TabsContent key={t.id} value={t.id}>
             {pre && t.comp?.id === pre.comp.id ? (
               <div className="space-y-2">
-                <PreseasonTable rows={displayRanking(pre)} masterSize={pre.ps.split?.master_size ?? pre.cfg.masterSize} final={!!pre.ps.final_ranking} />
+                <PreseasonTable rows={displayRanking(pre)} masterSize={pre.ps.split?.master_size ?? pre.cfg.masterSize} final={!!pre.ps.final_ranking} compact={!fullView} />
                 <p className="px-1 text-xs text-muted-foreground">Départage de la pré-saison : points, différence de buts, buts marqués, force des adversaires, tirage au sort. <Link to="/pre-saison" className="text-neon underline">Journées, explications et parcours</Link></p>
               </div>
             ) : <>
             <Card><CardContent className="px-1 pt-4 sm:px-4">
-              <StandingsTable rows={t.rows} zones={t.comp ? competitionZones(t.comp, t.rows.length, season?.gold_size ?? 10) : [{ from: 1, to: 10, color: '#facc15', label: phaseName('gold') }, { from: 11, to: 20, color: '#94a3b8', label: phaseName('silver') }]} />
+              <StandingsTable rows={t.rows} compact={!fullView} zones={t.comp ? competitionZones(t.comp, t.rows.length, season?.gold_size ?? 10) : [{ from: 1, to: 10, color: '#facc15', label: phaseName('gold') }, { from: 11, to: 20, color: '#94a3b8', label: phaseName('silver') }]} />
             </CardContent></Card>
             <TiebreakNote rows={t.rows} />
             </>}

@@ -8,6 +8,7 @@ import { competitionNames } from '@/lib/competitionNames'
 import type { PreseasonRow } from '@/lib/preseason'
 import { cn } from '@/lib/utils'
 import { Table } from '@/components/ui/table'
+import { CompactStandings } from '@/components/standings/CompactStandings'
 
 export const DIVISION_STYLE = {
   master: { color: '#E8B931', bg: 'rgb(232 185 49 / .10)', logo: '/brand/logo-master.png' },
@@ -30,9 +31,23 @@ export function PreseasonTable({ rows, masterSize, final = false, compact = fals
   const anyPlayed = rows.some((r) => r.played > 0)
   const th = 'px-1.5 py-2 text-center text-[11px] font-bold uppercase tracking-wide text-muted-foreground'
   const td = 'num px-1.5 py-1.5 text-center'
+  const divOf = (rank: number) => (rank <= masterSize ? 'master' : 'challenger') as 'master' | 'challenger'
+  const legendBox = (
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+        <span className="inline-flex items-center gap-1.5"><DivisionMark div="master" size={18} label={false} /><b style={{ color: DIVISION_STYLE.master.color }}>{n.gold}</b> ({Math.min(masterSize, rows.length)} équipes)</span>
+        <span>·</span>
+        <span className="inline-flex items-center gap-1.5"><DivisionMark div="challenger" size={18} label={false} /><b style={{ color: DIVISION_STYLE.challenger.color }}>{n.silver}</b> ({Math.max(0, rows.length - masterSize)} équipes)</span>
+        {!final && anyPlayed && <span className="ml-auto">Zone provisoire jusqu’à la clôture</span>}
+      </div>
+  )
+  if (compact) return (
+    <CompactStandings rows={rows} cutAfter={masterSize} highlight={highlight} legend={legendBox}
+      accent={(r) => (anyPlayed || final ? DIVISION_STYLE[divOf(r.rank)].color : undefined)}
+      background={(r) => (anyPlayed || final ? DIVISION_STYLE[divOf(r.rank)].bg : undefined)} />
+  )
   return (
     <div className="overflow-hidden rounded-2xl border border-white/10">
-      <Table stickyCols={2} stickyHeader={rows.length > 12} className="min-w-[640px] border-collapse">
+      <Table stickyCols={2} stickyHeader={false} className="min-w-[640px] border-collapse">
         <thead className="bg-white/[.03]">
           <tr>
             <th className={cn(th, 'w-10')}>Rang</th><th className={cn(th, 'text-left')}>Équipe</th>

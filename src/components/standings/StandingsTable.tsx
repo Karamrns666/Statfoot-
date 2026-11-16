@@ -8,6 +8,7 @@ import { FormPills } from '@/components/league/Bits'
 import { SortableTable, type SortColumn } from '@/components/league/SortableTable'
 import { cn } from '@/lib/utils'
 import { tiebreakText } from '@/components/reglement/TiebreakNote'
+import { CompactStandings } from './CompactStandings'
 
 export interface Zone { from: number; to: number; color: string; label: string }
 
@@ -36,6 +37,8 @@ export function StandingsTable({ rows, compact = false, zones: zonesIn = [], hig
     { key: 'points', label: 'Pts', title: 'Points', tip: 'points', headClassName: 'text-center', className: 'num text-center text-xl text-white', sort: (r) => r.points, render: (r) => r.points },
     { key: 'form', label: 'Forme', title: '5 derniers matchs (victoire 3, nul 1)', headClassName: cn(compact && 'hidden sm:table-cell'), className: cn(compact && 'hidden sm:table-cell'), sort: (r) => formPoints(r), render: (r) => <FormPills form={r.form} /> },
   ]
+  const legend = zones.length > 0 ? <div className="flex flex-wrap gap-4">{zones.map((z) => <span key={z.label} className="inline-flex items-center gap-1.5"><span className="size-2.5 rounded-full" style={{ background: z.color }} />{z.label}</span>)}</div> : undefined
+  if (compact) return <CompactStandings rows={rows.map((r) => ({ team_id: r.team_id, rank: r.rank, played: r.played, diff: r.gd, points: r.points, form: r.form }))} accent={(r) => zoneOf(r.rank)?.color} highlight={highlightTeamId} legend={legend} />
   return (
     <div>
       <SortableTable rows={rows} columns={columns} rowKey={(r) => r.team_id} initial={{ key: 'rank', dir: 'asc' }} rowClassName={(r) => highlightTeamId === r.team_id && 'bg-neon/10'} />

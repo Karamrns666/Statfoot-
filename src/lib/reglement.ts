@@ -62,20 +62,17 @@ export const TIEBREAKERS = [
 export type TiebreakKey = (typeof TIEBREAKERS)[number]['key']
 export const TIEBREAK_ART = '17.3'
 
-/** « L'essentiel en 1 minute » (page Règlement) */
+/** « L'essentiel en 1 minute » de la page /reglement (affichage uniquement) — d'après le texte v11 */
 export const ESSENTIALS: { text: string; art: string }[] = [
-  { text: '6 contre 6 (1 gardien obligatoire), 6 remplaçants au plus, changements illimités', art: '2.1' },
+  { text: '6 contre 6 (1 gardien obligatoire), 6 remplaçants au plus', art: '2.1' },
   { text: '2 × 20 minutes de temps de jeu effectif, pas de prolongation', art: '5.1' },
   { text: 'Pas de hors-jeu', art: '7' },
-  { text: 'Touches au pied', art: '8.2' },
-  { text: 'Pré-saison en système suisse : J1 tirée au sort, puis adversaires aux points proches, sans revanche · 4 matchs par équipe', art: '17.1' },
-  { text: 'Après la pré-saison : places 1 à 12 → MASTER, places 13 à 23 → CHALLENGER', art: '17.1' },
-  { text: 'Victoire 3 pts · Nul 1 pt · Défaite 0 pt', art: '17.2' },
-  { text: 'Forfait = défaite 3-0', art: '14.1' },
-  { text: 'Départage MASTER / CHALLENGER : points, confrontation directe, différence de buts, buts marqués, moins de jaunes, moins de rouges, tirage au sort', art: '17.3' },
-  { text: '2 jaunes dans le même match = rouge · Pas de cumul de jaunes d’un match à l’autre', art: '11.5' },
-  { text: 'Pas de suspension automatique : seul le conseil de discipline (Ardentia, Sifflé d’Or, capitaines de l’autre division) suspend un joueur', art: '19' },
-  { text: 'Réclamation sous 24 h après le coup de sifflet final', art: '17.4' },
+  { text: 'Pré-saison en système suisse (4 matchs par équipe), puis répartition en deux divisions : MASTER et CHALLENGER', art: '17.1' },
+  { text: 'Joueurs obligatoirement salariés de l’entreprise qu’ils représentent', art: '2.3' },
+  { text: 'Réserve confirmée contre un joueur non salarié = défaite 3-0', art: '17.4' },
+  { text: 'Joueurs inscrits assurés ; infirmier présent sur place, transport ambulancier gratuit', art: '2.10' },
+  { text: 'Un seul report de match par saison, sous conditions (demande RH, 48 h avant, accord de l’adversaire)', art: '17.5' },
+  { text: 'Pas de suspension automatique : seul le conseil de discipline peut suspendre un joueur', art: '19' },
 ]
 
 // ---------------------------------------------------------------------------

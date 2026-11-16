@@ -5,14 +5,20 @@ import { SEASON_2026_ID } from './season2026'
 import V3 from './reglement-v3.md?raw'
 import V4 from './reglement-v4.md?raw'
 import V9 from './reglement-v9.md?raw'
+import V11 from './reglement-v11.md?raw'
 
 export const RULEBOOK_TITLE = 'Règlement officiel — Football 6 contre 6'
 
 export function buildRulebooks(): Rulebook[] {
   return [
     {
+      id: 'rulebook_v11', version: 'v11', title: RULEBOOK_TITLE, date: '2026-11-16', season_id: SEASON_2026_ID, content: V11,
+      pdf_url: '/reglement/reglement-ardentia-v11.pdf', docx_url: '/reglement/REGLEMENT_DE_JEU_ARDENTIA_FOOTBALL_v11.docx', status: 'current',
+      changes: 'Règlement v10 complété de la règle des joueurs salariés de l’entreprise (Art. 2.3) et de la défaite 3-0 sur réserve confirmée contre un joueur non salarié (Art. 2.3 et 17.4). Nouveaux articles : 2.10 Assurance et assistance médicale, 17.7 Procès-verbaux, 19 Conseil de discipline.',
+    },
+    {
       id: 'rulebook_v9', version: 'v9', title: RULEBOOK_TITLE, date: '2026-11-11', season_id: SEASON_2026_ID, content: V9,
-      pdf_url: '/reglement/reglement-ardentia-v9.pdf', docx_url: '/reglement/REGLEMENT_DE_JEU_ARDENTIA_FOOTBALL_v9.docx', status: 'current',
+      pdf_url: '/reglement/reglement-ardentia-v9.pdf', docx_url: '/reglement/REGLEMENT_DE_JEU_ARDENTIA_FOOTBALL_v9.docx', status: 'archived',
       changes: 'Règlement v8 d’Ardentia complété du fonctionnement de la plateforme : pré-saison en système suisse et répartition MASTER / CHALLENGER (Art. 17.1), classement de la pré-saison (Art. 17.3), capitaines votants MASTER / CHALLENGER (Art. 19.3), coquilles corrigées (Art. 2.3). Nouveautés du v8 : plus de cumul de jaunes ni de suspension automatique, conseil de discipline (Art. 19), procès-verbaux (Art. 17.7), remplacements par la porte après accord de l’arbitre (Art. 2.4), règle des 4 secondes retirée de l’Art. 11.2.',
     },
     {
@@ -26,4 +32,9 @@ export function buildRulebooks(): Rulebook[] {
       changes: 'Version remplacée par la v4 (les cartons ne se cumulaient pas d’un match à l’autre).',
     },
   ]
+}
+
+/** Versions connues avant la v11 (v9 en vigueur) : utilisées par les anciennes étapes de migration, inchangées. */
+export function legacyRulebooks(): Rulebook[] {
+  return buildRulebooks().filter((b) => b.version !== 'v11').map((b) => (b.version === 'v9' ? { ...b, status: 'current' as const } : b))
 }

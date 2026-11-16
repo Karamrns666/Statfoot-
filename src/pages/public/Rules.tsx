@@ -50,7 +50,7 @@ export default function Rules() {
         <h1 className="title-caps mt-1 text-4xl sm:text-5xl">Règlement officiel</h1>
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-2.5 py-0.5 font-semibold text-foreground">Version {book.version.replace(/^v/, '')}</span>
-          <span>{fmtDate(book.date, 'd MMMM yyyy')}</span>
+          <span>{archived ? fmtDate(book.date, 'd MMMM yyyy') : <b className="text-foreground">Mis à jour le {fmtDate(book.date, 'd MMMM yyyy')}</b>}</span>
           {season ? <span>Saison {season.name.replace(/^Saison /, '')}</span> : <span>Non rattachée à une saison</span>}
           <VersionPicker books={books} current={book} onPick={setVersion} seasons={seasons} />
         </div>

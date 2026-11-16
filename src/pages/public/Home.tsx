@@ -17,7 +17,7 @@ import { seasonStrip } from '@/lib/seasonStrip'
 import { IPGCard, XPCard } from '@/components/players/Cards'
 import { IPG_RANKING } from '@/lib/ipg'
 import { SEASON_2025_ID } from '@/api/seed/season2025'
-import { initials, playerShort } from '@/lib/format'
+import { fmtDate, initials, playerShort } from '@/lib/format'
 import { Link } from 'react-router-dom'
 import { RecentBadges } from '@/components/badges/RecentBadges'
 import { useRecentUnlocks } from '@/hooks/useBadgeOwnership'
@@ -43,6 +43,7 @@ export default function Home() {
   const L = useLookup()
   // l'accueil montre TOUJOURS la saison en cours (2026-2027) ; les autres saisons restent dans leurs pages (sélecteur)
   const { seasons } = useSeason()
+  const rulebook = db.Rulebook?.find((r) => r.status === 'current')
   const season = seasons.find((x) => x.is_active) ?? seasons[0] ?? null
   const comps = useSeasonCompetitions(season?.id)
   const sid = season?.id
@@ -162,6 +163,18 @@ export default function Home() {
             )
           })}
         </div>
+        {rulebook && (
+          <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[.03] p-4 sm:flex-row sm:items-center">
+            <div className="min-w-0 flex-1">
+              <div className="font-display text-lg font-black uppercase">Règlement officiel {season?.name.replace(/^Saison /, '').replace('-', '/') ?? ''}</div>
+              <div className="text-sm text-muted-foreground">Version {rulebook.version.replace(/^v/, '')} · mis à jour le {fmtDate(rulebook.date, 'd MMMM yyyy')}</div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild size="sm"><Link to="/reglement">Lire le règlement</Link></Button>
+              {rulebook.pdf_url && <Button asChild size="sm" variant="outline"><a href={rulebook.pdf_url} download>Télécharger (PDF)</a></Button>}
+            </div>
+          </div>
+        )}
       </section>
 
       {/* ÉQUIPE TYPE + RÉCOMPENSES DE LA JOURNÉE */}

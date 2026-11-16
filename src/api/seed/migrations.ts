@@ -3,7 +3,7 @@
 import { buildOfficialJ1 } from './preseasonJ1'
 import type { Award, BaseEntity, CaptainTeam, Club, Draw, Suspension, Competition, Lineup, Match, Page, Position, MatchEvent, MatchTeamStats, Player, Rulebook, Season, Settings, Team, TeamOfWeek } from '@/types/entities'
 import { CURRENT_RULEBOOK, REGLEMENT, isDisputed } from '@/lib/reglement'
-import { buildRulebooks } from './rulebook'
+import { buildRulebooks, legacyRulebooks } from './rulebook'
 import { DEFAULT_COMPETITION_NAMES, LEGACY_COMPETITION_NAMES } from '@/lib/competitionNames'
 import { LEAGUE } from '@/config/league'
 import { SEASON_2026_ID } from './season2026'
@@ -120,7 +120,7 @@ export function applyLot1(db: Rules6Data): Rules6Data {
  */
 export function applyReglementV4(db: Rules6Data): Rules6Data {
   const out: Rules6Data = {}
-  const books = buildRulebooks()
+  const books = legacyRulebooks()
   const have = new Set((db.Rulebook ?? []).map((r) => r.version))
   if (db.Rulebook && books.some((b) => !have.has(b.version)))
     out.Rulebook = [...(db.Rulebook ?? []).map((r) => (r.status === 'current' ? { ...r, status: 'archived' as const } : r)), ...books.filter((b) => !have.has(b.version))]
@@ -259,7 +259,7 @@ export function applyDisciplineV8(db: Rules6Data): Rules6Data {
 /** Règlement v9 publié (v8 + fonctionnement de la plateforme) : ajouté à l'historique, rattaché à 2026-2027. */
 export function applyReglementV9(db: Rules6Data): Rules6Data {
   const out: Rules6Data = {}
-  const books = buildRulebooks()
+  const books = legacyRulebooks()
   const have = new Set((db.Rulebook ?? []).map((r) => r.version))
   if (db.Rulebook && books.some((b) => !have.has(b.version)))
     out.Rulebook = [...books.filter((b) => !have.has(b.version)), ...db.Rulebook.map((r) => (r.status === 'current' ? { ...r, status: 'archived' as const, changes: books.find((b) => b.version === r.version)?.changes ?? r.changes } : r))]
@@ -501,6 +501,14 @@ export function applyRulesEmployees2026(db: Rules6Data): Rules6Data {
   return { Rulebook, AuditLog: [log, ...(db.AuditLog ?? [])] }
 }
 
+/** Règlement v11 publié (affichage uniquement) : version en vigueur sur /reglement, les autres versions restent dans l'historique.
+ *  Ne touche PAS au règlement appliqué par la plateforme (Season.rulebook_version et lib/reglement inchangés). */
+export function applyReglementV11(db: Rules6Data): Rules6Data {
+  if (!db.Rulebook || db.Rulebook.some((r) => r.version === 'v11')) return {}
+  const v11 = buildRulebooks().find((b) => b.version === 'v11')!
+  return { Rulebook: [v11, ...db.Rulebook.map((r) => (r.status === 'current' ? { ...r, status: 'archived' as const } : r))] }
+}
+
 /** Parebrise Express : logo clair conçu pour un fond noir → « Fond du logo : Noir » (si l'admin n'a rien choisi) */
 export function applyLogoBgPbe(db: Rules6Data): Rules6Data {
   const teams = (db.Team ?? []) as unknown as { id: string; short_name?: string; name?: string; logo_bg?: string }[]
@@ -509,7 +517,7 @@ export function applyLogoBgPbe(db: Rules6Data): Rules6Data {
   return { Team: teams.map((t) => hit.includes(t) ? { ...t, logo_bg: 'black' } : t) } as unknown as Rules6Data
 }
 
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams, applyHideSeason2025, applyLogoRevisions, applyRemoveCanpack2026, applyTierCorrections2026, applyTagline2026, applyRulesEmployees2026, applyLogoBgPbe]
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams, applyHideSeason2025, applyLogoRevisions, applyRemoveCanpack2026, applyTierCorrections2026, applyTagline2026, applyRulesEmployees2026, applyLogoBgPbe, applyReglementV11]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */

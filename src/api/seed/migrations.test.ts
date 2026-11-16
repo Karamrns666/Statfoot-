@@ -58,7 +58,7 @@ describe('règles 6 contre 6', () => {
 describe('règlement Ardentia v4', () => {
   it('données neuves : v4 en vigueur (saison 2026-2027), v3 dans l’historique, saison rattachée, mi-temps 20 min', () => {
     const db = generateLeagueData(new Date('2026-11-09T10:00:00'))
-    expect(db.Rulebook.map((r) => [r.version, r.status])).toEqual([['v9', 'current'], ['v4', 'archived'], ['v3', 'archived']])
+    expect(db.Rulebook.map((r) => [r.version, r.status])).toEqual([['v11', 'current'], ['v9', 'archived'], ['v4', 'archived'], ['v3', 'archived']])
     expect(db.Season.find((s) => s.id === 'season_2026')!.rulebook_version).toBe('v9')
     expect(db.Competition.filter((c) => c.season_id === 'season_2026').every((c) => c.half_duration_min === 20)).toBe(true)
     expect(db.Settings[0]).not.toHaveProperty('tiebreakers')
@@ -96,5 +96,17 @@ describe('règlement v9 publié', () => {
     expect(out.Rulebook![0].docx_url).toMatch(/v9\.docx$/)
     expect(out.Season![0].rulebook_version).toBe('v9')
     expect(applyReglementV9({ ...db, ...out })).toEqual({})
+  })
+})
+
+describe('règlement v11 publié (affichage uniquement)', () => {
+  it('v11 en vigueur sur /reglement, v9 archivée, règlement appliqué par la saison inchangé', async () => {
+    const { applyReglementV11 } = await import('./migrations')
+    const db = { Rulebook: [{ id: 'rulebook_v9', version: 'v9', title: 'R', date: '2026-11-11', content: 'x', status: 'current' as const }], Season: [{ id: 'season_2026', name: 'S', start_date: '2026-08-22', rulebook_version: 'v9' }] }
+    const out = applyReglementV11(db as never)
+    expect(out.Rulebook!.map((r) => [r.version, r.status])).toEqual([['v11', 'current'], ['v9', 'archived']])
+    expect(out.Rulebook![0].content).toMatch(/2\.10 Assurance et assistance médicale/)
+    expect(out).not.toHaveProperty('Season')
+    expect(applyReglementV11({ ...db, Rulebook: out.Rulebook } as never)).toEqual({})
   })
 })

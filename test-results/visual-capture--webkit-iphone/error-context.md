@@ -1,0 +1,661 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: visual.spec.mjs >> capture /
+- Location: e2e/visual.spec.mjs:7:3
+
+# Error details
+
+```
+Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/webkit-iphone/accueil.png, writing actual.
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "MBL — Morocco Business League, accueil" [ref=e6]:
+        - /url: /
+        - generic [ref=e7]: MBL
+      - button "Menu" [ref=e10] [cursor=pointer]
+  - main [ref=e12]:
+    - generic [ref=e13]:
+      - region "Billboard de la ligue" [ref=e14]:
+        - generic [ref=e15]:
+          - generic [ref=e17]:
+            - generic [ref=e18]: Morocco Business League
+            - generic [ref=e19]: saison 2026-2027
+          - generic [ref=e21]:
+            - paragraph [ref=e22]: 1ère LIGUE DE FOOTBALL INTER-ENTREPRISES AU MAROC
+            - paragraph [ref=e23]: الدوري الوطني للشركات لكرة القدم
+          - generic [ref=e25]:
+            - generic [ref=e28]: Morocco Business League
+            - generic [ref=e29]: saison 2026-2027
+          - generic [ref=e30]:
+            - generic [ref=e31]:
+              - button "Panneau précédent" [ref=e32] [cursor=pointer]
+              - tablist "Panneaux" [ref=e35]:
+                - tab "Logo de la ligue" [selected] [ref=e36] [cursor=pointer]
+                - tab "Affiche de la saison" [ref=e39] [cursor=pointer]
+                - tab "Saison 2026-2027" [ref=e41] [cursor=pointer]
+              - button "Panneau suivant" [ref=e43] [cursor=pointer]
+            - generic [ref=e46]:
+              - link "Calendrier" [ref=e47] [cursor=pointer]:
+                - /url: /matchs
+              - link "Classement" [ref=e50] [cursor=pointer]:
+                - /url: /classement
+        - generic [ref=e54]:
+          - generic [ref=e55]: Organisé par
+          - img "Ardentia" [ref=e56]
+      - generic [ref=e58]:
+        - generic [ref=e59]:
+          - generic [ref=e60]: Équipes
+          - generic [ref=e67]: "21"
+        - generic [ref=e68]:
+          - generic [ref=e69]: Joueurs participants
+          - generic [ref=e75]: "0"
+        - generic [ref=e76]:
+          - generic [ref=e77]: Matchs joués
+          - generic [ref=e81]:
+            - text: "0"
+            - generic [ref=e82]: /10
+        - link "Pré-saison J1 0/42 matchs" [ref=e83]:
+          - /url: /pre-saison
+          - generic [ref=e84]: Pré-saison
+          - generic [ref=e87]: J1
+          - generic [ref=e88]: 0/42 matchs
+        - generic [ref=e89]:
+          - link "MASTER À venir Après la pré-saison" [ref=e90]:
+            - /url: /classement/master
+            - generic [ref=e92]: MASTER
+            - generic [ref=e97]: À venir
+            - generic [ref=e98]: Après la pré-saison
+          - link "CHALLENGER À venir Après la pré-saison" [ref=e99]:
+            - /url: /classement/challenger
+            - generic [ref=e101]: CHALLENGER
+            - generic [ref=e106]: À venir
+            - generic [ref=e107]: Après la pré-saison
+      - generic [ref=e108]:
+        - generic [ref=e109]:
+          - generic [ref=e110]:
+            - heading "Derniers résultats" [level=2] [ref=e111]
+            - paragraph [ref=e113]: Saison 2026-2027
+          - link "Tous les matchs →" [ref=e114] [cursor=pointer]:
+            - /url: /matchs
+        - generic [ref=e115]:
+          - generic [ref=e116]: La saison n’a pas encore commencé
+          - generic [ref=e117]:
+            - text: Les résultats s’afficheront ici après la première journée. En attendant, retrouvez la saison 2025-2026 dans
+            - link "l’historique" [ref=e118]:
+              - /url: /historique
+            - text: .
+        - generic [ref=e119]:
+          - heading "À venir" [level=3] [ref=e120]
+          - generic [ref=e121]:
+            - link "Pré-saison PS-01 · J1 lun. 16 nov. Distra Distra 21h00 BMCI BMCI" [ref=e122]:
+              - /url: /matchs/m26_ps01
+              - generic [ref=e123]:
+                - generic [ref=e124]:
+                  - generic [ref=e125]: Pré-saison
+                  - generic [ref=e126]:
+                    - generic [ref=e127]: PS-01 ·
+                    - text: J1
+                - generic [ref=e128]: lun. 16 nov.
+              - generic [ref=e129]:
+                - generic [ref=e130]:
+                  - img "Distra" [ref=e131]
+                  - generic [ref=e132]: Distra
+                - generic [ref=e133]: 21h00
+                - generic [ref=e135]:
+                  - img "BMCI" [ref=e136]
+                  - generic [ref=e137]: BMCI
+            - link "Pré-saison PS-02 · J1 lun. 16 nov. Crédit Agricole Crédit Agricole 21h00 Pharmaprom Pharmaprom" [ref=e138]:
+              - /url: /matchs/m26_ps02
+              - generic [ref=e139]:
+                - generic [ref=e140]:
+                  - generic [ref=e141]: Pré-saison
+                  - generic [ref=e142]:
+                    - generic [ref=e143]: PS-02 ·
+                    - text: J1
+                - generic [ref=e144]: lun. 16 nov.
+              - generic [ref=e145]:
+                - generic [ref=e146]:
+                  - img "Crédit Agricole" [ref=e147]
+                  - generic [ref=e148]: Crédit Agricole
+                - generic [ref=e149]: 21h00
+                - generic [ref=e151]:
+                  - img "Pharmaprom" [ref=e152]
+                  - generic [ref=e153]: Pharmaprom
+            - link "Pré-saison PS-03 · J1 lun. 16 nov. CAC CAC 22h00 Taqeef (Midea) Taqeef (Midea)" [ref=e154]:
+              - /url: /matchs/m26_ps03
+              - generic [ref=e155]:
+                - generic [ref=e156]:
+                  - generic [ref=e157]: Pré-saison
+                  - generic [ref=e158]:
+                    - generic [ref=e159]: PS-03 ·
+                    - text: J1
+                - generic [ref=e160]: lun. 16 nov.
+              - generic [ref=e161]:
+                - generic [ref=e162]:
+                  - img "CAC" [ref=e163]
+                  - generic [ref=e164]: CAC
+                - generic [ref=e165]: 22h00
+                - generic [ref=e167]:
+                  - img "Taqeef (Midea)" [ref=e168]
+                  - generic [ref=e169]: Taqeef (Midea)
+            - link "Pré-saison PS-04 · J1 mar. 17 nov. L'Heure Joyeuse L'Heure Joyeuse 20h00 ALD Automotive ALD Automotive" [ref=e170]:
+              - /url: /matchs/m26_ps04
+              - generic [ref=e171]:
+                - generic [ref=e172]:
+                  - generic [ref=e173]: Pré-saison
+                  - generic [ref=e174]:
+                    - generic [ref=e175]: PS-04 ·
+                    - text: J1
+                - generic [ref=e176]: mar. 17 nov.
+              - generic [ref=e177]:
+                - generic [ref=e178]:
+                  - img "L'Heure Joyeuse" [ref=e179]
+                  - generic [ref=e180]: L'Heure Joyeuse
+                - generic [ref=e181]: 20h00
+                - generic [ref=e183]:
+                  - img "ALD Automotive" [ref=e184]
+                  - generic [ref=e185]: ALD Automotive
+      - generic [ref=e186]:
+        - generic [ref=e187]:
+          - heading "Classements" [level=2] [ref=e189]
+          - link "Classement complet →" [ref=e191] [cursor=pointer]:
+            - /url: /classement
+        - generic [ref=e193]:
+          - generic [ref=e194]:
+            - heading "Pré-saison" [level=3] [ref=e195]
+            - link "Journées et parcours" [ref=e197]:
+              - /url: /pre-saison
+          - generic [ref=e199]:
+            - table [ref=e200]:
+              - rowgroup [ref=e201]:
+                - row [ref=e202]:
+                  - columnheader "Rang" [ref=e203]
+                  - columnheader "Équipe" [ref=e204]
+                  - columnheader "J" [ref=e205]
+                  - columnheader "Diff." [ref=e206]
+                  - columnheader "Pts" [ref=e207]
+              - rowgroup [ref=e208]:
+                - row [ref=e209]:
+                  - cell "1" [ref=e210]
+                  - cell [ref=e211]:
+                    - link "Distra Distra" [ref=e212]:
+                      - /url: /equipes/t26_dst
+                      - img "Distra" [ref=e213]
+                      - generic [ref=e214]: Distra
+                  - cell "0" [ref=e215]
+                  - cell "0" [ref=e216]
+                  - cell "0" [ref=e217]
+                - row [ref=e218]:
+                  - cell "2" [ref=e219]
+                  - cell [ref=e220]:
+                    - link "BMCI BMCI" [ref=e221]:
+                      - /url: /equipes/t26_bmc
+                      - img "BMCI" [ref=e222]
+                      - generic [ref=e223]: BMCI
+                  - cell "0" [ref=e224]
+                  - cell "0" [ref=e225]
+                  - cell "0" [ref=e226]
+                - row [ref=e227]:
+                  - cell "3" [ref=e228]
+                  - cell [ref=e229]:
+                    - link "Crédit Agricole Crédit Agricole" [ref=e230]:
+                      - /url: /equipes/t26_cam
+                      - img "Crédit Agricole" [ref=e231]
+                      - generic [ref=e232]: Crédit Agricole
+                  - cell "0" [ref=e233]
+                  - cell "0" [ref=e234]
+                  - cell "0" [ref=e235]
+                - row [ref=e236]:
+                  - cell "4" [ref=e237]
+                  - cell [ref=e238]:
+                    - link "Pharmaprom Pharmaprom" [ref=e239]:
+                      - /url: /equipes/t26_php
+                      - img "Pharmaprom" [ref=e240]
+                      - generic [ref=e241]: Pharmaprom
+                  - cell "0" [ref=e242]
+                  - cell "0" [ref=e243]
+                  - cell "0" [ref=e244]
+                - row [ref=e245]:
+                  - cell "5" [ref=e246]
+                  - cell [ref=e247]:
+                    - link "CAC CAC" [ref=e248]:
+                      - /url: /equipes/t26_cac
+                      - img "CAC" [ref=e249]
+                      - generic [ref=e250]: CAC
+                  - cell "0" [ref=e251]
+                  - cell "0" [ref=e252]
+                  - cell "0" [ref=e253]
+                - row [ref=e254]:
+                  - cell "6" [ref=e255]
+                  - cell [ref=e256]:
+                    - link "Taqeef (Midea) Taqeef (Midea)" [ref=e257]:
+                      - /url: /equipes/t26_mid
+                      - img "Taqeef (Midea)" [ref=e258]
+                      - generic [ref=e259]: Taqeef (Midea)
+                  - cell "0" [ref=e260]
+                  - cell "0" [ref=e261]
+                  - cell "0" [ref=e262]
+                - row [ref=e263]:
+                  - cell "7" [ref=e264]
+                  - cell [ref=e265]:
+                    - link "L'Heure Joyeuse L'Heure Joyeuse" [ref=e266]:
+                      - /url: /equipes/t26_lhj
+                      - img "L'Heure Joyeuse" [ref=e267]
+                      - generic [ref=e268]: L'Heure Joyeuse
+                  - cell "0" [ref=e269]
+                  - cell "0" [ref=e270]
+                  - cell "0" [ref=e271]
+                - row [ref=e272]:
+                  - cell "8" [ref=e273]
+                  - cell [ref=e274]:
+                    - link "ALD Automotive ALD Automotive" [ref=e275]:
+                      - /url: /equipes/t26_ald
+                      - img "ALD Automotive" [ref=e276]
+                      - generic [ref=e277]: ALD Automotive
+                  - cell "0" [ref=e278]
+                  - cell "0" [ref=e279]
+                  - cell "0" [ref=e280]
+                - row [ref=e281]:
+                  - cell "9" [ref=e282]
+                  - cell [ref=e283]:
+                    - link "G3C G3C" [ref=e284]:
+                      - /url: /equipes/t26_g3c
+                      - img "G3C" [ref=e285]
+                      - generic [ref=e286]: G3C
+                  - cell "0" [ref=e287]
+                  - cell "0" [ref=e288]
+                  - cell "0" [ref=e289]
+                - row [ref=e290]:
+                  - cell "10" [ref=e291]
+                  - cell [ref=e292]:
+                    - link "Mega Post Tension Mega Post Tension" [ref=e293]:
+                      - /url: /equipes/t26_mpt
+                      - img "Mega Post Tension" [ref=e294]
+                      - generic [ref=e295]: Mega Post Tension
+                  - cell "0" [ref=e296]
+                  - cell "0" [ref=e297]
+                  - cell "0" [ref=e298]
+                - row [ref=e299]:
+                  - cell "11" [ref=e300]
+                  - cell [ref=e301]:
+                    - link "Michoc Michoc" [ref=e302]:
+                      - /url: /equipes/t26_mic
+                      - img "Michoc" [ref=e303]
+                      - generic [ref=e304]: Michoc
+                  - cell "0" [ref=e305]
+                  - cell "0" [ref=e306]
+                  - cell "0" [ref=e307]
+                - row [ref=e308]:
+                  - cell "12" [ref=e309]
+                  - cell [ref=e310]:
+                    - link "Atelier Vert Casa Atelier Vert Casa" [ref=e311]:
+                      - /url: /equipes/t26_avc
+                      - img "Atelier Vert Casa" [ref=e312]
+                      - generic [ref=e313]: Atelier Vert Casa
+                  - cell "0" [ref=e314]
+                  - cell "0" [ref=e315]
+                  - cell "0" [ref=e316]
+                - row [ref=e317]:
+                  - cell "13" [ref=e318]
+                  - cell [ref=e319]:
+                    - link "JTI JTI" [ref=e320]:
+                      - /url: /equipes/t26_jti
+                      - img "JTI" [ref=e321]
+                      - generic [ref=e322]: JTI
+                  - cell "0" [ref=e323]
+                  - cell "0" [ref=e324]
+                  - cell "0" [ref=e325]
+                - row [ref=e326]:
+                  - cell "14" [ref=e327]
+                  - cell [ref=e328]:
+                    - link "Cobco Cobco" [ref=e329]:
+                      - /url: /equipes/t26_cob
+                      - img "Cobco" [ref=e330]
+                      - generic [ref=e331]: Cobco
+                  - cell "0" [ref=e332]
+                  - cell "0" [ref=e333]
+                  - cell "0" [ref=e334]
+                - row [ref=e335]:
+                  - cell "15" [ref=e336]
+                  - cell [ref=e337]:
+                    - link "Arrow ECS Arrow ECS" [ref=e338]:
+                      - /url: /equipes/t26_arw
+                      - img "Arrow ECS" [ref=e339]
+                      - generic [ref=e340]: Arrow ECS
+                  - cell "0" [ref=e341]
+                  - cell "0" [ref=e342]
+                  - cell "0" [ref=e343]
+                - row [ref=e344]:
+                  - cell "16" [ref=e345]
+                  - cell [ref=e346]:
+                    - link "Marjane Market Marjane Market" [ref=e347]:
+                      - /url: /equipes/t26_mjm
+                      - img "Marjane Market" [ref=e348]
+                      - generic [ref=e349]: Marjane Market
+                  - cell "0" [ref=e350]
+                  - cell "0" [ref=e351]
+                  - cell "0" [ref=e352]
+                - row [ref=e353]:
+                  - cell "17" [ref=e354]
+                  - cell [ref=e355]:
+                    - link "Atelier Vert Rabat Atelier Vert Rabat" [ref=e356]:
+                      - /url: /equipes/t26_avr
+                      - img "Atelier Vert Rabat" [ref=e357]
+                      - generic [ref=e358]: Atelier Vert Rabat
+                  - cell "0" [ref=e359]
+                  - cell "0" [ref=e360]
+                  - cell "0" [ref=e361]
+                - row [ref=e362]:
+                  - cell "18" [ref=e363]
+                  - cell [ref=e364]:
+                    - link "Attijariwafa bank Attijariwafa bank" [ref=e365]:
+                      - /url: /equipes/t26_atw
+                      - img "Attijariwafa bank" [ref=e366]
+                      - generic [ref=e367]: Attijariwafa bank
+                  - cell "0" [ref=e368]
+                  - cell "0" [ref=e369]
+                  - cell "0" [ref=e370]
+                - row [ref=e371]:
+                  - cell "19" [ref=e372]
+                  - cell [ref=e373]:
+                    - link "Parebrise Express Parebrise Express" [ref=e374]:
+                      - /url: /equipes/t26_pbe
+                      - img "Parebrise Express" [ref=e375]
+                      - generic [ref=e376]: Parebrise Express
+                  - cell "0" [ref=e377]
+                  - cell "0" [ref=e378]
+                  - cell "0" [ref=e379]
+                - row [ref=e380]:
+                  - cell "20" [ref=e381]
+                  - cell [ref=e382]:
+                    - link "CTR CTR" [ref=e383]:
+                      - /url: /equipes/t26_ctr
+                      - img "CTR" [ref=e384]
+                      - generic [ref=e385]: CTR
+                  - cell "0" [ref=e386]
+                  - cell "0" [ref=e387]
+                  - cell "0" [ref=e388]
+                - row [ref=e389]:
+                  - cell "21" [ref=e390]
+                  - cell [ref=e391]:
+                    - link "Wafasalaf Wafasalaf" [ref=e392]:
+                      - /url: /equipes/t26_waf
+                      - img "Wafasalaf" [ref=e393]
+                      - generic [ref=e394]: Wafasalaf
+                  - cell "0" [ref=e395]
+                  - cell "0" [ref=e396]
+                  - cell "0" [ref=e397]
+            - generic [ref=e399]:
+              - generic [ref=e400]:
+                - generic [ref=e402]: MASTER
+                - text: (11 équipes)
+              - generic [ref=e403]: ·
+              - generic [ref=e404]:
+                - generic [ref=e406]: CHALLENGER
+                - text: (10 équipes)
+        - generic [ref=e407]:
+          - generic [ref=e408]:
+            - generic [ref=e409]: Règlement officiel 2026/2027
+            - generic [ref=e410]: Version 11 · mis à jour le 16 novembre 2026
+          - generic [ref=e411]:
+            - link "Lire le règlement" [ref=e412] [cursor=pointer]:
+              - /url: /reglement
+            - link "Télécharger (PDF)" [ref=e413] [cursor=pointer]:
+              - /url: /reglement/reglement-ardentia-v11.pdf
+      - generic [ref=e414]:
+        - generic [ref=e415]:
+          - heading "Les équipes" [level=2] [ref=e417]
+          - link "Voir toutes →" [ref=e419] [cursor=pointer]:
+            - /url: /equipes
+        - generic [ref=e421]:
+          - generic [ref=e422]:
+            - link "Arrow ECS Arrow ECS" [ref=e423]:
+              - /url: /equipes/t26_arw
+              - img "Arrow ECS" [ref=e424]
+              - generic [ref=e425]: Arrow ECS
+            - link "Atelier Vert Rabat Atelier Vert Rabat" [ref=e426]:
+              - /url: /equipes/t26_avr
+              - img "Atelier Vert Rabat" [ref=e427]
+              - generic [ref=e428]: Atelier Vert Rabat
+            - link "Atelier Vert Casa Atelier Vert Casa" [ref=e429]:
+              - /url: /equipes/t26_avc
+              - img "Atelier Vert Casa" [ref=e430]
+              - generic [ref=e431]: Atelier Vert Casa
+            - link "Cobco Cobco" [ref=e432]:
+              - /url: /equipes/t26_cob
+              - img "Cobco" [ref=e433]
+              - generic [ref=e434]: Cobco
+            - link "ALD Automotive ALD Automotive" [ref=e435]:
+              - /url: /equipes/t26_ald
+              - img "ALD Automotive" [ref=e436]
+              - generic [ref=e437]: ALD Automotive
+            - link "Pharmaprom Pharmaprom" [ref=e438]:
+              - /url: /equipes/t26_php
+              - img "Pharmaprom" [ref=e439]
+              - generic [ref=e440]: Pharmaprom
+            - link "Taqeef (Midea) Taqeef (Midea)" [ref=e441]:
+              - /url: /equipes/t26_mid
+              - img "Taqeef (Midea)" [ref=e442]
+              - generic [ref=e443]: Taqeef (Midea)
+            - link "Wafasalaf Wafasalaf" [ref=e444]:
+              - /url: /equipes/t26_waf
+              - img "Wafasalaf" [ref=e445]
+              - generic [ref=e446]: Wafasalaf
+            - link "JTI JTI" [ref=e447]:
+              - /url: /equipes/t26_jti
+              - img "JTI" [ref=e448]
+              - generic [ref=e449]: JTI
+            - link "Crédit Agricole Crédit Agricole" [ref=e450]:
+              - /url: /equipes/t26_cam
+              - img "Crédit Agricole" [ref=e451]
+              - generic [ref=e452]: Crédit Agricole
+            - link "G3C G3C" [ref=e453]:
+              - /url: /equipes/t26_g3c
+              - img "G3C" [ref=e454]
+              - generic [ref=e455]: G3C
+            - link "Parebrise Express Parebrise Express" [ref=e456]:
+              - /url: /equipes/t26_pbe
+              - img "Parebrise Express" [ref=e457]
+              - generic [ref=e458]: Parebrise Express
+            - link "Marjane Market Marjane Market" [ref=e459]:
+              - /url: /equipes/t26_mjm
+              - img "Marjane Market" [ref=e460]
+              - generic [ref=e461]: Marjane Market
+            - link "Attijariwafa bank Attijariwafa bank" [ref=e462]:
+              - /url: /equipes/t26_atw
+              - img "Attijariwafa bank" [ref=e463]
+              - generic [ref=e464]: Attijariwafa bank
+            - link "Distra Distra" [ref=e465]:
+              - /url: /equipes/t26_dst
+              - img "Distra" [ref=e466]
+              - generic [ref=e467]: Distra
+            - link "Michoc Michoc" [ref=e468]:
+              - /url: /equipes/t26_mic
+              - img "Michoc" [ref=e469]
+              - generic [ref=e470]: Michoc
+            - link "BMCI BMCI" [ref=e471]:
+              - /url: /equipes/t26_bmc
+              - img "BMCI" [ref=e472]
+              - generic [ref=e473]: BMCI
+            - link "CTR CTR" [ref=e474]:
+              - /url: /equipes/t26_ctr
+              - img "CTR" [ref=e475]
+              - generic [ref=e476]: CTR
+            - link "Mega Post Tension Mega Post Tension" [ref=e477]:
+              - /url: /equipes/t26_mpt
+              - img "Mega Post Tension" [ref=e478]
+              - generic [ref=e479]: Mega Post Tension
+            - link "L'Heure Joyeuse L'Heure Joyeuse" [ref=e480]:
+              - /url: /equipes/t26_lhj
+              - img "L'Heure Joyeuse" [ref=e481]
+              - generic [ref=e482]: L'Heure Joyeuse
+            - link "CAC CAC" [ref=e483]:
+              - /url: /equipes/t26_cac
+              - img "CAC" [ref=e484]
+              - generic [ref=e485]: CAC
+          - generic [aria-hidden] [ref=e486]:
+            - link [ref=e487]:
+              - /url: /equipes/t26_arw
+              - generic [ref=e489]: Arrow ECS
+            - link [ref=e490]:
+              - /url: /equipes/t26_avr
+              - generic [ref=e492]: Atelier Vert Rabat
+            - link [ref=e493]:
+              - /url: /equipes/t26_avc
+              - generic [ref=e495]: Atelier Vert Casa
+            - link [ref=e496]:
+              - /url: /equipes/t26_cob
+              - generic [ref=e498]: Cobco
+            - link [ref=e499]:
+              - /url: /equipes/t26_ald
+              - generic [ref=e501]: ALD Automotive
+            - link [ref=e502]:
+              - /url: /equipes/t26_php
+              - generic [ref=e504]: Pharmaprom
+            - link [ref=e505]:
+              - /url: /equipes/t26_mid
+              - generic [ref=e507]: Taqeef (Midea)
+            - link [ref=e508]:
+              - /url: /equipes/t26_waf
+              - generic [ref=e510]: Wafasalaf
+            - link [ref=e511]:
+              - /url: /equipes/t26_jti
+              - generic [ref=e513]: JTI
+            - link [ref=e514]:
+              - /url: /equipes/t26_cam
+              - generic [ref=e516]: Crédit Agricole
+            - link [ref=e517]:
+              - /url: /equipes/t26_g3c
+              - generic [ref=e519]: G3C
+            - link [ref=e520]:
+              - /url: /equipes/t26_pbe
+              - generic [ref=e522]: Parebrise Express
+            - link [ref=e523]:
+              - /url: /equipes/t26_mjm
+              - generic [ref=e525]: Marjane Market
+            - link [ref=e526]:
+              - /url: /equipes/t26_atw
+              - generic [ref=e528]: Attijariwafa bank
+            - link [ref=e529]:
+              - /url: /equipes/t26_dst
+              - generic [ref=e531]: Distra
+            - link [ref=e532]:
+              - /url: /equipes/t26_mic
+              - generic [ref=e534]: Michoc
+            - link [ref=e535]:
+              - /url: /equipes/t26_bmc
+              - generic [ref=e537]: BMCI
+            - link [ref=e538]:
+              - /url: /equipes/t26_ctr
+              - generic [ref=e540]: CTR
+            - link [ref=e541]:
+              - /url: /equipes/t26_mpt
+              - generic [ref=e543]: Mega Post Tension
+            - link [ref=e544]:
+              - /url: /equipes/t26_lhj
+              - generic [ref=e546]: L'Heure Joyeuse
+            - link [ref=e547]:
+              - /url: /equipes/t26_cac
+              - generic [ref=e549]: CAC
+  - contentinfo [ref=e550]:
+    - generic [ref=e551]:
+      - generic [ref=e552]:
+        - img "Morocco Business League" [ref=e553]
+        - generic [ref=e554]:
+          - generic [ref=e555]: Morocco Business League
+          - paragraph [ref=e556]: 1ère LIGUE DE FOOTBALL INTER‑ENTREPRISES AU MAROC
+          - paragraph [ref=e557]: الدوري الوطني للشركات لكرة القدم
+          - link [ref=e558]:
+            - /url: https://www.ardentia.ma
+            - text: Organisé par
+            - img "Ardentia" [ref=e559]
+      - generic [ref=e560]:
+        - generic [ref=e561]: Contact
+        - link "contact@ardentia.ma" [ref=e562]:
+          - /url: mailto:contact@ardentia.ma
+        - link "+212 6 43 04 79 84" [ref=e566]:
+          - /url: tel:+212643047984
+        - link "39, Av Lalla Yaqout, 1er étage, Apt n°1, Casablanca" [ref=e569]:
+          - /url: https://www.google.com/maps/search/?api=1&query=39%2C%20Av%20Lalla%20Yaqout%2C%201er%20%C3%A9tage%2C%20Apt%20n%C2%B01%2C%20Casablanca
+        - link "www.ardentia.ma" [ref=e573]:
+          - /url: https://www.ardentia.ma
+        - generic [ref=e577]:
+          - link "WhatsApp" [ref=e578]:
+            - /url: https://wa.me/212643047984?text=Bonjour%2C%20je%20vous%20contacte%20depuis%20le%20site%20de%20la%20Morocco%20Business%20League.
+          - link "Appeler" [ref=e582]:
+            - /url: tel:+212643047984
+      - generic [ref=e585]:
+        - generic [ref=e586]: Suivez-nous
+        - list [ref=e587]:
+          - listitem [ref=e588]:
+            - link [ref=e589]:
+              - /url: https://www.instagram.com/morocco.business.league/
+          - listitem [ref=e595]:
+            - link [ref=e596]:
+              - /url: https://www.instagram.com/ardentia.ma/
+          - listitem [ref=e602]:
+            - link [ref=e603]:
+              - /url: https://www.linkedin.com/company/ardentia-agence/
+        - generic [ref=e608]:
+          - link "Règlement" [ref=e609]:
+            - /url: /reglement
+          - link "Discipline" [ref=e610]:
+            - /url: /discipline
+          - link "Historique" [ref=e611]:
+            - /url: /historique
+          - link "Pré-saison" [ref=e612]:
+            - /url: /pre-saison
+          - link "Équipe type" [ref=e613]:
+            - /url: /equipe-type
+          - link "Badges" [ref=e614]:
+            - /url: /badges
+          - link "Glossaire" [ref=e615]:
+            - /url: /glossaire
+          - link "Match des capitaines" [ref=e616]:
+            - /url: /match-des-capitaines
+          - link "Média" [ref=e617]:
+            - /url: /media
+          - link "Espace admin" [ref=e618]:
+            - /url: /admin
+    - generic [ref=e619]: © 2026 Morocco Business League · organisée par Ardentia
+```
+
+# Test source
+
+```ts
+  1  | // Captures de référence : chaque page clé est comparée à sa capture validée (dossier __screenshots__).
+  2  | // Mettre à jour après un changement voulu : npx playwright test -c e2e/playwright.config.mjs visual --update-snapshots
+  3  | import { expect, test } from '@playwright/test'
+  4  | import { FROZEN, SHOTS } from './routes.mjs'
+  5  | 
+  6  | for (const route of SHOTS) {
+  7  |   test(`capture ${route}`, async ({ page, browserName }) => {
+  8  |     // WebKit : la grille des cartes équipes (reflets animés) ne se stabilise pas assez pour une capture fiable
+  9  |     test.skip(browserName === 'webkit' && route === '/equipes', 'capture instable sur WebKit (reflets animés des cartes)')
+  10 |     await page.clock.setFixedTime(FROZEN)
+  11 |     await page.goto(route)
+  12 |     // Firefox (CI) n'atteint parfois jamais « réseau inactif » : on plafonne l'attente, puis on attend le contenu
+  13 |     await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {})
+  14 |     await page.locator('main').first().waitFor({ timeout: 20_000 })
+  15 |     await page.evaluate(() => document.fonts.ready)
+  16 |     await page.waitForTimeout(600)
+  17 |     const name = (route === '/' ? 'accueil' : route.slice(1).replace(/\//g, '-')) + '.png'
+  18 |     // zones qui bougent d'elles-mêmes (bandeau défilant, carrousel) masquées
+> 19 |     await expect(page).toHaveScreenshot(name, { fullPage: false, mask: [page.locator('[data-ticker], .marquee, [aria-roledescription="carousel"]')] })
+     |     ^ Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/webkit-iphone/accueil.png, writing actual.
+  20 |   })
+  21 | }
+  22 | 
+```

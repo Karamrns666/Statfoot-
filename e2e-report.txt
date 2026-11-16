@@ -1,0 +1,256 @@
+
+Running 135 tests using 2 workers
+
+  ✓    2 [chromium-mobile] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 360 px (1.6s)
+  ✓    1 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page / (2.8s)
+  ✓    3 [chromium-mobile] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 390 px (1.3s)
+  ✓    5 [chromium-mobile] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 430 px (1.3s)
+  ✓    4 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /matchs (2.1s)
+  ✘    6 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture / (2.5s)
+  ✓    7 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /classement (2.2s)
+  ✓    8 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /pre-saison (2.4s)
+  ✓    9 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /classement (2.4s)
+  ✓   10 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /equipes (2.3s)
+  ✓   11 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /pre-saison (2.2s)
+  ✓   12 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /joueurs (2.3s)
+  ✓   13 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /equipes (2.2s)
+  ✓   15 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /joueurs (2.2s)
+  ✓   14 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /trophees (2.3s)
+  ✓   16 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /trophees (2.1s)
+  ✓   17 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /statistiques (2.2s)
+  ✓   18 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /badges (2.0s)
+  ✓   19 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /historique (2.2s)
+  ✓   20 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /glossaire (1.9s)
+  ✓   21 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /reglement (2.1s)
+  ✓   22 [chromium-desktop] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 360 px (1.5s)
+  ✓   23 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /badges (2.4s)
+  ✓   24 [chromium-desktop] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 390 px (1.2s)
+  ✓   26 [chromium-desktop] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 430 px (1.3s)
+  ✓   25 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /glossaire (2.4s)
+  ✓   27 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page / (2.5s)
+  ✓   28 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /match-des-capitaines (2.3s)
+  ✓   29 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /matchs (2.0s)
+  ✓   30 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /equipe-type (2.2s)
+  ✓   31 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /classement (2.3s)
+  ✓   32 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /discipline (2.2s)
+  ✓   33 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /pre-saison (2.5s)
+  ✓   34 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /media (2.1s)
+  ✓   35 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /equipes (2.2s)
+  ✘   36 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture / (2.9s)
+  ✓   37 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /joueurs (2.1s)
+  ✓   38 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /trophees (2.3s)
+  ✓   39 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /classement (2.4s)
+  ✓   40 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /statistiques (2.1s)
+  ✓   41 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /pre-saison (2.1s)
+  ✓   42 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /historique (2.1s)
+  ✓   43 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /equipes (2.2s)
+  ✓   44 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /reglement (2.1s)
+  ✓   45 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /joueurs (2.1s)
+  ✓   46 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /badges (2.1s)
+  ✓   47 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /trophees (2.0s)
+  ✓   48 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /glossaire (2.1s)
+  ✓   49 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /badges (2.0s)
+  ✓   50 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /match-des-capitaines (2.0s)
+  ✓   51 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /glossaire (2.1s)
+  ✓   52 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /equipe-type (2.0s)
+  ✓   54 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /discipline (2.1s)
+  ✓   55 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /media (2.1s)
+  ✓   53 [webkit-iphone] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 360 px (9.8s)
+  ✓   56 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page / (6.3s)
+  ✓   57 [webkit-iphone] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 390 px (4.2s)
+  ✓   58 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /matchs (3.0s)
+  ✓   59 [webkit-iphone] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 430 px (4.1s)
+  ✓   60 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /classement (3.8s)
+  ✓   62 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /pre-saison (3.1s)
+  ✘   61 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture / (8.5s)
+  ✓   64 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /classement (3.0s)
+  ✓   65 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /pre-saison (2.8s)
+  -   66 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /equipes
+  ✓   63 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /equipes (14.9s)
+  ✓   67 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /joueurs (3.9s)
+  ✓   68 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /joueurs (3.6s)
+  ✓   69 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /trophees (4.7s)
+  ✓   70 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /trophees (3.8s)
+  ✓   71 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /badges (3.2s)
+  ✓   72 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /statistiques (2.6s)
+  ✓   73 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /glossaire (2.9s)
+  ✓   74 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /historique (2.9s)
+  ✓   76 [webkit-ipad] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 360 px (2.5s)
+  ✓   75 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /reglement (3.7s)
+  ✓   77 [webkit-ipad] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 390 px (2.4s)
+  ✓   78 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /badges (3.5s)
+  ✓   79 [webkit-ipad] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 430 px (2.3s)
+  ✓   80 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /glossaire (3.0s)
+  ✓   81 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page / (3.9s)
+  ✓   82 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /match-des-capitaines (2.7s)
+  ✓   83 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /matchs (3.3s)
+  ✓   84 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /equipe-type (3.0s)
+  ✓   85 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /classement (2.6s)
+  ✓   86 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /discipline (2.6s)
+  ✓   87 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /pre-saison (2.7s)
+  ✓   88 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /media (2.8s)
+  ✘   90 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture / (7.6s)
+  ✓   91 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /classement (3.2s)
+  ✓   89 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /equipes (14.8s)
+  ✓   92 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /pre-saison (3.1s)
+  -   94 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /equipes
+  ✓   93 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /joueurs (3.0s)
+  ✓   95 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /joueurs (3.3s)
+  ✓   96 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /trophees (6.0s)
+  ✓   97 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /trophees (4.3s)
+  ✓   98 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /statistiques (2.8s)
+  ✓   99 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /badges (3.6s)
+  ✓  100 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /historique (3.0s)
+  ✓  101 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /glossaire (3.5s)
+  ✓  102 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /reglement (3.1s)
+  ✓  104 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /badges (3.0s)
+  ✓  103 [firefox-desktop] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 360 px (3.1s)
+  ✓  106 [firefox-desktop] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 390 px (1.6s)
+  ✓  105 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /glossaire (3.4s)
+  ✓  107 [firefox-desktop] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 430 px (1.6s)
+  ✓  108 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /match-des-capitaines (2.7s)
+  ✓  109 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page / (2.8s)
+  ✓  110 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /equipe-type (2.7s)
+  ✓  111 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /matchs (2.6s)
+  ✓  112 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /discipline (2.4s)
+  ✓  113 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /classement (2.6s)
+  ✓  114 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /media (2.9s)
+  ✓  115 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /pre-saison (2.7s)
+  ✓  117 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /equipes (2.6s)
+  ✘  116 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture / (4.0s)
+  ✓  118 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /joueurs (2.6s)
+  ✓  119 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /trophees (3.4s)
+  ✓  120 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /classement (3.3s)
+  ✓  121 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /statistiques (2.4s)
+  ✓  122 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /pre-saison (2.2s)
+  ✓  123 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /historique (2.5s)
+  ✓  124 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /equipes (2.4s)
+  ✓  125 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /reglement (2.5s)
+  ✓  126 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /joueurs (2.5s)
+  ✓  127 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /badges (2.4s)
+  ✓  128 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /trophees (2.3s)
+  ✓  129 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /glossaire (2.5s)
+  ✓  130 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /badges (2.5s)
+  ✓  131 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /match-des-capitaines (2.4s)
+  ✓  132 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /glossaire (2.5s)
+  ✓  133 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /equipe-type (2.5s)
+  ✓  134 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /discipline (2.3s)
+  ✓  135 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /media (2.4s)
+
+
+  1) [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture / ───────────────────────────────────────
+
+    Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/chromium-mobile/accueil.png, writing actual.
+
+      17 |     const name = (route === '/' ? 'accueil' : route.slice(1).replace(/\//g, '-')) + '.png'
+      18 |     // zones qui bougent d'elles-mêmes (bandeau défilant, carrousel) masquées
+    > 19 |     await expect(page).toHaveScreenshot(name, { fullPage: false, mask: [page.locator('[data-ticker], .marquee, [aria-roledescription="carousel"]')] })
+         |     ^
+      20 |   })
+      21 | }
+      22 |
+        at /home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs:19:5
+
+    attachment #1: accueil (image/png) ─────────────────────────────────────────────────────────────
+    Expected: e2e/__screenshots__/chromium-mobile/accueil.png
+    Received: test-results/visual-capture--chromium-mobile/accueil-actual.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/visual-capture--chromium-mobile/error-context.md
+
+  2) [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture / ──────────────────────────────────────
+
+    Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/chromium-desktop/accueil.png, writing actual.
+
+      17 |     const name = (route === '/' ? 'accueil' : route.slice(1).replace(/\//g, '-')) + '.png'
+      18 |     // zones qui bougent d'elles-mêmes (bandeau défilant, carrousel) masquées
+    > 19 |     await expect(page).toHaveScreenshot(name, { fullPage: false, mask: [page.locator('[data-ticker], .marquee, [aria-roledescription="carousel"]')] })
+         |     ^
+      20 |   })
+      21 | }
+      22 |
+        at /home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs:19:5
+
+    attachment #1: accueil (image/png) ─────────────────────────────────────────────────────────────
+    Expected: e2e/__screenshots__/chromium-desktop/accueil.png
+    Received: test-results/visual-capture--chromium-desktop/accueil-actual.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/visual-capture--chromium-desktop/error-context.md
+
+  3) [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture / ─────────────────────────────────────────
+
+    Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/webkit-iphone/accueil.png, writing actual.
+
+      17 |     const name = (route === '/' ? 'accueil' : route.slice(1).replace(/\//g, '-')) + '.png'
+      18 |     // zones qui bougent d'elles-mêmes (bandeau défilant, carrousel) masquées
+    > 19 |     await expect(page).toHaveScreenshot(name, { fullPage: false, mask: [page.locator('[data-ticker], .marquee, [aria-roledescription="carousel"]')] })
+         |     ^
+      20 |   })
+      21 | }
+      22 |
+        at /home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs:19:5
+
+    attachment #1: accueil (image/png) ─────────────────────────────────────────────────────────────
+    Expected: e2e/__screenshots__/webkit-iphone/accueil.png
+    Received: test-results/visual-capture--webkit-iphone/accueil-actual.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/visual-capture--webkit-iphone/error-context.md
+
+  4) [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture / ───────────────────────────────────────────
+
+    Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/webkit-ipad/accueil.png, writing actual.
+
+      17 |     const name = (route === '/' ? 'accueil' : route.slice(1).replace(/\//g, '-')) + '.png'
+      18 |     // zones qui bougent d'elles-mêmes (bandeau défilant, carrousel) masquées
+    > 19 |     await expect(page).toHaveScreenshot(name, { fullPage: false, mask: [page.locator('[data-ticker], .marquee, [aria-roledescription="carousel"]')] })
+         |     ^
+      20 |   })
+      21 | }
+      22 |
+        at /home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs:19:5
+
+    attachment #1: accueil (image/png) ─────────────────────────────────────────────────────────────
+    Expected: e2e/__screenshots__/webkit-ipad/accueil.png
+    Received: test-results/visual-capture--webkit-ipad/accueil-actual.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/visual-capture--webkit-ipad/error-context.md
+
+  5) [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture / ───────────────────────────────────────
+
+    Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/firefox-desktop/accueil.png, writing actual.
+
+      17 |     const name = (route === '/' ? 'accueil' : route.slice(1).replace(/\//g, '-')) + '.png'
+      18 |     // zones qui bougent d'elles-mêmes (bandeau défilant, carrousel) masquées
+    > 19 |     await expect(page).toHaveScreenshot(name, { fullPage: false, mask: [page.locator('[data-ticker], .marquee, [aria-roledescription="carousel"]')] })
+         |     ^
+      20 |   })
+      21 | }
+      22 |
+        at /home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs:19:5
+
+    attachment #1: accueil (image/png) ─────────────────────────────────────────────────────────────
+    Expected: e2e/__screenshots__/firefox-desktop/accueil.png
+    Received: test-results/visual-capture--firefox-desktop/accueil-actual.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/visual-capture--firefox-desktop/error-context.md
+
+  5 failed
+    [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture / ────────────────────────────────────────
+    [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture / ───────────────────────────────────────
+    [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture / ──────────────────────────────────────────
+    [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture / ────────────────────────────────────────────
+    [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture / ────────────────────────────────────────
+  2 skipped
+  128 passed (3.5m)
+exit=1
+LIGHTHOUSE build / Performance 45 · Accessibility 100 · Best Practices 100 · SEO 100
+LIGHTHOUSE build /classement Performance 81 · Accessibility 100 · Best Practices 100 · SEO 100
+LIGHTHOUSE build /joueurs Performance 76 · Accessibility 100 · Best Practices 100 · SEO 100
+LIGHTHOUSE build /trophees Performance 76 · Accessibility 100 · Best Practices 100 · SEO 100
+LIGHTHOUSE prod / Performance 74 · Accessibility 100 · Best Practices 100 · SEO 100
+LIGHTHOUSE prod /classement Performance 83 · Accessibility 100 · Best Practices 100 · SEO 100
+LIGHTHOUSE prod /joueurs Performance 81 · Accessibility 100 · Best Practices 96 · SEO 100

@@ -1,0 +1,5136 @@
+{
+  "config": {
+    "argv": [
+      "/opt/hostedtoolcache/node/22.23.4/x64/bin/node",
+      "/home/runner/work/Statfoot-/Statfoot-/node_modules/.bin/playwright",
+      "test",
+      "-c",
+      "e2e/playwright.config.mjs",
+      "--update-snapshots=missing"
+    ],
+    "configFile": "/home/runner/work/Statfoot-/Statfoot-/e2e/playwright.config.mjs",
+    "rootDir": "/home/runner/work/Statfoot-/Statfoot-/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "ci": {
+        "commitHref": "https://github.com/Karamrns666/Statfoot-/commit/f3626943da1cfc42c4087ac4ab59ab0bb865787f",
+        "commitHash": "f3626943da1cfc42c4087ac4ab59ab0bb865787f",
+        "buildHref": "https://github.com/Karamrns666/Statfoot-/actions/runs/43853928722"
+      },
+      "gitCommit": {
+        "shortHash": "f362694",
+        "hash": "f3626943da1cfc42c4087ac4ab59ab0bb865787f",
+        "subject": "Règlement v11 publié (affichage uniquement) : texte intégral, PDF et Word, mis à jour le 16 novembre 2026, essentiel en 1 minute, encart sur l'accueil ; règlement appliqué par la plateforme inchangé",
+        "body": "Règlement v11 publié (affichage uniquement) : texte intégral, PDF et Word, mis à jour le 16 novembre 2026, essentiel en 1 minute, encart sur l'accueil ; règlement appliqué par la plateforme inchangé\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_014oJKbELDjeikG7TTrw4zvo\n",
+        "author": {
+          "name": "Claude",
+          "email": "noreply@anthropic.com",
+          "time": 1794826298000
+        },
+        "committer": {
+          "name": "Claude",
+          "email": "noreply@anthropic.com",
+          "time": 1794826298000
+        },
+        "branch": "audit-complet"
+      },
+      "actualWorkers": 2
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/runner/work/Statfoot-/Statfoot-/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/Karamrns666/Statfoot-/commit/f3626943da1cfc42c4087ac4ab59ab0bb865787f",
+            "commitHash": "f3626943da1cfc42c4087ac4ab59ab0bb865787f",
+            "buildHref": "https://github.com/Karamrns666/Statfoot-/actions/runs/43853928722"
+          },
+          "gitCommit": {
+            "shortHash": "f362694",
+            "hash": "f3626943da1cfc42c4087ac4ab59ab0bb865787f",
+            "subject": "Règlement v11 publié (affichage uniquement) : texte intégral, PDF et Word, mis à jour le 16 novembre 2026, essentiel en 1 minute, encart sur l'accueil ; règlement appliqué par la plateforme inchangé",
+            "body": "Règlement v11 publié (affichage uniquement) : texte intégral, PDF et Word, mis à jour le 16 novembre 2026, essentiel en 1 minute, encart sur l'accueil ; règlement appliqué par la plateforme inchangé\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_014oJKbELDjeikG7TTrw4zvo\n",
+            "author": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794826298000
+            },
+            "committer": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794826298000
+            },
+            "branch": "audit-complet"
+          },
+          "actualWorkers": 2
+        },
+        "id": "chromium-mobile",
+        "name": "chromium-mobile",
+        "testDir": "/home/runner/work/Statfoot-/Statfoot-/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/home/runner/work/Statfoot-/Statfoot-/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/Karamrns666/Statfoot-/commit/f3626943da1cfc42c4087ac4ab59ab0bb865787f",
+            "commitHash": "f3626943da1cfc42c4087ac4ab59ab0bb865787f",
+            "buildHref": "https://github.com/Karamrns666/Statfoot-/actions/runs/43853928722"
+          },
+          "gitCommit": {
+            "shortHash": "f362694",
+            "hash": "f3626943da1cfc42c4087ac4ab59ab0bb865787f",
+            "subject": "Règlement v11 publié (affichage uniquement) : texte intégral, PDF et Word, mis à jour le 16 novembre 2026, essentiel en 1 minute, encart sur l'accueil ; règlement appliqué par la plateforme inchangé",
+            "body": "Règlement v11 publié (affichage uniquement) : texte intégral, PDF et Word, mis à jour le 16 novembre 2026, essentiel en 1 minute, encart sur l'accueil ; règlement appliqué par la plateforme inchangé\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_014oJKbELDjeikG7TTrw4zvo\n",
+            "author": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794826298000
+            },
+            "committer": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794826298000
+            },
+            "branch": "audit-complet"
+          },
+          "actualWorkers": 2
+        },
+        "id": "chromium-desktop",
+        "name": "chromium-desktop",
+        "testDir": "/home/runner/work/Statfoot-/Statfoot-/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/home/runner/work/Statfoot-/Statfoot-/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/Karamrns666/Statfoot-/commit/f3626943da1cfc42c4087ac4ab59ab0bb865787f",
+            "commitHash": "f3626943da1cfc42c4087ac4ab59ab0bb865787f",
+            "buildHref": "https://github.com/Karamrns666/Statfoot-/actions/runs/43853928722"
+          },
+          "gitCommit": {
+            "shortHash": "f362694",
+            "hash": "f3626943da1cfc42c4087ac4ab59ab0bb865787f",
+            "subject": "Règlement v11 publié (affichage uniquement) : texte intégral, PDF et Word, mis à jour le 16 novembre 2026, essentiel en 1 minute, encart sur l'accueil ; règlement appliqué par la plateforme inchangé",
+            "body": "Règlement v11 publié (affichage uniquement) : texte intégral, PDF et Word, mis à jour le 16 novembre 2026, essentiel en 1 minute, encart sur l'accueil ; règlement appliqué par la plateforme inchangé\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_014oJKbELDjeikG7TTrw4zvo\n",
+            "author": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794826298000
+            },
+            "committer": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794826298000
+            },
+            "branch": "audit-complet"
+          },
+          "actualWorkers": 2
+        },
+        "id": "webkit-iphone",
+        "name": "webkit-iphone",
+        "testDir": "/home/runner/work/Statfoot-/Statfoot-/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/home/runner/work/Statfoot-/Statfoot-/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/Karamrns666/Statfoot-/commit/f3626943da1cfc42c4087ac4ab59ab0bb865787f",
+            "commitHash": "f3626943da1cfc42c4087ac4ab59ab0bb865787f",
+            "buildHref": "https://github.com/Karamrns666/Statfoot-/actions/runs/43853928722"
+          },
+          "gitCommit": {
+            "shortHash": "f362694",
+            "hash": "f3626943da1cfc42c4087ac4ab59ab0bb865787f",
+            "subject": "Règlement v11 publié (affichage uniquement) : texte intégral, PDF et Word, mis à jour le 16 novembre 2026, essentiel en 1 minute, encart sur l'accueil ; règlement appliqué par la plateforme inchangé",
+            "body": "Règlement v11 publié (affichage uniquement) : texte intégral, PDF et Word, mis à jour le 16 novembre 2026, essentiel en 1 minute, encart sur l'accueil ; règlement appliqué par la plateforme inchangé\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_014oJKbELDjeikG7TTrw4zvo\n",
+            "author": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794826298000
+            },
+            "committer": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794826298000
+            },
+            "branch": "audit-complet"
+          },
+          "actualWorkers": 2
+        },
+        "id": "webkit-ipad",
+        "name": "webkit-ipad",
+        "testDir": "/home/runner/work/Statfoot-/Statfoot-/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/home/runner/work/Statfoot-/Statfoot-/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/Karamrns666/Statfoot-/commit/f3626943da1cfc42c4087ac4ab59ab0bb865787f",
+            "commitHash": "f3626943da1cfc42c4087ac4ab59ab0bb865787f",
+            "buildHref": "https://github.com/Karamrns666/Statfoot-/actions/runs/43853928722"
+          },
+          "gitCommit": {
+            "shortHash": "f362694",
+            "hash": "f3626943da1cfc42c4087ac4ab59ab0bb865787f",
+            "subject": "Règlement v11 publié (affichage uniquement) : texte intégral, PDF et Word, mis à jour le 16 novembre 2026, essentiel en 1 minute, encart sur l'accueil ; règlement appliqué par la plateforme inchangé",
+            "body": "Règlement v11 publié (affichage uniquement) : texte intégral, PDF et Word, mis à jour le 16 novembre 2026, essentiel en 1 minute, encart sur l'accueil ; règlement appliqué par la plateforme inchangé\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_014oJKbELDjeikG7TTrw4zvo\n",
+            "author": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794826298000
+            },
+            "committer": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794826298000
+            },
+            "branch": "audit-complet"
+          },
+          "actualWorkers": 2
+        },
+        "id": "firefox-desktop",
+        "name": "firefox-desktop",
+        "testDir": "/home/runner/work/Statfoot-/Statfoot-/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "../test-results/e2e.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 2,
+    "webServer": {
+      "command": "npx vite preview --port 4173 --strictPort",
+      "cwd": "..",
+      "url": "http://localhost:4173",
+      "reuseExistingServer": true,
+      "timeout": 60000
+    }
+  },
+  "suites": [
+    {
+      "title": "home-standings.spec.mjs",
+      "file": "home-standings.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "classement accueil sans défilement interne — 360 px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1582,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:12.253Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "91012eb883bf2f0cc2c5-113b66864e186ce009ab",
+          "file": "home-standings.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "classement accueil sans défilement interne — 390 px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1305,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:14.213Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "91012eb883bf2f0cc2c5-30656816e82ed675b7d5",
+          "file": "home-standings.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "classement accueil sans défilement interne — 430 px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1343,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:15.538Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "91012eb883bf2f0cc2c5-ae7ef48e68552259617d",
+          "file": "home-standings.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "classement accueil sans défilement interne — 360 px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1457,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:35.528Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "91012eb883bf2f0cc2c5-9c8d304ef27e8d6c473d",
+          "file": "home-standings.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "classement accueil sans défilement interne — 390 px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1217,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:37.114Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "91012eb883bf2f0cc2c5-b52d317950e2abb98364",
+          "file": "home-standings.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "classement accueil sans défilement interne — 430 px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1297,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:38.350Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "91012eb883bf2f0cc2c5-4c20f760fb1ac9578ec4",
+          "file": "home-standings.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "classement accueil sans défilement interne — 360 px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 9792,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:09.304Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "91012eb883bf2f0cc2c5-0974e9f95255577b8df3",
+          "file": "home-standings.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "classement accueil sans défilement interne — 390 px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 4210,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:19.905Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "91012eb883bf2f0cc2c5-96899673f1fef9260a6d",
+          "file": "home-standings.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "classement accueil sans défilement interne — 430 px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 4063,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:24.142Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "91012eb883bf2f0cc2c5-6158054c57af9e92e6c7",
+          "file": "home-standings.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "classement accueil sans défilement interne — 360 px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2478,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:59.696Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "91012eb883bf2f0cc2c5-3dacd16b918143944807",
+          "file": "home-standings.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "classement accueil sans défilement interne — 390 px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2360,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:02.381Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "91012eb883bf2f0cc2c5-7526013168581629c4fa",
+          "file": "home-standings.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "classement accueil sans défilement interne — 430 px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2321,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:04.767Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "91012eb883bf2f0cc2c5-019c7e19bf4f55fc0feb",
+          "file": "home-standings.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "classement accueil sans défilement interne — 360 px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3067,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:52.443Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "91012eb883bf2f0cc2c5-e3e4fbfcac96ea828547",
+          "file": "home-standings.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "classement accueil sans défilement interne — 390 px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1605,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:56.464Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "91012eb883bf2f0cc2c5-4c9a62475367fcc4c7f4",
+          "file": "home-standings.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "classement accueil sans défilement interne — 430 px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1567,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:58.105Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "91012eb883bf2f0cc2c5-c122299cd609f1b5af1a",
+          "file": "home-standings.spec.mjs",
+          "line": 6,
+          "column": 3
+        }
+      ]
+    },
+    {
+      "title": "layout.spec.mjs",
+      "file": "layout.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "mise en page /",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2802,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:12.249Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-000c6f84d2692b65050a",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /matchs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2142,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:15.421Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-f9548d65a532a50ac0d4",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /classement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2238,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:17.585Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-9d9a1f9240a788949c3e",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /pre-saison",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2380,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:19.837Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-5026c07310485f5cad80",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /equipes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2268,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:22.233Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-36ba7d6f794de79ac9c3",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /joueurs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2272,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:24.514Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-c51dd5b463798e48ce8b",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /trophees",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2323,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:26.797Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-a2bf16ef7911c2ab2e56",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /statistiques",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2194,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:29.136Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-fd89cdc41f7010f5728c",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /historique",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2156,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:31.350Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-5bd3cadb973ebaceccee",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /reglement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2108,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:33.525Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-4beddca63ab92bc77eab",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /badges",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2417,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:35.661Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-805a4efb50404a6f0207",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /glossaire",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2362,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:38.107Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-4b464f7af0f93f8bb8e3",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /match-des-capitaines",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2280,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:40.483Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-efd77eda71e6b68804fe",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /equipe-type",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2158,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:42.785Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-947cac6571b4cd44c0b3",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /discipline",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2231,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:44.961Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-70b6e20688722e84e452",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /media",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2117,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:47.203Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-f9c81c4b489a562eb22a",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2477,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:39.688Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-14543f93ab731911881a",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /matchs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1973,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:42.178Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-748654243d2018599c77",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /classement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2298,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:44.167Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-ef4be838cd870691ddc0",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /pre-saison",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2535,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:46.476Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-11c2f2aabda8a0e4f04a",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /equipes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2159,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:49.023Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-2e74ec5c14e4b29840b4",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /joueurs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2110,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:51.197Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-364eb4770bf4c36a1ec5",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /trophees",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2296,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:53.322Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-682bbd5ef48f76b9df4a",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /statistiques",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2125,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:55.632Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-6e6a18a5074063fff254",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /historique",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2079,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:57.766Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-8a0fe4e7d7cc1a03d090",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /reglement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2081,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:59.854Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-90dea73b8914c0721231",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /badges",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2054,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:01.945Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-9c1d682c987031d313a6",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /glossaire",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2052,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:04.009Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-f21494e786da1b075aa8",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /match-des-capitaines",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2029,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:06.070Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-728832114272b7b678b3",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /equipe-type",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2013,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:08.108Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-42f7c6063ec1d096db40",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /discipline",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2051,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:10.136Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-22846be46f8275c70d8e",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /media",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2123,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:12.197Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-2944cc5a2e8b52606780",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6260,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:15.012Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-44395933bb1b5e94cab0",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /matchs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3016,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:21.421Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-32d28df1dae96f62eb15",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /classement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3773,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:24.478Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-8c575c723aacb2e16a09",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /pre-saison",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3099,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:28.285Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-dd982facfe0c7a1e6a5b",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /equipes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14909,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:31.404Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-f27bfc8d82db3292031e",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /joueurs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3584,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:46.326Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-9441dd2412fee447cce0",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /trophees",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3801,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:49.928Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-e4aadf9cabe524b53386",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /statistiques",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2615,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:53.746Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-33792e0d4a9a317d9306",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /historique",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2870,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:56.389Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-cd92b952e37f13095a12",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /reglement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3711,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:59.283Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-e0c8116f2491774eeb1c",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /badges",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3536,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:03.019Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-36770e24c289baf360a6",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /glossaire",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3007,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:06.569Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-615ac9575c8fa1234035",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /match-des-capitaines",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2726,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:09.589Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-c69c2ce90313630b5208",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /equipe-type",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2991,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:12.334Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-ceec56eb0a45e479941b",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /discipline",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2569,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:15.360Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-21b19485fd745793990e",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /media",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2776,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:17.951Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-0800c1247ff7fb3dc5ca",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 3877,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:07.168Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-995384e8a55a82def63a",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /matchs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 3320,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:11.066Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-2bf1b4d41fa823d40c62",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /classement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2633,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:14.397Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-1748520b721bc2bb3249",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /pre-saison",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2692,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:17.040Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-4fd4bd8c59526328a1d4",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /equipes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 14759,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:19.747Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-076d3b639151b64feaa6",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /joueurs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 3001,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:34.535Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-38fcd591472864a6427e",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /trophees",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 6018,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:37.569Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-205ebc1e410e3fb375de",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /statistiques",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2847,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:43.613Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-bded11529e539730cf93",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /historique",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2973,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:46.469Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-15f564ba5eedf0bf7d29",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /reglement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 3133,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:49.455Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-6913544f003a9485a34f",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /badges",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 3046,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:52.614Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-11e9c76332f5eeb1cb80",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /glossaire",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 3406,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:55.674Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-35b8626a7bc82ce98fdf",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /match-des-capitaines",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2737,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:59.091Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-3823840e0b84a4bbf6a3",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /equipe-type",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2715,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:01.838Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-1929f3f36546e506dc58",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /discipline",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2383,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:04.562Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-5931c552f2b294efc06e",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /media",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2924,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:06.953Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-19ca9263c3faf2fda65a",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2776,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:59.716Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-3102b856a073e4e00cea",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /matchs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2610,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:02.526Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-12d230dfc6cb22caca0c",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /classement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2644,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:05.163Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-809acb97d571ba639ff1",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /pre-saison",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2652,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:07.836Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-ad300d97953c2ba0d729",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /equipes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2553,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:10.512Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-be9fadc2310ebd445e1f",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /joueurs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2561,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:13.089Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-4d747eb31191fb9598bb",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /trophees",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3378,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:15.666Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-38721b70c11047c0586e",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /statistiques",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2395,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:19.059Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-d7116c9c482e3b64b9ec",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /historique",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2457,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:21.469Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-414fec42c1e83d81f859",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /reglement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2531,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:23.939Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-cc642ce221b13ce49430",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /badges",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2435,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:26.483Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-099321b0c36d363712a8",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /glossaire",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2453,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:28.931Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-d3f4a8b5f68d481117cc",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /match-des-capitaines",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2431,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:31.396Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-f8d1b4c9374c440241d6",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /equipe-type",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2529,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:33.838Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-7cbac9a68581d21e9f72",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /discipline",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2340,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:36.377Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-e14213b5ec551ad43248",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "mise en page /media",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2385,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:38.731Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d98756a4c30587bf4905-0f04a489104273f68950",
+          "file": "layout.spec.mjs",
+          "line": 6,
+          "column": 3
+        }
+      ]
+    },
+    {
+      "title": "visual.spec.mjs",
+      "file": "visual.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "capture /",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 2453,
+                  "error": {
+                    "message": "Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/chromium-mobile/accueil.png, writing actual.",
+                    "stack": "Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/chromium-mobile/accueil.png, writing actual.\n    at /home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs:19:5",
+                    "location": {
+                      "file": "/home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs",
+                      "column": 5,
+                      "line": 19
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 17 |\u001b[39m     \u001b[36mconst\u001b[39m name \u001b[33m=\u001b[39m (route \u001b[33m===\u001b[39m \u001b[32m'/'\u001b[39m \u001b[33m?\u001b[39m \u001b[32m'accueil'\u001b[39m \u001b[33m:\u001b[39m route\u001b[33m.\u001b[39mslice(\u001b[35m1\u001b[39m)\u001b[33m.\u001b[39mreplace(\u001b[35m/\\//g\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'-'\u001b[39m)) \u001b[33m+\u001b[39m \u001b[32m'.png'\u001b[39m\n \u001b[90m 18 |\u001b[39m     \u001b[90m// zones qui bougent d'elles-mêmes (bandeau défilant, carrousel) masquées\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveScreenshot(name\u001b[33m,\u001b[39m { fullPage\u001b[33m:\u001b[39m \u001b[36mfalse\u001b[39m\u001b[33m,\u001b[39m mask\u001b[33m:\u001b[39m [page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-ticker], .marquee, [aria-roledescription=\"carousel\"]'\u001b[39m)] })\n \u001b[90m    |\u001b[39m     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m   })\n \u001b[90m 21 |\u001b[39m }\n \u001b[90m 22 |\u001b[39m\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs",
+                        "column": 5,
+                        "line": 19
+                      },
+                      "message": "Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/chromium-mobile/accueil.png, writing actual.\n\n  17 |     const name = (route === '/' ? 'accueil' : route.slice(1).replace(/\\//g, '-')) + '.png'\n  18 |     // zones qui bougent d'elles-mêmes (bandeau défilant, carrousel) masquées\n> 19 |     await expect(page).toHaveScreenshot(name, { fullPage: false, mask: [page.locator('[data-ticker], .marquee, [aria-roledescription=\"carousel\"]')] })\n     |     ^\n  20 |   })\n  21 | }\n  22 |\n    at /home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs:19:5"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:16.908Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "accueil-expected.png",
+                      "contentType": "image/png",
+                      "path": "/home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/chromium-mobile/accueil.png"
+                    },
+                    {
+                      "name": "accueil-actual.png",
+                      "contentType": "image/png",
+                      "path": "/home/runner/work/Statfoot-/Statfoot-/test-results/visual-capture--chromium-mobile/accueil-actual.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/runner/work/Statfoot-/Statfoot-/test-results/visual-capture--chromium-mobile/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs",
+                    "column": 5,
+                    "line": 19
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-f06c53e4a9e6c60cd123",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /classement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2405,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:19.853Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-bc76c4c2395756812d9a",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /pre-saison",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2169,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:22.442Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-d558c94ee7129487bade",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /equipes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2166,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:24.632Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-bfd3d0674e4ab6bd141a",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /joueurs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2208,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:26.815Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-be354cc8300e6d4cfaca",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /trophees",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2063,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:29.053Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-26aab6ecb86cffbc1734",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /badges",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2008,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:31.124Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-0e9ffe9a14cad4ce5296",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /glossaire",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-mobile",
+              "projectName": "chromium-mobile",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1932,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:33.144Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-163219dc9cdb3044509c",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 1,
+                  "status": "failed",
+                  "duration": 2925,
+                  "error": {
+                    "message": "Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/chromium-desktop/accueil.png, writing actual.",
+                    "stack": "Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/chromium-desktop/accueil.png, writing actual.\n    at /home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs:19:5",
+                    "location": {
+                      "file": "/home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs",
+                      "column": 5,
+                      "line": 19
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 17 |\u001b[39m     \u001b[36mconst\u001b[39m name \u001b[33m=\u001b[39m (route \u001b[33m===\u001b[39m \u001b[32m'/'\u001b[39m \u001b[33m?\u001b[39m \u001b[32m'accueil'\u001b[39m \u001b[33m:\u001b[39m route\u001b[33m.\u001b[39mslice(\u001b[35m1\u001b[39m)\u001b[33m.\u001b[39mreplace(\u001b[35m/\\//g\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'-'\u001b[39m)) \u001b[33m+\u001b[39m \u001b[32m'.png'\u001b[39m\n \u001b[90m 18 |\u001b[39m     \u001b[90m// zones qui bougent d'elles-mêmes (bandeau défilant, carrousel) masquées\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveScreenshot(name\u001b[33m,\u001b[39m { fullPage\u001b[33m:\u001b[39m \u001b[36mfalse\u001b[39m\u001b[33m,\u001b[39m mask\u001b[33m:\u001b[39m [page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-ticker], .marquee, [aria-roledescription=\"carousel\"]'\u001b[39m)] })\n \u001b[90m    |\u001b[39m     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m   })\n \u001b[90m 21 |\u001b[39m }\n \u001b[90m 22 |\u001b[39m\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs",
+                        "column": 5,
+                        "line": 19
+                      },
+                      "message": "Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/chromium-desktop/accueil.png, writing actual.\n\n  17 |     const name = (route === '/' ? 'accueil' : route.slice(1).replace(/\\//g, '-')) + '.png'\n  18 |     // zones qui bougent d'elles-mêmes (bandeau défilant, carrousel) masquées\n> 19 |     await expect(page).toHaveScreenshot(name, { fullPage: false, mask: [page.locator('[data-ticker], .marquee, [aria-roledescription=\"carousel\"]')] })\n     |     ^\n  20 |   })\n  21 | }\n  22 |\n    at /home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs:19:5"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:49.887Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "accueil-expected.png",
+                      "contentType": "image/png",
+                      "path": "/home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/chromium-desktop/accueil.png"
+                    },
+                    {
+                      "name": "accueil-actual.png",
+                      "contentType": "image/png",
+                      "path": "/home/runner/work/Statfoot-/Statfoot-/test-results/visual-capture--chromium-desktop/accueil-actual.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/runner/work/Statfoot-/Statfoot-/test-results/visual-capture--chromium-desktop/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs",
+                    "column": 5,
+                    "line": 19
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-a095f3ddf80e8bdc4b2f",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /classement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2424,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:53.601Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-d6e80dec770150a2eab1",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /pre-saison",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2140,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:56.169Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-c88738bfd17fe312cf7f",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /equipes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2210,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:02:58.322Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-6372a94615986cfe47ce",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /joueurs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2103,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:00.543Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-4978f5691efd953df024",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /trophees",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2050,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:02.662Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-3fb317beb29cf184465c",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /badges",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2042,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:04.727Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-5e2749a8ef8ff3a7f208",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /glossaire",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-desktop",
+              "projectName": "chromium-desktop",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2059,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:06.781Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-8ffbe4de8c8563a5bc9b",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 1,
+                  "status": "failed",
+                  "duration": 8456,
+                  "error": {
+                    "message": "Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/webkit-iphone/accueil.png, writing actual.",
+                    "stack": "Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/webkit-iphone/accueil.png, writing actual.\n    at /home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs:19:5",
+                    "location": {
+                      "file": "/home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs",
+                      "column": 5,
+                      "line": 19
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 17 |\u001b[39m     \u001b[36mconst\u001b[39m name \u001b[33m=\u001b[39m (route \u001b[33m===\u001b[39m \u001b[32m'/'\u001b[39m \u001b[33m?\u001b[39m \u001b[32m'accueil'\u001b[39m \u001b[33m:\u001b[39m route\u001b[33m.\u001b[39mslice(\u001b[35m1\u001b[39m)\u001b[33m.\u001b[39mreplace(\u001b[35m/\\//g\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'-'\u001b[39m)) \u001b[33m+\u001b[39m \u001b[32m'.png'\u001b[39m\n \u001b[90m 18 |\u001b[39m     \u001b[90m// zones qui bougent d'elles-mêmes (bandeau défilant, carrousel) masquées\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveScreenshot(name\u001b[33m,\u001b[39m { fullPage\u001b[33m:\u001b[39m \u001b[36mfalse\u001b[39m\u001b[33m,\u001b[39m mask\u001b[33m:\u001b[39m [page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-ticker], .marquee, [aria-roledescription=\"carousel\"]'\u001b[39m)] })\n \u001b[90m    |\u001b[39m     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m   })\n \u001b[90m 21 |\u001b[39m }\n \u001b[90m 22 |\u001b[39m\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs",
+                        "column": 5,
+                        "line": 19
+                      },
+                      "message": "Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/webkit-iphone/accueil.png, writing actual.\n\n  17 |     const name = (route === '/' ? 'accueil' : route.slice(1).replace(/\\//g, '-')) + '.png'\n  18 |     // zones qui bougent d'elles-mêmes (bandeau défilant, carrousel) masquées\n> 19 |     await expect(page).toHaveScreenshot(name, { fullPage: false, mask: [page.locator('[data-ticker], .marquee, [aria-roledescription=\"carousel\"]')] })\n     |     ^\n  20 |   })\n  21 | }\n  22 |\n    at /home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs:19:5"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:28.238Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "accueil-expected.png",
+                      "contentType": "image/png",
+                      "path": "/home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/webkit-iphone/accueil.png"
+                    },
+                    {
+                      "name": "accueil-actual.png",
+                      "contentType": "image/png",
+                      "path": "/home/runner/work/Statfoot-/Statfoot-/test-results/visual-capture--webkit-iphone/accueil-actual.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/runner/work/Statfoot-/Statfoot-/test-results/visual-capture--webkit-iphone/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs",
+                    "column": 5,
+                    "line": 19
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-5c26758a12299c80f5e1",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /classement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 8,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2959,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:37.687Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-66629e1344b6571475fb",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /pre-saison",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 8,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2780,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:40.799Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-56254d759e1635df83cd",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /equipes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "capture instable sur WebKit (reflets animés des cartes)",
+                  "location": {
+                    "file": "/home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs",
+                    "line": 9,
+                    "column": 10
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 8,
+                  "parallelIndex": 1,
+                  "status": "skipped",
+                  "duration": 363,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:43.596Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "capture instable sur WebKit (reflets animés des cartes)",
+                      "location": {
+                        "file": "/home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs",
+                        "line": 9,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-597776d136b5e8279d11",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /joueurs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 8,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 3905,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:43.979Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-6324d418fbbc572d0768",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /trophees",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 8,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 4669,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:47.921Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-438a90becfe5b949e5f4",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /badges",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 8,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 3204,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:52.633Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-2cbb1fd7d39f67309183",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /glossaire",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-iphone",
+              "projectName": "webkit-iphone",
+              "results": [
+                {
+                  "workerIndex": 8,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2876,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:03:55.854Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-7c6b079a16eed3dd24ca",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 10,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 7551,
+                  "error": {
+                    "message": "Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/webkit-ipad/accueil.png, writing actual.",
+                    "stack": "Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/webkit-ipad/accueil.png, writing actual.\n    at /home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs:19:5",
+                    "location": {
+                      "file": "/home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs",
+                      "column": 5,
+                      "line": 19
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 17 |\u001b[39m     \u001b[36mconst\u001b[39m name \u001b[33m=\u001b[39m (route \u001b[33m===\u001b[39m \u001b[32m'/'\u001b[39m \u001b[33m?\u001b[39m \u001b[32m'accueil'\u001b[39m \u001b[33m:\u001b[39m route\u001b[33m.\u001b[39mslice(\u001b[35m1\u001b[39m)\u001b[33m.\u001b[39mreplace(\u001b[35m/\\//g\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'-'\u001b[39m)) \u001b[33m+\u001b[39m \u001b[32m'.png'\u001b[39m\n \u001b[90m 18 |\u001b[39m     \u001b[90m// zones qui bougent d'elles-mêmes (bandeau défilant, carrousel) masquées\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveScreenshot(name\u001b[33m,\u001b[39m { fullPage\u001b[33m:\u001b[39m \u001b[36mfalse\u001b[39m\u001b[33m,\u001b[39m mask\u001b[33m:\u001b[39m [page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-ticker], .marquee, [aria-roledescription=\"carousel\"]'\u001b[39m)] })\n \u001b[90m    |\u001b[39m     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m   })\n \u001b[90m 21 |\u001b[39m }\n \u001b[90m 22 |\u001b[39m\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs",
+                        "column": 5,
+                        "line": 19
+                      },
+                      "message": "Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/webkit-ipad/accueil.png, writing actual.\n\n  17 |     const name = (route === '/' ? 'accueil' : route.slice(1).replace(/\\//g, '-')) + '.png'\n  18 |     // zones qui bougent d'elles-mêmes (bandeau défilant, carrousel) masquées\n> 19 |     await expect(page).toHaveScreenshot(name, { fullPage: false, mask: [page.locator('[data-ticker], .marquee, [aria-roledescription=\"carousel\"]')] })\n     |     ^\n  20 |   })\n  21 | }\n  22 |\n    at /home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs:19:5"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:21.338Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "accueil-expected.png",
+                      "contentType": "image/png",
+                      "path": "/home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/webkit-ipad/accueil.png"
+                    },
+                    {
+                      "name": "accueil-actual.png",
+                      "contentType": "image/png",
+                      "path": "/home/runner/work/Statfoot-/Statfoot-/test-results/visual-capture--webkit-ipad/accueil-actual.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/runner/work/Statfoot-/Statfoot-/test-results/visual-capture--webkit-ipad/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs",
+                    "column": 5,
+                    "line": 19
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-43c68b910dcb03ee176e",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /classement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 11,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3243,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:30.065Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-a63df21466f7be2fa60e",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /pre-saison",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 11,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3127,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:33.480Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-e2dd2426330c04557028",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /equipes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "capture instable sur WebKit (reflets animés des cartes)",
+                  "location": {
+                    "file": "/home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs",
+                    "line": 9,
+                    "column": 10
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 11,
+                  "parallelIndex": 0,
+                  "status": "skipped",
+                  "duration": 278,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:36.622Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "capture instable sur WebKit (reflets animés des cartes)",
+                      "location": {
+                        "file": "/home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs",
+                        "line": 9,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-baf9068821e9e8894dae",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /joueurs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 11,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3259,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:36.918Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-524d0cbb320e376c66d0",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /trophees",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 11,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4292,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:40.197Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-d0a7aaf22ba8f3c89a62",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /badges",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 11,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3633,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:44.510Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-54f2d5af239ea21baddb",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /glossaire",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-ipad",
+              "projectName": "webkit-ipad",
+              "results": [
+                {
+                  "workerIndex": 11,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3479,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:04:48.172Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-31f12072bce50db6d7b7",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 13,
+                  "parallelIndex": 1,
+                  "status": "failed",
+                  "duration": 4006,
+                  "error": {
+                    "message": "Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/firefox-desktop/accueil.png, writing actual.",
+                    "stack": "Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/firefox-desktop/accueil.png, writing actual.\n    at /home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs:19:5",
+                    "location": {
+                      "file": "/home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs",
+                      "column": 5,
+                      "line": 19
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 17 |\u001b[39m     \u001b[36mconst\u001b[39m name \u001b[33m=\u001b[39m (route \u001b[33m===\u001b[39m \u001b[32m'/'\u001b[39m \u001b[33m?\u001b[39m \u001b[32m'accueil'\u001b[39m \u001b[33m:\u001b[39m route\u001b[33m.\u001b[39mslice(\u001b[35m1\u001b[39m)\u001b[33m.\u001b[39mreplace(\u001b[35m/\\//g\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'-'\u001b[39m)) \u001b[33m+\u001b[39m \u001b[32m'.png'\u001b[39m\n \u001b[90m 18 |\u001b[39m     \u001b[90m// zones qui bougent d'elles-mêmes (bandeau défilant, carrousel) masquées\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveScreenshot(name\u001b[33m,\u001b[39m { fullPage\u001b[33m:\u001b[39m \u001b[36mfalse\u001b[39m\u001b[33m,\u001b[39m mask\u001b[33m:\u001b[39m [page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-ticker], .marquee, [aria-roledescription=\"carousel\"]'\u001b[39m)] })\n \u001b[90m    |\u001b[39m     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m   })\n \u001b[90m 21 |\u001b[39m }\n \u001b[90m 22 |\u001b[39m\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs",
+                        "column": 5,
+                        "line": 19
+                      },
+                      "message": "Error: A snapshot doesn't exist at /home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/firefox-desktop/accueil.png, writing actual.\n\n  17 |     const name = (route === '/' ? 'accueil' : route.slice(1).replace(/\\//g, '-')) + '.png'\n  18 |     // zones qui bougent d'elles-mêmes (bandeau défilant, carrousel) masquées\n> 19 |     await expect(page).toHaveScreenshot(name, { fullPage: false, mask: [page.locator('[data-ticker], .marquee, [aria-roledescription=\"carousel\"]')] })\n     |     ^\n  20 |   })\n  21 | }\n  22 |\n    at /home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs:19:5"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:10.405Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "accueil-expected.png",
+                      "contentType": "image/png",
+                      "path": "/home/runner/work/Statfoot-/Statfoot-/e2e/__screenshots__/firefox-desktop/accueil.png"
+                    },
+                    {
+                      "name": "accueil-actual.png",
+                      "contentType": "image/png",
+                      "path": "/home/runner/work/Statfoot-/Statfoot-/test-results/visual-capture--firefox-desktop/accueil-actual.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/runner/work/Statfoot-/Statfoot-/test-results/visual-capture--firefox-desktop/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/runner/work/Statfoot-/Statfoot-/e2e/visual.spec.mjs",
+                    "column": 5,
+                    "line": 19
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-c363ddfa8a6abf3bdaac",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /classement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 14,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 3314,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:16.105Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-1d4c9198532ab91290a6",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /pre-saison",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 14,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2216,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:20.076Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-bdd355aa893736ec9f9c",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /equipes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 14,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2391,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:22.306Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-b046d0581d01bb81a6ed",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /joueurs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 14,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2453,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:24.711Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-f7b339ae863d60837ae1",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /trophees",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 14,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2298,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:27.190Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-7bdb78d50d272dcbb818",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /badges",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 14,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2521,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:29.508Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-f49d0c0b636a9aa718d6",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        },
+        {
+          "title": "capture /glossaire",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox-desktop",
+              "projectName": "firefox-desktop",
+              "results": [
+                {
+                  "workerIndex": 14,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2480,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T11:05:32.046Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a9e8504622c1797aedfc-f2b8e4b1392a692e6cf8",
+          "file": "visual.spec.mjs",
+          "line": 7,
+          "column": 3
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-16T11:02:10.790Z",
+    "duration": 210803.456,
+    "expected": 128,
+    "skipped": 2,
+    "unexpected": 5,
+    "flaky": 0
+  }
+}

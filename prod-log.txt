@@ -1,0 +1,22 @@
+telephone   /                  contenu affiché en 2.7 s · instantané oui · aucune erreur
+telephone   /matchs            contenu affiché en 0.9 s · instantané oui · aucune erreur
+telephone   /pre-saison        contenu affiché en 0.5 s · instantané oui · aucune erreur
+telephone   /classement        contenu affiché en 0.5 s · instantané oui · aucune erreur
+telephone   /equipes           contenu affiché en 0.7 s · instantané oui · aucune erreur
+telephone   /joueurs           contenu affiché en 0.8 s · instantané oui · aucune erreur
+telephone   /matchs/m26_ps01   contenu affiché en 0.6 s · instantané oui · aucune erreur
+tablette    /                  contenu affiché en 1.1 s · instantané oui · aucune erreur
+tablette    /matchs            contenu affiché en 0.6 s · instantané oui · aucune erreur
+tablette    /pre-saison        contenu affiché en 0.4 s · instantané oui · aucune erreur
+tablette    /classement        contenu affiché en 0.8 s · instantané oui · aucune erreur
+tablette    /equipes           contenu affiché en 0.5 s · instantané oui · aucune erreur
+tablette    /joueurs           contenu affiché en 0.8 s · instantané oui · aucune erreur
+tablette    /matchs/m26_ps01   contenu affiché en 0.8 s · instantané oui · aucune erreur
+ordinateur  /                  contenu affiché en 0.8 s · instantané oui · aucune erreur
+ordinateur  /matchs            contenu affiché en 0.3 s · instantané oui · aucune erreur
+ordinateur  /pre-saison        contenu affiché en 0.5 s · instantané oui · aucune erreur
+ordinateur  /classement        contenu affiché en 0.6 s · instantané oui · aucune erreur
+ordinateur  /equipes           contenu affiché en 0.6 s · instantané oui · aucune erreur
+ordinateur  /joueurs           contenu affiché en 0.6 s · instantané oui · aucune erreur
+ordinateur  /matchs/m26_ps01   contenu affiché en 0.5 s · instantané oui · aucune erreur
+exit=0

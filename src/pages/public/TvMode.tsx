@@ -7,7 +7,7 @@ import { SimBanner } from '@/components/sim/SimBanner'
 import { ForfeitBadge } from '@/components/match/ForfeitBadge'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Maximize, Pause, Play, RotateCw, X } from 'lucide-react'
+import { Maximize, Minimize, Pause, Play, RotateCw, X } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
 import { useNow } from '@/hooks/useNow'
 import { TeamLogo } from '@/components/league/Identity'
@@ -42,6 +42,22 @@ export default function TvMode() {
 
   const [selected, setSelected] = useState<string | null>(null)
   const [rotate, setRotate] = useState(readPref)
+  // plein écran : API standard ou préfixée (Safari iPad / Mac) ; sur iPhone (pas d'API pour une page) → mode immersif
+  const rootRef = useRef<HTMLDivElement>(null)
+  const [immersive, setImmersive] = useState(false)
+  type FsDoc = Document & { webkitFullscreenElement?: Element | null; webkitExitFullscreen?: () => Promise<void> | void; webkitFullscreenEnabled?: boolean }
+  type FsEl = HTMLElement & { webkitRequestFullscreen?: () => Promise<void> | void }
+  const toggleFull = useCallback(async () => {
+    const d = document as FsDoc, el = (rootRef.current ?? document.documentElement) as FsEl
+    const inFs = !!(d.fullscreenElement || d.webkitFullscreenElement)
+    try {
+      if (inFs) { await (d.exitFullscreen?.() ?? d.webkitExitFullscreen?.()); return }
+      if (immersive) { setImmersive(false); return }
+      if (d.fullscreenEnabled && el.requestFullscreen) { await el.requestFullscreen(); return }
+      if (d.webkitFullscreenEnabled && el.webkitRequestFullscreen) { await el.webkitRequestFullscreen(); return }
+    } catch { /* refusé par le navigateur : mode immersif */ }
+    setImmersive((v) => !v)
+  }, [immersive])
   const [cycle, setCycle] = useState(0) // relance la barre de progression
   const multi = matches.length > 1
   const current = matches.find((m) => m.id === selected) ?? matches[0]
@@ -70,28 +86,29 @@ export default function TvMode() {
   const pitchName = terrain && terrain !== 'tous' ? db.Match.find((x) => pitchSlug(x.pitch) === terrain)?.pitch ?? terrain : 'Tous les terrains'
   const url = `${location.origin}/live/${terrain ?? 'tous'}`
   return (
-    <div className="tv fixed inset-0 z-50 flex flex-col overflow-y-auto text-white sm:overflow-hidden" style={{ background: 'radial-gradient(ellipse 50% 45% at 8% 0%, rgba(160,210,255,.16), transparent 70%), radial-gradient(ellipse 50% 45% at 92% 0%, rgba(160,210,255,.13), transparent 70%), #020B22' }}>
+    <div ref={rootRef} className="tv fixed inset-0 z-50 flex flex-col overflow-y-auto text-white sm:overflow-hidden [@media(max-height:520px)]:!overflow-y-auto" style={{ background: 'radial-gradient(ellipse 50% 45% at 8% 0%, rgba(160,210,255,.16), transparent 70%), radial-gradient(ellipse 50% 45% at 92% 0%, rgba(160,210,255,.13), transparent 70%), #020B22' }}>
       <SimBanner compact />
       {/* barre du haut */}
-      <header className="flex items-center gap-4 px-[2vw] pt-[1.6vh]">
+      {!immersive && <header className="flex items-center gap-4 px-[2vw] pt-[1.6vh] [@media(max-height:520px)]:gap-2 [@media(max-height:520px)]:pt-1">
         <Logo subtitle={settings.league_name} />
         <div className="title-caps ml-auto hidden text-[clamp(1.1rem,2.2vw,2.6rem)] text-neon sm:block">{pitchName}</div>
         <div className="num ml-auto text-[clamp(1.1rem,2.2vw,2.6rem)] text-white/80 sm:ml-0" aria-label="Heure">{fmtTime(new Date(now).toISOString())}</div>
         <div className="flex items-center gap-1">
-          <button className="hidden cursor-pointer rounded-lg p-2 hover:bg-white/10 sm:block" onClick={() => document.documentElement.requestFullscreen?.()} title="Plein écran"><Maximize /></button>
-          <Link to="/" className="rounded-lg p-2 hover:bg-white/10" title="Quitter"><X /></Link>
+          <button className="tap cursor-pointer rounded-lg p-2 hover:bg-white/10" onClick={toggleFull} title="Plein écran" aria-label="Plein écran"><Maximize /></button>
+          <Link to="/" className="tap rounded-lg p-2 hover:bg-white/10" title="Quitter" aria-label="Quitter le mode TV"><X /></Link>
         </div>
-      </header>
+      </header>}
+      {immersive && <button onClick={toggleFull} className="tap fixed right-2 top-2 z-[60] cursor-pointer rounded-full bg-black/50 p-2 text-white/80 hover:text-white" aria-label="Quitter le plein écran"><Minimize /></button>}
 
       {/* onglets : un par match en cours */}
-      {multi && (
-        <nav className="mt-[1.4vh] flex flex-wrap items-stretch gap-2 px-[2vw]" aria-label="Matchs en cours">
-          <div className="scrollbar-none -mx-1 flex min-w-0 flex-1 gap-2 overflow-x-auto px-1 sm:flex-wrap" role="tablist">
+      {multi && !immersive && (
+        <nav className="mt-[1.4vh] flex flex-wrap items-stretch gap-2 px-[2vw] [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:flex-nowrap" aria-label="Matchs en cours">
+          <div className="scrollbar-none -mx-1 flex min-w-0 flex-1 gap-2 overflow-x-auto px-1 sm:flex-wrap [@media(max-height:520px)]:!flex-nowrap" role="tablist">
             {matches.map((m) => <MatchTab key={m.id} m={m} active={m.id === current?.id} onClick={() => pick(m.id)} />)}
           </div>
           <button onClick={toggleRotate} aria-pressed={rotate} className={cn('relative flex cursor-pointer items-center gap-2 overflow-hidden rounded-xl border px-4 font-display text-[clamp(.9rem,1.2vw,1.4rem)] font-bold uppercase', rotate ? 'border-neon/60 bg-neon/15 text-white' : 'border-white/15 bg-white/5 text-white/70')}>
             {rotate ? <Pause className="size-5" /> : <Play className="size-5" />}<RotateCw className="size-5" />
-            <span>Rotation {rotate ? '20 s' : 'désactivée'}</span>
+            <span className="[@media(max-height:520px)]:hidden">Rotation {rotate ? '20 s' : 'désactivée'}</span>
             {rotate && <span key={`${cycle}-${current?.id}`} className="tv-progress absolute inset-x-0 bottom-0 h-1 origin-left bg-neon" style={{ animationDuration: `${ROTATE_MS}ms` }} />}
           </button>
         </nav>
@@ -103,10 +120,10 @@ export default function TvMode() {
         </div>
       )}
 
-      <footer className="flex items-end justify-between gap-4 px-[2vw] pb-[1.6vh]">
+      {!immersive && <footer className="flex items-end justify-between gap-4 px-[2vw] pb-[1.6vh] [@media(max-height:520px)]:hidden">
         <p className="hidden text-[clamp(.8rem,1vw,1.1rem)] text-white/50 lg:block">{multi ? '← → changer de match · R rotation' : ''}</p>
         <div className="ml-auto hidden shrink-0 items-center gap-3 rounded-2xl bg-white p-1.5 sm:flex"><QrCode value={url} size={72} /><div className="pr-2 text-xs font-bold uppercase text-night-950">Suivez<br />en direct</div></div>
-      </footer>
+      </footer>}
     </div>
   )
 }
@@ -148,7 +165,7 @@ function Board({ m, now }: { m: Match; now: number }) {
   const d = durationsFor(m, comp)
   const inf = live && ls && isPlaying(ls.period) ? inferiorityAt(m, events, (ls.period === '2H' ? d.half * 60_000 : 0) + elapsedMs(ls, now), d.half) : []
   return (
-    <main className="relative flex flex-1 flex-col items-center px-[2vw] py-[1vh] [justify-content:safe_center] sm:min-h-0 sm:overflow-hidden">
+    <main className="relative flex flex-1 flex-col items-center px-[2vw] py-[1vh] [justify-content:safe_center] sm:min-h-0 sm:overflow-hidden [@media(max-height:520px)]:!overflow-visible">
       <div className="mb-[1vh] text-center font-display text-[clamp(.95rem,min(1.6vw,2.8vh),2rem)] font-bold uppercase tracking-[.2em] text-white/70">{m.number ? `${m.number} · ` : ''}{comp?.name}{m.round ? ` · Journée ${m.round}` : ''}{m.pitch ? ` · ${m.pitch}` : ''}</div>
       <div className="grid w-full max-w-[92vw] grid-cols-[1fr_auto_1fr] items-center gap-[2vw]">
         <TeamSide team={h} />
@@ -186,7 +203,7 @@ function Board({ m, now }: { m: Match; now: number }) {
 function TeamSide({ team }: { team?: Team }) {
   return (
     <div className="flex min-w-0 flex-col items-center gap-[1.2vh] text-center">
-      <div className="aspect-square w-[clamp(3.5rem,min(11vw,15vh),13rem)]"><TeamLogo team={team} size={220} className="!size-full" /></div>
+      <div className="aspect-square w-[clamp(3.5rem,min(11vw,15vh),13rem)]"><TeamLogo team={team} size={220} fluid /></div>
       <div className="title-caps line-clamp-2 max-w-full text-[clamp(1.3rem,min(3vw,5vh),3.8rem)] leading-[.95]">{team?.name}</div>
     </div>
   )
@@ -263,7 +280,7 @@ function GoalFlash({ team }: { team?: Team }) {
   return (
     <div className="tv-goal pointer-events-none fixed inset-0 z-10 flex items-center justify-center" role="status">
       <div className="flex items-center gap-[2vw] rounded-[3vw] px-[4vw] py-[2vh] shadow-2xl" style={{ background: `linear-gradient(135deg, ${team?.primary_color ?? '#F85A00'}, #04163D)` }}>
-        <div className="aspect-square w-[clamp(4rem,10vw,12rem)]"><TeamLogo team={team} size={160} className="!size-full" /></div>
+        <div className="aspect-square w-[clamp(4rem,10vw,12rem)]"><TeamLogo team={team} size={160} fluid /></div>
         <div className="title-caps text-[clamp(4rem,12vw,14rem)] leading-none">But !</div>
       </div>
     </div>

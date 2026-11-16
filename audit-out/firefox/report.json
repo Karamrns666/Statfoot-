@@ -1,0 +1,2602 @@
+[
+ {
+  "vp": "360x800",
+  "r": "/",
+  "iss": [
+   "cibles trop petites: 33 ex. button «Logo de la ligue» 24×44 | button «Saison 2026-2027» 24×44 | button «Mettre en pause» 34×34 | a «Calendrier» 108×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/matchs",
+  "iss": [
+   "cibles trop petites: 1 ex. button «Ajouter les 10 prochains» 313×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/matchs/m26_ps01",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Matchs» 90×32 | button «Ajouter à mon agenda» 174×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/matchs/m25_1",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Matchs» 90×32 | button «Partager» 100×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/classement",
+  "iss": [
+   "cibles trop petites: 22 ex. button «PDF» 72×32 | a «Distra» 154×24 | a «BMCI» 154×24 | a «Crédit Agricole» 154×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/equipes/t26_arw",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Télécharger la carte» 224×32 | button «Partager» 224×32 | a «Arrow ECS» 242×28 | button «Trier» 27×36"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/joueurs",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Lire l’article 17.2 du r» 63×32 | a «Lire l’article 11.5 du r» 62×32 | a «Lire l’article 19 du règ» 54×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/statistiques",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Discipline» 91×26"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/reglement",
+  "iss": [
+   "cibles trop petites: 1 ex. select «Historique des versions» 305×29"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/discipline",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Lire l’article 11.5 du r» 62×32 | a «Lire l’article 11.6 du r» 62×32 | a «Lire l’article 19 du règ» 54×32 | a «Lire l’article 19.9 du r» 65×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/glossaire",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Voir qui a débloqué chaq» 227×20"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/media",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Tout» 65×34 | button «Photo» 95×34 | button «Vidéo» 92×34 | button «Lien» 82×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin",
+  "iss": [
+   "cibles trop petites: 5 ex. button «Menu» 36×44 | a «Compétition» 122×32 | a «Équipe» 89×32 | a «Joueur» 90×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/match-center",
+  "iss": [
+   "cibles trop petites: 7 ex. button «Menu» 36×44 | button «Tous» 57×34 | button «Phase de ligue» 105×34 | button «MASTER» 71×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/matchs",
+  "iss": [
+   "cibles trop petites: 1 ex. button «Menu» 36×44"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/saisons",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Menu» 36×44 | button «Clôturer» 98×32 | button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/competitions",
+  "iss": [
+   "cibles trop petites: 3 ex. button «Menu» 36×44 | button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/divisions",
+  "iss": [
+   "cibles trop petites: 5 ex. button «Menu» 36×44 | button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/pre-saison",
+  "iss": [
+   "cibles trop petites: 23 ex. button «Menu» 36×44 | button «Tirage au sort Ardentia » 217×32 | a «Distra» 135×26 | a «BMCI» 135×26"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/planning",
+  "iss": [
+   "cibles trop petites: 5 ex. button «Menu» 36×44 | button «Lundi 16 novembre» 150×34 | button «Mardi 17 novembre» 149×34 | button «Jeudi 19 novembre» 149×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/tirage",
+  "iss": [
+   "cibles trop petites: 1 ex. button «Menu» 36×44"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/groupes",
+  "iss": [
+   "cibles trop petites: 22 ex. button «Menu» 36×44 | select «Affecter» 30×17"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/equipes",
+  "iss": [
+   "cibles trop petites: 85 ex. button «Menu» 36×44 | button «Nouvelle» 98×32 | button «Photos & poster» 141×32 | button «Modifier» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/joueurs",
+  "iss": [
+   "cibles trop petites: 3 ex. button «Menu» 36×44 | button «Liste» 28×28 | button «Trombinoscope» 28×28"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/import",
+  "iss": [
+   "cibles trop petites: 1 ex. button «Menu» 36×44"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/discipline",
+  "iss": [
+   "cibles trop petites: 5 ex. button «Menu» 36×44 | a «Lire l’article 11.6 du r» 62×32 | a «Lire l’article 19.9 du r» 65×32 | a «Lire l’article 17.7 du r» 62×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/arbitres",
+  "iss": [
+   "cibles trop petites: 1 ex. button «Menu» 36×44"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/ajustements-classement",
+  "iss": [
+   "cibles trop petites: 1 ex. button «Menu» 36×44"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/visuels",
+  "iss": [
+   "cibles trop petites: 1 ex. button «Menu» 36×44"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/visuels-semaine",
+  "iss": [
+   "cibles trop petites: 1 ex. button «Menu» 36×44"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/xp",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Menu» 36×44 | button «Désigner le but du mois» 157×32 | button «Désigner le joueur du mo» 175×32 | button «Désigner l'équipe du moi» 170×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/trophees",
+  "iss": [
+   "cibles trop petites: 1 ex. button «Menu» 36×44"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/equipe-type",
+  "iss": [
+   "cibles trop petites: 1 ex. button «Menu» 36×44"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/capitaines",
+  "iss": [
+   "cibles trop petites: 3 ex. button «Menu» 36×44 | button «Enregistrer» 112×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/statistiques",
+  "iss": [
+   "cibles trop petites: 3 ex. button «Menu» 36×44 | button «Export CSV» 114×32 | button «Trier» 32×36"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/medias",
+  "iss": [
+   "cibles trop petites: 1 ex. button «Menu» 36×44"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/reglement",
+  "iss": [
+   "cibles trop petites: 7 ex. button «Menu» 36×44 | button «v11 · en vigueur» 125×34 | button «v9» 42×34 | button «v4» 42×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/diffusion",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Menu» 36×44 | a «Ouvrir le mode TV» 148×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/journal",
+  "iss": [
+   "cibles trop petites: 3 ex. button «Menu» 36×44 | summary «JSON» 48×16"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/administrateurs",
+  "iss": [
+   "cibles trop petites: 7 ex. button «Menu» 36×44 | button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/parametres",
+  "iss": [
+   "cibles trop petites: 5 ex. button «Menu» 36×44 | button «» 44×24 | a «Lire l’article 17.2 du r» 63×32 | a «Lire l’article 17.3 du r» 63×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/match-center/m26_ps01",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Menu» 36×44 | a «Programme» 114×32 | a «Public» 83×32 | a «Feuille» 85×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/feuille/m26_ps01",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Menu» 36×44 | a «Matchs» 90×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "360x800",
+  "r": "/admin/matchs/m26_ps01/feuille",
+  "iss": [
+   "cibles trop petites: 23 ex. button «Menu» 36×44 | input «» 64×32 | button «Effacer» 24×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/",
+  "iss": [
+   "cibles trop petites: 33 ex. button «Affiche de la saison» 24×44 | button «Saison 2026-2027» 24×44 | button «Mettre en pause» 34×34 | a «Calendrier» 108×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/matchs",
+  "iss": [
+   "cibles trop petites: 1 ex. button «Ajouter les 10 prochains» 313×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/matchs/m26_ps01",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Matchs» 90×32 | button «Ajouter à mon agenda» 174×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/matchs/m25_1",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Matchs» 90×32 | button «Partager» 100×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/classement",
+  "iss": [
+   "cibles trop petites: 22 ex. button «PDF» 72×32 | a «Distra» 594×24 | a «BMCI» 594×24 | a «Crédit Agricole» 594×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/pre-saison",
+  "iss": [
+   "cibles trop petites: 19 ex. a «Distra» 72×24 | a «vs» 64×32 | a «BMCI» 67×24 | a «Pharmaprom» 118×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/equipes/t26_arw",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Télécharger la carte» 224×32 | button «Partager» 224×32 | a «Arrow ECS» 490×28 | button «Trier» 33×36"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/joueurs",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Lire l’article 17.2 du r» 63×32 | a «Lire l’article 11.5 du r» 62×32 | a «Lire l’article 19 du règ» 54×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/statistiques",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Discipline» 91×26"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/reglement",
+  "iss": [
+   "cibles trop petites: 1 ex. select «Historique des versions» 305×29"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/discipline",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Lire l’article 11.5 du r» 62×32 | a «Lire l’article 11.6 du r» 62×32 | a «Lire l’article 19 du règ» 54×32 | a «Lire l’article 19.9 du r» 65×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/glossaire",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Voir qui a débloqué chaq» 227×20"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/media",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Tout» 65×34 | button «Photo» 95×34 | button «Vidéo» 92×34 | button «Lien» 82×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Compétition» 122×32 | a «Équipe» 89×32 | a «Joueur» 90×32 | a «Match» 84×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/match-center",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Tous» 57×34 | button «Phase de ligue» 105×34 | button «MASTER» 71×34 | button «CHALLENGER» 91×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/saisons",
+  "iss": [
+   "cibles trop petites: 5 ex. button «Clôturer» 98×32 | button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/competitions",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/divisions",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/pre-saison",
+  "iss": [
+   "cibles trop petites: 22 ex. button «Tirage au sort Ardentia » 217×32 | a «Distra» 168×26 | a «BMCI» 168×26 | a «Crédit Agricole» 168×26"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/planning",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Lundi 16 novembre» 150×34 | button «Mardi 17 novembre» 149×34 | button «Jeudi 19 novembre» 149×34 | button «Ajouter» 90×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/groupes",
+  "iss": [
+   "cibles trop petites: 21 ex. select «Affecter» 30×17"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/equipes",
+  "iss": [
+   "cibles trop petites: 105 ex. button «Nouvelle» 98×32 | button «Ancienneté Silver, 1 sai» 111×22 | button «Photos & poster» 141×32 | button «Modifier» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/joueurs",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Liste» 28×28 | button «Trombinoscope» 28×28"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/discipline",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Lire l’article 11.6 du r» 62×32 | a «Lire l’article 19.9 du r» 65×32 | a «Lire l’article 17.7 du r» 62×32 | button «Nouveau PV» 116×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/xp",
+  "iss": [
+   "cibles trop petites: 3 ex. button «Désigner le but du mois» 157×32 | button «Désigner le joueur du mo» 175×32 | button «Désigner l'équipe du moi» 170×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/capitaines",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Enregistrer» 112×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/statistiques",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Export CSV» 114×32 | button «Trier» 33×36"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/reglement",
+  "iss": [
+   "cibles trop petites: 6 ex. button «v11 · en vigueur» 125×34 | button «v9» 42×34 | button «v4» 42×34 | button «v3» 42×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/diffusion",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Ouvrir le mode TV» 148×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/journal",
+  "iss": [
+   "cibles trop petites: 2 ex. summary «JSON» 49×16"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/administrateurs",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/parametres",
+  "iss": [
+   "cibles trop petites: 4 ex. button «» 44×24 | a «Lire l’article 17.2 du r» 63×32 | a «Lire l’article 17.3 du r» 63×32 | button «Enregistrer les raretés» 710×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/match-center/m26_ps01",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Programme» 114×32 | a «Public» 83×32 | a «Feuille» 85×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/feuille/m26_ps01",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Matchs» 90×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "800x360",
+  "r": "/admin/matchs/m26_ps01/feuille",
+  "iss": [
+   "cibles trop petites: 22 ex. input «» 64×32 | button «Effacer» 24×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/",
+  "iss": [
+   "cibles trop petites: 33 ex. button «Affiche de la saison» 24×44 | button «Saison 2026-2027» 24×44 | button «Mettre en pause» 34×34 | a «Calendrier» 108×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/matchs",
+  "iss": [
+   "cibles trop petites: 1 ex. button «Ajouter les 10 prochains» 313×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/matchs/m26_ps01",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Matchs» 90×32 | button «Ajouter à mon agenda» 174×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/matchs/m25_1",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Matchs» 90×32 | button «Partager» 100×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/classement",
+  "iss": [
+   "cibles trop petites: 22 ex. button «PDF» 72×32 | a «Distra» 184×24 | a «BMCI» 184×24 | a «Crédit Agricole» 184×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/equipes/t26_arw",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Télécharger la carte» 224×32 | button «Partager» 224×32 | a «Arrow ECS» 272×28 | button «Trier» 27×36"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/joueurs",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Cartes» 92×32 | button «Classement» 127×32 | button «Top 25 IPG» 116×32 | a «Lire l’article 17.2 du r» 63×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/joueurs?vue=ipg",
+  "iss": [
+   "cibles trop petites: 3 ex. button «Cartes» 92×32 | button «Classement» 127×32 | button «Top 25 IPG» 116×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/statistiques",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Discipline» 91×26"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/reglement",
+  "iss": [
+   "cibles trop petites: 1 ex. select «Historique des versions» 305×29"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/discipline",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Lire l’article 11.5 du r» 62×32 | a «Lire l’article 11.6 du r» 62×32 | a «Lire l’article 19 du règ» 54×32 | a «Lire l’article 19.9 du r» 65×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/glossaire",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Voir qui a débloqué chaq» 227×20"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/media",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Tout» 65×34 | button «Photo» 95×34 | button «Vidéo» 92×34 | button «Lien» 82×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Compétition» 122×32 | a «Équipe» 89×32 | a «Joueur» 90×32 | a «Match» 84×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/match-center",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Tous» 57×34 | button «Phase de ligue» 105×34 | button «MASTER» 71×34 | button «CHALLENGER» 91×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/saisons",
+  "iss": [
+   "cibles trop petites: 5 ex. button «Clôturer» 98×32 | button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/competitions",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/divisions",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/pre-saison",
+  "iss": [
+   "cibles trop petites: 22 ex. button «Tirage au sort Ardentia » 217×32 | a «Distra» 135×26 | a «BMCI» 135×26 | a «Crédit Agricole» 135×26"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/planning",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Lundi 16 novembre» 150×34 | button «Mardi 17 novembre» 149×34 | button «Jeudi 19 novembre» 149×34 | button «Ajouter» 90×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/groupes",
+  "iss": [
+   "cibles trop petites: 21 ex. select «Affecter» 30×17"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/equipes",
+  "iss": [
+   "cibles trop petites: 84 ex. button «Nouvelle» 98×32 | button «Photos & poster» 141×32 | button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/joueurs",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Liste» 28×28 | button «Trombinoscope» 28×28"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/discipline",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Lire l’article 11.6 du r» 62×32 | a «Lire l’article 19.9 du r» 65×32 | a «Lire l’article 17.7 du r» 62×32 | button «Nouveau PV» 116×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/xp",
+  "iss": [
+   "cibles trop petites: 3 ex. button «Désigner le but du mois» 157×32 | button «Désigner le joueur du mo» 175×32 | button «Désigner l'équipe du moi» 170×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/capitaines",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Enregistrer» 112×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/statistiques",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Export CSV» 114×32 | button «Trier» 32×36"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/reglement",
+  "iss": [
+   "cibles trop petites: 6 ex. button «v11 · en vigueur» 125×34 | button «v9» 42×34 | button «v4» 42×34 | button «v3» 42×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/diffusion",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Ouvrir le mode TV» 148×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/journal",
+  "iss": [
+   "cibles trop petites: 2 ex. summary «JSON» 48×16"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/administrateurs",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/parametres",
+  "iss": [
+   "cibles trop petites: 4 ex. button «» 44×24 | a «Lire l’article 17.2 du r» 63×32 | a «Lire l’article 17.3 du r» 63×32 | button «Enregistrer les raretés» 332×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/match-center/m26_ps01",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Programme» 114×32 | a «Public» 83×32 | a «Feuille» 85×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/feuille/m26_ps01",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Matchs» 90×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "390x844",
+  "r": "/admin/matchs/m26_ps01/feuille",
+  "iss": [
+   "cibles trop petites: 22 ex. input «» 64×32 | button «Effacer» 24×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/",
+  "iss": [
+   "cibles trop petites: 33 ex. button «Affiche de la saison» 24×44 | button «Saison 2026-2027» 24×44 | button «Mettre en pause» 34×34 | a «Calendrier» 108×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/matchs",
+  "iss": [
+   "cibles trop petites: 1 ex. button «Ajouter les 10 prochains» 313×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/matchs/m26_ps01",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Matchs» 90×32 | button «Ajouter à mon agenda» 174×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/matchs/m25_1",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Matchs» 90×32 | button «Partager» 100×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/classement",
+  "iss": [
+   "cibles trop petites: 22 ex. button «PDF» 72×32 | a «Distra» 638×24 | a «BMCI» 638×24 | a «Crédit Agricole» 638×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/pre-saison",
+  "iss": [
+   "cibles trop petites: 20 ex. a «Distra» 72×24 | a «vs» 64×32 | a «BMCI» 67×24 | a «Pharmaprom» 118×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/equipes/t26_arw",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Télécharger la carte» 224×32 | button «Partager» 224×32 | a «Arrow ECS» 490×28 | button «Trier» 35×36"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/joueurs",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Lire l’article 17.2 du r» 63×32 | a «Lire l’article 11.5 du r» 62×32 | a «Lire l’article 19 du règ» 54×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/statistiques",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Discipline» 91×26"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/reglement",
+  "iss": [
+   "cibles trop petites: 1 ex. select «Historique des versions» 305×29"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/discipline",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Lire l’article 11.5 du r» 62×32 | a «Lire l’article 11.6 du r» 62×32 | a «Lire l’article 19 du règ» 54×32 | a «Lire l’article 19.9 du r» 65×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/glossaire",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Voir qui a débloqué chaq» 227×20"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/media",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Tout» 65×34 | button «Photo» 95×34 | button «Vidéo» 92×34 | button «Lien» 82×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Compétition» 122×32 | a «Équipe» 89×32 | a «Joueur» 90×32 | a «Match» 84×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/match-center",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Tous» 57×34 | button «Phase de ligue» 105×34 | button «MASTER» 71×34 | button «CHALLENGER» 91×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/saisons",
+  "iss": [
+   "cibles trop petites: 5 ex. button «Clôturer» 98×32 | button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/competitions",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/divisions",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/pre-saison",
+  "iss": [
+   "cibles trop petites: 22 ex. button «Tirage au sort Ardentia » 217×32 | a «Distra» 180×26 | a «BMCI» 180×26 | a «Crédit Agricole» 180×26"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/planning",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Lundi 16 novembre» 150×34 | button «Mardi 17 novembre» 149×34 | button «Jeudi 19 novembre» 149×34 | button «Ajouter» 90×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/groupes",
+  "iss": [
+   "cibles trop petites: 21 ex. select «Affecter» 30×17"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/equipes",
+  "iss": [
+   "cibles trop petites: 105 ex. button «Nouvelle» 98×32 | button «Ancienneté Silver, 1 sai» 111×22 | button «Photos & poster» 141×32 | button «Modifier» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/joueurs",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Liste» 28×28 | button «Trombinoscope» 28×28"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/discipline",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Lire l’article 11.6 du r» 62×32 | a «Lire l’article 19.9 du r» 65×32 | a «Lire l’article 17.7 du r» 62×32 | button «Nouveau PV» 116×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/xp",
+  "iss": [
+   "cibles trop petites: 3 ex. button «Désigner le but du mois» 157×32 | button «Désigner le joueur du mo» 175×32 | button «Désigner l'équipe du moi» 170×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/capitaines",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Enregistrer» 112×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/statistiques",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Export CSV» 114×32 | button «Trier» 35×36"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/reglement",
+  "iss": [
+   "cibles trop petites: 6 ex. button «v11 · en vigueur» 125×34 | button «v9» 42×34 | button «v4» 42×34 | button «v3» 42×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/diffusion",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Ouvrir le mode TV» 148×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/journal",
+  "iss": [
+   "cibles trop petites: 2 ex. summary «JSON» 53×16"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/administrateurs",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/parametres",
+  "iss": [
+   "cibles trop petites: 4 ex. button «» 44×24 | a «Lire l’article 17.2 du r» 63×32 | a «Lire l’article 17.3 du r» 63×32 | button «Enregistrer les raretés» 754×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/match-center/m26_ps01",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Programme» 114×32 | a «Public» 83×32 | a «Feuille» 85×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/feuille/m26_ps01",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Matchs» 90×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "844x390",
+  "r": "/admin/matchs/m26_ps01/feuille",
+  "iss": [
+   "cibles trop petites: 22 ex. input «» 64×32 | button «Effacer» 24×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/",
+  "iss": [
+   "cibles trop petites: 33 ex. button «Affiche de la saison» 24×44 | button «Saison 2026-2027» 24×44 | button «Mettre en pause» 34×34 | a «Calendrier» 108×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/matchs",
+  "iss": [
+   "cibles trop petites: 1 ex. button «Ajouter les 10 prochains» 313×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/matchs/m26_ps01",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Matchs» 90×32 | button «Ajouter à mon agenda» 174×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/matchs/m25_1",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Matchs» 90×32 | button «Partager» 100×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/classement",
+  "iss": [
+   "cibles trop petites: 22 ex. button «PDF» 72×32 | a «Distra» 224×24 | a «BMCI» 224×24 | a «Crédit Agricole» 224×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/equipes/t26_arw",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Télécharger la carte» 224×32 | button «Partager» 224×32 | a «Arrow ECS» 312×28 | button «Trier» 27×36"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/joueurs",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Cartes» 92×32 | button «Classement» 127×32 | button «Top 25 IPG» 116×32 | a «Lire l’article 17.2 du r» 63×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/joueurs?vue=ipg",
+  "iss": [
+   "cibles trop petites: 3 ex. button «Cartes» 92×32 | button «Classement» 127×32 | button «Top 25 IPG» 116×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/statistiques",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Discipline» 91×26"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/reglement",
+  "iss": [
+   "cibles trop petites: 1 ex. select «Historique des versions» 305×29"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/discipline",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Lire l’article 11.5 du r» 62×32 | a «Lire l’article 11.6 du r» 62×32 | a «Lire l’article 19 du règ» 54×32 | a «Lire l’article 19.9 du r» 65×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/glossaire",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Voir qui a débloqué chaq» 227×20"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/media",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Tout» 65×34 | button «Photo» 95×34 | button «Vidéo» 92×34 | button «Lien» 82×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Compétition» 122×32 | a «Équipe» 89×32 | a «Joueur» 90×32 | a «Match» 84×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/match-center",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Tous» 57×34 | button «Phase de ligue» 105×34 | button «MASTER» 71×34 | button «CHALLENGER» 91×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/saisons",
+  "iss": [
+   "cibles trop petites: 5 ex. button «Clôturer» 98×32 | button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/competitions",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/divisions",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/pre-saison",
+  "iss": [
+   "cibles trop petites: 22 ex. button «Tirage au sort Ardentia » 217×32 | a «Distra» 135×26 | a «BMCI» 135×26 | a «Crédit Agricole» 135×26"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/planning",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Lundi 16 novembre» 150×34 | button «Mardi 17 novembre» 149×34 | button «Jeudi 19 novembre» 149×34 | button «Ajouter» 90×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/groupes",
+  "iss": [
+   "cibles trop petites: 21 ex. select «Affecter» 30×17"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/equipes",
+  "iss": [
+   "cibles trop petites: 84 ex. button «Nouvelle» 98×32 | button «Photos & poster» 141×32 | button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/joueurs",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Liste» 28×28 | button «Trombinoscope» 28×28"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/discipline",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Lire l’article 11.6 du r» 62×32 | a «Lire l’article 19.9 du r» 65×32 | a «Lire l’article 17.7 du r» 62×32 | button «Nouveau PV» 116×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/xp",
+  "iss": [
+   "cibles trop petites: 3 ex. button «Désigner le but du mois» 157×32 | button «Désigner le joueur du mo» 175×32 | button «Désigner l'équipe du moi» 170×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/capitaines",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Enregistrer» 112×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/statistiques",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Export CSV» 114×32 | button «Trier» 32×36"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/reglement",
+  "iss": [
+   "cibles trop petites: 6 ex. button «v11 · en vigueur» 125×34 | button «v9» 42×34 | button «v4» 42×34 | button «v3» 42×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/diffusion",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Ouvrir le mode TV» 148×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/journal",
+  "iss": [
+   "cibles trop petites: 2 ex. summary «JSON» 48×16"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/administrateurs",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/parametres",
+  "iss": [
+   "cibles trop petites: 4 ex. button «» 44×24 | a «Lire l’article 17.2 du r» 63×32 | a «Lire l’article 17.3 du r» 63×32 | button «Enregistrer les raretés» 372×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/match-center/m26_ps01",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Programme» 114×32 | a «Public» 83×32 | a «Feuille» 85×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/feuille/m26_ps01",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Matchs» 90×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "430x932",
+  "r": "/admin/matchs/m26_ps01/feuille",
+  "iss": [
+   "cibles trop petites: 22 ex. input «» 64×32 | button «Effacer» 24×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/",
+  "iss": [
+   "cibles trop petites: 33 ex. button «Affiche de la saison» 24×44 | button «Saison 2026-2027» 24×44 | button «Mettre en pause» 34×34 | a «Calendrier» 108×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/matchs",
+  "iss": [
+   "cibles trop petites: 1 ex. button «Ajouter les 10 prochains» 313×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/matchs/m26_ps01",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Matchs» 90×32 | button «Ajouter à mon agenda» 174×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/matchs/m25_1",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Matchs» 90×32 | button «Partager» 100×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/classement",
+  "iss": [
+   "cibles trop petites: 22 ex. button «PDF» 72×32 | a «Distra» 726×24 | a «BMCI» 726×24 | a «Crédit Agricole» 726×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/pre-saison",
+  "iss": [
+   "cibles trop petites: 26 ex. a «Distra» 72×24 | a «vs» 64×32 | a «BMCI» 67×24 | a «Crédit Agricole» 132×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/equipes/t26_arw",
+  "iss": [
+   "cibles trop petites: 3 ex. button «Télécharger la carte» 224×32 | button «Partager» 224×32 | a «Arrow ECS» 490×28"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/joueurs",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Lire l’article 17.2 du r» 63×32 | a «Lire l’article 11.5 du r» 62×32 | a «Lire l’article 19 du règ» 54×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/statistiques",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Discipline» 91×26"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/reglement",
+  "iss": [
+   "cibles trop petites: 1 ex. select «Historique des versions» 305×29"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/discipline",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Lire l’article 11.5 du r» 62×32 | a «Lire l’article 11.6 du r» 62×32 | a «Lire l’article 19 du règ» 54×32 | a «Lire l’article 19.9 du r» 65×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/glossaire",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Voir qui a débloqué chaq» 227×20"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/media",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Tout» 65×34 | button «Photo» 95×34 | button «Vidéo» 92×34 | button «Lien» 82×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Compétition» 122×32 | a «Équipe» 89×32 | a «Joueur» 90×32 | a «Match» 84×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/match-center",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Tous» 57×34 | button «Phase de ligue» 105×34 | button «MASTER» 71×34 | button «CHALLENGER» 91×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/saisons",
+  "iss": [
+   "cibles trop petites: 5 ex. button «Clôturer» 98×32 | button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/competitions",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/divisions",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/pre-saison",
+  "iss": [
+   "cibles trop petites: 22 ex. button «Tirage au sort Ardentia » 217×32 | a «Distra» 204×26 | a «BMCI» 204×26 | a «Crédit Agricole» 204×26"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/planning",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Lundi 16 novembre» 150×34 | button «Mardi 17 novembre» 149×34 | button «Jeudi 19 novembre» 149×34 | button «Ajouter» 90×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/groupes",
+  "iss": [
+   "cibles trop petites: 21 ex. select «Affecter» 30×17"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/equipes",
+  "iss": [
+   "cibles trop petites: 105 ex. button «Nouvelle» 98×32 | button «Ancienneté Silver, 1 sai» 111×22 | button «Photos & poster» 141×32 | button «Modifier» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/joueurs",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Liste» 28×28 | button «Trombinoscope» 28×28"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/discipline",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Lire l’article 11.6 du r» 62×32 | a «Lire l’article 19.9 du r» 65×32 | a «Lire l’article 17.7 du r» 62×32 | button «Nouveau PV» 116×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/xp",
+  "iss": [
+   "cibles trop petites: 3 ex. button «Désigner le but du mois» 157×32 | button «Désigner le joueur du mo» 175×32 | button «Désigner l'équipe du moi» 170×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/capitaines",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Enregistrer» 112×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/statistiques",
+  "iss": [
+   "cibles trop petites: 1 ex. button «Export CSV» 114×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/reglement",
+  "iss": [
+   "cibles trop petites: 6 ex. button «v11 · en vigueur» 125×34 | button «v9» 42×34 | button «v4» 42×34 | button «v3» 42×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/diffusion",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Ouvrir le mode TV» 148×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/journal",
+  "iss": [
+   "cibles trop petites: 2 ex. summary «JSON» 61×16"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/administrateurs",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/parametres",
+  "iss": [
+   "cibles trop petites: 4 ex. button «» 44×24 | a «Lire l’article 17.2 du r» 63×32 | a «Lire l’article 17.3 du r» 63×32 | button «Enregistrer les raretés» 842×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/match-center/m26_ps01",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Programme» 114×32 | a «Public» 83×32 | a «Feuille» 85×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/feuille/m26_ps01",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Matchs» 90×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "932x430",
+  "r": "/admin/matchs/m26_ps01/feuille",
+  "iss": [
+   "cibles trop petites: 22 ex. input «» 64×32 | button «Effacer» 24×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/",
+  "iss": [
+   "cibles trop petites: 33 ex. button «Affiche de la saison» 24×44 | button «Saison 2026-2027» 24×44 | button «Mettre en pause» 34×34 | a «Calendrier» 108×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/matchs",
+  "iss": [
+   "cibles trop petites: 1 ex. button «Ajouter les 10 prochains» 313×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/matchs/m26_ps01",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Matchs» 90×32 | button «Ajouter à mon agenda» 174×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/matchs/m25_1",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Matchs» 90×32 | button «Partager» 100×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/classement",
+  "iss": [
+   "cibles trop petites: 22 ex. button «PDF» 72×32 | a «Distra» 562×24 | a «BMCI» 562×24 | a «Crédit Agricole» 562×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/pre-saison",
+  "iss": [
+   "cibles trop petites: 19 ex. a «Distra» 72×24 | a «vs» 64×32 | a «BMCI» 67×24 | a «Pharmaprom» 118×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/equipes/t26_arw",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Télécharger la carte» 224×32 | button «Partager» 224×32 | a «Arrow ECS» 490×28 | button «Trier» 31×36"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/joueurs",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Lire l’article 17.2 du r» 63×32 | a «Lire l’article 11.5 du r» 62×32 | a «Lire l’article 19 du règ» 54×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/statistiques",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Discipline» 91×26"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/reglement",
+  "iss": [
+   "cibles trop petites: 1 ex. select «Historique des versions» 305×29"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/discipline",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Lire l’article 11.5 du r» 62×32 | a «Lire l’article 11.6 du r» 62×32 | a «Lire l’article 19 du règ» 54×32 | a «Lire l’article 19.9 du r» 65×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/glossaire",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Voir qui a débloqué chaq» 227×20"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/media",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Tout» 65×34 | button «Photo» 95×34 | button «Vidéo» 92×34 | button «Lien» 82×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Compétition» 122×32 | a «Équipe» 89×32 | a «Joueur» 90×32 | a «Match» 84×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/match-center",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Tous» 57×34 | button «Phase de ligue» 105×34 | button «MASTER» 71×34 | button «CHALLENGER» 91×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/saisons",
+  "iss": [
+   "cibles trop petites: 5 ex. button «Clôturer» 98×32 | button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/competitions",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/divisions",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/pre-saison",
+  "iss": [
+   "cibles trop petites: 22 ex. button «Tirage au sort Ardentia » 217×32 | a «Distra» 160×26 | a «BMCI» 160×26 | a «Crédit Agricole» 160×26"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/planning",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Lundi 16 novembre» 150×34 | button «Mardi 17 novembre» 149×34 | button «Jeudi 19 novembre» 149×34 | button «Ajouter» 90×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/groupes",
+  "iss": [
+   "cibles trop petites: 21 ex. select «Affecter» 30×17"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/equipes",
+  "iss": [
+   "cibles trop petites: 105 ex. button «Nouvelle» 98×32 | button «Ancienneté Silver, 1 sai» 111×22 | button «Photos & poster» 141×32 | button «Modifier» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/joueurs",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Liste» 28×28 | button «Trombinoscope» 28×28"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/discipline",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Lire l’article 11.6 du r» 62×32 | a «Lire l’article 19.9 du r» 65×32 | a «Lire l’article 17.7 du r» 62×32 | button «Nouveau PV» 116×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/xp",
+  "iss": [
+   "cibles trop petites: 3 ex. button «Désigner le but du mois» 157×32 | button «Désigner le joueur du mo» 175×32 | button «Désigner l'équipe du moi» 170×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/capitaines",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Enregistrer» 112×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/statistiques",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Export CSV» 114×32 | button «Trier» 32×36"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/reglement",
+  "iss": [
+   "cibles trop petites: 6 ex. button «v11 · en vigueur» 125×34 | button «v9» 42×34 | button «v4» 42×34 | button «v3» 42×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/diffusion",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Ouvrir le mode TV» 148×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/journal",
+  "iss": [
+   "cibles trop petites: 2 ex. summary «JSON» 48×16"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/administrateurs",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/parametres",
+  "iss": [
+   "cibles trop petites: 4 ex. button «» 44×24 | a «Lire l’article 17.2 du r» 63×32 | a «Lire l’article 17.3 du r» 63×32 | button «Enregistrer les raretés» 678×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/match-center/m26_ps01",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Programme» 114×32 | a «Public» 83×32 | a «Feuille» 85×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/feuille/m26_ps01",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Matchs» 90×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "768x1024",
+  "r": "/admin/matchs/m26_ps01/feuille",
+  "iss": [
+   "cibles trop petites: 22 ex. input «» 64×32 | button «Effacer» 24×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1024x768",
+  "r": "/",
+  "iss": [
+   "cibles trop petites: 2 ex. a «l’historique» 71×19 | a «Journées et parcours» 121×16"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1024x768",
+  "r": "/reglement",
+  "iss": [
+   "cibles trop petites: 64 ex. a «1.1 Le terrain» 239×23 | a «1.2 Le ballon» 239×23 | a «1.3 Les remplacements pa» 239×23 | a «2.1 Composition des équi» 239×23"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1024x768",
+  "r": "/glossaire",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Voir qui a débloqué chaq» 227×20"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1024x768",
+  "r": "/admin/groupes",
+  "iss": [
+   "cibles trop petites: 21 ex. select «Affecter» 30×17"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1024x768",
+  "r": "/admin/equipes",
+  "iss": [
+   "cibles trop petites: 21 ex. button «Ancienneté Silver, 1 sai» 111×22 | button «Ancienneté Gold, 2 saiso» 147×22 | button «Ancienneté Platinum, 3 s» 170×22"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1024x768",
+  "r": "/admin/reglement",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Voir la page publique» 132×20 | a «Ouvrir le PDF» 81×20"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1024x768",
+  "r": "/admin/journal",
+  "iss": [
+   "cibles trop petites: 2 ex. summary «JSON» 48×16"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1024x768",
+  "r": "/admin/parametres",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Monter» 21×40 | button «Descendre» 21×40"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/",
+  "iss": [
+   "cibles trop petites: 33 ex. button «Affiche de la saison» 24×44 | button «Saison 2026-2027» 24×44 | button «Mettre en pause» 34×34 | a «Calendrier» 108×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/matchs",
+  "iss": [
+   "cibles trop petites: 1 ex. button «Ajouter les 10 prochains» 313×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/matchs/m26_ps01",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Matchs» 90×32 | button «Ajouter à mon agenda» 174×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/matchs/m25_1",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Matchs» 90×32 | button «Partager» 100×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/classement",
+  "iss": [
+   "cibles trop petites: 22 ex. button «PDF» 72×32 | a «Distra» 614×24 | a «BMCI» 614×24 | a «Crédit Agricole» 614×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/pre-saison",
+  "iss": [
+   "cibles trop petites: 20 ex. a «Distra» 72×24 | a «vs» 64×32 | a «BMCI» 67×24 | a «Pharmaprom» 118×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/equipes/t26_arw",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Télécharger la carte» 224×32 | button «Partager» 224×32 | a «Arrow ECS» 490×28 | button «Trier» 33×36"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/joueurs",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Lire l’article 17.2 du r» 63×32 | a «Lire l’article 11.5 du r» 62×32 | a «Lire l’article 19 du règ» 54×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/statistiques",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Discipline» 91×26"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/reglement",
+  "iss": [
+   "cibles trop petites: 1 ex. select «Historique des versions» 305×29"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/discipline",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Lire l’article 11.5 du r» 62×32 | a «Lire l’article 11.6 du r» 62×32 | a «Lire l’article 19 du règ» 54×32 | a «Lire l’article 19.9 du r» 65×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/glossaire",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Voir qui a débloqué chaq» 227×20"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/media",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Tout» 65×34 | button «Photo» 95×34 | button «Vidéo» 92×34 | button «Lien» 82×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Compétition» 122×32 | a «Équipe» 89×32 | a «Joueur» 90×32 | a «Match» 84×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/match-center",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Tous» 57×34 | button «Phase de ligue» 105×34 | button «MASTER» 71×34 | button «CHALLENGER» 91×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/saisons",
+  "iss": [
+   "cibles trop petites: 5 ex. button «Clôturer» 98×32 | button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/competitions",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/divisions",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/pre-saison",
+  "iss": [
+   "cibles trop petites: 22 ex. button «Tirage au sort Ardentia » 217×32 | a «Distra» 174×26 | a «BMCI» 174×26 | a «Crédit Agricole» 174×26"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/planning",
+  "iss": [
+   "cibles trop petites: 4 ex. button «Lundi 16 novembre» 150×34 | button «Mardi 17 novembre» 149×34 | button «Jeudi 19 novembre» 149×34 | button «Ajouter» 90×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/groupes",
+  "iss": [
+   "cibles trop petites: 21 ex. select «Affecter» 30×17"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/equipes",
+  "iss": [
+   "cibles trop petites: 105 ex. button «Nouvelle» 98×32 | button «Ancienneté Silver, 1 sai» 111×22 | button «Photos & poster» 141×32 | button «Modifier» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/joueurs",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Liste» 28×28 | button «Trombinoscope» 28×28"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/discipline",
+  "iss": [
+   "cibles trop petites: 4 ex. a «Lire l’article 11.6 du r» 62×32 | a «Lire l’article 19.9 du r» 65×32 | a «Lire l’article 17.7 du r» 62×32 | button «Nouveau PV» 116×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/xp",
+  "iss": [
+   "cibles trop petites: 3 ex. button «Désigner le but du mois» 157×32 | button «Désigner le joueur du mo» 175×32 | button «Désigner l'équipe du moi» 170×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/capitaines",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Enregistrer» 112×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/statistiques",
+  "iss": [
+   "cibles trop petites: 2 ex. button «Export CSV» 114×32 | button «Trier» 34×36"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/reglement",
+  "iss": [
+   "cibles trop petites: 6 ex. button «v11 · en vigueur» 125×34 | button «v9» 42×34 | button «v4» 42×34 | button «v3» 42×34"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/diffusion",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Ouvrir le mode TV» 148×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/journal",
+  "iss": [
+   "cibles trop petites: 2 ex. summary «JSON» 51×16"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/administrateurs",
+  "iss": [
+   "cibles trop petites: 6 ex. button «Modifier» 32×32 | button «Supprimer» 32×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/parametres",
+  "iss": [
+   "cibles trop petites: 4 ex. button «» 44×24 | a «Lire l’article 17.2 du r» 63×32 | a «Lire l’article 17.3 du r» 63×32 | button «Enregistrer les raretés» 730×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/match-center/m26_ps01",
+  "iss": [
+   "cibles trop petites: 3 ex. a «Programme» 114×32 | a «Public» 83×32 | a «Feuille» 85×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/feuille/m26_ps01",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Matchs» 90×32"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "820x1180",
+  "r": "/admin/matchs/m26_ps01/feuille",
+  "iss": [
+   "cibles trop petites: 22 ex. input «» 64×32 | button «Effacer» 24×24"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1180x820",
+  "r": "/",
+  "iss": [
+   "cibles trop petites: 2 ex. a «l’historique» 71×19 | a «Journées et parcours» 121×16"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1180x820",
+  "r": "/reglement",
+  "iss": [
+   "cibles trop petites: 64 ex. a «1.1 Le terrain» 239×23 | a «1.2 Le ballon» 239×23 | a «1.3 Les remplacements pa» 239×23 | a «2.1 Composition des équi» 239×23"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1180x820",
+  "r": "/glossaire",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Voir qui a débloqué chaq» 227×20"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1180x820",
+  "r": "/admin/groupes",
+  "iss": [
+   "cibles trop petites: 21 ex. select «Affecter» 30×17"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1180x820",
+  "r": "/admin/equipes",
+  "iss": [
+   "cibles trop petites: 21 ex. button «Ancienneté Silver, 1 sai» 111×22 | button «Ancienneté Gold, 2 saiso» 147×22 | button «Ancienneté Platinum, 3 s» 170×22"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1180x820",
+  "r": "/admin/reglement",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Voir la page publique» 132×20 | a «Ouvrir le PDF» 81×20"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1180x820",
+  "r": "/admin/journal",
+  "iss": [
+   "cibles trop petites: 2 ex. summary «JSON» 60×16"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1280x800",
+  "r": "/",
+  "iss": [
+   "cibles trop petites: 2 ex. a «l’historique» 71×19 | a «Journées et parcours» 121×16"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1280x800",
+  "r": "/reglement",
+  "iss": [
+   "cibles trop petites: 64 ex. a «1.1 Le terrain» 239×23 | a «1.2 Le ballon» 239×23 | a «1.3 Les remplacements pa» 239×23 | a «2.1 Composition des équi» 239×23"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1280x800",
+  "r": "/glossaire",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Voir qui a débloqué chaq» 227×20"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1280x800",
+  "r": "/admin/groupes",
+  "iss": [
+   "cibles trop petites: 21 ex. select «Affecter» 30×17"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1280x800",
+  "r": "/admin/equipes",
+  "iss": [
+   "cibles trop petites: 21 ex. button «Ancienneté Silver, 1 sai» 111×22 | button «Ancienneté Gold, 2 saiso» 147×22 | button «Ancienneté Platinum, 3 s» 170×22"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1280x800",
+  "r": "/admin/reglement",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Voir la page publique» 132×20 | a «Ouvrir le PDF» 81×20"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1280x800",
+  "r": "/admin/journal",
+  "iss": [
+   "cibles trop petites: 2 ex. summary «JSON» 69×16"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1440x900",
+  "r": "/",
+  "iss": [
+   "cibles trop petites: 2 ex. a «l’historique» 71×19 | a «Journées et parcours» 121×16"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1440x900",
+  "r": "/reglement",
+  "iss": [
+   "cibles trop petites: 64 ex. a «1.1 Le terrain» 239×23 | a «1.2 Le ballon» 239×23 | a «1.3 Les remplacements pa» 239×23 | a «2.1 Composition des équi» 239×23"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1440x900",
+  "r": "/glossaire",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Voir qui a débloqué chaq» 227×20"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1440x900",
+  "r": "/admin/groupes",
+  "iss": [
+   "cibles trop petites: 21 ex. select «Affecter» 30×17"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1440x900",
+  "r": "/admin/equipes",
+  "iss": [
+   "cibles trop petites: 21 ex. button «Ancienneté Silver, 1 sai» 111×22 | button «Ancienneté Gold, 2 saiso» 147×22 | button «Ancienneté Platinum, 3 s» 170×22"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1440x900",
+  "r": "/admin/reglement",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Voir la page publique» 132×20 | a «Ouvrir le PDF» 81×20"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1440x900",
+  "r": "/admin/journal",
+  "iss": [
+   "cibles trop petites: 2 ex. summary «JSON» 83×16"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1920x1080",
+  "r": "/",
+  "iss": [
+   "cibles trop petites: 2 ex. a «l’historique» 71×19 | a «Journées et parcours» 121×16"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1920x1080",
+  "r": "/reglement",
+  "iss": [
+   "cibles trop petites: 64 ex. a «1.1 Le terrain» 239×23 | a «1.2 Le ballon» 239×23 | a «1.3 Les remplacements pa» 239×23 | a «2.1 Composition des équi» 239×23"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1920x1080",
+  "r": "/glossaire",
+  "iss": [
+   "cibles trop petites: 1 ex. a «Voir qui a débloqué chaq» 227×20"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1920x1080",
+  "r": "/admin/groupes",
+  "iss": [
+   "cibles trop petites: 21 ex. select «Affecter» 30×17"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1920x1080",
+  "r": "/admin/equipes",
+  "iss": [
+   "cibles trop petites: 21 ex. button «Ancienneté Silver, 1 sai» 111×22 | button «Ancienneté Gold, 2 saiso» 147×22 | button «Ancienneté Platinum, 3 s» 170×22"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1920x1080",
+  "r": "/admin/reglement",
+  "iss": [
+   "cibles trop petites: 2 ex. a «Voir la page publique» 132×20 | a «Ouvrir le PDF» 81×20"
+  ],
+  "errs": []
+ },
+ {
+  "vp": "1920x1080",
+  "r": "/admin/journal",
+  "iss": [
+   "cibles trop petites: 2 ex. summary «JSON» 96×16"
+  ],
+  "errs": []
+ }
+]

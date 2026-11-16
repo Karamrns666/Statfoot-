@@ -1,0 +1,16 @@
+firefox 360x800 44
+firefox 800x360 79
+firefox 390x844 114
+firefox 844x390 149
+firefox 430x932 184
+firefox 932x430 219
+firefox 768x1024 254
+firefox 1024x768 262
+firefox 820x1180 297
+firefox 1180x820 304
+firefox 1280x800 311
+firefox 1440x900 318
+firefox 1920x1080 325
+
+firefox pages contrôlées 689 avec remarques 325
+exit=0

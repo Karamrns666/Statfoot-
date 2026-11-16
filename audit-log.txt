@@ -1,0 +1,16 @@
+chromium 360x800 44
+chromium 800x360 79
+chromium 390x844 114
+chromium 844x390 149
+chromium 430x932 184
+chromium 932x430 219
+chromium 768x1024 254
+chromium 1024x768 262
+chromium 820x1180 297
+chromium 1180x820 304
+chromium 1280x800 311
+chromium 1440x900 318
+chromium 1920x1080 325
+
+chromium pages contrôlées 689 avec remarques 325
+exit=0

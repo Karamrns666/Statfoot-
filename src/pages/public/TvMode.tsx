@@ -47,16 +47,25 @@ export default function TvMode() {
   const [immersive, setImmersive] = useState(false)
   type FsDoc = Document & { webkitFullscreenElement?: Element | null; webkitExitFullscreen?: () => Promise<void> | void; webkitFullscreenEnabled?: boolean }
   type FsEl = HTMLElement & { webkitRequestFullscreen?: () => Promise<void> | void }
+  const [fsTip, setFsTip] = useState(false)
   const toggleFull = useCallback(async () => {
     const d = document as FsDoc, el = (rootRef.current ?? document.documentElement) as FsEl
     const inFs = !!(d.fullscreenElement || d.webkitFullscreenElement)
-    try {
-      if (inFs) { await (d.exitFullscreen?.() ?? d.webkitExitFullscreen?.()); return }
-      if (immersive) { setImmersive(false); return }
-      if (d.fullscreenEnabled && el.requestFullscreen) { await el.requestFullscreen(); return }
-      if (d.webkitFullscreenEnabled && el.webkitRequestFullscreen) { await el.webkitRequestFullscreen(); return }
-    } catch { /* refusé par le navigateur : mode immersif */ }
-    setImmersive((v) => !v)
+    if (inFs) { try { await (d.exitFullscreen?.() ?? d.webkitExitFullscreen?.()) } catch { /* déjà sorti */ } return }
+    if (immersive) { setImmersive(false); return }
+    // iPhone / iPod : Safari ne met jamais une page en plein écran (vidéos seulement) → mode épuré directement
+    const iPhone = /iPhone|iPod/.test(navigator.userAgent)
+    if (!iPhone) {
+      try {
+        if (d.fullscreenEnabled && el.requestFullscreen) await el.requestFullscreen()
+        else if (el.webkitRequestFullscreen) await el.webkitRequestFullscreen()
+      } catch { /* refusé : mode épuré */ }
+      // vérifie que le plein écran a vraiment été accordé (certains navigateurs ignorent la demande sans erreur)
+      await new Promise((r) => setTimeout(r, 350))
+      if (d.fullscreenElement || d.webkitFullscreenElement) return
+    }
+    setImmersive(true); window.scrollTo(0, 0)
+    if (iPhone) { setFsTip(true); window.setTimeout(() => setFsTip(false), 6000) }
   }, [immersive])
   const [cycle, setCycle] = useState(0) // relance la barre de progression
   const multi = matches.length > 1
@@ -99,6 +108,7 @@ export default function TvMode() {
         </div>
       </header>}
       {immersive && <button onClick={toggleFull} className="tap fixed right-2 top-2 z-[60] cursor-pointer rounded-full bg-black/50 p-2 text-white/80 hover:text-white" aria-label="Quitter le plein écran"><Minimize /></button>}
+      {fsTip && <div role="status" className="fixed inset-x-3 bottom-3 z-[60] rounded-xl bg-black/80 px-4 py-3 text-center text-sm text-white">Mode plein écran activé. Sur iPhone, pour masquer aussi la barre de Safari : Partager → « Sur l’écran d’accueil », puis ouvrez le mode TV depuis l’icône.</div>}
 
       {/* onglets : un par match en cours */}
       {multi && !immersive && (
@@ -203,7 +213,7 @@ function Board({ m, now }: { m: Match; now: number }) {
 function TeamSide({ team }: { team?: Team }) {
   return (
     <div className="flex min-w-0 flex-col items-center gap-[1.2vh] text-center">
-      <div className="aspect-square w-[clamp(3.5rem,min(11vw,15vh),13rem)]"><TeamLogo team={team} size={220} fluid /></div>
+      <div className="relative aspect-square h-[clamp(3.5rem,min(11vw,15vh),13rem)] w-[clamp(3.5rem,min(11vw,15vh),13rem)] shrink-0"><TeamLogo team={team} size={220} fluid /></div>
       <div className="title-caps line-clamp-2 max-w-full text-[clamp(1.3rem,min(3vw,5vh),3.8rem)] leading-[.95]">{team?.name}</div>
     </div>
   )
@@ -280,7 +290,7 @@ function GoalFlash({ team }: { team?: Team }) {
   return (
     <div className="tv-goal pointer-events-none fixed inset-0 z-10 flex items-center justify-center" role="status">
       <div className="flex items-center gap-[2vw] rounded-[3vw] px-[4vw] py-[2vh] shadow-2xl" style={{ background: `linear-gradient(135deg, ${team?.primary_color ?? '#F85A00'}, #04163D)` }}>
-        <div className="aspect-square w-[clamp(4rem,10vw,12rem)]"><TeamLogo team={team} size={160} fluid /></div>
+        <div className="relative aspect-square h-[clamp(4rem,10vw,12rem)] w-[clamp(4rem,10vw,12rem)] shrink-0"><TeamLogo team={team} size={160} fluid /></div>
         <div className="title-caps text-[clamp(4rem,12vw,14rem)] leading-none">But !</div>
       </div>
     </div>

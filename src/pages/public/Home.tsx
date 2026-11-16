@@ -1,5 +1,6 @@
 import { useMemo, type ReactNode } from 'react'
 import { Billboard, type BillboardPoster, type BillboardSlide } from '@/components/home/Billboard'
+import { billboardLayout } from '@/lib/billboard'
 
 /** Affiche « Saison 4 » fournie avec le site (WebP en 3 tailles) ; remplaçable dans Admin → Paramètres */
 const DEFAULT_POSTER: BillboardPoster = {
@@ -7,8 +8,6 @@ const DEFAULT_POSTER: BillboardPoster = {
   srcSet: '/brand/affiche-saison-4-768.webp 768w, /brand/affiche-saison-4-1280.webp 1280w, /brand/affiche-saison-4-1920.webp 1920w',
   alt: 'Affiche de la Saison 4 de la Morocco Business League : 23 équipes, Atlantique Club, logos des entreprises participantes et joueurs en maillot, organisée par Ardentia',
 }
-import { previousSeasons } from '@/lib/clubs'
-import { returningHighlights } from '@/lib/heritage'
 import { SeasonStrip } from '@/components/home/SeasonStrip'
 import { NextCaptainBlock } from '@/components/captains/CaptainBits'
 import { usePreseason } from '@/hooks/usePreseason'
@@ -36,7 +35,7 @@ import { StandingsTable } from '@/components/standings/StandingsTable'
 import { EmptyState, SectionTitle, CompetitionBadge } from '@/components/league/Bits'
 import { PlayerAvatar, PlayerLink, TeamLogo } from '@/components/league/Identity'
 import { TrophyBadge } from '@/components/awards/TrophyBadge'
-import { bestAttack, bestDefense, competitionStandings, generalStandings, kpis, isPlayed, race } from '@/lib/stats'
+import { bestAttack, bestDefense, competitionStandings, kpis, isPlayed, race } from '@/lib/stats'
 import { competitionZones } from '@/lib/zones'
 
 export default function Home() {
@@ -47,9 +46,7 @@ export default function Home() {
   const season = seasons.find((x) => x.is_active) ?? seasons[0] ?? null
   const comps = useSeasonCompetitions(season?.id)
   const sid = season?.id
-  const prevSid = previousSeasons(sid, seasons)[0]
   const preHome = usePreseason(sid)
-  const heritage = useMemo(() => (sid && prevSid ? returningHighlights(league, prevSid, sid) : []), [league, sid, prevSid])
 
   const { lastRound, live, next } = useMemo(() => {
     const ms = db.Match.filter((m) => m.season_id === sid && m.published !== false)
@@ -67,7 +64,6 @@ export default function Home() {
   const refSid = sid
   const notStarted = k.matches === 0
   const archive = undefined as { name: string } | undefined
-  const refK = useMemo(() => (refSid === sid ? k : kpis(league, { seasonId: refSid })), [league, refSid, sid, k])
   // MÊME fonction que la fiche joueur et la page Trophées (computePlayerXP via useRace)
   const podium = useRace({ seasonId: refSid }, 'xp').slice(0, 3)
   const xpAll = usePlayerXP({ seasonId: refSid })
@@ -80,71 +76,46 @@ export default function Home() {
   const tow = useTeamOfWeek(refSid, lastPlayedRound)
   const hasUnlocks = useRecentUnlocks(sid ?? null, 1).length > 0
 
-  // billboard : joueurs et équipes mis en avant, en alternance
+  // billboard : 3 panneaux fixes (logo, affiche, saison) puis panneaux de STATISTIQUES de la saison en cours,
+  // ajoutés seulement quand la donnée existe (jamais de panneau vide, à 0 ou « – ») ; ordre et activation réglés dans l'admin
   const slides = useMemo<BillboardSlide[]>(() => {
     const out: BillboardSlide[] = []
-    if (!sid || !refSid) return out
+    if (!sid) return out
     const team = (id?: string) => (id ? L.team.get(id) : undefined)
-    if (notStarted) {
-      const names = comps.map((c) => c.name)
-      out.push({ key: 'intro', kind: 'info', eyebrow: season?.name ?? 'Nouvelle saison', title: names.length > 1 ? names.join(' & ') : 'Coup d’envoi', value: teamsInSeason.size || undefined, unit: 'ÉQUIPES', sub: `${teamsInSeason.size} entreprises engagées. Calendrier et résultats en ligne dès la première journée.`, href: '/equipes', tone: 'orange' })
-    }
-    for (const m of live.slice(0, 2)) {
-      const h = team(m.home_team_id), a = team(m.away_team_id)
-      out.push({ key: `live-${m.id}`, kind: 'match', eyebrow: `En direct${m.pitch ? ` · ${m.pitch}` : ''}`, tone: 'red', title: `${h?.short_name ?? '?'} ${m.home_score ?? 0} – ${m.away_score ?? 0} ${a?.short_name ?? '?'}`, sub: `${h?.name} contre ${a?.name}`, images: [h?.logo_url, a?.logo_url], href: `/matchs/${m.id}` })
-    }
-    // --- joueurs
-    const players: BillboardSlide[] = []
+    const names = comps.map((c) => c.name)
+    out.push({ key: 'intro', kind: 'info', eyebrow: season?.name ?? 'Nouvelle saison', title: names.length > 1 ? names.join(' & ') : names[0] ?? 'Coup d’envoi', value: teamsInSeason.size || undefined, unit: teamsInSeason.size ? 'ÉQUIPES' : undefined, sub: `${teamsInSeason.size} entreprises engagées · calendrier, résultats et classements en direct.`, href: '/matchs', tone: 'white' })
+    if (notStarted) return out
     const list = [...xpAll.values()]
     const pushPlayer = (key: string, eyebrow: string, r: ReturnType<typeof race>[number] | undefined, value: number, unit: string, tone: BillboardSlide['tone']) => {
-      if (!r || !value) return
+      if (!r || !(value > 0)) return
       const p = L.player.get(r.item.player_id), t = team(r.item.team_id)
-      players.push({ key, kind: 'player', eyebrow, title: playerShort(p), value, unit, image: t?.logo_url, color: t?.primary_color, photo: p?.photo_url, initials: initials(p), sub: t?.name, href: p ? `/joueurs/${p.id}` : undefined, tone })
+      if (!p) return
+      out.push({ key, kind: 'player', eyebrow, title: playerShort(p), value, unit, image: t?.logo_url, color: t?.primary_color, photo: p.photo_url, initials: initials(p), sub: t?.name, href: `/joueurs/${p.id}`, tone })
     }
-    const xp1 = race(league, list, 'xp', refSid)[0]; pushPlayer('xp', `N°1 du classement XP${tag}`, xp1, xp1?.item.xp ?? 0, 'XP', 'orange')
-    const sc = race(league, list, 'top_scorer', refSid)[0]; pushPlayer('scorer', `Meilleur buteur${tag}`, sc, sc?.item.goals ?? 0, 'BUTS', 'orange')
-    const as = race(league, list, 'top_assist', refSid)[0]; pushPlayer('assist', `Meilleur passeur${tag}`, as, as?.item.assists ?? 0, 'PASSES', 'sky')
-    const gk = race(league, list, 'golden_glove', refSid)[0]; pushPlayer('keeper', `Gant d’or${tag}`, gk, gk?.item.saves ?? 0, 'ARRÊTS', 'white')
-    if (tow?.player_of_round) {
-      const b = tow.player_of_round, p = L.player.get(b.player_id), t = team(b.team_id)
-      players.push({ key: 'potr', kind: 'player', eyebrow: `Joueur de la journée ${tow.round}`, title: playerShort(p), value: b.rating.toFixed(1).replace('.', ','), unit: '/10', image: t?.logo_url, color: t?.primary_color, photo: p?.photo_url, initials: initials(p), sub: t?.name, href: '/equipe-type', tone: 'sky' })
-    }
-    if (showIPG && IPG_RANKING[0]) {
-      const e = IPG_RANKING[0]
-      players.push({ key: 'ipg', kind: 'player', eyebrow: 'N°1 de l’indice de performance', title: e.name, value: e.ipg.toFixed(0), unit: 'IPG', initials: e.name.split(' ').map((w) => w[0]).join('').slice(0, 2), sub: `${e.team} · ${e.goals} buts, ${e.assists} passes décisives`, href: '/joueurs?vue=ipg', tone: 'sky' })
-    }
-    // --- équipes
-    const teams: BillboardSlide[] = []
+    const xp1 = race(league, list, 'xp', sid)[0]; pushPlayer('xp', 'Meilleur joueur · classement XP', xp1, xp1?.item.xp ?? 0, 'XP', 'orange')
+    const sc = race(league, list, 'top_scorer', sid)[0]; pushPlayer('scorer', 'Meilleur buteur', sc, sc?.item.goals ?? 0, 'BUTS', 'orange')
+    const as = race(league, list, 'top_assist', sid)[0]; pushPlayer('assist', 'Meilleur passeur', as, as?.item.assists ?? 0, 'PASSES', 'sky')
+    const gk = race(league, list, 'golden_glove', sid)[0]; pushPlayer('keeper', 'Meilleur gardien', gk, gk?.item.saves ?? 0, 'ARRÊTS', 'white')
     const pushTeam = (key: string, eyebrow: string, id: string | undefined, value: ReactNode, unit: string, sub: string, tone: BillboardSlide['tone']) => {
       const t = team(id); if (!t) return
-      teams.push({ key, kind: 'team', eyebrow, title: t.name, value, unit, image: t.logo_url, color: t.primary_color, sub, href: `/equipes/${t.id}`, tone })
+      out.push({ key, kind: 'team', eyebrow, title: t.name, value, unit, image: t.logo_url, color: t.primary_color, sub, href: `/equipes/${t.id}`, tone })
     }
-    const lead = generalStandings(league, refSid)[0]
-    if (lead && lead.played > 0) pushTeam('leader', season?.status === 'closed' ? `Champion · ${season.name}` : 'Leader du classement', lead.team_id, lead.points, 'PTS', `${lead.won} victoires, ${lead.drawn} nuls, ${lead.lost} défaites · différence ${lead.gd > 0 ? '+' : ''}${lead.gd}`, 'orange')
     const tstats = [...teamStatsAll.values()].filter((t) => t.played > 0)
-    const att = bestAttack(tstats)[0]; if (att && att.team_id !== lead?.team_id) pushTeam('attack', 'Meilleure attaque', att.team_id, att.gf, 'BUTS', `${att.gf_avg} buts par match en ${att.played} matchs`, 'orange')
-    const def = bestDefense(tstats)[0]; if (def) pushTeam('defense', 'Meilleure défense', def.team_id, def.ga_avg.toLocaleString('fr-FR'), 'BC / MATCH', `${def.ga} buts encaissés en ${def.played} matchs`, 'sky')
-    // saison précédente : seulement les équipes / joueurs revenus avec un lien approuvé
-    for (const h of heritage) {
-      if (h.kind === 'team') teams.push({ key: h.key, kind: 'team', eyebrow: h.label, title: h.team.name, value: h.value, unit: h.unit, image: h.team.logo_url, color: h.team.primary_color, sub: h.sub, href: `/equipes/${h.team.id}`, tone: 'orange' })
-      else if (h.player) players.push({ key: h.key, kind: 'player', eyebrow: h.label, title: playerShort(h.player), value: h.value, unit: h.unit, image: h.team.logo_url, color: h.team.primary_color, photo: h.player.photo_url, initials: initials(h.player), sub: h.sub, href: `/joueurs/${h.player.id}`, tone: 'sky' })
+    const att = bestAttack(tstats)[0]
+    if (att && att.gf > 0) pushTeam('attack', 'Meilleure attaque', att.team_id, att.gf, att.gf > 1 ? 'BUTS' : 'BUT', `${att.gf_avg.toLocaleString('fr-FR')} buts par match en ${att.played} match${att.played > 1 ? 's' : ''}`, 'orange')
+    const def = bestDefense(tstats)[0]
+    if (def) pushTeam('defense', 'Meilleure défense', def.team_id, def.ga > 0 ? def.ga_avg.toLocaleString('fr-FR') : def.played, def.ga > 0 ? 'BC / MATCH' : def.played > 1 ? 'MATCHS SANS ENCAISSER' : 'MATCH SANS ENCAISSER', def.ga > 0 ? `${def.ga} buts encaissés en ${def.played} matchs` : `Aucun but encaissé en ${def.played} match${def.played > 1 ? 's' : ''}`, 'sky')
+    const lastMotm = db.Match.filter((m) => m.season_id === sid && m.status === 'finished' && m.motm_player_id).sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''))[0]
+    if (lastMotm) {
+      const p = L.player.get(lastMotm.motm_player_id!), t = team(p?.team_id), h = team(lastMotm.home_team_id), aw = team(lastMotm.away_team_id)
+      if (p) out.push({ key: 'motm', kind: 'player', eyebrow: `Homme du dernier match${lastMotm.number ? ` · ${lastMotm.number}` : ''}`, title: playerShort(p), image: t?.logo_url, color: t?.primary_color, photo: p.photo_url, initials: initials(p), sub: `${h?.short_name ?? ''} ${lastMotm.home_score ?? ''} – ${lastMotm.away_score ?? ''} ${aw?.short_name ?? ''}`, href: `/matchs/${lastMotm.id}`, tone: 'orange' })
     }
-    if (notStarted) {
-      const engaged = [...teamsInSeason].map((id) => team(id)).filter((t): t is NonNullable<typeof t> => !!t).sort((a, b) => a.name.localeCompare(b.name)).slice(0, 6)
-      for (const t of engaged) pushTeam(`team-${t.id}`, `Engagée en ${season?.name.replace('Saison ', '') ?? ''}`, t.id, undefined, '', t.company && t.company !== t.name ? t.company : 'Entreprise engagée dans la ligue', 'white')
-    }
-    // alternance joueur / équipe
-    for (let i = 0; i < Math.max(players.length, teams.length); i++) {
-      if (players[i]) out.push(players[i])
-      if (teams[i]) out.push(teams[i])
-    }
-    if (refK.matches) out.push({ key: 'kpi', kind: 'info', eyebrow: `${archive ? archive.name : 'La saison'} en chiffres`, title: `${refK.matches} matchs`, value: refK.goals, unit: 'BUTS', sub: `${refK.goals_avg} buts par match · ${refK.assists} passes décisives · ${refK.yellow} cartons jaunes`, tone: 'white' })
     return out
-  }, [sid, refSid, archive, comps, teamsInSeason, tag, live, league, xpAll, teamStatsAll, tow, L, season, showIPG, refK, notStarted, heritage])
+  }, [sid, comps, teamsInSeason, league, xpAll, teamStatsAll, L, season, notStarted, db.Match])
 
   return (
     <div className="space-y-12">
-      <Billboard slides={slides} leagueName={settings.league_name ?? 'Morocco Business League'} seasonLabel={season?.name.replace(/^Saison /, 'saison ') ?? ''} logoUrl={settings.logo_url} poster={settings.billboard_poster_hidden ? null : settings.billboard_poster_url ? { src: settings.billboard_poster_url, alt: settings.billboard_poster_alt || DEFAULT_POSTER.alt } : DEFAULT_POSTER} />
+      <Billboard slides={slides} layout={billboardLayout(settings.billboard_slides)} leagueName={settings.league_name ?? 'Morocco Business League'} seasonLabel={season?.name.replace(/^Saison /, 'saison ') ?? ''} logoUrl={settings.logo_url} poster={settings.billboard_poster_hidden ? null : settings.billboard_poster_url ? { src: settings.billboard_poster_url, alt: settings.billboard_poster_alt || DEFAULT_POSTER.alt } : DEFAULT_POSTER} />
       <div className="-mt-6">{sid && <SeasonStrip s={strip} />}</div>
 
       {live.length > 0 && (

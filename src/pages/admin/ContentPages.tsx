@@ -26,6 +26,7 @@ import { ArtLink } from '@/components/reglement/ArtLink'
 import { BadgeRarityEditor } from '@/components/admin/BadgeRarityEditor'
 import { BackupsCard, ErrorsCard } from '@/components/admin/OpsCards'
 import { MediaDropzone } from '@/components/admin/MediaDropzone'
+import { BillboardSlidesCard } from '@/components/admin/BillboardSlidesCard'
 
 // ---------------------------------------------------------------------------
 export function MediaAdmin() {
@@ -194,6 +195,7 @@ export function SettingsPage() {
             <ol className="space-y-1">{TIEBREAKERS.map((t, i) => <li key={t.key} className="flex gap-2 rounded-lg bg-white/5 px-3 py-1.5"><span className="num w-4 text-neon">{i + 1}</span>{t.label}</li>)}</ol>
             <ArtLink art={TIEBREAK_ART} />
           </CardContent></Card>
+          <BillboardSlidesCard />
           <BackupsCard superAdmin={user?.role === 'super_admin'} />
           <ErrorsCard />
           <BadgeRarityEditor />

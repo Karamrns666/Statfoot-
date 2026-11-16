@@ -147,18 +147,22 @@ function PosterView({ poster, phase }: { poster: BillboardPoster; phase: 'in' | 
   return (
     <div className={cn('bb-slide relative -mx-5 -my-7 flex items-center justify-center overflow-hidden sm:-mx-10 sm:-my-9', phase === 'in' ? 'bb-wipe-in' : 'bb-wipe-out')} aria-hidden={phase === 'out'}>
       <img src={poster.src} srcSet={poster.srcSet} sizes="(min-width: 1280px) 1200px, 100vw" alt="" aria-hidden className="absolute inset-0 size-full scale-110 object-cover opacity-45 blur-2xl" />
-      <img src={poster.src} srcSet={poster.srcSet} sizes="(min-width: 1280px) 1200px, 100vw" alt={poster.alt} className="relative block max-h-[min(72vh,560px)] w-full object-contain drop-shadow-[0_12px_30px_rgb(0_0_0/.5)]" decoding="async" />
+      <img src={poster.src} srcSet={poster.srcSet} sizes="(min-width: 1280px) 1200px, 100vw" alt={poster.alt} className="relative block size-full object-contain drop-shadow-[0_12px_30px_rgb(0_0_0/.5)]" decoding="async" />
     </div>
   )
 }
 
-export function Billboard({ slides: content, leagueName, seasonLabel, logoUrl, poster }: { slides: BillboardSlide[]; leagueName: string; seasonLabel: string; logoUrl?: string; poster?: BillboardPoster | null }) {
+export function Billboard({ slides: content, leagueName, seasonLabel, logoUrl, poster, layout }: { layout?: { key: string; enabled: boolean }[]; slides: BillboardSlide[]; leagueName: string; seasonLabel: string; logoUrl?: string; poster?: BillboardPoster | null }) {
   const reduced = useReducedMotion()
   const logo = logoUrl || MBL_LOGO
   // le logo MBL ouvre chaque tour du billboard
   // 1 : logo de la ligue · 2 : affiche de la saison (remplaçable dans l'admin) · puis les panneaux de données
   type Special = { key: 'brand'; brand: true; eyebrow: string } | { key: 'poster'; poster: BillboardPoster; eyebrow: string }
-  const slides: (BillboardSlide | Special)[] = [{ key: 'brand', brand: true, eyebrow: leagueName }, ...(poster ? [{ key: 'poster' as const, poster, eyebrow: 'Affiche de la saison' }] : []), ...content]
+  const all: (BillboardSlide | Special)[] = [{ key: 'brand', brand: true, eyebrow: leagueName }, ...(poster ? [{ key: 'poster' as const, poster, eyebrow: 'Affiche de la saison' }] : []), ...content]
+  const slides: (BillboardSlide | Special)[] = layout
+    ? layout.filter((x) => x.enabled).map((x) => all.find((s) => s.key === x.key)).filter((s): s is BillboardSlide | Special => !!s)
+    : all
+  if (!slides.length) slides.push(all[0])
   const n = slides.length
   const [cur, setCur] = useState(0)
   const [prev, setPrev] = useState<number | null>(null)
@@ -223,7 +227,7 @@ export function Billboard({ slides: content, leagueName, seasonLabel, logoUrl, p
         <div className="relative z-10 border-b border-white/10 bg-night-950/40 px-4 py-2 sm:px-6"><Tagline className="mx-auto max-w-3xl" /></div>
 
         {/* panneau */}
-        <div className="bb-panel relative z-10 grid min-h-[300px] px-5 py-7 sm:min-h-[330px] sm:px-10 sm:py-9" aria-live={hover || paused ? 'polite' : 'off'}>
+        <div className="bb-panel relative z-10 grid h-[320px] grid-rows-[minmax(0,1fr)] px-5 py-7 sm:h-[380px] sm:px-10 sm:py-9 lg:h-[440px]" aria-live={hover || paused ? 'polite' : 'off'}>
           {prev !== null && render(prev, 'out')}
           {n > 0 && render(idx, 'in')}
           {prev !== null && (

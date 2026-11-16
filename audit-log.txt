@@ -1,0 +1,16 @@
+webkit 360x800 43
+webkit 800x360 77
+webkit 390x844 111
+webkit 844x390 145
+webkit 430x932 179
+webkit 932x430 213
+webkit 768x1024 247
+webkit 1024x768 254
+webkit 820x1180 288
+webkit 1180x820 294
+webkit 1280x800 300
+webkit 1440x900 306
+webkit 1920x1080 312
+
+webkit pages contrôlées 689 avec remarques 312
+exit=0

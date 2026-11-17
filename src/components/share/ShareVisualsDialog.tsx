@@ -1,6 +1,7 @@
 // Visuels Instagram 1080×1350 générés côté navigateur (html-to-image) : BUT !, score final, homme du match.
 import { useMemo, useRef, useState } from 'react'
-import { toPng } from 'html-to-image'
+import { exportNodePng } from '@/lib/exportImage'
+import { embeddedFontCss } from '@/components/players/CardShare'
 import { Download, Loader2 } from 'lucide-react'
 import type { Match, MatchEvent } from '@/types/entities'
 import { useData, useLookup } from '@/hooks/useData'
@@ -26,7 +27,7 @@ export function ShareVisualsDialog({ open, onOpenChange, match }: { open: boolea
     if (!ref.current) return
     setBusy(true)
     try {
-      const url = await toPng(ref.current, { width: 1080, height: 1350, pixelRatio: 1, cacheBust: true })
+      const url = await exportNodePng(ref.current, { width: 1080, height: 1350, fontEmbedCSS: await embeddedFontCss() })
       const a = document.createElement('a'); a.href = url; a.download = `${settings.short_name ?? 'mbl'}-${kind}-${match.id}.png`; a.click()
     } finally { setBusy(false) }
   }

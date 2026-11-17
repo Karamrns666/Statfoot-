@@ -1,7 +1,7 @@
 // Groupes (création, affectation, équipes sans groupe, export PDF) + tirage au sort par pots (format « groupes »).
 import { useRef, useState } from 'react'
 import { FileDown, ImageDown, Lock, Plus, RotateCcw, Shuffle, Trash2, CheckCheck } from 'lucide-react'
-import { toPng } from 'html-to-image'
+import { exportNodePng } from '@/lib/exportImage'
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { base44 } from '@/api/base44Client'
@@ -138,7 +138,7 @@ function GroupDraw({ competitionId }: { competitionId: string }) {
           <div className="flex flex-wrap gap-2">
             <Badge variant="warning"><Lock className="size-3" />Pots verrouillés</Badge>
             {!done && draw.status !== 'published' && <Button onClick={next} disabled={!!spinning}><Shuffle />Tirer la prochaine équipe</Button>}
-            <Button variant="outline" onClick={async () => { if (visual.current) { const a = document.createElement('a'); a.href = await toPng(visual.current, { pixelRatio: 2 }); a.download = 'tirage.png'; a.click() } }}><ImageDown />Exporter le visuel</Button>
+            <Button variant="outline" onClick={async () => { if (visual.current) { const a = document.createElement('a'); a.href = await exportNodePng(visual.current, { width: visual.current.offsetWidth, height: visual.current.offsetHeight, pixelRatio: 2 }); a.download = 'tirage.png'; a.click() } }}><ImageDown />Exporter le visuel</Button>
             {done && draw.status !== 'published' && <Button onClick={apply}><CheckCheck />Voir les résultats → appliquer aux groupes</Button>}
             <Button variant="ghost" onClick={async () => { await base44.entities.Draw.update(draw.id, { status: 'draft' }); toast.info('Tirage réinitialisé') }}><RotateCcw />Recommencer</Button>
           </div>

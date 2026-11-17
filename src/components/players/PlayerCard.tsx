@@ -93,7 +93,7 @@ function CardPhoto({ cutout, photo, initials, color }: { cutout?: string; photo?
   const shown = cut.status === 'ready' ? cut : arch.status === 'ready' ? arch : null
   const loading = (cutout && cut.status === 'loading') || (cut.status === 'error' && photo && arch.status === 'loading')
   return (
-    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
+    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden data-photo-state={loading ? 'loading' : shown ? 'ready' : 'none'}>
       {/* silhouette : affichée sans photo, et pendant le chargement */}
       <div className={cn('absolute bottom-0 right-[2%] flex h-[80%] w-[60%] items-end justify-center transition-opacity duration-300', shown ? 'opacity-0' : loading ? 'opacity-40' : 'opacity-100')}>
         <svg viewBox="0 0 100 110" className="h-full w-full" style={{ color }}>

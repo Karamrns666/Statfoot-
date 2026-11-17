@@ -5,14 +5,19 @@
 // html-to-image les ignore (PNG téléchargé différent de la carte affichée). Une image déjà composée s'affiche
 // partout pareil, à l'écran comme dans le PNG.
 import { useEffect, useState } from 'react'
+import { sameOriginImage } from '@/lib/exportImage'
 
 const cache = new Map<string, Promise<string | null>>()
 
-function load(url: string) {
+function loadOne(src: string) {
   return new Promise<HTMLImageElement>((res, rej) => {
     const i = new Image(); i.crossOrigin = 'anonymous'; i.decoding = 'async'
-    i.onload = () => res(i); i.onerror = () => rej(new Error('image')); i.src = url
+    i.onload = () => res(i); i.onerror = () => rej(new Error('image')); i.src = src
   })
+}
+/** directement depuis le stockage (autorisé), sinon via le site (même domaine) */
+async function load(url: string) {
+  try { return await loadOne(url) } catch (e) { const alt = sameOriginImage(url); if (alt === url) throw e; return loadOne(alt) }
 }
 
 /** Joueur détouré : fondu sur les 18 % du bas + ombre portée douce. Renvoie une URL data: (PNG transparent). */

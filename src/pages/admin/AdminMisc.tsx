@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import Papa from 'papaparse'
 import { phaseName } from '@/lib/competitionNames'
-import { toPng } from 'html-to-image'
+import { exportNodePng } from '@/lib/exportImage'
 import { CheckCircle2, Download, FileSpreadsheet, Lock, Send, Sparkles, Tv, Upload, ImageDown } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { base44 } from '@/api/base44Client'
@@ -196,7 +196,7 @@ function AwardPoster({ award, onClose }: { award: Award; onClose: () => void }) 
             </div>
           </div>
         </div>
-        <Button className="w-full" onClick={async () => { if (ref.current) { const a = document.createElement('a'); a.href = await toPng(ref.current, { width: 1080, height: 1350 }); a.download = `award-${award.category}.png`; a.click() } }}><Download />Télécharger (1080×1350)</Button>
+        <Button className="w-full" onClick={async () => { if (ref.current) { const a = document.createElement('a'); a.href = await exportNodePng(ref.current, { width: 1080, height: 1350 }); a.download = `award-${award.category}.png`; a.click() } }}><Download />Télécharger (1080×1350)</Button>
       </div>
     </div>
   )

@@ -3,6 +3,7 @@
 // Textes : taille réduite automatiquement jusqu'à tenir dans leur zone, puis « … » en dernier recours.
 import { colorOf, VISUAL_SIZE, type VisualsConfig, type Zone } from './config'
 import type { MvpModel, ResultModel, ResultRow } from './model'
+import { sameOriginImage } from '@/lib/exportImage'
 
 // ---------------------------------------------------------------------------
 //  Polices
@@ -37,7 +38,9 @@ export function loadImage(url?: string): Promise<HTMLImageElement | null> {
       const i = new Image()
       i.decoding = 'async'
       if (/^https?:/.test(url) && !url.startsWith(location.origin)) i.crossOrigin = 'anonymous'
-      i.onload = () => res(i); i.onerror = () => { imgCache.delete(url); res(null) }
+      let retried = false
+      i.onload = () => res(i)
+      i.onerror = () => { const alt = sameOriginImage(url); if (!retried && alt !== url) { retried = true; i.src = alt; return } imgCache.delete(url); res(null) }
       i.src = url
     }))
   }

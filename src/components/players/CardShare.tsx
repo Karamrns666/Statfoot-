@@ -1,7 +1,7 @@
 // « Télécharger ma carte » (PNG 1080 × 1350) et « Partager » : partage natif du téléphone avec le fichier
 // (Web Share API), sinon liens WhatsApp / Facebook / LinkedIn / X et copie du lien de la fiche.
 import { useRef, useState, type ReactNode } from 'react'
-import { toBlob } from 'html-to-image'
+import { exportNodeBlob } from '@/lib/exportImage'
 import { Check, Copy, Download, Loader2, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -50,9 +50,7 @@ export function CardShareActions({ card, fileName, url, text, subtitle, download
 
   const render = async () => {
     if (!ref.current) throw new Error('Carte indisponible')
-    await document.fonts?.ready
-    const b = await toBlob(ref.current, { width: W, height: H, pixelRatio: 1, cacheBust: true, fontEmbedCSS: await embeddedFontCss() })
-    if (!b) throw new Error('Image impossible à générer')
+    const b = await exportNodeBlob(ref.current, { width: W, height: H, fontEmbedCSS: await embeddedFontCss() })
     return new File([b], fileName, { type: 'image/png' })
   }
   const save = (f: File) => { const a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = f.name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000) }

@@ -278,6 +278,8 @@
 .hit::before { content: ''; position: absolute; inset: -8px; }
 
 /* apparition douce de la photo du joueur (cadre déjà réservé : aucun saut) */
+/* export PNG : aucune animation pendant la capture (html-to-image les rejouerait depuis l'image 0) */
+[data-exporting], [data-exporting] * { animation: none !important; transition: none !important; }
 @keyframes card-photo-in { from { opacity: 0 } to { opacity: 1 } }
 .card-photo-in { animation: card-photo-in .35s ease-out both }
 @media (prefers-reduced-motion: reduce) { .card-photo-in { animation: none } }

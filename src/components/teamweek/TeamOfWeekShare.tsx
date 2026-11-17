@@ -1,6 +1,7 @@
 // Export de l'équipe type en image : post Instagram 1080×1350 ou story 1080×1920 (html-to-image, dans le navigateur).
 import { useRef, useState } from 'react'
-import { toPng } from 'html-to-image'
+import { exportNodePng } from '@/lib/exportImage'
+import { embeddedFontCss } from '@/components/players/CardShare'
 import { Download, Loader2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -26,7 +27,7 @@ export function TeamOfWeekShare({ open, onOpenChange, result, title }: { open: b
     if (!ref.current) return
     setBusy(true)
     try {
-      const url = await toPng(ref.current, { width: f.w, height: f.h, pixelRatio: 1, cacheBust: true })
+      const url = await exportNodePng(ref.current, { width: f.w, height: f.h, fontEmbedCSS: await embeddedFontCss() })
       const a = document.createElement('a'); a.href = url; a.download = `${league.shortName.toLowerCase()}-equipe-type-j${result.round}-${fmt}.png`; a.click()
     } finally { setBusy(false) }
   }

@@ -10,6 +10,8 @@ const dir = path.dirname(fileURLToPath(import.meta.url))
 const PHOTO = fs.readFileSync(path.join(dir, 'fixtures/test-photo.jpg')) // maillot rouge (200, 40, 40)
 const CUTOUT = fs.readFileSync(path.join(dir, 'fixtures/test-cutout.png')) // maillot bleu (30, 90, 200)
 const KINDS = ['cutout', 'photo', 'none']
+// le service worker du site prend les requêtes d'images avant l'interception de Playwright sous WebKit : bloqué ici
+test.use({ serviceWorkers: 'block' })
 
 test('photo présente dans la carte téléchargée', async ({ page }, info) => {
   test.setTimeout(120_000)

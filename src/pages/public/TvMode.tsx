@@ -21,6 +21,7 @@ import { fmtHour, wallDay } from '@/lib/matchTime'
 import { Logo } from '@/components/layout/Logo'
 import type { Match, MatchEvent, Team } from '@/types/entities'
 import { cn } from '@/lib/utils'
+import { matchColors, type SideColor } from '@/lib/teamColors'
 
 const ROTATE_MS = 20000
 const PREF = 'statfoot:tv:rotation'
@@ -163,6 +164,7 @@ function Board({ m, now }: { m: Match; now: number }) {
   const { db } = useData()
   const L = useLookup()
   const h = L.team.get(m.home_team_id), a = L.team.get(m.away_team_id), comp = L.competition.get(m.competition_id)
+  const colors = matchColors(h, a)
   const ls = L.live.get(m.id)
   const events = useMemo(() => db.MatchEvent.filter((e) => e.match_id === m.id), [db.MatchEvent, m.id])
   const sc = matchScorers(m, events)
@@ -178,7 +180,7 @@ function Board({ m, now }: { m: Match; now: number }) {
     <main className="relative flex flex-1 flex-col items-center px-[2vw] py-[1vh] [justify-content:safe_center] sm:min-h-0 sm:overflow-hidden [@media(max-height:520px)]:!overflow-visible">
       <div className="mb-[1vh] text-center font-display text-[clamp(.95rem,min(1.6vw,2.8vh),2rem)] font-bold uppercase tracking-[.2em] text-white/70">{m.number ? `${m.number} · ` : ''}{comp?.name}{m.round ? ` · Journée ${m.round}` : ''}{m.pitch ? ` · ${m.pitch}` : ''}</div>
       <div className="grid w-full max-w-[92vw] grid-cols-[1fr_auto_1fr] items-center gap-[2vw]">
-        <TeamSide team={h} />
+        <TeamSide team={h} color={colors.home} />
         <div className="flex flex-col items-center">
           <div className="num flex items-center leading-none text-[clamp(4.5rem,min(13vw,21vh),16rem)]" aria-live="polite" aria-label={`Score ${m.home_score ?? 0} à ${m.away_score ?? 0}`}>
             <span>{m.home_score ?? 0}</span><span className="mx-[1.6vw] inline-block h-[.09em] w-[.32em] rounded-full bg-white/35" aria-hidden /><span>{m.away_score ?? 0}</span>
@@ -188,7 +190,7 @@ function Board({ m, now }: { m: Match; now: number }) {
           </div>
           {m.forfeit_team_id && <ForfeitBadge match={m} detailed link={false} className="mt-[1vh] scale-150" />}
         </div>
-        <TeamSide team={a} />
+        <TeamSide team={a} color={colors.away} />
       </div>
       <InferiorityBar list={inf} home={h?.short_name} away={a?.short_name} size="xl" />
 
@@ -197,10 +199,10 @@ function Board({ m, now }: { m: Match; now: number }) {
         <Timeline goals={sc.home} cards={cards(m.home_team_id)} align="right" className="sm:col-start-1 sm:row-start-1" />
         {(live || m.status === 'finished') ? (
           <div className="col-span-2 row-start-1 grid gap-[.9vh] sm:col-span-1 sm:col-start-2">
-            <StatBar label="Tirs" h={st.home.shots} a={st.away.shots} hc={h?.primary_color} ac={a?.primary_color} />
-            <StatBar label="Tirs cadrés" h={st.home.shots_on_target} a={st.away.shots_on_target} hc={h?.primary_color} ac={a?.primary_color} />
-            <StatBar label="Arrêts" h={st.home.saves} a={st.away.saves} hc={h?.primary_color} ac={a?.primary_color} />
-            {ls && <StatBar label="Possession" h={pos.home_pct} a={pos.away_pct} hc={h?.primary_color} ac={a?.primary_color} unit="%" />}
+            <StatBar label="Tirs" h={st.home.shots} a={st.away.shots} hc={colors.home.bg} ac={colors.away.outline ? '#FFFFFF' : colors.away.bg} />
+            <StatBar label="Tirs cadrés" h={st.home.shots_on_target} a={st.away.shots_on_target} hc={colors.home.bg} ac={colors.away.outline ? '#FFFFFF' : colors.away.bg} />
+            <StatBar label="Arrêts" h={st.home.saves} a={st.away.saves} hc={colors.home.bg} ac={colors.away.outline ? '#FFFFFF' : colors.away.bg} />
+            {ls && <StatBar label="Possession" h={pos.home_pct} a={pos.away_pct} hc={colors.home.bg} ac={colors.away.outline ? '#FFFFFF' : colors.away.bg} unit="%" />}
           </div>
         ) : <div className="hidden sm:block" />}
         <Timeline goals={sc.away} cards={cards(m.away_team_id)} align="left" className="sm:col-start-3 sm:row-start-1" />
@@ -210,11 +212,12 @@ function Board({ m, now }: { m: Match; now: number }) {
   )
 }
 
-function TeamSide({ team }: { team?: Team }) {
+function TeamSide({ team, color }: { team?: Team; color?: SideColor }) {
   return (
     <div className="flex min-w-0 flex-col items-center gap-[1.2vh] text-center">
       <div className="relative aspect-square h-[clamp(3.5rem,min(11vw,15vh),13rem)] w-[clamp(3.5rem,min(11vw,15vh),13rem)] shrink-0"><TeamLogo team={team} size={220} fluid /></div>
       <div className="title-caps line-clamp-2 max-w-full text-[clamp(1.3rem,min(3vw,5vh),3.8rem)] leading-[.95]">{team?.name}</div>
+      {color && <div className="h-[.6vh] min-h-1 w-3/4 rounded-full" style={{ background: color.outline ? '#FFFFFF' : color.bg }} aria-hidden />}
     </div>
   )
 }

@@ -6,6 +6,7 @@ import { base44 } from '@/api/base44Client'
 import { forfeitText } from './forfeit'
 import { RESERVE_OUTCOMES } from './forfeit'
 import { CRITERIA } from './referee'
+import { durationsFor, minutesPlayed } from './matchEngine'
 import type { BaseEntity, EntityName, Lineup, Match, MatchEvent, Player, RefereeEvaluation, Team } from '@/types/entities'
 
 const all = <T extends BaseEntity>(n: EntityName) => store.all<T>(n)
@@ -13,7 +14,7 @@ const all = <T extends BaseEntity>(n: EntityName) => store.all<T>(n)
 export interface SheetTeam {
   id: string; name: string; score: number | null
   starters: string[]; substitutes: string[]; goalkeeper?: string; captain?: string
-  players: { name: string; number?: number; goals: number; assists: number; shots: number; on_target: number; saves: number; yellow: number; red: number }[]
+  players: { name: string; number?: number; minutes?: number; goals: number; assists: number; shots: number; on_target: number; saves: number; yellow: number; red: number }[]
 }
 export interface MatchSheet {
   match_id: string; number?: string; date?: string; pitch?: string; competition?: string; round?: number
@@ -22,6 +23,8 @@ export interface MatchSheet {
   penalties?: string
   goals: { minute: string; team: string; scorer: string; assist?: string; kind?: string }[]
   cards: { minute: string; team: string; player: string; type: string }[]
+  /** historique des entrées / sorties (remplacements illimités) */
+  changes?: { minute: string; team: string; in?: string; out?: string }[]
   forfeit?: string
   motm?: string
   reserve?: string
@@ -40,16 +43,19 @@ export function buildMatchSheet(matchId: string, opts: { private?: boolean } = {
   const events = all<MatchEvent>('MatchEvent').filter((e) => e.match_id === matchId).sort((a, b) => (a.minute ?? 0) - (b.minute ?? 0) || (a.added_minute ?? 0) - (b.added_minute ?? 0))
   const lineups = all<Lineup>('Lineup').filter((l) => l.match_id === matchId)
   const pname = (id?: string) => { const p = id ? players.get(id) : undefined; return p ? `${p.first_name} ${p.last_name}` : '' }
+  const comp0 = all<{ id: string; half_duration_min?: number } & BaseEntity>('Competition').find((c) => c.id === m.competition_id)
+  const total = 2 * durationsFor(m, comp0 as never).half
   const side = (tid: string, score: number | null): SheetTeam => {
     const l = lineups.find((x) => x.team_id === tid)
     const ids = [...new Set([...(l?.present_ids ?? []), ...events.filter((e) => e.team_id === tid && e.player_id).map((e) => e.player_id!)])]
     const ev = (pid: string, ...types: string[]) => events.filter((e) => e.player_id === pid && types.includes(e.type)).length
+    const mins = minutesPlayed(l, events, tid, total)
     return {
       id: tid, name: teams.get(tid)?.name ?? '', score,
       starters: (l?.starter_ids ?? []).map(pname), substitutes: (l?.substitute_ids ?? []).map(pname),
       goalkeeper: pname(l?.goalkeeper_id), captain: pname(l?.captain_id),
       players: ids.map((pid) => ({
-        name: pname(pid), number: l?.numbers?.[pid] ?? players.get(pid)?.number,
+        name: pname(pid), number: l?.numbers?.[pid] ?? players.get(pid)?.number, minutes: mins.get(pid) ?? 0,
         goals: ev(pid, 'goal'), assists: events.filter((e) => e.type === 'goal' && e.related_player_id === pid).length,
         shots: ev(pid, 'goal', 'shot_on_target', 'shot_off_target'), on_target: ev(pid, 'goal', 'shot_on_target'),
         saves: ev(pid, 'save', 'penalty_saved'), yellow: ev(pid, 'yellow_card'), red: ev(pid, 'red_card', 'second_yellow'),
@@ -67,6 +73,7 @@ export function buildMatchSheet(matchId: string, opts: { private?: boolean } = {
     penalties: m.penalties ? `${m.home_pens ?? 0} - ${m.away_pens ?? 0}` : undefined,
     goals: events.filter((e) => e.type === 'goal' || e.type === 'own_goal').map((e) => ({ minute: minute(e), team: tname(e.type === 'own_goal' ? (e.team_id === m.home_team_id ? m.away_team_id : m.home_team_id) : e.team_id), scorer: e.type === 'own_goal' ? `${pname(e.player_id) || 'Contre son camp'} (csc)` : pname(e.player_id) || e.player_name_free || '—', assist: pname(e.related_player_id) || undefined, kind: e.goal_kind === 'penalty' ? 'penalty' : undefined })),
     cards: events.filter((e) => ['yellow_card', 'red_card', 'second_yellow'].includes(e.type)).map((e) => ({ minute: minute(e), team: tname(e.team_id), player: pname(e.player_id), type: e.type === 'yellow_card' ? 'Jaune' : e.type === 'second_yellow' ? '2e jaune' : 'Rouge' })),
+    changes: events.filter((e) => e.type === 'substitution').map((e) => ({ minute: minute(e), team: tname(e.team_id), in: pname(e.player_id) || undefined, out: pname(e.related_player_id) || undefined })),
     forfeit: forfeitText(m) || undefined,
     motm: pname(m.motm_player_id) || undefined,
     reserve: opts.private && reserve ? `${reserve.label}${m.reserve_note ? ` — ${m.reserve_note}` : ''}` : undefined,

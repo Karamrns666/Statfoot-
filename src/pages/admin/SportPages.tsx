@@ -153,7 +153,7 @@ export function Teams() {
         columns={[
           { label: 'Équipe', render: (t) => <span className="flex items-center gap-2"><TeamLogo team={t} size={28} /><span><span className="font-semibold">{t.name}</span><span className="ml-2 text-xs text-muted-foreground">{t.short_name}</span></span></span> },
           { label: 'Entreprise', render: (t) => <span className="flex items-center gap-2">{t.company_logo_url && <img src={t.company_logo_url} className="size-5 rounded" alt="" />}{t.company}</span>, className: 'hidden md:table-cell' },
-          { label: 'Couleurs', render: (t) => <span className="flex gap-1"><span className="size-4 rounded" style={{ background: t.primary_color }} /><span className="size-4 rounded ring-1 ring-white/20" style={{ background: t.secondary_color }} /></span>, className: 'hidden sm:table-cell' },
+          { label: 'Couleurs', render: (t) => t.primary_color ? <span className="flex gap-1"><span className="size-4 rounded" style={{ background: t.primary_color }} /><span className="size-4 rounded ring-1 ring-white/20" style={{ background: t.secondary_color }} /></span> : <span className="rounded bg-amber-400/15 px-1.5 py-0.5 text-[11px] font-semibold text-amber-200" title="Utilisée dans le match centre et le mode TV ; couleur par défaut en attendant">Couleur à renseigner</span> },
           { label: 'Série', render: (t) => db.Division.find((d) => d.id === t.division_id)?.name ?? '—', className: 'hidden xl:table-cell' },
           { label: 'Saison précédente', render: (t) => <SeasonLinkControl kind="team" item={t} /> },
           { label: 'Ancienneté', render: (t) => <SeniorityControl team={t} />, className: 'hidden sm:table-cell' },

@@ -18,8 +18,8 @@ export default function MatchSheetPrint() {
       <h3 className="mb-1 text-lg font-black">{t.name}</h3>
       <p className="text-xs">Titulaires : {t.starters.join(', ') || '—'}<br />Remplaçants : {t.substitutes.join(', ') || '—'}<br />Gardien : {t.goalkeeper || '—'} · Capitaine : {t.captain || '—'}</p>
       <div className="mt-2 overflow-x-auto"><table className="w-full border-collapse text-xs">
-        <thead><tr>{['N°', 'Joueur', 'Buts', 'Passes', 'Tirs', 'Cadrés', 'Arrêts', 'J', 'R'].map((h) => <th key={h} className="border border-black/30 px-1 py-0.5 text-left">{h}</th>)}</tr></thead>
-        <tbody>{t.players.map((p) => <tr key={p.name}>{[p.number ?? '', p.name, p.goals, p.assists, p.shots, p.on_target, p.saves, p.yellow, p.red].map((v, i) => <td key={i} className="border border-black/30 px-1 py-0.5">{v || (i > 1 ? '' : v)}</td>)}</tr>)}</tbody>
+        <thead><tr>{['N°', 'Joueur', 'Min.', 'Buts', 'Passes', 'Tirs', 'Cadrés', 'Arrêts', 'J', 'R'].map((h) => <th key={h} className="border border-black/30 px-1 py-0.5 text-left">{h}</th>)}</tr></thead>
+        <tbody>{t.players.map((p) => <tr key={p.name}>{[p.number ?? '', p.name, p.minutes ?? '', p.goals, p.assists, p.shots, p.on_target, p.saves, p.yellow, p.red].map((v, i) => <td key={i} className="border border-black/30 px-1 py-0.5">{v || (i > 1 ? '' : v)}</td>)}</tr>)}</tbody>
       </table></div>
     </section>
   )
@@ -43,6 +43,9 @@ export default function MatchSheetPrint() {
         </header>
         <section><h3 className="font-black">Buts</h3>
           <ul className="text-sm">{sheet.goals.map((g, i) => <li key={i}>{g.minute} {g.team} — {g.scorer}{g.kind ? ' (penalty)' : ''}{g.assist ? `, passe ${g.assist}` : ''}</li>)}{!sheet.goals.length && <li>—</li>}</ul>
+        </section>
+        <section><h3 className="font-black">Entrées et sorties</h3>
+          <ul className="text-sm">{(sheet.changes ?? []).map((c, i) => <li key={i}>{c.minute} {c.team} — {c.in ? `entre ${c.in}` : ''}{c.in && c.out ? ', ' : ''}{c.out ? `sort ${c.out}` : ''}</li>)}{!sheet.changes?.length && <li>—</li>}</ul>
         </section>
         <section><h3 className="font-black">Cartons</h3>
           <ul className="text-sm">{sheet.cards.map((c, i) => <li key={i}>{c.minute} {c.team} — {c.player} ({c.type})</li>)}{!sheet.cards.length && <li>—</li>}</ul>

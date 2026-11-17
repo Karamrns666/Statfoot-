@@ -232,7 +232,7 @@ function EventText({ e, p, rel, align }: { e: MatchEvent; p?: Player; rel?: Play
         {e.type === 'substitution' ? <span className="inline-flex items-center gap-1"><ArrowRightLeft className="size-3 text-win" />{playerShort(p)}</span> : p ? <PlayerLink player={p} short /> : <span>{e.player_name_free ?? 'Joueur inconnu'}</span>}
       </div>
       <div className="text-xs text-muted-foreground">
-        {e.type === 'goal' && rel ? <>{label.goal} · passe <span className="text-neon-soft">{playerShort(rel)}</span></> : e.type === 'substitution' ? <>remplace {playerShort(rel)}</> : label[e.type] ?? e.type}
+        {e.type === 'goal' && rel ? <>{label.goal} · passe <span className="text-neon-soft">{playerShort(rel)}</span></> : e.type === 'substitution' ? (rel ? <>entre · sort {playerShort(rel)}</> : <>entre en jeu</>) : label[e.type] ?? e.type}
       </div>
     </div>
   )

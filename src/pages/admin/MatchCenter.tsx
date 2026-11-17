@@ -23,6 +23,9 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TeamLogo } from '@/components/league/Identity'
 import { TeamStatsBars } from '@/components/match/TeamStatsBars'
 import { LineupEditor } from '@/components/matchcenter/LineupEditor'
+import { PitchPicker, TeamBand, sideColor, useMatchColors, usePitch } from '@/components/matchcenter/PitchPicker'
+import { MAX_ON_FIELD, needsEntry, pitchState } from '@/lib/pitch'
+import { matchColors, sideStyle, type SideColor } from '@/lib/teamColors'
 import { toast } from '@/components/ui/toast'
 import {
   closureChecklist, currentMinute, durationsFor, elapsedMs, endPeriod, fmtClock, fmtMinute, foulsInPeriod, footballMinute, goalkeeperAt, isPlaying, nextStep,
@@ -56,6 +59,7 @@ type Flow =
   | { kind: 'save'; team: string }
   | { kind: 'player_menu'; team: string; player: string }
   | { kind: 'sub'; team: string; out?: string }
+  | { kind: 'enter'; team: string; player?: string; then?: () => void | Promise<void>; correct?: boolean }
   | { kind: 'gk'; team: string }
   | { kind: 'more'; team: string }
   | { kind: 'player_for'; team: string; type: EventType }
@@ -142,6 +146,7 @@ export default function MatchCenter() {
 
   if (!m) return <div className="p-6">Match introuvable · <Link to="/admin/match-center" className="text-neon">Programme</Link></div>
   const home = L.team.get(m.home_team_id), away = L.team.get(m.away_team_id)
+  const colors = matchColors(home, away)
   const lineups = { [m.home_team_id]: db.Lineup.find((l) => l.match_id === m.id && l.team_id === m.home_team_id), [m.away_team_id]: db.Lineup.find((l) => l.match_id === m.id && l.team_id === m.away_team_id) }
   const lineupsOk = !!lineups[m.home_team_id]?.validated && !!lineups[m.away_team_id]?.validated
   const score = scoreFromEvents(m, events)
@@ -209,7 +214,7 @@ export default function MatchCenter() {
         <section className="glass rounded-3xl p-3 sm:p-5">
           <div className="text-center text-xs text-muted-foreground">{comp?.name} · {isKnockout(m) ? STAGE_LABELS[m.stage!] : `Journée ${m.round}`} · {fmtDate(m.date, 'EEE d MMM')} · {fmtTime(m.date)} · {m.pitch}</div>
           <div className="mt-2 grid grid-cols-[1fr_auto_1fr] items-start gap-2">
-            <ScoreSide team={home} scorers={events.filter((e) => (e.type === 'goal' && e.team_id === m.home_team_id) || (e.type === 'own_goal' && e.team_id === m.away_team_id))} xp={xpBy} />
+            <ScoreSide team={home} color={colors.home} scorers={events.filter((e) => (e.type === 'goal' && e.team_id === m.home_team_id) || (e.type === 'own_goal' && e.team_id === m.away_team_id))} xp={xpBy} />
             <div className="flex flex-col items-center">
               <div className="num text-6xl leading-none sm:text-8xl">{score.home}<span className="text-white/30">-</span>{score.away}</div>
               {(so.home.length + so.away.length > 0) && <div className="num text-lg text-neon">({so.home_score}-{so.away_score} tab)</div>}
@@ -219,7 +224,7 @@ export default function MatchCenter() {
               </div>
               <div className="mt-0.5 text-[11px] uppercase text-muted-foreground">{isPlaying(period) ? `${PERIOD_LABEL[period as Period]}${addedPlanned ? ` · +${addedPlanned}' annoncés` : ''}${!ls?.running ? ' · pause' : ''}` : m.status === 'finished' ? 'Match clôturé' : ''}</div>
             </div>
-            <ScoreSide team={away} scorers={events.filter((e) => (e.type === 'goal' && e.team_id === m.away_team_id) || (e.type === 'own_goal' && e.team_id === m.home_team_id))} xp={xpBy} align="right" />
+            <ScoreSide team={away} color={colors.away} scorers={events.filter((e) => (e.type === 'goal' && e.team_id === m.away_team_id) || (e.type === 'own_goal' && e.team_id === m.home_team_id))} xp={xpBy} align="right" />
           </div>
           <InferiorityBar list={inferiority} home={home?.short_name} away={away?.short_name} />
           <div className="mt-2 flex justify-center">
@@ -238,22 +243,22 @@ export default function MatchCenter() {
         </section>
 
         {/* POSSESSION */}
-        <section className="mt-3 grid grid-cols-3 gap-2">
+        <section className="mt-3 grid grid-cols-[1fr_.8fr_1fr] gap-2">
           {(['home', 'dead', 'away'] as const).map((s) => {
             const active = ls?.possession?.current === s
             const team = s === 'home' ? home : s === 'away' ? away : undefined
             const msv = s === 'home' ? pos.home_ms : s === 'away' ? pos.away_ms : pos.dead_ms
             return (
-              <button key={s} disabled={!canWrite || !isPlaying(period)} onClick={() => { vibrate(); mutateLive((x, t) => setPossession(x, s, t)) }}
-                className={cn('flex min-h-16 flex-col items-center justify-center rounded-2xl border-2 px-2 py-2 font-display font-bold uppercase transition cursor-pointer disabled:cursor-default', active ? 'border-white text-white' : 'border-white/10 text-muted-foreground')}
-                style={active && team ? { background: `${team.primary_color}55`, borderColor: team.primary_color } : active ? { background: '#ffffff22' } : undefined}>
-                <span className="text-xs sm:text-sm">{s === 'dead' ? 'Ballon mort' : `Ballon ${team?.short_name}`}</span>
-                <span className="num text-lg">{fmtClock(msv)}{s !== 'dead' && <span className="ml-1 text-sm text-muted-foreground">{s === 'home' ? pos.home_pct : pos.away_pct}%</span>}</span>
+              <button key={s} disabled={!canWrite || !isPlaying(period)} onClick={() => { vibrate(); mutateLive((x, t) => setPossession(x, s, t)) }} aria-pressed={active}
+                className={cn('flex min-h-16 flex-col items-center justify-center rounded-2xl px-2 py-2 font-display font-bold uppercase transition cursor-pointer disabled:cursor-default', team ? '' : 'border-2', active ? 'ring-4 ring-white ring-offset-2 ring-offset-night-950' : team ? '' : 'border-white/10 text-muted-foreground')}
+                style={team ? sideStyle(s === 'home' ? colors.home : colors.away, { dim: !active && !!ls?.possession?.current }) : active ? { background: '#ffffff22' } : undefined}>
+                <span className="flex items-center gap-1.5 text-sm sm:text-base">{team && <TeamLogo team={team} size={22} />}{s === 'dead' ? 'Ballon mort' : team?.short_name}</span>
+                <span className="num text-lg">{fmtClock(msv)}{s !== 'dead' && <span className="ml-1 text-sm opacity-80">{s === 'home' ? pos.home_pct : pos.away_pct}%</span>}</span>
               </button>
             )
           })}
         </section>
-        <div className="mt-1.5 flex h-2 overflow-hidden rounded-full bg-white/10"><div style={{ width: `${pos.home_pct}%`, background: home?.primary_color }} /><div style={{ width: `${pos.away_pct}%`, background: away?.primary_color }} /></div>
+        <div className="mt-1.5 flex h-2 overflow-hidden rounded-full bg-white/10"><div style={{ width: `${pos.home_pct}%`, background: colors.home.bg }} /><div style={{ width: `${pos.away_pct}%`, background: colors.away.outline ? '#FFFFFF' : colors.away.bg }} /></div>
 
         {m.status === 'finished' && (
           <section className="mt-3 rounded-2xl border border-white/10 bg-night-900/60 p-3 sm:p-4" aria-labelledby="visuels-titre">
@@ -270,14 +275,14 @@ export default function MatchCenter() {
             {period === 'PENS' && canWrite && <ShootoutPanel match={m} events={events} onKick={(team) => setFlow({ kind: 'shootout', team })} />}
             <div className="grid gap-3 sm:grid-cols-2">
               {[m.home_team_id, m.away_team_id].map((tid) => (
-                <ActionPad key={tid} teamId={tid} events={events} disabled={!canWrite || !(isPlaying(period) || period === 'HT' || period === 'ET_BREAK')}
+                <ActionPad key={tid} match={m} teamId={tid} events={events} disabled={!canWrite || !(isPlaying(period) || period === 'HT' || period === 'ET_BREAK')}
                   onGoal={() => setFlow({ kind: 'goal', team: tid, step: 'type' })}
                   onAction={(type) => (type === 'yellow_card' || type === 'red_card' ? setFlow({ kind: 'card', team: tid, type }) : type === 'shot_on_target' || type === 'shot_off_target' ? setFlow({ kind: 'shot', team: tid, type }) : type === 'save' ? setFlow({ kind: 'save', team: tid }) : act(tid, type))}
                   onMore={() => setFlow({ kind: 'more', team: tid })} />
               ))}
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
-              {[m.home_team_id, m.away_team_id].map((tid) => <LineupPanel key={tid} match={m} teamId={tid} events={events} onPlayer={(p) => canWrite && setFlow({ kind: 'player_menu', team: tid, player: p })} onEdit={() => setLineupsOpen(true)} />)}
+              {[m.home_team_id, m.away_team_id].map((tid) => <LineupPanel key={tid} match={m} teamId={tid} events={events} onPlayer={(p) => canWrite && setFlow({ kind: 'player_menu', team: tid, player: p })} onEdit={() => setLineupsOpen(true)} onEnter={canWrite ? () => setFlow({ kind: 'enter', team: tid }) : undefined} />)}
             </div>
             {canWrite && <Button variant="outline" size="lg" className="h-14 w-full" onClick={undoLast} disabled={!events.some((e) => !e.auto)}><Undo2 />Annuler la dernière action</Button>}
           </div>
@@ -302,18 +307,18 @@ export default function MatchCenter() {
           <div className="grid gap-3 md:grid-cols-2"><LineupEditor match={m} teamId={m.home_team_id} readOnly={!canWrite && !can(user, 'sport')} /><LineupEditor match={m} teamId={m.away_team_id} readOnly={!canWrite && !can(user, 'sport')} /></div>
         </DialogContent>
       </Dialog>
-      {flow && <FlowDialog flow={flow} setFlow={setFlow} match={m} events={events} act={act} ls={ls} />}
+      {flow && <FlowDialog flow={flow} setFlow={setFlow} match={m} events={events} act={act} ls={ls} d={d} />}
     </div>
   )
 }
 
 // ---------------------------------------------------------------------------
-function ScoreSide({ team, scorers, xp, align = 'left' }: { team?: { name: string; short_name: string; primary_color?: string } & Parameters<typeof TeamLogo>[0]['team']; scorers: MatchEvent[]; xp: Map<string, number>; align?: 'left' | 'right' }) {
+function ScoreSide({ team, scorers, xp, align = 'left', color }: { color?: SideColor; team?: { name: string; short_name: string; primary_color?: string } & Parameters<typeof TeamLogo>[0]['team']; scorers: MatchEvent[]; xp: Map<string, number>; align?: 'left' | 'right' }) {
   const L = useLookup()
   return (
     <div className="flex min-w-0 flex-col items-center gap-1 text-center">
       <TeamLogo team={team} size={64} />
-      <div className="title-caps text-base leading-tight sm:text-xl">{team?.name}</div>
+      <div className="title-caps max-w-full rounded-lg px-2 py-0.5 text-base leading-tight sm:text-xl" style={color ? sideStyle(color) : undefined}>{team?.name}</div>
       <ul className={cn('w-full space-y-0.5 text-[11px] sm:text-xs', align === 'right' ? 'text-right' : 'text-left')}>
         {scorers.map((e) => (
           <li key={e.id} className="truncate">⚽ {playerShort(L.player.get(e.player_id ?? '')) || e.player_name_free || 'Inconnu'} {fmtMinute(e.minute, e.added_minute)}{e.type === 'own_goal' ? ' (csc)' : e.goal_kind === 'penalty' ? ' (pen.)' : ''}
@@ -335,13 +340,11 @@ function AddedTime({ value, onChange }: { value: number; onChange: (v: number) =
   )
 }
 
-function ActionPad({ teamId, events, disabled, onGoal, onAction, onMore }: { teamId: string; events: MatchEvent[]; disabled: boolean; onGoal: () => void; onAction: (t: EventType) => void; onMore: () => void }) {
-  const L = useLookup()
-  const team = L.team.get(teamId)
+function ActionPad({ match, teamId, events, disabled, onGoal, onAction, onMore }: { match: Match; teamId: string; events: MatchEvent[]; disabled: boolean; onGoal: () => void; onAction: (t: EventType) => void; onMore: () => void }) {
   const count = (t: EventType) => events.filter((e) => e.team_id === teamId && (e.type === t || (t === 'yellow_card' && e.type === 'second_yellow') || (t === 'save' && e.type === 'penalty_saved'))).length
   return (
-    <div className="glass rounded-2xl p-2.5" style={{ borderTop: `3px solid ${team?.primary_color}` }}>
-      <div className="mb-2 flex items-center gap-2"><TeamLogo team={team} size={22} /><span className="font-display text-lg font-bold uppercase">{team?.short_name}</span></div>
+    <div className="glass rounded-2xl p-2.5">
+      <TeamBand match={match} teamId={teamId} className="mb-2" />
       <button disabled={disabled} onClick={() => { vibrate(); onGoal() }} className="mb-2 flex h-16 w-full items-center justify-center rounded-xl bg-neon font-display text-3xl font-black uppercase tracking-wider text-white shadow-[0_0_24px_-6px_rgb(242_107_29/.9)] active:scale-[.98] disabled:opacity-40 cursor-pointer">⚽ But</button>
       <div className="grid grid-cols-2 gap-1.5">
         {PAD.map((p) => (
@@ -355,37 +358,48 @@ function ActionPad({ teamId, events, disabled, onGoal, onAction, onMore }: { tea
   )
 }
 
-function LineupPanel({ match, teamId, events, onPlayer, onEdit }: { match: Match; teamId: string; events: MatchEvent[]; onPlayer: (pid: string) => void; onEdit: () => void }) {
+function LineupPanel({ match, teamId, events, onPlayer, onEdit, onEnter }: { match: Match; teamId: string; events: MatchEvent[]; onPlayer: (pid: string) => void; onEdit: () => void; onEnter?: () => void }) {
   const { db } = useData()
   const L = useLookup()
   const lu = db.Lineup.find((l) => l.match_id === match.id && l.team_id === teamId)
-  const subsIn = new Set(events.filter((e) => e.team_id === teamId && e.type === 'substitution').map((e) => e.player_id))
-  const subsOut = new Set(events.filter((e) => e.team_id === teamId && e.type === 'substitution').map((e) => e.related_player_id))
-  const gkNow = goalkeeperAt(lu, events, teamId, 999, 'PENS')
-  const row = (pid: string, bench: boolean) => {
+  const st = usePitch(match, teamId, events)
+  const entered = new Set(events.filter((e) => e.team_id === teamId && e.type === 'substitution').map((e) => e.player_id))
+  const row = (pid: string, onField: boolean) => {
     const p = L.player.get(pid); if (!p) return null
     const b = playerBadges(events, pid)
+    const out = st.expelled.has(pid)
     return (
-      <button key={pid} onClick={() => onPlayer(pid)} className={cn('flex min-h-11 w-full items-center gap-2 rounded-lg px-2 text-left text-sm hover:bg-white/5 cursor-pointer', bench && !subsIn.has(pid) && 'opacity-55', subsOut.has(pid) && 'line-through opacity-55')}>
+      <button key={pid} onClick={() => onPlayer(pid)} className={cn('flex w-full items-center gap-2 rounded-lg px-2 text-left text-sm hover:bg-white/5 cursor-pointer', onField ? 'min-h-11' : 'min-h-10 opacity-75', out && 'opacity-40')}>
         <span className="num w-6 text-right text-base">{lu?.numbers?.[pid] ?? p.number}</span>
-        <span className="flex-1 truncate">{p.first_name.charAt(0)}. {p.last_name}</span>
-        {gkNow === pid && <span className="flex size-5 items-center justify-center rounded-full bg-award-blue text-[10px] font-black">G</span>}
+        <span className={cn('flex-1 truncate', out && 'line-through')}>{p.first_name.charAt(0)}. {p.last_name}</span>
+        {out && <span className="rounded bg-red-500/20 px-1.5 text-[10px] font-bold uppercase text-red-200">Expulsé</span>}
+        {st.goalkeeper === pid && <span className="flex size-5 items-center justify-center rounded-full bg-award-blue text-[10px] font-black">G</span>}
         {lu?.captain_id === pid && <span className="flex size-5 items-center justify-center rounded-full bg-award-gold text-[10px] font-black text-night-950">C</span>}
-        {subsIn.has(pid) && <ArrowRightLeft className="size-3.5 text-win" />}
+        {entered.has(pid) && onField && <ArrowRightLeft className="size-3.5 text-win" />}
         <span className="text-xs">{b.goals ? `⚽${b.goals > 1 ? '×' + b.goals : ''}` : ''}{b.assists ? `🅰${b.assists > 1 ? '×' + b.assists : ''}` : ''}{b.red ? '🟥' : b.yellow ? '🟨' : ''}</span>
       </button>
     )
   }
   return (
     <div className="glass rounded-2xl p-2">
-      <div className="mb-1 flex items-center justify-between px-1"><span className="text-xs font-bold uppercase text-muted-foreground">{L.team.get(teamId)?.short_name} · 6 contre 6</span><button className="-my-2 inline-flex min-h-11 cursor-pointer items-center rounded-lg px-3 text-xs font-semibold text-neon hover:bg-white/5" onClick={onEdit}><Pencil className="inline size-3" /> compo</button></div>
-      {lu ? <>{(lu.starter_ids ?? []).map((p) => row(p, false))}<div className="my-1 border-t border-white/5" />{(lu.substitute_ids ?? []).map((p) => row(p, true))}</> : <p className="p-2 text-xs text-muted-foreground">Composition non saisie</p>}
+      <TeamBand match={match} teamId={teamId} className="mb-1.5">
+        <span className="ml-auto text-xs font-bold">{st.onField.length}/6</span>
+        <button className="-my-1 inline-flex min-h-10 cursor-pointer items-center rounded-lg px-2 text-xs font-semibold underline-offset-2 hover:underline" onClick={onEdit}>Compo</button>
+      </TeamBand>
+      {lu ? <>
+        <div className="px-1 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">Sur le terrain</div>
+        {st.onField.map((p) => row(p, true))}
+        <div className="mt-1 border-t border-white/5 px-1 pt-1 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">Sur le banc</div>
+        {st.bench.map((p) => row(p, false))}
+        {onEnter && <Button variant="outline" className="mt-1.5 h-12 w-full" onClick={onEnter}><ArrowRightLeft />Entrer en jeu</Button>}
+      </> : <p className="p-2 text-xs text-muted-foreground">Composition non saisie</p>}
     </div>
   )
 }
 
 function SummaryPanel({ match, events, canEdit, onEdit, onDelete }: { match: Match; events: MatchEvent[]; canEdit: boolean; onEdit: (e: MatchEvent) => void; onDelete: (e: MatchEvent) => void }) {
   const L = useLookup()
+  const colors = useMatchColors(match)
   const [confirm, setConfirm] = useState<{ id: string; n: number } | null>(null)
   const byP = timelineByPeriod(events)
   return (
@@ -397,11 +411,11 @@ function SummaryPanel({ match, events, canEdit, onEdit, onDelete }: { match: Mat
           <div className="mb-1 text-center text-[11px] font-bold uppercase text-muted-foreground">{PERIOD_LABEL[p]}</div>
           {list.map((e) => {
             const home = e.team_id === match.home_team_id
-            const txt = <span><b>{playerShort(L.player.get(e.player_id ?? '')) || e.player_name_free || (e.type === 'yellow_card' || e.type === 'red_card' ? 'Joueur inconnu' : '')}</b> {e.type === 'goal' && e.related_player_id ? <span className="text-muted-foreground">(🅰 {playerShort(L.player.get(e.related_player_id))})</span> : e.type === 'substitution' ? <span className="text-muted-foreground">↔ {playerShort(L.player.get(e.related_player_id ?? ''))}</span> : null} <span className="text-xs text-muted-foreground">{e.type === 'goal' ? (e.goal_kind === 'penalty' ? 'pen.' : e.goal_kind === 'header' ? 'tête' : e.goal_kind === 'direct_free_kick' ? 'CF direct' : '') : EVENT_LABEL[e.type]}</span>{e.revisions?.length ? <span className="ml-1 text-[10px] text-amber-300">(corrigé)</span> : null}</span>
+            const txt = <span><b>{playerShort(L.player.get(e.player_id ?? '')) || e.player_name_free || (e.type === 'yellow_card' || e.type === 'red_card' ? 'Joueur inconnu' : '')}</b> {e.type === 'goal' && e.related_player_id ? <span className="text-muted-foreground">(🅰 {playerShort(L.player.get(e.related_player_id))})</span> : e.type === 'substitution' ? <span className="text-muted-foreground">{e.related_player_id ? <>entre · sort {playerShort(L.player.get(e.related_player_id))}</> : 'entre en jeu'}</span> : null} <span className="text-xs text-muted-foreground">{e.type === 'goal' ? (e.goal_kind === 'penalty' ? 'pen.' : e.goal_kind === 'header' ? 'tête' : e.goal_kind === 'direct_free_kick' ? 'CF direct' : '') : EVENT_LABEL[e.type]}</span>{e.revisions?.length ? <span className="ml-1 text-[10px] text-amber-300">(corrigé)</span> : null}</span>
             return (
               <div key={e.id} className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 py-0.5 text-sm">
                 <div className="text-right">{home && txt}</div>
-                <div className="flex items-center gap-1"><span className="num w-12 text-center text-xs">{fmtMinute(e.minute, e.added_minute)}</span></div>
+                <div className="flex items-center gap-1"><span className="num flex min-w-14 items-center justify-center gap-1 rounded-md px-1 py-0.5 text-xs" style={sideStyle(sideColor(match, colors, e.team_id))}><TeamLogo team={L.team.get(e.team_id)} size={14} />{fmtMinute(e.minute, e.added_minute)}</span></div>
                 <div className="flex items-center gap-1">{!home && txt}
                   {canEdit && <span className={cn('ml-auto flex gap-0.5', home && 'order-first mr-auto ml-0')}>
                     <button className="flex size-10 items-center justify-center rounded-lg text-muted-foreground hover:bg-white/5 hover:text-white lg:size-8" onClick={() => onEdit(e)} title="Corriger" aria-label="Corriger"><Pencil className="size-3.5" /></button>
@@ -459,17 +473,6 @@ function ShootoutPanel({ match, events, onKick }: { match: Match; events: MatchE
 // ---------------------------------------------------------------------------
 //  Dialogues d'action
 // ---------------------------------------------------------------------------
-/** Le joueur est-il sur le terrain (titulaire non remplacé ou entré en jeu) ? Sinon : remplaçant sur le banc. */
-function onPitch(match: Match, events: MatchEvent[], teamId: string, pid: string, lineups: { match_id: string; team_id: string; starter_ids?: string[] }[]) {
-  const lu = lineups.find((l) => l.match_id === match.id && l.team_id === teamId)
-  let on = !lu || !!lu.starter_ids?.includes(pid)
-  for (const e of sortEvents(events.filter((x) => x.team_id === teamId && x.type === 'substitution'))) {
-    if (e.player_id === pid) on = true
-    if (e.related_player_id === pid) on = false
-  }
-  return on
-}
-
 /** Après un rouge (règlement v8) : aucune suspension automatique ; Ardentia peut saisir le conseil de discipline (Art. 11.6, 19). */
 function CouncilReferralForm({ player, defaultIncident, onSave, onCancel }: { player?: Player; defaultIncident: string; onSave: (x: { incident: string; matches: number }) => void; onCancel: () => void }) {
   const [v, setV] = useState({ incident: defaultIncident, matches: 1 })
@@ -487,26 +490,7 @@ function CouncilReferralForm({ player, defaultIncident, onSave, onCancel }: { pl
   )
 }
 
-function PlayerGrid({ match, teamId, events, onPick, includeBench = true, onlyGk }: { match: Match; teamId: string; events: MatchEvent[]; onPick: (pid: string) => void; includeBench?: boolean; onlyGk?: boolean }) {
-  const { db } = useData()
-  const L = useLookup()
-  const lu = db.Lineup.find((l) => l.match_id === match.id && l.team_id === teamId)
-  const ins = new Set(events.filter((e) => e.type === 'substitution' && e.team_id === teamId).map((e) => e.player_id))
-  const outs = new Set(events.filter((e) => e.type === 'substitution' && e.team_id === teamId).map((e) => e.related_player_id))
-  let ids = lu ? [...(lu.starter_ids ?? []).filter((x) => !outs.has(x)), ...(lu.substitute_ids ?? []).filter((x) => includeBench || ins.has(x))] : db.Player.filter((p) => p.team_id === teamId && p.season_ids?.includes(match.season_id)).map((p) => p.id)
-  if (onlyGk) ids = [...new Set([...ids, ...(lu?.substitute_ids ?? [])])]
-  const gk = goalkeeperAt(lu, events, teamId, 999, 'PENS')
-  return (
-    <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4">
-      {ids.map((pid) => { const p = L.player.get(pid) as Player; if (!p) return null; return (
-        <button key={pid} onClick={() => onPick(pid)} className={cn('flex min-h-16 flex-col items-center justify-center rounded-xl bg-white/5 p-1 hover:bg-neon/20 cursor-pointer', pid === gk && 'ring-1 ring-award-blue', !ins.has(pid) && !(lu?.starter_ids ?? []).includes(pid) && 'opacity-60')}>
-          <span className="num text-2xl">{lu?.numbers?.[pid] ?? p.number}</span><span className="w-full truncate text-center text-[11px]">{p.last_name}{pid === gk ? ' (GK)' : ''}</span>
-        </button>) })}
-    </div>
-  )
-}
-
-function FlowDialog({ flow, setFlow, match, events, act, ls }: { flow: Flow; setFlow: (f: Flow | null) => void; match: Match; events: MatchEvent[]; act: (team: string, type: EventType, extra?: Partial<MatchEvent>, opts?: { shooter?: string }) => Promise<MatchEvent | undefined>; ls?: LiveState }) {
+function FlowDialog({ flow, setFlow, match, events, act, ls, d }: { d: ReturnType<typeof durationsFor>; flow: Flow; setFlow: (f: Flow | null) => void; match: Match; events: MatchEvent[]; act: (team: string, type: EventType, extra?: Partial<MatchEvent>, opts?: { shooter?: string }) => Promise<MatchEvent | undefined>; ls?: LiveState }) {
   const { db, league, settings } = useData()
   const L = useLookup()
   const { user } = useAuth()
@@ -516,6 +500,13 @@ function FlowDialog({ flow, setFlow, match, events, act, ls }: { flow: Flow; set
   const opp = (t: string) => (t === match.home_team_id ? match.away_team_id : match.home_team_id)
   const close = () => setFlow(null)
   const teamName = (t: string) => L.team.get(t)?.name
+  const pitchOf = (t: string) => { const lu = db.Lineup.find((l) => l.match_id === match.id && l.team_id === t); return lu ? pitchState(lu, events, t) : { ...pitchState(undefined, events, t), onField: [] as string[] } }
+  /** joueur choisi sur le banc pour une action de jeu : on propose de le faire entrer, sans jamais bloquer l'action */
+  const guard = (t: string, pid: string, action: string, then: () => void | Promise<void>) => {
+    const lu = db.Lineup.find((l) => l.match_id === match.id && l.team_id === t)
+    if (lu && needsEntry(action, pitchState(lu, events, t), pid)) setFlow({ kind: 'enter', team: t, player: pid, then })
+    else void then()
+  }
   let title = '', body: React.ReactNode = null
   switch (flow.kind) {
     case 'goal': {
@@ -533,9 +524,9 @@ function FlowDialog({ flow, setFlow, match, events, act, ls }: { flow: Flow; set
           else if (flow.goal_kind === 'penalty' || flow.goal_kind === 'direct_free_kick') { await act(flow.team, 'goal', { goal_kind: flow.goal_kind, player_id: pid, player_name_free: freeName }); close() }
           else setFlow({ ...flow, step: 'assist', scorer: pid, free: freeName })
         }
-        body = <div className="space-y-3"><p className="text-sm text-muted-foreground">{flow.goal_kind === 'own_goal' ? `Joueur de ${teamName(scorerTeam)} auteur du CSC` : 'Buteur'}</p><PlayerGrid match={match} teamId={scorerTeam} events={events} onPick={(p) => pick(p)} includeBench={false} />
+        body = <div className="space-y-3"><p className="text-sm text-muted-foreground">{flow.goal_kind === 'own_goal' ? `Joueur de ${teamName(scorerTeam)} auteur du CSC` : 'Buteur'}</p><PitchPicker match={match} teamId={scorerTeam} events={events} mode="action" onPick={(p) => guard(scorerTeam, p, 'goal', () => pick(p))} />
           <div className="flex gap-2"><Input placeholder="Autre joueur (hors compo)" value={free} onChange={(e) => setFree(e.target.value)} /><Button variant="outline" disabled={!free} onClick={() => pick(undefined, free)}>Valider</Button></div></div>
-      } else body = <div className="space-y-3"><p className="text-sm text-muted-foreground">Passeur</p><PlayerGrid match={match} teamId={flow.team} events={events} includeBench={false} onPick={async (p) => { if (p === flow.scorer) return; await act(flow.team, 'goal', { goal_kind: flow.goal_kind as GoalKind, player_id: flow.scorer, player_name_free: flow.free, related_player_id: p }); close() }} />
+      } else body = <div className="space-y-3"><p className="text-sm text-muted-foreground">Passeur</p><PitchPicker match={match} teamId={flow.team} events={events} mode="action" exclude={flow.scorer ? [flow.scorer] : []} onPick={(p) => guard(flow.team, p, 'assist', async () => { await act(flow.team, 'goal', { goal_kind: flow.goal_kind as GoalKind, player_id: flow.scorer, player_name_free: flow.free, related_player_id: p }); close() })} />
         <Button size="xl" variant="outline" className="w-full" onClick={async () => { await act(flow.team, 'goal', { goal_kind: flow.goal_kind as GoalKind, player_id: flow.scorer, player_name_free: flow.free }); close() }}>Sans passeur</Button></div>
       break
     }
@@ -543,7 +534,7 @@ function FlowDialog({ flow, setFlow, match, events, act, ls }: { flow: Flow; set
       title = `${flow.type === 'yellow_card' ? 'Carton jaune' : 'Carton rouge'} — ${teamName(flow.team)}`
       body = <div className="space-y-3">
         <p className="text-xs text-muted-foreground">Joueur sur le terrain ou remplaçant — {flow.type === 'yellow_card' ? <>2e jaune du match = rouge automatique « 2e avertissement » ; pas de cumul d’un match à l’autre. <ArtLink art={REGLEMENT.cards.artYellow} /></> : <>2 min d’infériorité ; pas de suspension automatique, le conseil de discipline peut être saisi. <ArtLink art={REGLEMENT.cards.artRed} /></>}</p>
-        <PlayerGrid match={match} teamId={flow.team} events={events} onPick={async (p) => { setFlow(null); await act(flow.team, flow.type, { player_id: p, card_target: onPitch(match, events, flow.team, p, db.Lineup) ? 'player' : 'substitute' }) }} />
+        <PitchPicker match={match} teamId={flow.team} events={events} mode="card" onPick={async (p, onField) => { setFlow(null); await act(flow.team, flow.type, { player_id: p, card_target: onField ? 'player' : 'substitute' }) }} />
         <form className="flex gap-2" onSubmit={async (e) => { e.preventDefault(); const name = official.trim(); setFlow(null); await act(flow.team, flow.type, { card_target: 'official', player_name_free: name || 'Officiel d’équipe' }) }}>
           <Input value={official} onChange={(e) => setOfficial(e.target.value)} placeholder="Officiel d’équipe (nom)" aria-label="Nom de l’officiel d’équipe" />
           <Button type="submit" variant="outline">Officiel</Button>
@@ -552,28 +543,34 @@ function FlowDialog({ flow, setFlow, match, events, act, ls }: { flow: Flow; set
       break
     case 'shot':
       title = `${flow.type === 'shot_on_target' ? 'Tir cadré' : 'Tir non cadré'} — ${teamName(flow.team)}`
-      body = <div className="space-y-3"><p className="text-sm text-muted-foreground">Qui a tiré ? (obligatoire — compté dans les statistiques du joueur et de l’équipe)</p><PlayerGrid match={match} teamId={flow.team} events={events} includeBench={false} onPick={async (p) => { setFlow(null); await act(flow.team, flow.type, { player_id: p }) }} />
+      body = <div className="space-y-3"><p className="text-sm text-muted-foreground">Qui a tiré ? (obligatoire — compté dans les statistiques du joueur et de l’équipe)</p><PitchPicker match={match} teamId={flow.team} events={events} mode="action" onPick={(p) => guard(flow.team, p, flow.type, async () => { setFlow(null); await act(flow.team, flow.type, { player_id: p }) })} />
 </div>
       break
     case 'save': {
       const shooterTeam = opp(flow.team)
       title = `Arrêt — ${teamName(flow.team)}`
-      body = <div className="space-y-3"><p className="text-sm text-muted-foreground">Qui a tiré ? ({teamName(shooterTeam)} — compté comme tir cadré du joueur et de l’équipe)</p><PlayerGrid match={match} teamId={shooterTeam} events={events} includeBench={false} onPick={async (p) => { setFlow(null); await act(flow.team, 'save', {}, { shooter: p }) }} />
+      body = <div className="space-y-3"><p className="text-sm text-muted-foreground">Qui a tiré ? ({teamName(shooterTeam)} — compté comme tir cadré du joueur et de l’équipe)</p><PitchPicker match={match} teamId={shooterTeam} events={events} mode="action" onPick={(p) => guard(shooterTeam, p, 'shot_on_target', async () => { setFlow(null); await act(flow.team, 'save', {}, { shooter: p }) })} />
 </div>
       break
     }
     case 'player_for':
       title = `${EVENT_LABEL[flow.type]} — ${teamName(flow.team)}`
-      body = <PlayerGrid match={match} teamId={flow.team} events={events} onPick={async (p) => { setFlow(null); await act(flow.team, flow.type, { player_id: p }) }} />
+      body = <PitchPicker match={match} teamId={flow.team} events={events} mode="action" onPick={(p) => guard(flow.team, p, flow.type, async () => { setFlow(null); await act(flow.team, flow.type, { player_id: p }) })} />
       break
     case 'player_menu': {
       const p = L.player.get(flow.player)
-      title = `${p?.first_name} ${p?.last_name}`
+      const ps = pitchOf(flow.team)
+      const onField = ps.onField.includes(flow.player) || !db.Lineup.some((l) => l.match_id === match.id && l.team_id === flow.team)
+      const expelled = ps.expelled.has(flow.player)
+      title = `${p?.first_name} ${p?.last_name}${expelled ? ' · expulsé' : onField ? '' : ' · sur le banc'}`
       body = (
         <div className="grid grid-cols-2 gap-2">
-          <Button size="xl" onClick={() => setFlow({ kind: 'goal', team: flow.team, step: 'assist', goal_kind: 'normal', scorer: flow.player })}>⚽ But</Button>
-          {([['shot_on_target', 'Tir cadré'], ['shot_off_target', 'Tir non cadré'], ['yellow_card', '🟨 Jaune'], ['red_card', '🟥 Rouge']] as const).map(([t, l]) => <Button key={t} size="xl" variant="secondary" onClick={async () => { setFlow(null); await act(flow.team, t, { player_id: flow.player }) }}>{l}</Button>)}
-          <Button size="xl" variant="outline" onClick={() => setFlow({ kind: 'sub', team: flow.team, out: flow.player })}>↔ Remplacer</Button>
+          <Button size="xl" disabled={expelled} onClick={() => guard(flow.team, flow.player, 'goal', () => setFlow({ kind: 'goal', team: flow.team, step: 'assist', goal_kind: 'normal', scorer: flow.player }))}>⚽ But</Button>
+          {([['shot_on_target', 'Tir cadré'], ['shot_off_target', 'Tir non cadré']] as const).map(([t, l]) => <Button key={t} size="xl" variant="secondary" disabled={expelled} onClick={() => guard(flow.team, flow.player, t, async () => { setFlow(null); await act(flow.team, t, { player_id: flow.player }) })}>{l}</Button>)}
+          {([['yellow_card', '🟨 Jaune'], ['red_card', '🟥 Rouge']] as const).map(([t, l]) => <Button key={t} size="xl" variant="secondary" disabled={expelled} onClick={async () => { setFlow(null); await act(flow.team, t, { player_id: flow.player, card_target: onField ? 'player' : 'substitute' }) }}>{l}</Button>)}
+          {onField
+            ? <Button size="xl" variant="outline" onClick={() => setFlow({ kind: 'sub', team: flow.team, out: flow.player })}>↔ Faire sortir</Button>
+            : <Button size="xl" variant="outline" disabled={expelled} onClick={() => setFlow({ kind: 'enter', team: flow.team, player: flow.player })}>↗ Faire entrer</Button>}
         </div>)
       break
     }
@@ -592,20 +589,44 @@ function FlowDialog({ flow, setFlow, match, events, act, ls }: { flow: Flow; set
     case 'sub':
       title = `Remplacement — ${teamName(flow.team)}`
       body = !flow.out
-        ? <div className="space-y-2"><p className="text-sm text-muted-foreground">Joueur sortant</p><PlayerGrid match={match} teamId={flow.team} events={events} includeBench={false} onPick={(p) => setFlow({ ...flow, out: p })} /></div>
-        : <div className="space-y-2"><p className="text-sm text-muted-foreground">Joueur entrant (remplace {playerShort(L.player.get(flow.out))})</p>
-          <div className="grid grid-cols-3 gap-1.5">{(db.Lineup.find((l) => l.match_id === match.id && l.team_id === flow.team)?.substitute_ids ?? []).filter((x) => !events.some((e) => e.type === 'substitution' && e.player_id === x)).map((pid) => <Button key={pid} variant="secondary" className="h-14" onClick={async () => { close(); await act(flow.team, 'substitution', { player_id: pid, related_player_id: flow.out }) }}>{L.player.get(pid)?.number} {L.player.get(pid)?.last_name}</Button>)}</div></div>
+        ? <div className="space-y-2"><p className="text-sm text-muted-foreground">Joueur qui sort (il retourne sur le banc et pourra revenir)</p><PitchPicker match={match} teamId={flow.team} events={events} mode="out" onPick={(p) => setFlow({ ...flow, out: p })} /></div>
+        : <div className="space-y-2"><p className="text-sm text-muted-foreground">Joueur qui entre à la place de <b className="text-white">{playerShort(L.player.get(flow.out))}</b></p>
+          <PitchPicker match={match} teamId={flow.team} events={events} mode="in" onPick={async (pid) => { close(); await act(flow.team, 'substitution', { player_id: pid, related_player_id: flow.out }) }} /></div>
       break
+    case 'enter': {
+      const fieldNow = pitchOf(flow.team)
+      const room = fieldNow.onField.length < MAX_ON_FIELD
+      const minute = flow.correct ? Math.max(0, currentMinute(ls!, d, Date.now()).minute - 1) : undefined
+      const doEnter = async (out?: string) => {
+        await act(flow.team, 'substitution', { player_id: flow.player, related_player_id: out, ...(minute !== undefined ? { minute, added_minute: undefined, clock_ms: undefined } : {}) })
+        if (flow.then) await flow.then(); else close()
+      }
+      title = flow.player ? `${flow.then ? 'Faire entrer ce joueur maintenant ?' : 'Entrer en jeu'} — ${playerShort(L.player.get(flow.player))}` : `Entrer en jeu — ${teamName(flow.team)}`
+      body = !flow.player
+        ? <div className="space-y-2"><p className="text-sm text-muted-foreground">Joueur qui entre (sur le banc)</p><PitchPicker match={match} teamId={flow.team} events={events} mode="in" onPick={(p) => setFlow({ ...flow, player: p })} /></div>
+        : <div className="space-y-3">
+          {flow.then && <p className="text-sm text-muted-foreground"><b className="text-white">{playerShort(L.player.get(flow.player))}</b> est sur le banc. L’action sera enregistrée dans tous les cas.</p>}
+          <div className="flex rounded-xl border border-white/10 p-1 text-sm" role="group" aria-label="Moment de l’entrée">
+            <button type="button" aria-pressed={!flow.correct} onClick={() => setFlow({ ...flow, correct: false })} className={cn('min-h-10 flex-1 rounded-lg px-2 font-semibold', !flow.correct ? 'bg-white/10 text-white' : 'text-muted-foreground')}>Il entre maintenant</button>
+            <button type="button" aria-pressed={!!flow.correct} onClick={() => setFlow({ ...flow, correct: true })} className={cn('min-h-10 flex-1 rounded-lg px-2 font-semibold', flow.correct ? 'bg-white/10 text-white' : 'text-muted-foreground')}>Corriger : il était déjà sur le terrain</button>
+          </div>
+          <p className="text-xs text-muted-foreground">{flow.correct ? `Entrée enregistrée à la ${minute}e minute.` : 'Entrée enregistrée à la minute actuelle.'} Qui sort à sa place ?</p>
+          <PitchPicker match={match} teamId={flow.team} events={events} mode="out" onPick={(out) => doEnter(out)} />
+          <Button size="xl" variant="outline" className="w-full" disabled={!room} onClick={() => doEnter()}>{room ? `Entre sans remplacer personne (${fieldNow.onField.length}/6 sur le terrain)` : 'Déjà 6 joueurs sur le terrain : choisissez qui sort'}</Button>
+          {flow.then && <Button variant="ghost" className="w-full" onClick={async () => { await flow.then!() }}>Enregistrer l’action sans changer la composition</Button>}
+        </div>
+      break
+    }
     case 'gk':
       title = `Nouveau gardien — ${teamName(flow.team)}`
-      body = <PlayerGrid match={match} teamId={flow.team} events={events} onlyGk onPick={async (p) => { close(); await act(flow.team, 'gk_change', { player_id: p }) }} />
+      body = <div className="space-y-2"><p className="text-xs text-muted-foreground">Un joueur du terrain prend les gants, ou un remplaçant entre à la place du gardien (Art. 2.6).</p><PitchPicker match={match} teamId={flow.team} events={events} mode="gk" exclude={[pitchOf(flow.team).goalkeeper ?? '']} onPick={async (p) => { close(); await act(flow.team, 'gk_change', { player_id: p }) }} /></div>
       break
     case 'shootout': {
       const so = shootout(match, events)
       title = `Tir au but — ${teamName(flow.team)}`
       const gkOpp = goalkeeperAt(db.Lineup.find((l) => l.match_id === match.id && l.team_id === opp(flow.team)), events, opp(flow.team), 999, 'PENS')
       body = <div className="space-y-3"><p className="text-sm text-muted-foreground">Tireur puis résultat</p>
-        <PlayerGrid match={match} teamId={flow.team} events={events} includeBench={false} onPick={(p) => setFree(p)} />
+        <PitchPicker match={match} teamId={flow.team} events={events} mode="out" onPick={(p) => setFree(p)} />
         <div className="grid grid-cols-3 gap-2">
           <Button size="xl" disabled={!free} onClick={async () => { close(); await act(flow.team, 'shootout_scored', { player_id: free, shootout_order: so.nextOrder, period: 'PENS' }) }}>✓ Réussi</Button>
           <Button size="xl" variant="secondary" disabled={!free} onClick={async () => { close(); await act(flow.team, 'shootout_saved', { player_id: free, related_player_id: gkOpp, shootout_order: so.nextOrder, period: 'PENS' }) }}>🧤 Arrêté{gkOpp ? ` (${L.player.get(gkOpp)?.last_name})` : ''}</Button>

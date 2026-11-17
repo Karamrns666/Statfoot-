@@ -9,6 +9,7 @@ import type {
 } from '@/types/entities'
 import { teamLiveShots } from './shots'
 import { REGLEMENT } from './reglement'
+import { minutesFromStints, stints } from './pitch'
 
 export type Side = 'home' | 'away'
 /** Art. 5.1 : 2 × 20 min de temps de jeu effectif */
@@ -265,22 +266,9 @@ export function foulsInPeriod(events: MatchEvent[], teamId: string, p: Period) {
 // ---------------------------------------------------------------------------
 export function totalMinutes(d: Durations, extraTime: boolean) { return 2 * d.half + (extraTime ? 2 * d.et : 0) }
 
-/** Minutes jouées : titulaires dès 0', entrants à la minute du remplacement, sortie au remplacement ou au rouge. */
+/** Minutes jouées : somme de toutes les périodes sur le terrain (remplacements illimités, sortie au rouge). */
 export function minutesPlayed(lineup: Pick<Lineup, 'starter_ids'> | undefined, events: MatchEvent[], teamId: string, total: number): Map<string, number> {
-  const on = new Map<string, number>()
-  const out = new Map<string, number>()
-  for (const id of lineup?.starter_ids ?? []) on.set(id, 0)
-  for (const e of sortEvents(events.filter((x) => x.team_id === teamId))) {
-    const t = Math.min(total, e.minute ?? 0)
-    if (e.type === 'substitution') {
-      if (e.player_id && !on.has(e.player_id)) on.set(e.player_id, t)
-      if (e.related_player_id && on.has(e.related_player_id) && !out.has(e.related_player_id)) out.set(e.related_player_id, t)
-    }
-    if ((e.type === 'red_card' || e.type === 'second_yellow') && e.player_id && on.has(e.player_id) && !out.has(e.player_id)) out.set(e.player_id, t)
-  }
-  const res = new Map<string, number>()
-  for (const [id, start] of on) res.set(id, Math.max(0, (out.get(id) ?? total) - start))
-  return res
+  return minutesFromStints(stints(lineup as Pick<Lineup, 'starter_ids' | 'goalkeeper_id'>, events, teamId, total))
 }
 
 /** Joueurs ayant participé (titulaires + entrés en jeu). */

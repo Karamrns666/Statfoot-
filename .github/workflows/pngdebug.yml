@@ -1,0 +1,21 @@
+name: Diagnostic PNG carte
+on:
+  push:
+    branches: ['png-debug']
+permissions:
+  contents: write
+jobs:
+  png:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: |
+          npm i --no-save @playwright/test@1.63.0 > /dev/null 2>&1
+          npx playwright install --with-deps chromium webkit > /dev/null 2>&1
+          node e2e/png-debug.mjs > png-out-log.txt 2>&1; echo "exit=$?" >> png-out-log.txt; cat png-out-log.txt
+          mkdir -p /tmp/out && cp -r png-out png-out-log.txt /tmp/out/
+          cd /tmp/out && git init -q && git config user.name ci && git config user.email ci@users.noreply.github.com && git add -A && git commit -qm png
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/ci/png-debug"

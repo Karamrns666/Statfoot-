@@ -10,12 +10,16 @@ const dir = path.dirname(fileURLToPath(import.meta.url))
 const PHOTO = fs.readFileSync(path.join(dir, 'fixtures/test-photo.jpg')) // maillot rouge (200, 40, 40)
 const CUTOUT = fs.readFileSync(path.join(dir, 'fixtures/test-cutout.png')) // maillot bleu (30, 90, 200)
 const KINDS = ['cutout', 'photo', 'none']
+// le service worker du site prend les requêtes d'images avant l'interception de Playwright sous WebKit : bloqué ici
+test.use({ serviceWorkers: 'block' })
 
 test('photo présente dans la carte téléchargée', async ({ page }, info) => {
   test.setTimeout(120_000)
   await page.clock.setFixedTime(FROZEN)
-  await page.route('**/test-photo.jpg', (r) => r.fulfill({ body: PHOTO, contentType: 'image/jpeg' }))
-  await page.route('**/test-cutout.png', (r) => r.fulfill({ body: CUTOUT, contentType: 'image/png' }))
+  page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') console.log(`[${info.project.name}] console ${m.type()}: ${m.text().slice(0, 200)}`) })
+  page.on('pageerror', (e) => console.log(`[${info.project.name}] pageerror: ${e.message.slice(0, 200)}`))
+  await page.route('**/test-photo.jpg', (r) => r.fulfill({ body: PHOTO, contentType: 'image/jpeg', headers: { 'Access-Control-Allow-Origin': '*' } }))
+  await page.route('**/test-cutout.png', (r) => r.fulfill({ body: CUTOUT, contentType: 'image/png', headers: { 'Access-Control-Allow-Origin': '*' } }))
   await page.goto('/')
   await page.waitForFunction(() => !!localStorage.getItem('statfoot:v1:Team'))
   await page.evaluate((kinds) => {
@@ -30,6 +34,18 @@ test('photo présente dans la carte téléchargée', async ({ page }, info) => {
     const btn = page.getByRole('button', { name: /Télécharger ma carte/ })
     await btn.waitFor({ timeout: 20_000 })
     await page.waitForTimeout(1500)
+    if (k === 'cutout') console.log(`[${info.project.name}] DIAG`, JSON.stringify(await page.evaluate(async () => {
+      const out = { states: [...document.querySelectorAll('[data-photo-state]')].map((e) => e.getAttribute('data-photo-state')) }
+      const step = async (name, fn) => { try { out[name] = await fn() } catch (e) { out[name] = 'ERREUR ' + (e && e.message || e) } }
+      let img
+      await step('load', () => new Promise((res, rej) => { img = new Image(); img.crossOrigin = 'anonymous'; img.onload = () => res(`${img.naturalWidth}x${img.naturalHeight}`); img.onerror = () => rej(new Error('onerror')); img.src = '/test-cutout.png' }))
+      const c = document.createElement('canvas'); c.width = 200; c.height = 300
+      await step('draw', () => { c.getContext('2d').drawImage(img, 0, 0, 200, 300); return 'ok' })
+      await step('getImageData', () => { c.getContext('2d').getImageData(0, 0, 10, 10); return 'ok' })
+      await step('toDataURL', () => c.toDataURL('image/png').length)
+      await step('fetch', async () => { const r = await fetch('/test-cutout.png', { mode: 'cors', credentials: 'omit' }); return r.status + ' ' + r.headers.get('content-type') })
+      return out
+    })))
     // le téléchargement est intercepté : on récupère le PNG produit (lien <a download>)
     await page.evaluate(() => { window.__png = null; const o = HTMLAnchorElement.prototype.click; HTMLAnchorElement.prototype.click = function () { if (this.download) { window.__png = this.href; return } return o.call(this) } })
     await btn.click()

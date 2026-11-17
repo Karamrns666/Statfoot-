@@ -14,8 +14,8 @@ const KINDS = ['cutout', 'photo', 'none']
 test('photo présente dans la carte téléchargée', async ({ page }, info) => {
   test.setTimeout(120_000)
   await page.clock.setFixedTime(FROZEN)
-  await page.route('**/test-photo.jpg', (r) => r.fulfill({ body: PHOTO, contentType: 'image/jpeg' }))
-  await page.route('**/test-cutout.png', (r) => r.fulfill({ body: CUTOUT, contentType: 'image/png' }))
+  await page.route('**/test-photo.jpg', (r) => r.fulfill({ body: PHOTO, contentType: 'image/jpeg', headers: { 'Access-Control-Allow-Origin': '*' } }))
+  await page.route('**/test-cutout.png', (r) => r.fulfill({ body: CUTOUT, contentType: 'image/png', headers: { 'Access-Control-Allow-Origin': '*' } }))
   await page.goto('/')
   await page.waitForFunction(() => !!localStorage.getItem('statfoot:v1:Team'))
   await page.evaluate((kinds) => {

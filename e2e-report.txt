@@ -1,0 +1,290 @@
+
+Running 155 tests using 2 workers
+
+[chromium-mobile] console warning: Service Worker registration blocked by Playwright
+[chromium-mobile] console warning: Service Worker registration blocked by Playwright
+  ✓    2 [chromium-mobile] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 360 px (1.3s)
+  ✓    3 [chromium-mobile] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 390 px (1.0s)
+[chromium-mobile] DIAG {"states":[],"load":"600x900","draw":"ok","getImageData":"ok","toDataURL":7578,"fetch":"200 image/png"}
+  ✓    4 [chromium-mobile] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 430 px (1.0s)
+[chromium-mobile] cutout: 1080×1350 rouge=1268 bleu=19413
+[chromium-mobile] console warning: Service Worker registration blocked by Playwright
+  ✓    5 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page / (2.1s)
+[chromium-mobile] photo: 1080×1350 rouge=14407 bleu=68
+[chromium-mobile] console warning: Service Worker registration blocked by Playwright
+  ✓    6 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /matchs (1.7s)
+  ✓    7 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /classement (2.0s)
+[chromium-mobile] none: 1080×1350 rouge=1268 bleu=68
+  ✓    1 [chromium-mobile] › e2e/card-png.spec.mjs:16:1 › photo présente dans la carte téléchargée (10.2s)
+  ✓    8 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /pre-saison (2.0s)
+  ✓   10 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /equipes (2.0s)
+  ✓   11 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /joueurs (1.9s)
+  ✓    9 [chromium-mobile] › e2e/matchday-subs.spec.mjs:8:1 › match complet avec allers-retours de remplacements (6.4s)
+  ✓   12 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /trophees (2.0s)
+  ✓   14 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /statistiques (1.9s)
+  ✓   13 [chromium-mobile] › e2e/tv.spec.mjs:5:3 › mode TV portrait (3.3s)
+  ✓   15 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /historique (1.9s)
+  ✓   17 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /reglement (1.9s)
+  ✓   16 [chromium-mobile] › e2e/tv.spec.mjs:5:3 › mode TV paysage (3.3s)
+  ✓   18 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /badges (2.0s)
+  ✓   19 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture / (2.0s)
+  ✓   20 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /glossaire (2.0s)
+  ✓   21 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /classement (1.9s)
+  ✓   22 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /match-des-capitaines (2.0s)
+  ✓   23 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /pre-saison (1.9s)
+  ✓   25 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /equipes (1.9s)
+  ✓   24 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /equipe-type (2.0s)
+  ✓   26 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /joueurs (1.9s)
+  ✓   27 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /discipline (2.0s)
+  ✓   28 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /trophees (1.8s)
+  ✓   29 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /media (2.0s)
+[chromium-desktop] console warning: Service Worker registration blocked by Playwright
+[chromium-desktop] console warning: Service Worker registration blocked by Playwright
+  ✓   30 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /badges (1.8s)
+[chromium-desktop] DIAG {"states":[],"load":"600x900","draw":"ok","getImageData":"ok","toDataURL":7578,"fetch":"200 image/png"}
+  ✓   32 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /glossaire (1.9s)
+[chromium-desktop] cutout: 1080×1350 rouge=1268 bleu=19413
+[chromium-desktop] console warning: Service Worker registration blocked by Playwright
+  ✓   33 [chromium-desktop] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 360 px (1.2s)
+  ✓   34 [chromium-desktop] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 390 px (1.0s)
+[chromium-desktop] photo: 1080×1350 rouge=14407 bleu=68
+[chromium-desktop] console warning: Service Worker registration blocked by Playwright
+  ✓   35 [chromium-desktop] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 430 px (1.1s)
+  ✓   36 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page / (2.1s)
+[chromium-desktop] none: 1080×1350 rouge=1268 bleu=68
+  ✓   31 [chromium-desktop] › e2e/card-png.spec.mjs:16:1 › photo présente dans la carte téléchargée (9.6s)
+  -   38 [chromium-desktop] › e2e/matchday-subs.spec.mjs:8:1 › match complet avec allers-retours de remplacements
+  ✓   37 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /matchs (1.8s)
+  ✓   40 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /classement (2.0s)
+  ✓   39 [chromium-desktop] › e2e/tv.spec.mjs:5:3 › mode TV portrait (3.1s)
+  ✓   41 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /pre-saison (2.1s)
+  ✓   42 [chromium-desktop] › e2e/tv.spec.mjs:5:3 › mode TV paysage (3.3s)
+  ✓   43 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /equipes (1.9s)
+  ✓   44 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture / (2.2s)
+  ✓   45 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /joueurs (2.1s)
+  ✓   46 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /classement (2.0s)
+  ✓   47 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /trophees (2.0s)
+  ✓   48 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /pre-saison (2.0s)
+  ✓   49 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /statistiques (2.0s)
+  ✓   50 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /equipes (2.0s)
+  ✓   51 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /historique (2.0s)
+  ✓   52 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /joueurs (1.8s)
+  ✓   53 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /reglement (1.9s)
+  ✓   54 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /trophees (1.8s)
+  ✓   55 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /badges (1.9s)
+  ✓   56 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /badges (1.8s)
+  ✓   57 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /glossaire (1.9s)
+  ✓   58 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /glossaire (1.8s)
+  ✓   59 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /match-des-capitaines (1.9s)
+[webkit-iphone] console warning: Service Worker registration blocked by Playwright
+  ✓   61 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /equipe-type (1.9s)
+  ✓   62 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /discipline (1.9s)
+[webkit-iphone] console warning: Service Worker registration blocked by Playwright
+  ✓   63 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /media (2.0s)
+[webkit-iphone] DIAG {"states":[],"load":"600x900","draw":"ok","getImageData":"ok","toDataURL":2002,"fetch":"200 image/png"}
+  ✓   64 [webkit-iphone] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 360 px (1.9s)
+  ✓   65 [webkit-iphone] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 390 px (1.9s)
+  ✓   66 [webkit-iphone] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 430 px (2.6s)
+[webkit-iphone] console error: Failed to load resource
+  ✘   60 [webkit-iphone] › e2e/card-png.spec.mjs:16:1 › photo présente dans la carte téléchargée (14.8s)
+[webkit-iphone] console warning: Service Worker registration blocked by Playwright
+[webkit-iphone] console warning: Service Worker registration blocked by Playwright
+  ✓   67 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page / (4.1s)
+[webkit-iphone] DIAG {"states":[],"load":"600x900","draw":"ok","getImageData":"ok","toDataURL":2002,"fetch":"200 image/png"}
+  ✓   69 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /matchs (2.4s)
+  ✓   70 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /classement (2.6s)
+[webkit-iphone] cutout: 1080×1350 rouge=1181 bleu=66
+  ✘   68 [webkit-iphone] › e2e/card-png.spec.mjs:16:1 › photo présente dans la carte téléchargée (retry #1) (7.6s)
+  ✓   71 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /pre-saison (2.2s)
+  ✓   73 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /equipes (8.0s)
+  ✓   74 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /joueurs (2.6s)
+  ✓   75 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /trophees (3.5s)
+  ✓   76 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /statistiques (2.3s)
+  ✓   77 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /historique (2.5s)
+  ✓   72 [webkit-iphone] › e2e/matchday-subs.spec.mjs:8:1 › match complet avec allers-retours de remplacements (20.0s)
+  ✓   78 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /reglement (2.9s)
+  ✓   79 [webkit-iphone] › e2e/tv.spec.mjs:5:3 › mode TV portrait (4.0s)
+  ✓   80 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /badges (2.3s)
+  ✓   82 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /glossaire (2.5s)
+  ✓   81 [webkit-iphone] › e2e/tv.spec.mjs:5:3 › mode TV paysage (3.7s)
+  ✓   83 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /match-des-capitaines (2.5s)
+  ✓   84 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture / (4.1s)
+  ✓   85 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /equipe-type (2.3s)
+  ✓   86 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /classement (2.4s)
+  ✓   87 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /discipline (2.5s)
+  ✓   88 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /pre-saison (2.3s)
+  -   90 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /equipes
+  ✓   89 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /media (2.7s)
+[webkit-ipad] console warning: Service Worker registration blocked by Playwright
+[webkit-ipad] console warning: Service Worker registration blocked by Playwright
+  ✓   91 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /joueurs (2.4s)
+[webkit-ipad] DIAG {"states":[],"load":"600x900","draw":"ok","getImageData":"ok","toDataURL":2002,"fetch":"200 image/png"}
+  ✓   93 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /trophees (2.5s)
+[webkit-ipad] cutout: 1080×1350 rouge=1181 bleu=66
+  ✘   92 [webkit-ipad] › e2e/card-png.spec.mjs:16:1 › photo présente dans la carte téléchargée (6.1s)
+  ✓   94 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /badges (3.0s)
+[webkit-ipad] console warning: Service Worker registration blocked by Playwright
+[webkit-ipad] console warning: Service Worker registration blocked by Playwright
+  ✓   96 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /glossaire (2.6s)
+[webkit-ipad] DIAG {"states":[],"load":"600x900","draw":"ok","getImageData":"ok","toDataURL":2002,"fetch":"200 image/png"}
+  ✓   97 [webkit-ipad] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 360 px (1.8s)
+[webkit-ipad] cutout: 1080×1350 rouge=1181 bleu=66
+  ✘   95 [webkit-ipad] › e2e/card-png.spec.mjs:16:1 › photo présente dans la carte téléchargée (retry #1) (6.2s)
+  ✓   98 [webkit-ipad] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 390 px (1.5s)
+  ✓  100 [webkit-ipad] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 430 px (1.7s)
+  ✓   99 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page / (3.3s)
+  ✓  102 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /matchs (2.5s)
+  ✓  103 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /classement (2.4s)
+  ✓  104 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /pre-saison (2.3s)
+  ✓  105 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /equipes (8.0s)
+  ✓  101 [webkit-ipad] › e2e/matchday-subs.spec.mjs:8:1 › match complet avec allers-retours de remplacements (17.8s)
+  ✓  106 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /joueurs (3.2s)
+  ✓  107 [webkit-ipad] › e2e/tv.spec.mjs:5:3 › mode TV portrait (4.2s)
+  ✓  108 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /trophees (3.4s)
+  ✓  110 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /statistiques (2.3s)
+  ✓  109 [webkit-ipad] › e2e/tv.spec.mjs:5:3 › mode TV paysage (3.9s)
+  ✓  111 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /historique (2.5s)
+  ✓  112 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture / (3.9s)
+  ✓  113 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /reglement (2.5s)
+  ✓  114 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /classement (2.3s)
+  ✓  115 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /badges (2.4s)
+  ✓  116 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /pre-saison (2.4s)
+  -  118 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /equipes
+  ✓  117 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /glossaire (2.6s)
+  ✓  119 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /joueurs (2.6s)
+  ✓  120 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /match-des-capitaines (2.5s)
+  ✓  121 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /trophees (2.2s)
+  ✓  122 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /equipe-type (2.1s)
+  ✓  123 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /badges (2.7s)
+  ✓  124 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /discipline (2.2s)
+  ✓  125 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /glossaire (2.8s)
+  ✓  126 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /media (2.7s)
+  ✓  127 [firefox-desktop] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 360 px (1.8s)
+[firefox-desktop] console warning: Service Worker registration blocked by Playwright
+[firefox-desktop] console warning: Service Worker registration blocked by Playwright
+  ✓  129 [firefox-desktop] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 390 px (1.2s)
+  ✓  130 [firefox-desktop] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 430 px (809ms)
+[firefox-desktop] DIAG {"states":[],"load":"600x900","draw":"ok","getImageData":"ok","toDataURL":2646,"fetch":"200 image/png"}
+[firefox-desktop] cutout: 1080×1350 rouge=1283 bleu=19359
+[firefox-desktop] console warning: Service Worker registration blocked by Playwright
+  ✓  131 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page / (2.0s)
+  ✓  132 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /matchs (2.1s)
+[firefox-desktop] photo: 1080×1350 rouge=14432 bleu=64
+[firefox-desktop] console warning: Service Worker registration blocked by Playwright
+  ✓  133 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /classement (2.3s)
+[firefox-desktop] none: 1080×1350 rouge=1283 bleu=64
+  ✓  128 [firefox-desktop] › e2e/card-png.spec.mjs:16:1 › photo présente dans la carte téléchargée (11.5s)
+  -  135 [firefox-desktop] › e2e/matchday-subs.spec.mjs:8:1 › match complet avec allers-retours de remplacements
+  ✓  134 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /pre-saison (2.0s)
+  ✓  137 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /equipes (2.2s)
+  ✓  136 [firefox-desktop] › e2e/tv.spec.mjs:5:3 › mode TV portrait (3.5s)
+  ✓  138 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /joueurs (2.1s)
+  ✓  139 [firefox-desktop] › e2e/tv.spec.mjs:5:3 › mode TV paysage (3.3s)
+  ✓  140 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /trophees (2.8s)
+  ✓  141 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture / (2.2s)
+  ✓  142 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /statistiques (2.4s)
+  ✓  143 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /classement (1.8s)
+  ✓  144 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /historique (2.2s)
+  ✓  145 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /pre-saison (1.8s)
+  ✓  146 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /reglement (2.1s)
+  ✓  147 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /equipes (2.0s)
+  ✓  148 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /badges (2.2s)
+  ✓  149 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /joueurs (2.1s)
+  ✓  150 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /glossaire (2.2s)
+  ✓  151 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /trophees (1.8s)
+  ✓  152 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /match-des-capitaines (2.4s)
+  ✓  153 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /badges (3.3s)
+  ✓  154 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /equipe-type (2.2s)
+  ✓  155 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /glossaire (2.1s)
+  ✓  156 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /discipline (2.1s)
+  ✓  157 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /media (2.2s)
+
+
+  1) [webkit-iphone] › e2e/card-png.spec.mjs:16:1 › photo présente dans la carte téléchargée ───────
+
+    Error: page.evaluate: EncodingError: Loading error.
+
+      51 |     await btn.click()
+      52 |     await page.waitForFunction(() => !!window.__png, null, { timeout: 30_000 })
+    > 53 |     const r = await page.evaluate(async () => {
+         |                          ^
+      54 |       const im = new Image(); im.src = window.__png; await im.decode()
+      55 |       const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight
+      56 |       const x = c.getContext('2d'); x.drawImage(im, 0, 0)
+        at /home/runner/work/Statfoot-/Statfoot-/e2e/card-png.spec.mjs:53:26
+
+    Error Context: test-results/card-png-photo-présente-dans-la-carte-téléchargée-webkit-iphone/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: photo détourée (maillot bleu) dans le PNG
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 800
+    Received:   66
+
+      65 |     console.log(`[${info.project.name}] ${k}: ${r.w}×${r.h} rouge=${r.red} bleu=${r.blue}`)
+      66 |     expect([r.w, r.h]).toEqual([1080, 1350])
+    > 67 |     if (k === 'cutout') expect(r.blue, 'photo détourée (maillot bleu) dans le PNG').toBeGreaterThan(800)
+         |                                                                                     ^
+      68 |     if (k === 'photo') expect(r.red, 'photo (maillot rouge) dans le PNG').toBeGreaterThan(800)
+      69 |   }
+      70 | })
+        at /home/runner/work/Statfoot-/Statfoot-/e2e/card-png.spec.mjs:67:85
+
+    Error Context: test-results/card-png-photo-présente-dans-la-carte-téléchargée-webkit-iphone-retry1/error-context.md
+
+  2) [webkit-ipad] › e2e/card-png.spec.mjs:16:1 › photo présente dans la carte téléchargée ─────────
+
+    Error: photo détourée (maillot bleu) dans le PNG
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 800
+    Received:   66
+
+      65 |     console.log(`[${info.project.name}] ${k}: ${r.w}×${r.h} rouge=${r.red} bleu=${r.blue}`)
+      66 |     expect([r.w, r.h]).toEqual([1080, 1350])
+    > 67 |     if (k === 'cutout') expect(r.blue, 'photo détourée (maillot bleu) dans le PNG').toBeGreaterThan(800)
+         |                                                                                     ^
+      68 |     if (k === 'photo') expect(r.red, 'photo (maillot rouge) dans le PNG').toBeGreaterThan(800)
+      69 |   }
+      70 | })
+        at /home/runner/work/Statfoot-/Statfoot-/e2e/card-png.spec.mjs:67:85
+
+    Error Context: test-results/card-png-photo-présente-dans-la-carte-téléchargée-webkit-ipad/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: photo détourée (maillot bleu) dans le PNG
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 800
+    Received:   66
+
+      65 |     console.log(`[${info.project.name}] ${k}: ${r.w}×${r.h} rouge=${r.red} bleu=${r.blue}`)
+      66 |     expect([r.w, r.h]).toEqual([1080, 1350])
+    > 67 |     if (k === 'cutout') expect(r.blue, 'photo détourée (maillot bleu) dans le PNG').toBeGreaterThan(800)
+         |                                                                                     ^
+      68 |     if (k === 'photo') expect(r.red, 'photo (maillot rouge) dans le PNG').toBeGreaterThan(800)
+      69 |   }
+      70 | })
+        at /home/runner/work/Statfoot-/Statfoot-/e2e/card-png.spec.mjs:67:85
+
+    Error Context: test-results/card-png-photo-présente-dans-la-carte-téléchargée-webkit-ipad-retry1/error-context.md
+
+  2 failed
+    [webkit-iphone] › e2e/card-png.spec.mjs:16:1 › photo présente dans la carte téléchargée ────────
+    [webkit-ipad] › e2e/card-png.spec.mjs:16:1 › photo présente dans la carte téléchargée ──────────
+  4 skipped
+  149 passed (3.9m)
+exit=1
+LIGHTHOUSE build / Performance 45 · Accessibility 100 · Best Practices 100 · SEO 100
+LIGHTHOUSE build /classement Performance 84 · Accessibility 100 · Best Practices 100 · SEO 100
+LIGHTHOUSE build /joueurs Performance 79 · Accessibility 100 · Best Practices 100 · SEO 100
+LIGHTHOUSE build /trophees Performance 81 · Accessibility 100 · Best Practices 100 · SEO 100
+LIGHTHOUSE prod / Performance 75 · Accessibility 94 · Best Practices 100 · SEO 100
+LIGHTHOUSE prod /classement Performance 87 · Accessibility 97 · Best Practices 100 · SEO 100
+LIGHTHOUSE prod /joueurs Performance 91 · Accessibility 97 · Best Practices 96 · SEO 100

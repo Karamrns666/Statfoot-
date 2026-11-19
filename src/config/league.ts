@@ -19,7 +19,7 @@ export const LEAGUE = {
     logoRemote: 'https://media.base44.com/images/public/6a9ee5ea559f2e449ec37888/e6af957c3_cropped-ARDENTIA.webp',
     website: 'https://www.ardentia.ma',
     email: 'contact@ardentia.ma',
-    phone: '+212 6 43 04 79 84',
+    phone: '+212 6 60 63 11 27',
     address: '39, Av Lalla Yaqout, 1er étage, Apt n°1, Casablanca',
     instagram: 'https://www.instagram.com/ardentia.ma/',
     linkedin: 'https://www.linkedin.com/company/ardentia-agence/',
@@ -37,7 +37,7 @@ export interface LeagueInfo {
   organizer: { name: string; description: string; logo: string; logoDark: string; website: string; email: string; phone: string; address: string; instagram: string; linkedin: string }
 }
 
-/** +212 6 43 04 79 84 → +212643047984 (lien tel:) */
+/** +212 6 60 63 11 27 → +212660631127 (lien tel:) */
 export const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`
 /** lien WhatsApp avec message prérempli */
 export const whatsappHref = (phone: string, text = 'Bonjour, je vous contacte depuis le site de la Morocco Business League.') =>

@@ -16,15 +16,20 @@ function trim(url: string): Promise<string> {
     img.onload = () => idle(() => {
       try {
         const w = img.naturalWidth, h = img.naturalHeight
-        if (!w || !h || url.endsWith('.svg') || url.startsWith('data:image/svg')) return resolve(url)
+        if (!w || !h || /\.svg(\?|#|$)/i.test(url) || url.startsWith('data:image/svg')) return resolve(url) // vectoriel : déjà au ras
         const k = Math.min(1, SCAN / Math.max(w, h)), sw = Math.max(1, Math.round(w * k)), sh = Math.max(1, Math.round(h * k))
         const c = document.createElement('canvas'); c.width = sw; c.height = sh
         const ctx = c.getContext('2d', { willReadFrequently: true })!; ctx.drawImage(img, 0, 0, sw, sh)
         const d = ctx.getImageData(0, 0, sw, sh).data
+        // image avec transparence : seul le transparent est « vide » (un logo clair à texte blanc garde son texte) ;
+        // image opaque : le fond blanc autour du logo est retiré
+        let transparent = 0
+        for (let i = 3; i < d.length; i += 4) if (d[i] < 16) transparent++
+        const alphaOnly = transparent > (sw * sh) / 50
         let x0 = sw, y0 = sh, x1 = -1, y1 = -1
         for (let y = 0; y < sh; y++) for (let x = 0; x < sw; x++) {
           const i = (y * sw + x) * 4
-          const empty = d[i + 3] < 16 || (d[i] > 242 && d[i + 1] > 242 && d[i + 2] > 242)
+          const empty = d[i + 3] < 16 || (!alphaOnly && d[i] > 242 && d[i + 1] > 242 && d[i + 2] > 242)
           if (!empty) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y }
         }
         if (x1 < 0) return resolve(url)

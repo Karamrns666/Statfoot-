@@ -55,7 +55,7 @@ export function TeamLogoBanner({ team, className }: { team?: Team | null; classN
   const src = useTrimmedImage(team?.logo_url ? main : null) ?? main
   return (
     <span role="img" aria-label={team?.name ?? ''} title={team?.name} data-team-banner={team?.id ?? ''}
-      className={cn('flex size-full items-center justify-center overflow-hidden rounded-[.7em] px-[5%] py-[3%] shadow-[0_.25em_.8em_rgb(0_0_0/.3)] ring-1 ring-black/5', className)}
+      className={cn('flex size-full items-center justify-center overflow-hidden rounded-[.7em] px-[4%] py-[1.2%] shadow-[0_.25em_.8em_rgb(0_0_0/.3)] ring-1 ring-black/5', className)}
       style={{ background: plate.bg }}>
       <img src={src} alt="" className="block h-full w-full max-w-none object-contain" decoding="async" draggable={false} />
     </span>

@@ -9,7 +9,7 @@ const VIEWPORTS = [{ width: 360, height: 780 }, { width: 390, height: 844 }, { w
 
 test.describe('logos d’équipes', () => {
   // contrôle géométrique : un seul moteur suffit (les tailles d'écran sont simulées ci-dessous)
-  test.skip(({ browserName }, ti) => ti.project.name !== 'chromium-desktop', 'contrôle lancé sur Chromium seulement')
+  test.beforeEach(() => { test.skip(test.info().project.name !== 'chromium-desktop', 'contrôle lancé sur Chromium seulement') })
 
   test('toutes les pages', async ({ page }) => {
     test.setTimeout(600_000)

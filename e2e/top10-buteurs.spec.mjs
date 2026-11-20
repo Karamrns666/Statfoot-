@@ -18,7 +18,13 @@ test('Top 10 buteurs : nom long, égalité, moins de 10 buteurs', async ({ page 
     const comps = get('Competition').filter((c) => (!season || c.season_id === season) && ['league_phase', 'gold', 'silver'].includes(c.phase))
     const matches = get('Match')
     const played = (m) => ['finished', 'forfeit'].includes(m.status) || m.home_score != null
-    const comp = comps.find((c) => matches.some((m) => m.competition_id === c.id && played(m) && m.round != null))
+    let comp = comps.find((c) => matches.some((m) => m.competition_id === c.id && played(m) && m.round != null))
+    if (!comp) {
+      // aucune journée jouée dans la saison active : on joue la 1re journée de la 1re compétition
+      comp = comps.find((c) => matches.some((m) => m.competition_id === c.id && m.round != null))
+      const r1 = Math.min(...matches.filter((m) => m.competition_id === comp.id && m.round != null).map((m) => m.round))
+      for (const m of matches) if (m.competition_id === comp.id && m.round === r1) Object.assign(m, { status: 'finished', home_score: 1, away_score: 0, validated: true })
+    }
     const round = Math.max(...matches.filter((m) => m.competition_id === comp.id && played(m) && m.round != null).map((m) => m.round))
     const ms = matches.filter((m) => m.competition_id === comp.id && m.round === round && played(m) && !m.forfeit_team_id)
     const players = get('Player')

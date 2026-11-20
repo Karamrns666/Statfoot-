@@ -15,8 +15,7 @@ jobs:
       - run: |
           npm i --no-save @playwright/test@1.63.0 > /dev/null 2>&1
           npx playwright install --with-deps chromium webkit > /dev/null 2>&1
-          mkdir -p poster-out pbe-out; node e2e/poster-check.mjs > poster-out/run.txt 2>&1 || true
-          node e2e/pbe-planche.mjs > pbe-out/run.txt 2>&1 || true
-          mkdir -p /tmp/out && cp -r poster-out pbe-out /tmp/out/ 2>/dev/null
+          bash e2e/verif-run.sh || true
+          mkdir -p /tmp/out && cp -r poster-out pbe-out logos-* /tmp/out/ 2>/dev/null
           cd /tmp/out && git init -q && git config user.name ci && git config user.email ci@users.noreply.github.com && git add -A && git commit -qm verif
           git push -qf "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/ci/verif-out"

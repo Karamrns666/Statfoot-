@@ -172,6 +172,17 @@ function eraseBand(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
   ctx.putImageData(img, x, top)
 }
 
+/** Efface une zone en reprenant, ligne par ligne, un dégradé entre les pixels juste à gauche et juste à droite. */
+function eraseH(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+  x = Math.max(1, Math.round(x)); y = Math.round(y); w = Math.round(w); h = Math.round(h)
+  const img = ctx.getImageData(x - 1, y, w + 2, h), d = img.data, W = w + 2
+  for (let yy = 0; yy < h; yy++) {
+    const a = yy * W * 4, b = (yy * W + W - 1) * 4
+    for (let xx = 1; xx < W - 1; xx++) { const t = xx / (W - 1), i = (yy * W + xx) * 4; for (let ch = 0; ch < 3; ch++) d[i + ch] = d[a + ch] * (1 - t) + d[b + ch] * t; d[i + 3] = 255 }
+  }
+  ctx.putImageData(img, x - 1, y)
+}
+
 /** Petite icône de ballon (dessinée, pas d'image) : distingue le Top 10 buteurs d'un coup d'œil. */
 function drawBall(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
   ctx.save()
@@ -193,7 +204,9 @@ export async function renderTop10(entries: TopEntry[], cfg: VisualsConfig, opts:
   const L = cfg.top10, Z = L.zones
   const { c, ctx } = await base(cfg, cfg.templates.top10)
   // moins de 10 joueurs : les bandes vides du modèle sont effacées (décor bleu reconstitué entre les bandes voisines)
-  L.bands.forEach((y, k) => { if (!entries[k + 3]) eraseBand(ctx, Z.band.x - 3, y - 3, Z.band.w + 6, Z.band.h + 6) })
+  L.bands.forEach((y, k) => { if (!entries[k + 3]) eraseBand(ctx, Z.band.x, y - 3, Z.band.w, Z.band.h + 6) })
+  // podium incomplet : la pastille blanche vide est effacée (dégradé de la carte, de gauche à droite)
+  for (const [i, pz] of [[1, Z.pill2], [0, Z.pill1], [2, Z.pill3]] as const) if (!entries[i]) eraseH(ctx, pz.x - 2, pz.y - 2, pz.w + 4, pz.h + 4)
   drawHeader(ctx, cfg, Z, opts.title, opts.subtitle)
   const photos = await Promise.all(entries.slice(0, 3).map((e) => loadImage(e.player.photo_card_mode !== 'original' && e.player.photo_cutout_url ? e.player.photo_cutout_url : e.player.photo_url)))
   const logos = await Promise.all(entries.map((e) => loadImage(tileLogo(e.team, true))))

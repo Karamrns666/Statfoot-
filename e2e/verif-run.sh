@@ -2,3 +2,4 @@
 sleep 180
 mkdir -p final-out
 node e2e/final-planche.mjs > final-out/run.txt 2>&1
+# relance 15:26

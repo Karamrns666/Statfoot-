@@ -5,7 +5,7 @@
       "destination": "/api/sitemap"
     },
     {
-      "source": "/((?!api/).*)",
+      "source": "/((?!api/|assets/|fonts/|logos/|brand/).*)",
       "destination": "/index.html"
     }
   ],

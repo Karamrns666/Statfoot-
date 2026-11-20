@@ -65,6 +65,17 @@
     </div>
     <div id="root"></div>
     <script>if (/^\/(admin|tv|live)/.test(location.pathname)) { var sh = document.getElementById('app-shell'); if (sh) sh.remove() }</script>
+    <script>
+      // Filet de sécurité : si le site n'a pas démarré après 8 s (fichier du site resté en cache dans une mauvaise version,
+      // par ex. pendant une mise en ligne), on recharge une fois les fichiers depuis le serveur puis la page.
+      setTimeout(function () {
+        var root = document.getElementById('root')
+        if (!root || root.hasChildNodes()) return
+        try { if (sessionStorage.getItem('mbl-repair')) return; sessionStorage.setItem('mbl-repair', '1') } catch (e) { return }
+        var urls = [].slice.call(document.querySelectorAll('script[src*="/assets/"],link[href*="/assets/"]')).map(function (e) { return e.src || e.href })
+        Promise.all(urls.map(function (u) { return fetch(u, { cache: 'reload' }).catch(function () {}) })).then(function () { location.reload() })
+      }, 8000)
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

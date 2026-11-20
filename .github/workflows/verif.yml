@@ -19,4 +19,4 @@ jobs:
           node e2e/pbe-planche.mjs > pbe-out/run.txt 2>&1 || true
           mkdir -p /tmp/out && cp -r poster-out pbe-out /tmp/out/ 2>/dev/null
           cd /tmp/out && git init -q && git config user.name ci && git config user.email ci@users.noreply.github.com && git add -A && git commit -qm verif
-          git push -qf "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/ci/verif-prod"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/ci/verif-out"

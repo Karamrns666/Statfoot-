@@ -10,7 +10,7 @@ import { SEASON_2026_ID } from './season2026'
 import { toRole } from '@/lib/format'
 import { capStarters } from '@/lib/lineup'
 import { defaultCaptainTeams } from '@/lib/captains'
-import { LOGO_REVISION, applyOfficialPlan, officialLogo, planIsEmpty, planOfficialTeams } from '@/lib/officialTeams'
+import { LOGO_FILES, LOGO_REVISION, applyOfficialPlan, officialLogo, planIsEmpty, planOfficialTeams } from '@/lib/officialTeams'
 import { store } from '../localStore'
 
 /** copie sans la clé donnée */
@@ -517,7 +517,24 @@ export function applyLogoBgPbe(db: Rules6Data): Rules6Data {
   return { Team: teams.map((t) => hit.includes(t) ? { ...t, logo_bg: 'black' } : t) } as unknown as Rules6Data
 }
 
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams, applyHideSeason2025, applyLogoRevisions, applyRemoveCanpack2026, applyTierCorrections2026, applyTagline2026, applyRulesEmployees2026, applyLogoBgPbe, applyReglementV11]
+/**
+ * Parebrise Express : nouveau logo officiel au ras (SVG fond clair + fond sombre, PNG 2000 px), même identifiant d'équipe.
+ * Équipes et clubs qui utilisaient un fichier du dépôt (/logos/pbe…) passent aux nouveaux fichiers ; un logo importé à la
+ * main par un admin n'est pas touché.
+ */
+export function applyLogoPbeV2(db: Rules6Data & { Club?: Club[] }): Rules6Data & { Club?: Club[] } {
+  const o = LOGO_FILES.PBE
+  const official = (u?: string) => !!u && u.startsWith('/logos/pbe')
+  const out: Rules6Data & { Club?: Club[] } = {}
+  const T = (db.Team ?? []).map((t) => (official(t.logo_url) || official(t.company_logo_url)) && (t.logo_url !== o.logo_url || t.logo_dark_url !== o.logo_dark_url)
+    ? { ...t, logo_url: o.logo_url, company_logo_url: o.company_logo_url, logo_dark_url: o.logo_dark_url } : t)
+  if (T.some((t, i) => t !== db.Team![i])) out.Team = T
+  const C = (db.Club ?? []).map((c) => official(c.logo_url) && c.logo_url !== o.logo_url ? { ...c, logo_url: o.logo_url } : c)
+  if (C.some((c, i) => c !== db.Club![i])) out.Club = C
+  return out
+}
+
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams, applyHideSeason2025, applyLogoRevisions, applyRemoveCanpack2026, applyTierCorrections2026, applyTagline2026, applyRulesEmployees2026, applyLogoBgPbe, applyReglementV11, applyLogoPbeV2]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */

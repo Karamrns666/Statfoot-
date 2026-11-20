@@ -1,33 +1,39 @@
 import { Link } from 'react-router-dom'
 import { useTrimmedImage } from '@/hooks/useTrimmedImage'
-import { logoPlate } from '@/lib/logoPlate'
+import { logoPlate, logoSrc } from '@/lib/logoPlate'
+import { useImageRatio, WIDE_LOGO } from '@/hooks/useImageRatio'
 import type { Player, Position, Team } from '@/types/entities'
 import { cn } from '@/lib/utils'
 import { initials, playerName } from '@/lib/format'
 import { teamLogoSvg } from '@/lib/logos'
 
 export function TeamLogo({ team, size = 32, className, fluid = false }: { team?: Team | null; size?: number; className?: string; /** remplit son conteneur carré (mode TV) : pas de taille minimale, marge interne en % */ fluid?: boolean }) {
-  const raw = team?.logo_url || teamLogoSvg(team?.short_name ?? '?', team?.primary_color, team?.secondary_color)
-  // marges vides retirées (les logos larges remplissent leur cadre) ; fond choisi dans l'admin équipe
+  const raw = logoSrc(team) || teamLogoSvg(team?.short_name ?? '?', team?.primary_color, team?.secondary_color)
+  // marges vides retirées (les logos larges remplissent leur cadre) ; fond choisi dans l'admin équipe ;
+  // version claire du logo sur fond sombre (Admin équipe → « Logo pour fond sombre »)
   const src = useTrimmedImage(team?.logo_url ? raw : null) ?? raw
   const plate = logoPlate(team)
   const brand = !!plate.bg
+  // logo large (largeur > 2 × hauteur) : cadre en pilule plus large au lieu d'un carré, le logo y remplit ~88 % de la largeur
+  const ratio = useImageRatio(team?.logo_url ? src : null)
+  const wide = (ratio ?? 1) > WIDE_LOGO
   // cadre CARRÉ identique pour toutes les équipes : taille fixe (jamais écrasée par la largeur disponible),
   // logo entier visible (object-fit: contain) avec une marge interne, sans déformation
   if (fluid) {
     // mode TV : remplit un parent CARRÉ en position relative ; tailles en position absolue (définies sur Safari iOS,
     // contrairement à height: 100 % + aspect-ratio qui donnait une barre blanche étirée)
-    const pad = brand ? '10%' : '0%'
+    const pad = wide ? '6%' : brand ? '10%' : '0%'
     return (
-      <span role="img" aria-label={team?.name ?? ''} style={{ position: 'absolute', inset: 0, background: plate.bg ?? undefined }}
-        className={cn('block overflow-hidden', brand ? 'rounded-[22%] shadow-[0_2px_10px_rgba(0,0,0,.35)] ring-1 ring-black/5' : 'drop-shadow-[0_2px_8px_rgba(0,0,0,.5)]', className)}>
+      <span role="img" aria-label={team?.name ?? ''} style={{ position: 'absolute', inset: wide ? '24% 0' : 0, background: plate.bg ?? undefined }}
+        className={cn('block overflow-hidden', wide && brand ? 'rounded-full shadow-[0_2px_10px_rgba(0,0,0,.35)] ring-1 ring-black/5' : brand ? 'rounded-[22%] shadow-[0_2px_10px_rgba(0,0,0,.35)] ring-1 ring-black/5' : 'drop-shadow-[0_2px_8px_rgba(0,0,0,.5)]', className)}>
         <img src={src} alt="" className="absolute max-w-none object-contain" style={{ left: pad, top: pad, width: `calc(100% - 2 * ${pad})`, height: `calc(100% - 2 * ${pad})` }} loading="lazy" draggable={false} />
       </span>
     )
   }
+  const w = wide ? Math.round(size * 2) : size
   return (
-    <span role="img" aria-label={team?.name ?? ''} style={fluid ? { width: '100%', height: '100%', aspectRatio: '1 / 1', padding: brand ? '10%' : 0, background: plate.bg ?? undefined } : { width: size, height: size, minWidth: size, padding: brand ? Math.max(1, Math.round(size * 0.1)) : 0, background: plate.bg ?? undefined }}
-      className={cn('inline-flex shrink-0 items-center justify-center overflow-hidden', brand ? 'rounded-[22%] shadow-[0_2px_10px_rgba(0,0,0,.35)] ring-1 ring-black/5' : 'drop-shadow-[0_2px_8px_rgba(0,0,0,.5)]', className)}>
+    <span role="img" aria-label={team?.name ?? ''} style={{ width: w, height: size, minWidth: w, padding: wide ? `${Math.round(size * 0.14)}px ${Math.round(w * 0.06)}px` : brand ? Math.max(2, Math.round(size * 0.1)) : 0, background: plate.bg ?? undefined }}
+      className={cn('inline-flex shrink-0 items-center justify-center overflow-hidden', wide && brand ? 'rounded-full shadow-[0_2px_10px_rgba(0,0,0,.35)] ring-1 ring-black/5' : brand ? 'rounded-[22%] shadow-[0_2px_10px_rgba(0,0,0,.35)] ring-1 ring-black/5' : 'drop-shadow-[0_2px_8px_rgba(0,0,0,.5)]', className)}>
       <img src={src} alt="" className="block size-full max-w-none object-contain" loading="lazy" draggable={false} />
     </span>
   )

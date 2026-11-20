@@ -2,11 +2,15 @@ import { useMemo, type ReactNode } from 'react'
 import { Billboard, type BillboardPoster, type BillboardSlide } from '@/components/home/Billboard'
 import { billboardLayout } from '@/lib/billboard'
 
-/** Affiche « Saison 4 » fournie avec le site (WebP en 3 tailles) ; remplaçable dans Admin → Paramètres */
+/** Affiche « Saison 4 » v2 (21 équipes, sans Canpack) fournie avec le site : WebP en 4 tailles + PNG de secours ;
+ *  remplaçable dans Admin → Paramètres */
 const DEFAULT_POSTER: BillboardPoster = {
-  src: '/brand/affiche-saison-4-1280.webp',
-  srcSet: '/brand/affiche-saison-4-768.webp 768w, /brand/affiche-saison-4-1280.webp 1280w, /brand/affiche-saison-4-1920.webp 1920w',
-  alt: 'Affiche de la Saison 4 de la Morocco Business League : 23 équipes, Atlantique Club, logos des entreprises participantes et joueurs en maillot, organisée par Ardentia',
+  src: '/brand/affiche-saison-4-v2-1280.webp',
+  srcSet: '/brand/affiche-saison-4-v2-640.webp 640w, /brand/affiche-saison-4-v2-960.webp 960w, /brand/affiche-saison-4-v2-1280.webp 1280w, /brand/affiche-saison-4-v2-1920.webp 1920w',
+  fallback: '/brand/affiche-saison-4-v2-1280.png',
+  fallbackSrcSet: '/brand/affiche-saison-4-v2-1280.png 1280w, /brand/affiche-saison-4-v2-1920.png 1920w',
+  alt: 'Morocco Business League — Saison 4, 21 équipes, Atlantique Club, organisé par Ardentia',
+  href: '/equipes',
 }
 import { SeasonStrip } from '@/components/home/SeasonStrip'
 import { NextCaptainBlock } from '@/components/captains/CaptainBits'

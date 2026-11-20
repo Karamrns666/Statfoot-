@@ -39,7 +39,12 @@ export const OFFICIAL_TEAMS_2026: OfficialTeam[] = [
 export const teamKey = (s?: string) => (s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '')
 /** Révision des fichiers logo remplacés : l'URL change (?v=…) pour vider les caches des navigateurs et du site. */
 export const LOGO_REVISION: Record<string, string> = { CAM: '2026-11' }
-export const officialLogo = (o: Pick<OfficialTeam, 'short'>) => {
+/** Fichiers officiels particuliers (vectoriels, version fond sombre) : Parebrise Express, logo fourni au ras (nov. 2026) */
+export const LOGO_FILES: Record<string, { logo_url: string; company_logo_url: string; logo_dark_url: string }> = {
+  PBE: { logo_url: '/logos/pbe.svg?v=2026-11b', company_logo_url: '/logos/pbe-2000.png?v=2026-11b', logo_dark_url: '/logos/pbe-dark.svg?v=2026-11b' },
+}
+export const officialLogo = (o: Pick<OfficialTeam, 'short'>): { logo_url: string; company_logo_url: string; logo_dark_url?: string } => {
+  if (LOGO_FILES[o.short]) return { ...LOGO_FILES[o.short] }
   const f = o.short.toLowerCase(), v = LOGO_REVISION[o.short] ? `?v=${LOGO_REVISION[o.short]}` : ''
   return { logo_url: `/logos/${f}.png${v}`, company_logo_url: `/logos/${f}-full.png${v}` }
 }

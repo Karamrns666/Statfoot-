@@ -140,14 +140,25 @@ function BrandView({ logo, leagueName, seasonLabel, phase, still }: { logo: stri
   )
 }
 
-export interface BillboardPoster { src: string; srcSet?: string; alt: string }
+export interface BillboardPoster { src: string; srcSet?: string; alt: string; /** PNG de secours (navigateurs sans WebP) */ fallback?: string; fallbackSrcSet?: string; /** clic sur l'affiche */ href?: string }
 
 /** Affiche de la saison : image ENTIÈRE toujours visible (aucun recadrage), fond flouté de la même image autour */
 function PosterView({ poster, phase }: { poster: BillboardPoster; phase: 'in' | 'out' }) {
+  const sizes = '(min-width: 1280px) 1240px, 100vw'
+  const webp = /\.webp(\?|$)/.test(poster.src)
+  // image prioritaire (2e panneau, visible tôt) ; WebP + PNG de secours ; entière (contain), jamais recadrée
+  const img = (
+    <picture className="relative block size-full">
+      {webp && <source type="image/webp" srcSet={poster.srcSet ?? poster.src} sizes={sizes} />}
+      <img src={webp ? poster.fallback ?? poster.src : poster.src} srcSet={webp ? poster.fallbackSrcSet : poster.srcSet} sizes={sizes} alt={poster.alt}
+        className="block size-full object-contain" decoding="async" fetchPriority="high" draggable={false} />
+    </picture>
+  )
   return (
     <div className={cn('bb-slide relative -mx-5 -my-7 flex items-center justify-center overflow-hidden sm:-mx-10 sm:-my-9', phase === 'in' ? 'bb-wipe-in' : 'bb-wipe-out')} aria-hidden={phase === 'out'}>
-      <img src={poster.src} srcSet={poster.srcSet} sizes="(min-width: 1280px) 1200px, 100vw" alt="" aria-hidden className="absolute inset-0 size-full scale-110 object-cover opacity-45 blur-2xl" />
-      <img src={poster.src} srcSet={poster.srcSet} sizes="(min-width: 1280px) 1200px, 100vw" alt={poster.alt} className="relative block size-full object-contain drop-shadow-[0_12px_30px_rgb(0_0_0/.5)]" decoding="async" />
+      {/* espace autour de l'affiche (téléphone) : la même affiche floutée et assombrie, jamais de bande vide */}
+      <img src={poster.src} srcSet={poster.srcSet} sizes="40vw" alt="" aria-hidden className="absolute inset-0 size-full scale-110 object-cover opacity-50 blur-2xl brightness-50" />
+      {poster.href ? <Link to={poster.href} className="relative block size-full" tabIndex={phase === 'out' ? -1 : 0} aria-label={`${poster.alt} — voir les équipes`}>{img}</Link> : img}
     </div>
   )
 }
@@ -227,7 +238,7 @@ export function Billboard({ slides: content, leagueName, seasonLabel, logoUrl, p
         <div className="relative z-10 border-b border-white/10 bg-night-950/40 px-4 py-2 sm:px-6"><Tagline className="mx-auto max-w-3xl" /></div>
 
         {/* panneau */}
-        <div className="bb-panel relative z-10 grid h-[320px] grid-rows-[minmax(0,1fr)] px-5 py-7 sm:h-[380px] sm:px-10 sm:py-9 lg:h-[440px]" aria-live={hover || paused ? 'polite' : 'off'}>
+        <div className="bb-panel relative z-10 grid h-[320px] grid-rows-[minmax(0,1fr)] px-5 py-7 sm:aspect-[16/9] sm:h-auto sm:px-10 sm:py-9" aria-live={hover || paused ? 'polite' : 'off'}>
           {prev !== null && render(prev, 'out')}
           {n > 0 && render(idx, 'in')}
           {prev !== null && (

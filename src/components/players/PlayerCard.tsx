@@ -2,7 +2,7 @@
 // note (XP ou IPG), rôle, logo du club, nom et stats principales. La couleur suit le badge d'ancienneté
 // du club (Platinum nacré · Gold · Silver) ; en haut à droite, jusqu'à 3 badges de performance, du plus
 // rare au plus courant. Verso blanc, retournement 3D au clic (ou Entrée / Espace).
-import { logoPlate } from '@/lib/logoPlate'
+import { logoPlate, logoSrc } from '@/lib/logoPlate'
 import { useBakedPhoto } from '@/hooks/useBakedPhoto'
 import { useTrimmedImage } from '@/hooks/useTrimmedImage'
 import { InfoTip } from '@/components/league/InfoTip'
@@ -137,7 +137,7 @@ export function PlayerCard(p: PlayerCardProps) {
 }
 
 function cardLogo(p: PlayerCardProps) {
-  return p.team?.logo_url || (p.teamName ? teamLogoSvg(p.teamName.replace(/[^A-Za-zÀ-ÿ ]/g, '').split(/\s+/).map((w) => w[0]).join('').slice(0, 3).toUpperCase(), '#6CB4CC', '#0B2E73') : undefined)
+  return logoSrc(p.team) || (p.teamName ? teamLogoSvg(p.teamName.replace(/[^A-Za-zÀ-ÿ ]/g, '').split(/\s+/).map((w) => w[0]).join('').slice(0, 3).toUpperCase(), '#6CB4CC', '#0B2E73') : undefined)
 }
 
 /**
@@ -149,6 +149,8 @@ function TrimmedLogo({ src, alt }: { src: string; alt: string }) {
   const [ratio, setRatio] = useState(1)
   const AREA = 15, MAX_H = 2.9, MAX_W = 10.4 // en em
   let h = Math.min(MAX_H, Math.sqrt(AREA / ratio)), w = h * ratio
+  // logo large (> 2 × plus large que haut) : toute la largeur du cartouche, pour rester lisible
+  if (ratio > 2) { w = Math.min(MAX_W, MAX_H * ratio); h = w / ratio }
   if (w > MAX_W) { w = MAX_W; h = w / ratio }
   return <img src={t} alt={alt} draggable={false} onLoad={(e) => { const i = e.currentTarget; if (i.naturalWidth && i.naturalHeight) setRatio(i.naturalWidth / i.naturalHeight) }}
     className="block object-contain" style={{ width: `${w}em`, height: `${h}em` }} />

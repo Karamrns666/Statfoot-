@@ -15,3 +15,13 @@ export function logoPlate(team?: Pick<Team, 'logo_url' | 'logo_bg' | 'primary_co
   if (mode === 'white' || (mode === 'auto' && brand)) return { bg: '#FFFFFF', dark: false }
   return { bg: null, dark: false }
 }
+
+/** Version du logo selon le fond : claire (texte blanc) sur pastille noire / couleur ou sur le fond sombre du site,
+ *  normale sur pastille blanche. */
+export function logoSrc(team?: Pick<Team, 'logo_url' | 'logo_dark_url' | 'logo_bg' | 'primary_color'> | null): string | undefined {
+  if (!team?.logo_url) return undefined
+  const p = logoPlate(team)
+  const darkBg = p.bg ? p.dark : true
+  return darkBg && team.logo_dark_url ? team.logo_dark_url : team.logo_url
+}
+

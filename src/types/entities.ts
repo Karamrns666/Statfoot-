@@ -126,6 +126,8 @@ export interface Team extends BaseEntity {
   captain_player_id?: string
   /** fond derrière le logo (cartes, classements, visuels) — « auto » si absent */
   logo_bg?: 'auto' | 'white' | 'black' | 'transparent' | 'team'
+  /** logo pour fond sombre (texte clair) : utilisé automatiquement sur une pastille noire / couleur ou sur le fond du site */
+  logo_dark_url?: string
   /** photos collectives et posters (en-tête de la page équipe) */
   media?: TeamMedia[]
   /** image affichée en en-tête */

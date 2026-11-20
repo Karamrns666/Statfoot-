@@ -5,7 +5,7 @@ import { useMemo, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import type { Team } from '@/types/entities'
 import { teamLogoSvg } from '@/lib/logos'
-import { logoPlate } from '@/lib/logoPlate'
+import { logoPlate, logoSrc } from '@/lib/logoPlate'
 import { useTrimmedImage } from '@/hooks/useTrimmedImage'
 import { SENIORITY_LABEL, SENIORITY_STYLE, type SeniorityTier } from '@/lib/seniority'
 import { useData } from '@/hooks/useData'
@@ -36,10 +36,10 @@ export interface TeamCardProps {
 export function TeamCard(p: TeamCardProps) {
   const st = SENIORITY_STYLE[p.tier]
   const shine = useCardShine<HTMLDivElement>()
-  const logo = p.team.logo_url || teamLogoSvg(p.team.short_name, p.team.primary_color, p.team.secondary_color)
+  const logo = logoSrc(p.team) || teamLogoSvg(p.team.short_name, p.team.primary_color, p.team.secondary_color)
   const plate = logoPlate(p.team)
   const brand = !!plate.bg
-  const trimmed = useTrimmedImage(p.team.logo_url || null)
+  const trimmed = useTrimmedImage(logoSrc(p.team) || null)
   const stats = [
     { label: 'PTS', value: p.points ?? 0, hint: 'Points' },
     { label: 'BUTS', value: p.goals ?? 0, hint: 'Buts marqués' },

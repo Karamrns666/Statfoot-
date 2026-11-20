@@ -15,6 +15,19 @@ export function sameOriginImage(url: string): string {
   return url
 }
 
+/** SVG → PNG data URL, 1200 px de large (net dans un visuel 1080 px) */
+async function svgToPng(b: Blob, width = 1200): Promise<string | null> {
+  const url = URL.createObjectURL(b.type.includes('svg') ? b : new Blob([b], { type: 'image/svg+xml' }))
+  try {
+    const img = new Image(); img.decoding = 'async'; img.src = url
+    await img.decode()
+    const r = img.naturalWidth && img.naturalHeight ? img.naturalHeight / img.naturalWidth : 0.25
+    const c = document.createElement('canvas'); c.width = width; c.height = Math.max(1, Math.round(width * r))
+    c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height)
+    return c.toDataURL('image/png')
+  } catch { return null } finally { URL.revokeObjectURL(url) }
+}
+
 const dataCache = new Map<string, Promise<string | null>>()
 /** Image → data: URL (directe, sinon via le proxy du site) ; null si impossible */
 export function imageDataUrl(url: string): Promise<string | null> {
@@ -22,7 +35,14 @@ export function imageDataUrl(url: string): Promise<string | null> {
   if (!dataCache.has(url)) {
     dataCache.set(url, (async () => {
       for (const u of [url, sameOriginImage(url)]) {
-        try { const r = await fetch(u, { mode: 'cors', credentials: 'omit' }); if (r.ok) return await blobToDataUrl(await r.blob()) } catch { /* essai suivant */ }
+        try {
+          const r = await fetch(u, { mode: 'cors', credentials: 'omit' })
+          if (!r.ok) continue
+          const b = await r.blob()
+          // logo vectoriel : converti en PNG haute définition (Safari dessine mal un SVG imbriqué dans l'export)
+          if (b.type.includes('svg') || /\.svg(\?|$)/.test(u)) { const png = await svgToPng(b); if (png) return png }
+          return await blobToDataUrl(b)
+        } catch { /* essai suivant */ }
       }
       return null
     })())

@@ -86,7 +86,8 @@ test('photo présente dans la carte téléchargée', async ({ page }, info) => {
     expect(screen, 'bandeau du logo sur la carte affichée').toBeTruthy()
     expect(exp, 'bandeau du logo dans la carte exportée').toBeTruthy()
     expect(screen.part).toBeGreaterThan(0.72); expect(screen.part).toBeLessThan(0.8)
-    expect(Math.abs(exp.part - screen.part)).toBeLessThan(0.01)
+    // cadre de la carte en px fixes : la part varie de ~1 % entre une petite carte et la carte 1080 px
+    expect(Math.abs(exp.part - screen.part)).toBeLessThan(0.025)
     expect(Math.abs(exp.ratio - screen.ratio)).toBeLessThan(0.15)
     expect(Math.abs(exp.top - screen.top)).toBeLessThan(0.02)
     expect(exp.src).toBe(screen.src)

@@ -156,6 +156,22 @@ export async function renderWeeklyResults(rows: WeeklyResultRow[], cfg: VisualsC
 // ---------------------------------------------------------------------------
 //  Top 10
 // ---------------------------------------------------------------------------
+/** Efface une bande du modèle : chaque colonne reprend un dégradé entre le décor juste au-dessus et juste en dessous. */
+function eraseBand(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+  x = Math.max(0, Math.round(x)); y = Math.round(y); w = Math.round(w); h = Math.round(h)
+  const top = Math.max(0, y - 2), bot = Math.min(WEEKLY_H - 1, y + h + 2)
+  const img = ctx.getImageData(x, top, w, bot - top + 1), d = img.data, rows = bot - top + 1
+  for (let xx = 0; xx < w; xx++) {
+    const a = xx * 4, b = ((rows - 1) * w + xx) * 4
+    for (let yy = 1; yy < rows - 1; yy++) {
+      const t = yy / (rows - 1), i = (yy * w + xx) * 4
+      for (let ch = 0; ch < 3; ch++) d[i + ch] = d[a + ch] * (1 - t) + d[b + ch] * t
+      d[i + 3] = 255
+    }
+  }
+  ctx.putImageData(img, x, top)
+}
+
 /** Petite icône de ballon (dessinée, pas d'image) : distingue le Top 10 buteurs d'un coup d'œil. */
 function drawBall(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
   ctx.save()
@@ -176,12 +192,15 @@ function drawBall(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: numb
 export async function renderTop10(entries: TopEntry[], cfg: VisualsConfig, opts: { title: string; subtitle: string; showZones?: boolean; icon?: 'ball' }) {
   const L = cfg.top10, Z = L.zones
   const { c, ctx } = await base(cfg, cfg.templates.top10)
+  // moins de 10 joueurs : les bandes vides du modèle sont effacées (décor bleu reconstitué entre les bandes voisines)
+  L.bands.forEach((y, k) => { if (!entries[k + 3]) eraseBand(ctx, Z.band.x - 3, y - 3, Z.band.w + 6, Z.band.h + 6) })
   drawHeader(ctx, cfg, Z, opts.title, opts.subtitle)
   const photos = await Promise.all(entries.slice(0, 3).map((e) => loadImage(e.player.photo_card_mode !== 'original' && e.player.photo_cutout_url ? e.player.photo_cutout_url : e.player.photo_url)))
   const logos = await Promise.all(entries.map((e) => loadImage(tileLogo(e.team, true))))
   // podium : 2e à gauche, 1er au centre, 3e à droite
   const slots: [number, Zone, Zone][] = [[0, Z.card1, Z.pill1], [1, Z.card2, Z.pill2], [2, Z.card3, Z.pill3]]
-  const pillSize = Math.min(...slots.filter(([i]) => entries[i]).map(([i, , pz]) => fitText(ctx, cfg, entries[i].name, pz).size), Z.pill1.size ?? 30)
+  // nom de chaque pastille ajusté à sa place (un nom très long ne réduit pas les deux autres), jamais coupé
+  const pillSize = (i: number, pz: Zone) => fitText(ctx, cfg, entries[i].name, { ...pz, w: pz.w - 16, min: 12 }).size
   for (const [i, card, pill] of slots) {
     const e = entries[i]; if (!e) continue
     // photo (ou logo du club) dans le haut de la carte, découpée aux coins arrondis
@@ -192,7 +211,7 @@ export async function renderTop10(entries: TopEntry[], cfg: VisualsConfig, opts:
     else if (logos[i]) { ctx.globalAlpha = 0.9; drawContain(ctx, logos[i]!, { ...area, pad: 40 }) }
     ctx.restore()
     drawText(ctx, cfg, String(e.rank), { ...Z.podiumRank, x: card.x + 8, y: card.y + 8 }, { shadow: true })
-    drawText(ctx, cfg, e.name, { ...pill, size: pillSize })
+    drawText(ctx, cfg, e.name, { ...pill, x: pill.x + 8, w: pill.w - 16, size: pillSize(i, pill), min: 12 })
     // valeur + logo du club sous la pastille
     const vz = Z.podiumValue, lg = vz.logo ?? 46, vy = vz.y + vz.h / 2
     const ic = opts.icon ? Math.round(lg * 0.72) : 0, icGap = ic ? 8 : 0

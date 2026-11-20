@@ -5,7 +5,7 @@ import { LEAGUE } from '@/config/league'
 import { resolveVisualsConfig, type VisualsConfig } from './config'
 import { buildMvpModel, buildResultModel, captionText, matchVisualHash, type VisualData } from './model'
 import { canvasToPng, renderMvp, renderResult, renderStory } from './render'
-import { competitionTitle, roundMatches, TOP_CARD_LABEL, TOP_KINDS, TOP_LABEL, topCaptionLines, weeklyCaption, weeklyResults, weeklyStandings, weeklyTop, type TopPeriod } from './weekly'
+import { competitionTitle, roundMatches, TOP_CARD_LABEL, TOP_KINDS, TOP_LABEL, topCaptionLines, weeklyCaption, weeklyResults, weeklyStandingsInfo, weeklyTop, type TopPeriod } from './weekly'
 import { renderTop10, renderWeeklyResults, renderWeeklyStandings } from './weeklyRender'
 import type { SeniorityTier } from '@/lib/seniority'
 import { isPlayed } from '@/lib/standings'
@@ -65,19 +65,26 @@ export function downloadBlob(blob: Blob, name: string) {
 export interface WeeklyVisual { key: string; label: string; fileName: string; caption: string; aspect: string; render: (opts?: { showZones?: boolean }) => Promise<HTMLCanvasElement> }
 
 /** Tous les visuels d'une journée : résultats, classement, 4 Top 10 (+ résultat et homme du match de chaque match). */
-export function weeklyPlan(league: LeagueData, competitionId: string, round: number, cfg: VisualsConfig, tierOf: (teamId: string) => SeniorityTier | undefined = () => undefined, period: TopPeriod = 'round'): WeeklyVisual[] {
+export function weeklyPlan(league: LeagueData, competitionId: string, round: number, cfg: VisualsConfig, tierOf: (teamId: string) => SeniorityTier | undefined = () => undefined, period: TopPeriod = 'round', split = false): WeeklyVisual[] {
   const comp = league.competitions.find((c) => c.id === competitionId)
   const title = competitionTitle(comp)
   const slug = title.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-')
   const results = weeklyResults(league, competitionId, round)
-  const standings = weeklyStandings(league, competitionId, round).map((r) => ({ ...r, tier: tierOf(r.team_id) }))
+  const sInfo = weeklyStandingsInfo(league, competitionId, round)
+  const standings = sInfo.rows.map((r) => ({ ...r, tier: tierOf(r.team_id) }))
   const out: WeeklyVisual[] = [
     { key: 'resultats', label: 'Résultats de la journée', aspect: '4 / 5', fileName: `mbl-${slug}-j${round}-resultats.png`,
       caption: weeklyCaption('resultats', title, round, results.map((r) => `${r.home.name} ${r.score} ${r.away.name}${r.sub ? ` (${r.sub})` : ''}`)),
       render: (o) => renderWeeklyResults(results, cfg, { title: 'RÉSULTATS', subtitle: `${title} · J${round}`, barLabel: `RÉSULTATS · J${round}`, showZones: o?.showZones, logo: divisionLogo(comp) }) },
-    { key: 'classement', label: 'Classement', aspect: '4 / 5', fileName: `mbl-${slug}-j${round}-classement.png`,
-      caption: weeklyCaption('classement', title, round, standings.slice(0, 3).map((r) => `${r.rank}. ${r.name} — ${r.points} pts`)),
-      render: (o) => renderWeeklyStandings(standings, cfg, { title: 'CLASSEMENT', subtitle: `${title} · APRÈS LA J${round}`, showZones: o?.showZones, logo: divisionLogo(comp) }) },
+    ...(split && sInfo.masterSize && standings.length > sInfo.masterSize
+      // carrousel Instagram : 2 images (zone MASTER puis zone CHALLENGER), lignes plus grandes
+      ? ([['master', 'ZONE MASTER', standings.slice(0, sInfo.masterSize), '/brand/logo-master.png'], ['challenger', 'ZONE CHALLENGER', standings.slice(sInfo.masterSize), '/brand/logo-challenger.png']] as const).map(([k, t, part, logo], i) => ({
+        key: `classement-${k}`, label: `Classement · ${i + 1}/2 · zone ${k === 'master' ? 'MASTER' : 'CHALLENGER'}`, aspect: '4 / 5', fileName: `mbl-${slug}-j${round}-classement-${i + 1}-${k}.png`,
+        caption: weeklyCaption('classement', title, round, part.slice(0, 3).map((r) => `${r.rank}. ${r.name} — ${r.points} pts`)),
+        render: (o?: { showZones?: boolean }) => renderWeeklyStandings([...part], cfg, { title: t, subtitle: `${title} · APRÈS LA J${round}`, showZones: o?.showZones, logo, big: true }) }))
+      : [{ key: 'classement', label: 'Classement', aspect: '4 / 5', fileName: `mbl-${slug}-j${round}-classement.png`,
+        caption: weeklyCaption('classement', title, round, standings.slice(0, 3).map((r) => `${r.rank}. ${r.name} — ${r.points} pts`)),
+        render: (o?: { showZones?: boolean }) => renderWeeklyStandings(standings, cfg, { title: 'CLASSEMENT', subtitle: `${title} · APRÈS LA J${round}`, showZones: o?.showZones, logo: divisionLogo(comp), masterSize: sInfo.masterSize, provisional: sInfo.provisional }) }]),
   ]
   // Top 10 : journée choisie ou cumul depuis le début de la compétition ; buteurs juste avant passeurs
   const when = period === 'cumul' ? `CUMUL J1 À J${round}` : `J${round}`

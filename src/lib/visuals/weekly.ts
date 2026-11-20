@@ -8,6 +8,9 @@ import { keeperMatchStats } from '@/lib/matchEngine'
 import type { LeagueData } from '@/lib/stats'
 import { shortName } from './model'
 import { logoPlate, tileLogo } from '@/lib/logoPlate'
+import { PRESEASON_DEFAULTS, preseasonState, resolvePreseasonConfig, type PMatch } from '@/lib/preseason'
+import { isDisputed } from '@/lib/reglement'
+import { activeAdjustments } from '@/lib/adjustments'
 
 const upper = (s: string) => s.toLocaleUpperCase('fr-FR')
 
@@ -47,12 +50,30 @@ export function weeklyResults(league: LeagueData, competitionId: string, round: 
 //  Classement après la journée
 // ---------------------------------------------------------------------------
 export interface WeeklyStandingRow extends StandingRow { name: string; short: string; logo?: string; logoBg?: string; color?: string }
-export function weeklyStandings(league: LeagueData, competitionId: string, round: number): WeeklyStandingRow[] {
+/** Classement après la journée choisie, TOUTES les équipes de la compétition (aucune limite de lignes).
+ *  Pré-saison : même classement que la page Classement (départage spécifique : force des adversaires, tirage). */
+export function weeklyStandingsInfo(league: LeagueData, competitionId: string, round: number): { rows: WeeklyStandingRow[]; masterSize?: number; provisional: boolean } {
   const T = new Map(league.teams.map((t) => [t.id, t]))
-  return competitionStandings(league, competitionId, { beforeRound: round + 1 }).map((r) => {
-    const t = T.get(r.team_id)
-    return { ...r, name: upper(t?.name ?? '?'), short: upper(t?.short_name ?? ''), logo: tileLogo(t, true), logoBg: logoPlate(t).bg, color: t?.primary_color }
-  })
+  const comp = league.competitions.find((c) => c.id === competitionId)
+  const deco = (r: StandingRow) => { const t = T.get(r.team_id); return { ...r, name: upper(t?.name ?? '?'), short: upper(t?.short_name ?? ''), logo: tileLogo(t, true), logoBg: logoPlate(t).bg, color: t?.primary_color } }
+  if (comp?.phase === 'league_phase' && comp.format === 'swiss') {
+    const ps = comp.preseason ?? {}
+    const cfg = resolvePreseasonConfig({ ...PRESEASON_DEFAULTS, ...(ps.config ?? {}) })
+    const teamIds = comp.team_ids ?? []
+    const pm: PMatch[] = league.matches.filter((m) => m.competition_id === competitionId && m.status !== 'cancelled' && (m.round ?? 0) <= round)
+      .map((m) => ({ id: m.id, round: m.round ?? 0, home: m.home_team_id, away: m.away_team_id, hs: m.home_score, as: m.away_score, played: isDisputed(m), reason: m.pairing_reason }))
+    const rests = Object.fromEntries(Object.entries(ps.rests ?? {}).map(([k, v]) => [Number(k), v]))
+    const drawOrder = ps.tiebreak_order ?? ps.draw_order ?? [...teamIds].sort()
+    const st = preseasonState(teamIds, pm, rests, cfg, drawOrder, activeAdjustments(league.adjustments, comp.id))
+    const byId = new Map(st.ranking.map((r) => [r.team_id, r]))
+    const ranking = ps.final_ranking && st.finished ? ps.final_ranking.map((id, i) => ({ ...byId.get(id)!, rank: i + 1 })).filter((r) => r.team_id) : st.ranking
+    const rows = ranking.map((r) => deco({ team_id: r.team_id, rank: r.rank, played: r.played, won: r.won, drawn: r.drawn, lost: r.lost, gf: r.gf, ga: r.ga, gd: r.diff, points: r.points, yellow: 0, red: 0, form: [], adjustments: r.adjustments }))
+    return { rows, masterSize: ps.split?.master_size ?? cfg.masterSize, provisional: !ps.final_ranking }
+  }
+  return { rows: competitionStandings(league, competitionId, { beforeRound: round + 1 }).map(deco), provisional: false }
+}
+export function weeklyStandings(league: LeagueData, competitionId: string, round: number): WeeklyStandingRow[] {
+  return weeklyStandingsInfo(league, competitionId, round).rows
 }
 
 // ---------------------------------------------------------------------------
@@ -137,6 +158,24 @@ export function weeklyCaption(kind: 'resultats' | 'classement' | TopKind, comp: 
   const when = period === 'cumul' ? `cumul J1 à J${round}` : `J${round}`
   const head = kind === 'resultats' ? `⚽ RÉSULTATS | ${comp} · J${round}` : kind === 'classement' ? `📊 CLASSEMENT | ${comp} · après la J${round}` : `${kind === 'goals' ? '⚽' : '🏅'} ${TOP_LABEL[kind]} | ${comp} · ${when}`
   return [head, ...lines, '', '#MoroccoBusinessLeague #MBL #Ardentia #FootEntreprise'].join('\n')
+}
+
+// Lignes du classement / des résultats : AUCUNE limite — le nombre de lignes suit les données ; elles se
+// répartissent entre y = 274 et y = 1222 (hauteur de la barre orange) ; tailles ajustées à la hauteur de ligne.
+const ROWS_TOP = 274, ROWS_BOTTOM = 1222
+export function weeklyRowsLayout(n: number, maxStep = 59) {
+  const step = Math.min(maxStep, (ROWS_BOTTOM - ROWS_TOP) / Math.max(1, n))
+  const big = maxStep > 59
+  const h = Math.round(Math.max(24, Math.min(step * 0.6, big ? 52 : 35)))
+  return {
+    n, step, h,
+    top: (i: number) => ROWS_TOP + i * step,
+    /** taille du nom d'équipe (≥ 24 px : lisible sur téléphone) */
+    name: Math.round(Math.max(24, Math.min(step * 0.66, big ? 46 : 30))),
+    logo: Math.round(Math.min(step * 0.86, big ? 70 : 50)),
+    stats: Math.round(Math.max(16, Math.min(step * 0.42, big ? 28 : 22))),
+    pillFont: Math.round(Math.max(18, Math.min(h * 0.8, big ? 40 : 28))),
+  }
 }
 
 /** Couleur de texte lisible sur une couleur de fond (contraste WCAG). */

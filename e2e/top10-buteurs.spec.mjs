@@ -78,4 +78,14 @@ test('Top 10 buteurs : nom long, égalité, moins de 10 buteurs', async ({ page 
   await page.getByRole('radio', { name: 'Cumul depuis le début' }).click()
   const cumul = await save('Top 10 buteurs', 'top10-buteurs-cumul.png')
   expect(cumul.split('\n')[0]).toMatch(/cumul J1 à J\d+$/)
+  // classement : toutes les équipes (1 image), puis 2 images si la compétition a une zone MASTER / CHALLENGER
+  await page.getByRole('radio', { name: 'Journée' }).click()
+  await save('Classement', 'classement-1-image.png')
+  await save('Résultats de la journée', 'resultats.png')
+  await page.getByRole('radio', { name: '2 images (MASTER + CHALLENGER)' }).click()
+  const two = page.locator('figcaption', { hasText: /^Classement · \d\/2/ })
+  if (await two.count()) {
+    await save('Classement · 1/2 · zone MASTER', 'classement-2-images-1.png')
+    await save('Classement · 2/2 · zone CHALLENGER', 'classement-2-images-2.png')
+  }
 })

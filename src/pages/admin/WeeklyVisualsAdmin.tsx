@@ -1,7 +1,7 @@
 // Admin — « Visuels de la semaine » : choisir la compétition (PRÉ-SAISON, MASTER, CHALLENGER) et la journée,
 // prévisualiser tout (résultats, classement, 3 Top 10, résultat + homme du match de chaque match), télécharger
 // tout en ZIP ou un par un, copier le texte de publication. Mode « aperçu des zones » (config src/config/visuals.json).
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Archive, Check, Copy, Download, Loader2, ScanLine } from 'lucide-react'
 import { useData } from '@/hooks/useData'
 import { useAdminScope } from '@/hooks/useAdminScope'
@@ -32,8 +32,10 @@ export default function WeeklyVisualsAdmin() {
   const [zones, setZones] = useState(false)
   // Top 10 : journée choisie (défaut) ou cumul depuis le début de la compétition
   const [period, setPeriod] = useState<TopPeriod>('round')
+  // classement : 1 image (toutes les équipes) ou 2 images (zone MASTER + zone CHALLENGER, carrousel Instagram)
+  const [split, setSplit] = useState(false)
   const [zip, setZip] = useState<string | null>(null)
-  const plan = useMemo(() => (comp && round != null ? weeklyPlan(league, comp.id, round, cfg, (id) => seniority.get(id)?.tier, period) : []), [league, comp, round, cfg, seniority, period])
+  const plan = useMemo(() => (comp && round != null ? weeklyPlan(league, comp.id, round, cfg, (id) => seniority.get(id)?.tier, period, split) : []), [league, comp, round, cfg, seniority, period, split])
 
   const downloadAll = async () => {
     const files: { name: string; data: Uint8Array }[] = []
@@ -64,7 +66,13 @@ export default function WeeklyVisualsAdmin() {
             <label className="ml-auto flex cursor-pointer items-center gap-2 text-sm text-muted-foreground"><ScanLine className="size-4" />Aperçu des zones<Switch checked={zones} onCheckedChange={setZones} aria-label="Aperçu des zones" /></label>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {plan.map((v) => <VisualTile key={`${v.key}-${zones}`} v={v} zones={zones} />)}
+            {plan.map((v) => <VisualTile key={`${v.key}-${zones}`} v={v} zones={zones} extra={v.key.startsWith('classement') ? (
+              <div role="radiogroup" aria-label="Format du classement" className="mb-1.5 grid grid-cols-2 gap-1 rounded-lg border border-white/10 p-0.5 text-xs">
+                {([[false, '1 image (toutes les équipes)'], [true, '2 images (MASTER + CHALLENGER)']] as const).map(([k, l]) => (
+                  <button key={String(k)} role="radio" aria-checked={split === k} onClick={() => setSplit(k)} className={split === k ? 'rounded-md bg-neon px-2 py-1 font-bold text-night-950' : 'rounded-md px-2 py-1 text-muted-foreground hover:text-white'}>{l}</button>
+                ))}
+              </div>
+            ) : undefined} />)}
           </div>
         </div>
       ) : <EmptyState title="Aucune journée jouée">Les visuels de la semaine apparaissent dès qu’une journée de PRÉ-SAISON, MASTER ou CHALLENGER est jouée dans la saison choisie.</EmptyState>}
@@ -72,7 +80,7 @@ export default function WeeklyVisualsAdmin() {
   )
 }
 
-function VisualTile({ v, zones }: { v: WeeklyVisual; zones: boolean }) {
+function VisualTile({ v, zones, extra }: { v: WeeklyVisual; zones: boolean; extra?: ReactNode }) {
   const [url, setUrl] = useState<string>()
   const [blob, setBlob] = useState<Blob | null>(null)
   const [err, setErr] = useState<string>()
@@ -86,6 +94,7 @@ function VisualTile({ v, zones }: { v: WeeklyVisual; zones: boolean }) {
   return (
     <figure className="flex flex-col rounded-xl border border-white/10 bg-night-950/40 p-2">
       <figcaption className="mb-1.5 truncate text-sm font-semibold" title={v.label}>{v.label}</figcaption>
+      {extra}
       <div className="relative overflow-hidden rounded-lg bg-white/5" style={{ aspectRatio: v.aspect }}>
         {url && <img src={url} alt={v.label} className="size-full object-contain" />}
         {!url && <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-xs text-white/80">{err ? `Erreur : ${err}` : <><Loader2 className="size-6 animate-spin text-neon" />Préparation…</>}</div>}

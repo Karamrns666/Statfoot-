@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { generateLeagueData } from '@/api/seed/generate'
 import { leagueFromDb } from '@/lib/leagueData'
 import { competitionStandings } from '@/lib/standings'
-import { contrastText, playedRounds, weeklyResults, weeklyStandings, weeklyTop } from './weekly'
+import { contrastText, playedRounds, weeklyResults, weeklyRowsLayout, weeklyStandings, weeklyStandingsInfo, weeklyTop } from './weekly'
+import { makeLeague } from '../__fixtures__/league'
 import { DEFAULT_VISUALS_CONFIG } from './config'
 import type { Settings } from '@/types/entities'
 
@@ -44,5 +45,29 @@ describe('visuels de la semaine', () => {
     const S = DEFAULT_VISUALS_CONFIG.semaine
     expect(S.zones.pill.y + 15 * S.options.step).toBe(1159)
     expect(DEFAULT_VISUALS_CONFIG.top10.bands).toHaveLength(7)
+  })
+})
+
+describe('classement de la semaine : toutes les équipes', () => {
+  it('une ligne par équipe de la compétition (21, 11, 10) — aucune limite à 16', () => {
+    for (const n of [21, 11, 10]) {
+      const ids = Array.from({ length: n }, (_, i) => `T${i}`)
+      const teams = ids.map((id) => ({ id, name: `Équipe ${id}`, short_name: id, primary_color: '#123456' }))
+      const lg = makeLeague({ teams: teams as never, competitions: [{ id: 'c', season_id: 's1', name: 'Test', phase: 'gold', team_ids: ids } as never],
+        matches: [{ id: 'm', season_id: 's1', competition_id: 'c', round: 1, home_team_id: 'T0', away_team_id: 'T1', home_score: 2, away_score: 1, status: 'finished', date: '2026-11-17T20:00' } as never], events: [], lineups: [] })
+      const rows = weeklyStandingsInfo(lg, 'c', 1).rows
+      expect(rows).toHaveLength(n)
+      const L = weeklyRowsLayout(n)
+      expect(L.top(n - 1) + L.h).toBeLessThanOrEqual(1222)
+      expect(L.name).toBeGreaterThanOrEqual(24)
+    }
+  })
+  it('pré-saison : même classement que la page Classement (21 équipes, séparation après la 11e)', () => {
+    const pre = db.Competition.find((c) => c.phase === 'league_phase' && c.format === 'swiss' && playedRounds(league, c.id).length)
+    if (!pre) return
+    const r = Math.max(...playedRounds(league, pre.id))
+    const info = weeklyStandingsInfo(league, pre.id, r)
+    expect(info.rows).toHaveLength(pre.team_ids!.length)
+    expect(info.masterSize).toBeGreaterThan(0)
   })
 })

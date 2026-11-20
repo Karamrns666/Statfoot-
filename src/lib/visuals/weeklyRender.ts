@@ -4,18 +4,13 @@
 // Toutes les zones viennent de src/config/visuals.json (semaine / top10), modifiables et visibles en « aperçu des zones ».
 import { colorOf, WEEKLY_H, WEEKLY_W, type VisualsConfig, type Zone } from './config'
 import { drawContain, drawText, drawTile, drawZones, ensureVisualFonts, fitText, fontOf, loadImage, newCanvas } from './render'
-import { contrastText, shade, type TopEntry, type WeeklyResultRow, type WeeklyStandingRow } from './weekly'
+import { contrastText, shade, weeklyRowsLayout, type TopEntry, type WeeklyResultRow, type WeeklyStandingRow } from './weekly'
 import type { SeniorityTier } from '@/lib/seniority'
 import { logoPlate, tileLogo } from '@/lib/logoPlate'
 
 const withAlpha = (ctx: CanvasRenderingContext2D, a: number | undefined, f: () => void) => { ctx.save(); ctx.globalAlpha = a ?? 1; f(); ctx.restore() }
-const rowY = (cfg: VisualsConfig, z: Zone, i: number) => ({ ...z, y: z.y + i * cfg.semaine.options.step })
 
 /** Masque une pastille inutilisée en recopiant le fond du modèle situé juste à droite (même dégradé). */
-function hidePill(ctx: CanvasRenderingContext2D, bg: HTMLImageElement, p: Zone) {
-  const sx = p.x + p.w + 14
-  ctx.drawImage(bg, sx, p.y - 4, p.w + 4, p.h + 8, p.x - 2, p.y - 4, p.w + 4, p.h + 8)
-}
 
 async function base(cfg: VisualsConfig, url: string) {
   await ensureVisualFonts(cfg)
@@ -65,33 +60,57 @@ function tierCoin(ctx: CanvasRenderingContext2D, cfg: VisualsConfig, tier: Senio
 // ---------------------------------------------------------------------------
 //  Classement de la semaine
 // ---------------------------------------------------------------------------
-export async function renderWeeklyStandings(rows: (WeeklyStandingRow & { tier?: SeniorityTier })[], cfg: VisualsConfig, opts: { title: string; subtitle: string; showZones?: boolean; logo?: string }) {
+// Lignes du classement / des résultats : AUCUNE limite — le nombre de lignes suit les données. Les lignes se
+// répartissent entre y = 274 et y = 1222 (hauteur de la barre orange) ; pastilles de rang dessinées en code sur le
+// fond sans pastilles (template-semaine-fond.png). Tailles ajustées à la hauteur de ligne.
+type RowsLayout = ReturnType<typeof weeklyRowsLayout>
+function drawPill(ctx: CanvasRenderingContext2D, cfg: VisualsConfig, P: Zone, Lay: RowsLayout, i: number, text: string) {
+  const y = Lay.top(i)
+  ctx.save(); ctx.shadowColor = 'rgba(0, 12, 48, .25)'; ctx.shadowBlur = 4
+  ctx.beginPath(); ctx.roundRect(P.x, y, P.w, Lay.h, Math.min(10, Lay.h * 0.3)); ctx.fillStyle = '#FFFFFF'; ctx.fill(); ctx.restore()
+  textAt(ctx, cfg, P, text, P.x + P.w / 2, y + Lay.h / 2, P.w - 10, Lay.pillFont, 'center', colorOf(cfg, P.color ?? 'navy'), true)
+}
+
+export async function renderWeeklyStandings(rows: (WeeklyStandingRow & { tier?: SeniorityTier })[], cfg: VisualsConfig, opts: { title: string; subtitle: string; showZones?: boolean; logo?: string; masterSize?: number; provisional?: boolean; big?: boolean }) {
   const L = cfg.semaine, Z = L.zones
-  const { c, ctx, bg } = await base(cfg, cfg.templates.semaine)
+  const { c, ctx } = await base(cfg, cfg.templates.semaine)
   drawHeader(ctx, cfg, Z, opts.title, opts.subtitle)
   await drawDivisionLogo(ctx, Z, opts.logo)
-  const list = rows.slice(0, L.options.maxRows)
-  if (bg && L.options.hideUnusedPills) for (let i = list.length; i < L.options.maxRows; i++) hidePill(ctx, bg, rowY(cfg, Z.pill, i))
+  const list = rows
+  const Lay = weeklyRowsLayout(list.length, opts.big ? 84 : L.options.step)
   drawText(ctx, cfg, 'PTS', Z.barHead)
   const logos = await Promise.all(list.map((r) => loadImage(r.logo)))
-  // tailles communes à toutes les lignes
-  const nameSize = Math.min(...list.map((r) => fitText(ctx, cfg, r.name, { ...Z.row, w: Z.row.w * 0.6 }).size), Z.row.size ?? 30)
+  const row = Z.row
+  // tailles communes à toutes les lignes ; noms longs (PARE-BRISE EXPRESS…) sur une ligne sans toucher « MJ · DIFF »
+  const lg = Lay.logo, gap = row.gap ?? 12
+  ctx.font = fontOf(cfg, Z.rowStats, Lay.stats)
+  const statsW = Math.max(...list.map((r) => ctx.measureText(`MJ ${r.played} · DIFF ${r.gd > 0 ? '+' : ''}${r.gd}`).width), 0)
+  const nameMax = row.x + row.w - statsW - 22 - (row.x + lg + gap) - (list.some((r) => r.tier) ? 26 : 0)
+  let nameSize = Lay.name
+  ctx.font = fontOf(cfg, row, nameSize)
+  while (nameSize > 16 && Math.max(...list.map((r) => ctx.measureText(r.name).width), 0) > nameMax) { nameSize--; ctx.font = fontOf(cfg, row, nameSize) }
   list.forEach((r, i) => {
-    const p = rowY(cfg, Z.pill, i), row = rowY(cfg, Z.row, i), cy = row.y + row.h / 2
-    drawText(ctx, cfg, String(r.rank), p)
-    const lg = Z.row.logo ?? 40
+    const y = Lay.top(i), cy = y + Lay.h / 2
+    drawPill(ctx, cfg, Z.pill, Lay, i, String(r.rank))
     let x = row.x
     const img = logos[i]
     if (img) drawTile(ctx, img, { x, y: cy - lg / 2, w: lg, h: lg }, r.logoBg)
-    x += lg + (Z.row.gap ?? 12)
+    x += lg + gap
     const stats = `MJ ${r.played} · DIFF ${r.gd > 0 ? '+' : ''}${r.gd}`
-    ctx.font = fontOf(cfg, Z.rowStats, Z.rowStats.size ?? 22); const sw = ctx.measureText(stats).width
-    const nameMax = row.x + row.w - sw - 22 - x - (r.tier ? 26 : 0)
-    const nw = textAt(ctx, cfg, Z.row, r.name, x, cy, nameMax, nameSize)
-    if (r.tier) tierCoin(ctx, cfg, r.tier, x + nw + 8, cy, 9)
-    withAlpha(ctx, Z.rowStats.opacity, () => textAt(ctx, cfg, Z.rowStats, stats, row.x + row.w, cy, sw + 2, Z.rowStats.size ?? 22, 'right'))
-    drawText(ctx, cfg, String(r.points), rowY(cfg, Z.points, i), { shadow: true })
+    const nw = textAt(ctx, cfg, row, r.name, x, cy, nameMax, nameSize)
+    if (r.tier) tierCoin(ctx, cfg, r.tier, x + nw + 8, cy, Math.max(7, Math.round(Lay.h * 0.26)))
+    withAlpha(ctx, Z.rowStats.opacity, () => textAt(ctx, cfg, Z.rowStats, stats, row.x + row.w, cy, statsW + 2, Lay.stats, 'right', undefined, true))
+    textAt(ctx, cfg, Z.points, String(r.points), Z.points.x + Z.points.w / 2, cy, Z.points.w - 4, nameSize, 'center', colorOf(cfg, Z.points.color), true)
   })
+  // séparation MASTER / CHALLENGER + légende
+  const ms = opts.masterSize
+  if (ms && list.length > ms && list[0]?.rank === 1) {
+    const yA = Lay.top(ms - 1) + Lay.h, yB = Lay.top(ms), ys = (yA + yB) / 2
+    ctx.save(); ctx.strokeStyle = 'rgba(255, 255, 255, .9)'; ctx.lineWidth = 3; ctx.setLineDash([14, 8])
+    ctx.beginPath(); ctx.moveTo(Z.pill.x - 6, ys); ctx.lineTo(Z.points.x + Z.points.w + 6, ys); ctx.stroke(); ctx.restore()
+    const legend = `1–${ms} : zone MASTER · ${ms + 1}–${list.length} : zone CHALLENGER${opts.provisional ? ' (provisoire)' : ''}`
+    textAt(ctx, cfg, { ...Z.rowStats, font: 'text', weight: 600 }, legend, Z.pill.x, 1262, Z.points.x + Z.points.w - Z.pill.x, 24, 'left', '#FFFFFF')
+  }
   if (opts.showZones) drawZones(ctx, Z, L.decor)
   return c
 }
@@ -101,27 +120,27 @@ export async function renderWeeklyStandings(rows: (WeeklyStandingRow & { tier?: 
 // ---------------------------------------------------------------------------
 export async function renderWeeklyResults(rows: WeeklyResultRow[], cfg: VisualsConfig, opts: { title: string; subtitle: string; barLabel: string; showZones?: boolean; logo?: string }) {
   const L = cfg.semaine, Z = L.zones
-  const { c, ctx, bg } = await base(cfg, cfg.templates.semaine)
+  const { c, ctx } = await base(cfg, cfg.templates.semaine)
   drawHeader(ctx, cfg, Z, opts.title, opts.subtitle)
   await drawDivisionLogo(ctx, Z, opts.logo)
-  const list = rows.slice(0, L.options.maxRows)
-  if (bg && L.options.hideUnusedPills) for (let i = list.length; i < L.options.maxRows; i++) hidePill(ctx, bg, rowY(cfg, Z.pill, i))
+  const list = rows
+  const Lay = weeklyRowsLayout(list.length, L.options.step)
   // libellé vertical dans la barre orange
   const bz = Z.barLabel
   ctx.save(); ctx.translate(bz.x + bz.w / 2, bz.y + bz.h / 2); ctx.rotate(-Math.PI / 2)
   drawText(ctx, cfg, opts.barLabel, { ...bz, x: -bz.h / 2, y: -bz.w / 2, w: bz.h, h: bz.w })
   ctx.restore()
   const imgs = await Promise.all(list.flatMap((r) => [loadImage(r.home.logo), loadImage(r.away.logo)]))
-  const row0 = Z.row, cx = row0.x + row0.w / 2, lg = Math.min(row0.logo ?? 40, row0.h + 6), scoreW = 120, gap = row0.gap ?? 12
+  const row0 = Z.row, cx = row0.x + row0.w / 2, lg = Math.min(Lay.logo, Lay.h + 10), scoreW = 120, gap = row0.gap ?? 12
   const nameMax = cx - scoreW / 2 - gap - lg - gap - row0.x
-  const nameSize = Math.min(...list.flatMap((r) => [r.home.name, r.away.name]).map((n) => fitText(ctx, cfg, n, { ...row0, w: nameMax }).size), row0.size ?? 30)
+  const nameSize = Math.min(...list.flatMap((r) => [r.home.name, r.away.name]).map((n) => fitText(ctx, cfg, n, { ...row0, w: nameMax, size: Lay.name }).size), Lay.name)
   list.forEach((r, i) => {
-    const p = rowY(cfg, Z.pill, i), row = rowY(cfg, row0, i), cy = row.y + row.h / 2
-    drawText(ctx, cfg, r.tag, p)
+    const y = Lay.top(i), cy = y + Lay.h / 2
+    drawPill(ctx, cfg, Z.pill, Lay, i, r.tag)
     // score dans un cartouche blanc
-    ctx.save(); ctx.beginPath(); ctx.roundRect(cx - scoreW / 2, row.y - 2, scoreW, row.h + 4, 8); ctx.fillStyle = '#FFFFFF'; ctx.fill(); ctx.restore()
-    textAt(ctx, cfg, row0, r.score, cx, cy, scoreW - 10, Math.min(row0.size ?? 30, 30), 'center', colorOf(cfg, 'navy'))
-    if (r.sub) textAt(ctx, cfg, Z.rowStats, r.sub, cx, row.y + row.h + 9, scoreW + 60, 14, 'center')
+    ctx.save(); ctx.beginPath(); ctx.roundRect(cx - scoreW / 2, y - 2, scoreW, Lay.h + 4, 8); ctx.fillStyle = '#FFFFFF'; ctx.fill(); ctx.restore()
+    textAt(ctx, cfg, row0, r.score, cx, cy, scoreW - 10, Math.min(nameSize, 30), 'center', colorOf(cfg, 'navy'), true)
+    if (r.sub) textAt(ctx, cfg, Z.rowStats, r.sub, cx, y + Lay.h + 9, scoreW + 60, 14, 'center')
     const hx = cx - scoreW / 2 - gap - lg, ax = cx + scoreW / 2 + gap
     for (const [img, x, bgc] of [[imgs[i * 2], hx, r.home.logoBg], [imgs[i * 2 + 1], ax, r.away.logoBg]] as const) {
       if (img) drawTile(ctx, img, { x, y: cy - lg / 2, w: lg, h: lg }, bgc)

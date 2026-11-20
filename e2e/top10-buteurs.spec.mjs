@@ -28,10 +28,13 @@ test('Top 10 buteurs : nom long, égalité, moins de 10 buteurs', async ({ page 
     const round = Math.max(...matches.filter((m) => m.competition_id === comp.id && played(m) && m.round != null).map((m) => m.round))
     const ms = matches.filter((m) => m.competition_id === comp.id && m.round === round && played(m) && !m.forfeit_team_id)
     const players = get('Player')
-    const of = (tid) => players.filter((p) => p.team_id === tid && p.status !== 'inactive')
-    const m = ms[0], h = of(m.home_team_id), a = of(m.away_team_id)
-    // nom très long
-    const long = h[0]; long.first_name = 'Mohammed-Amine'; long.last_name = 'BENABDELLAH EL OUAZZANI'
+    const m = ms[0]
+    const now = new Date().toISOString()
+    // joueurs de test dans les deux équipes du match
+    const mk = (tid, tag, i, last = `${tag}${i}`, first = 'Joueur') => { const p = { id: `e2e_${tag}${i}`, first_name: first, last_name: last, number: i, team_id: tid, season_ids: [m.season_id], status: 'active', created_date: now, updated_date: now }; players.push(p); return p }
+    const h = [mk(m.home_team_id, 'Dom', 1, 'BENABDELLAH EL OUAZZANI', 'Mohammed-Amine'), mk(m.home_team_id, 'Dom', 2)]
+    const a = [mk(m.away_team_id, 'Ext', 1), mk(m.away_team_id, 'Ext', 2), mk(m.away_team_id, 'Ext', 3), mk(m.away_team_id, 'Ext', 4)]
+    const long = h[0]
     set('Player', players)
     const ids = new Set(ms.map((x) => x.id))
     const evs = get('MatchEvent').filter((e) => !(ids.has(e.match_id) && ['goal', 'own_goal'].includes(e.type)))

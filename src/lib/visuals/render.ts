@@ -4,6 +4,7 @@
 import { colorOf, VISUAL_SIZE, type VisualsConfig, type Zone } from './config'
 import type { MvpModel, ResultModel, ResultRow } from './model'
 import { sameOriginImage } from '@/lib/exportImage'
+import { isBleedSquare } from '@/lib/logoPlate'
 
 // ---------------------------------------------------------------------------
 //  Polices
@@ -55,7 +56,9 @@ export function drawTile(ctx: CanvasRenderingContext2D, img: HTMLImageElement, z
   ctx.save(); ctx.shadowColor = 'rgba(0, 0, 0, .28)'; ctx.shadowBlur = Math.max(4, s * 0.08)
   ctx.beginPath(); ctx.roundRect(x, y, s, s, s * 0.22); ctx.fillStyle = bg; ctx.fill(); ctx.restore()
   const { w, h } = natural(img), wide = w / h > 2
-  const px = s * (wide ? 0.07 : 0.12), py = s * 0.12
+  // logo carré « pleine tuile » (fond et marge compris dans le fichier) : sans marge
+  const bleed = isBleedSquare(img.src)
+  const px = bleed ? 0 : s * (wide ? 0.07 : 0.12), py = bleed ? 0 : s * 0.12
   const k = Math.min((s - 2 * px) / w, (s - 2 * py) / h)
   ctx.drawImage(img, x + (s - w * k) / 2, y + (s - h * k) / 2, w * k, h * k)
 }

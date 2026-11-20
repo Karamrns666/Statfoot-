@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTrimmedImage } from '@/hooks/useTrimmedImage'
-import { isSmallLogo, LOGO_SIZES, logoLargeSrc, logoPlate, logoSize, logoSquareSrc, logoSrc, teamShortName, WIDE_FOR_TILE, type LogoSize } from '@/lib/logoPlate'
+import { isBleedSquare, isSmallLogo, LOGO_SIZES, logoLargeSrc, logoPlate, logoSize, logoSquareSrc, logoSrc, teamShortName, WIDE_FOR_TILE, type LogoSize } from '@/lib/logoPlate'
 import { useImageRatio } from '@/hooks/useImageRatio'
 import type { Player, Position, Team } from '@/types/entities'
 import { cn } from '@/lib/utils'
@@ -15,11 +15,16 @@ import { teamLogoSvg } from '@/lib/logos'
  * à la plus proche). xs à md : logo carré / icône ; lg et plus : logo principal (HD).
  * `fluid` : la tuile remplit son parent carré (mode TV, projection du tirage).
  */
-export function TeamLogo({ team, size = 'sm', className, fluid = false }: { team?: Team | null; size?: LogoSize | number; className?: string; fluid?: boolean }) {
+export function TeamLogo(p: { team?: Team | null; size?: LogoSize | number; className?: string; fluid?: boolean; /** « banner » : bandeau horizontal des cartes joueurs (remplit son parent) */ variant?: 'tile' | 'banner' }) {
+  return p.variant === 'banner' ? <TeamLogoBanner team={p.team} className={p.className} /> : <TeamLogoTile {...p} />
+}
+
+function TeamLogoTile({ team, size = 'sm', className, fluid = false }: { team?: Team | null; size?: LogoSize | number; className?: string; fluid?: boolean }) {
   const s = logoSize(size), px = LOGO_SIZES[s]
   const small = isSmallLogo(s) && !fluid
   const plate = logoPlate(team)
   const square = small ? logoSquareSrc(team) : undefined
+  const bleed = isBleedSquare(square)
   const main = (small ? logoSrc(team) : logoLargeSrc(team)) || teamLogoSvg(team?.short_name ?? '?', team?.primary_color, team?.secondary_color)
   const trimmed = useTrimmedImage(!square && team?.logo_url ? main : null) ?? main
   const src = square ?? trimmed
@@ -28,12 +33,31 @@ export function TeamLogo({ team, size = 'sm', className, fluid = false }: { team
   const wide = (ratio ?? 1) > 2
   const radius = fluid ? '22%' : Math.round(px * 0.22)
   const pad = Math.max(2, Math.round(px * 0.12)), padX = wide ? Math.max(2, Math.round(px * 0.07)) : pad
-  const box = fluid ? { position: 'absolute' as const, inset: 0, padding: wide ? '12% 7%' : '12%' } : { width: px, height: px, minWidth: px, padding: `${pad}px ${padX}px` }
+  // logo carré « pleine tuile » (fond et marge de ~5 % compris dans le fichier, ex. Parebrise Express) : sans marge
+  const box = fluid ? { position: 'absolute' as const, inset: 0, padding: bleed ? 0 : wide ? '12% 7%' : '12%' } : { width: px, height: px, minWidth: px, padding: bleed ? 0 : `${pad}px ${padX}px` }
   return (
     <span role="img" aria-label={team?.name ?? ''} title={team?.name} data-team-logo={team?.id ?? ''} data-logo-size={fluid ? 'fluid' : s} data-logo-kind={square ? 'square' : 'main'}
       style={{ ...box, background: plate.bg, borderRadius: radius }}
       className={cn('inline-flex shrink-0 items-center justify-center overflow-hidden shadow-[0_1px_6px_rgba(0,0,0,.28)] ring-1 ring-inset ring-black/10', className)}>
       <img src={src} alt="" className="block size-full max-w-none object-contain" loading="lazy" decoding="async" draggable={false} />
+    </span>
+  )
+}
+
+/**
+ * Bandeau du logo des cartes joueurs (variante dédiée) : rectangle horizontal aux coins arrondis qui remplit son
+ * parent, fond réglé dans l'admin (« Fond de la tuile »), LOGO PRINCIPAL complet (version fond sombre sur noir),
+ * marges vides retirées, object-fit: contain, aussi grand que le bandeau le permet.
+ */
+export function TeamLogoBanner({ team, className }: { team?: Team | null; className?: string }) {
+  const plate = logoPlate(team)
+  const main = logoLargeSrc(team) || teamLogoSvg(team?.short_name ?? '?', team?.primary_color, team?.secondary_color)
+  const src = useTrimmedImage(team?.logo_url ? main : null) ?? main
+  return (
+    <span role="img" aria-label={team?.name ?? ''} title={team?.name} data-team-banner={team?.id ?? ''}
+      className={cn('flex size-full items-center justify-center overflow-hidden rounded-[.7em] px-[5%] py-[3%] shadow-[0_.25em_.8em_rgb(0_0_0/.3)] ring-1 ring-black/5', className)}
+      style={{ background: plate.bg }}>
+      <img src={src} alt="" className="block h-full w-full max-w-none object-contain" decoding="async" draggable={false} />
     </span>
   )
 }

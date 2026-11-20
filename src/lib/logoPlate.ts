@@ -45,22 +45,32 @@ export function logoLargeSrc(team?: Pick<Team, 'logo_url' | 'logo_dark_url' | 'l
   return isBrandLogo(s) && isBrandLogo(team?.company_logo_url) ? team!.company_logo_url : s
 }
 
-/** Icônes recadrées automatiquement sur le symbole du logo officiel (fichiers du dépôt, nov. 2026). */
+/** Symboles recadrés du logo officiel (fichiers du dépôt) : utilisés en petit UNIQUEMENT si l'admin choisit
+ *  « Recadrage du logo en petit : Symbole seul ». Par défaut : logo complet. */
 export const BUILTIN_ICONS: Record<string, string> = {
   cac: '/logos/cac-icone.png', pbe: '/logos/pbe-icone.png', mid: '/logos/mid-icone.png', g3c: '/logos/g3c-icone.png',
 }
+/** Logos carrés COMPLETS officiels (logo entier centré, fond compris) : Parebrise Express, carré fond noir 1024 px. */
+export const BUILTIN_SQUARES: Record<string, string> = { pbe: '/logos/pbe-carre-noir-1024.png' }
+/** logo carré « pleine tuile » (fond et marge de ~5 % compris dans le fichier) : affiché sans marge dans la tuile */
+export const isBleedSquare = (u?: string) => !!u && /\/logos\/[a-z0-9]+-carre-noir-1024\.png/.test(u)
+export type LogoSmall = 'full' | 'symbol'
+export const LOGO_SMALL_LABEL: Record<LogoSmall, string> = { full: 'Logo complet', symbol: 'Symbole seul' }
 const officialCode = (u?: string) => u?.match(/^\/logos\/([a-z0-9]+)(?:[-.?]|$)/)?.[1]
 
-/** Logo carré / icône : celui de l'admin, sinon le symbole recadré du logo officiel, sinon rien (→ logo principal entier). */
-export function logoSquareSrc(team?: Pick<Team, 'logo_url' | 'logo_square_url'> | null): string | undefined {
+/** Logo carré / icône : celui de l'admin ; sinon le symbole recadré si « Symbole seul » est choisi ; sinon le logo
+ *  carré complet officiel ; sinon rien (→ logo principal entier dans la tuile). */
+export function logoSquareSrc(team?: Pick<Team, 'logo_url' | 'logo_square_url' | 'logo_small'> | null): string | undefined {
   if (!team) return undefined
   if (team.logo_square_url) return team.logo_square_url
   const c = officialCode(team.logo_url)
-  return c ? BUILTIN_ICONS[c] : undefined
+  if (!c) return undefined
+  if (team.logo_small === 'symbol' && BUILTIN_ICONS[c]) return BUILTIN_ICONS[c]
+  return BUILTIN_SQUARES[c]
 }
 
 /** Image de la tuile pour les visuels dessinés (canvas) : petite tuile → logo carré, sinon logo principal HD. */
-export function tileLogo(team: Parameters<typeof logoLargeSrc>[0] & Pick<Team, 'logo_square_url'> | null | undefined, small: boolean): string | undefined {
+export function tileLogo(team: Parameters<typeof logoLargeSrc>[0] & Pick<Team, 'logo_square_url' | 'logo_small'> | null | undefined, small: boolean): string | undefined {
   return (small ? logoSquareSrc(team) : undefined) ?? logoLargeSrc(team)
 }
 

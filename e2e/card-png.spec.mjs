@@ -57,13 +57,37 @@ test('photo présente dans la carte téléchargée', async ({ page }, info) => {
       const d = x.getImageData(0, 0, c.width, c.height).data
       let red = 0, blue = 0
       for (let i = 0; i < d.length; i += 16) { const [R, G, B] = [d[i], d[i + 1], d[i + 2]]; if (R > 150 && G < 90 && B < 90) red++; if (B > 150 && R < 90 && G > 50 && G < 140) blue++ }
-      return { w: c.width, h: c.height, red, blue, url: c.toDataURL('image/png') }
+      // bandeau blanc du logo : lignes dont les pixels blancs s'étendent sur plus de 400 px (coins arrondis exclus)
+      const rows = []
+      for (let y = 0; y < c.height; y++) {
+        let x0 = -1, x1 = -1, n = 0
+        for (let xx = 0; xx < c.width; xx++) { const i = (y * c.width + xx) * 4; if (d[i] > 235 && d[i + 1] > 235 && d[i + 2] > 235) { if (x0 < 0) x0 = xx; x1 = xx; n++ } }
+        if (x1 - x0 > 400 && n > 120) rows.push({ y, w: x1 - x0 + 1 })
+      }
+      // plus longue suite de lignes consécutives
+      let best = [], cur = []
+      for (const r of rows) { if (cur.length && r.y !== cur.at(-1).y + 1) cur = []; cur.push(r); if (cur.length > best.length) best = cur.slice() }
+      const bw = best.length ? Math.max(...best.map((r) => r.w)) : 0
+      return { w: c.width, h: c.height, red, blue, url: c.toDataURL('image/png'), banner: { w: bw, h: best.length } }
     })
     fs.mkdirSync(`e2e/__screenshots__/${info.project.name}`, { recursive: true })
     fs.writeFileSync(`e2e/__screenshots__/${info.project.name}/carte-png-${k}.png`, Buffer.from(r.url.split(',')[1], 'base64'))
     await page.screenshot({ path: `e2e/__screenshots__/${info.project.name}/carte-ecran-${k}.png` })
     console.log(`[${info.project.name}] ${k}: ${r.w}×${r.h} rouge=${r.red} bleu=${r.blue}`)
     expect([r.w, r.h]).toEqual([1080, 1350])
+    // bandeau du logo identique à l'écran et dans le PNG : même rapport largeur / hauteur (6,1 : 1, coins arrondis
+    // non comptés → ±0,8), et même part de la largeur de la carte
+    const screen = await page.evaluate(() => {
+      const b = document.querySelector('[data-card-banner]'), card = b?.closest('.pcard')
+      if (!b || !card) return null
+      const rb = b.getBoundingClientRect(), rc = card.getBoundingClientRect()
+      return { ratio: rb.width / rb.height, part: rb.width / rc.width }
+    })
+    console.log(`[${info.project.name}] bandeau ${k}: écran ${JSON.stringify(screen)} · PNG ${r.banner.w}×${r.banner.h}`)
+    expect(screen, 'bandeau du logo sur la carte affichée').not.toBeNull()
+    expect(screen.part).toBeGreaterThan(0.72); expect(screen.part).toBeLessThan(0.8)
+    expect(r.banner.h, 'bandeau du logo dans le PNG').toBeGreaterThan(40)
+    expect(Math.abs(r.banner.w / r.banner.h - screen.ratio), 'même bandeau à l’écran et dans le PNG').toBeLessThan(0.9)
     if (k === 'cutout') expect(r.blue, 'photo détourée (maillot bleu) dans le PNG').toBeGreaterThan(800)
     if (k === 'photo') expect(r.red, 'photo (maillot rouge) dans le PNG').toBeGreaterThan(800)
   }

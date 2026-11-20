@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { logoLargeSrc, logoPlate, logoSize, logoSquareSrc, logoSrc, teamShortName, tileLogo } from './logoPlate'
+import { isBleedSquare, logoLargeSrc, logoPlate, logoSize, logoSquareSrc, logoSrc, teamShortName, tileLogo } from './logoPlate'
 import { applyLogoPbeV2 } from '@/api/seed/migrations'
 import { LOGO_FILES, officialLogo } from './officialTeams'
 
@@ -49,17 +49,21 @@ describe('tuile logo unique', () => {
     expect(logoPlate({ logo_bg: 'black' }).bg).toBe('#0A0A0A')
     expect(logoPlate({ logo_bg: 'team', primary_color: '#123456' }).bg).toBe('#123456')
   })
-  it('logo carré : celui de l’admin, sinon le symbole recadré du logo officiel, sinon rien', () => {
+  it('logo carré : celui de l’admin ; symbole seulement si « Symbole seul » ; sinon logo complet', () => {
     expect(logoSquareSrc({ logo_url: '/logos/cac.png', logo_square_url: '/x.png' })).toBe('/x.png')
-    expect(logoSquareSrc({ logo_url: '/logos/cac.png' })).toBe('/logos/cac-icone.png')
-    expect(logoSquareSrc({ logo_url: '/logos/pbe.svg?v=2026-11b' })).toBe('/logos/pbe-icone.png')
+    expect(logoSquareSrc({ logo_url: '/logos/cac.png' })).toBeUndefined()
+    expect(logoSquareSrc({ logo_url: '/logos/cac.png', logo_small: 'symbol' })).toBe('/logos/cac-icone.png')
+    expect(logoSquareSrc({ logo_url: '/logos/pbe.svg?v=2026-11b' })).toBe('/logos/pbe-carre-noir-1024.png')
+    expect(logoSquareSrc({ logo_url: '/logos/pbe.svg?v=2026-11b', logo_small: 'symbol' })).toBe('/logos/pbe-icone.png')
+    expect(isBleedSquare('/logos/pbe-carre-noir-1024.png')).toBe(true)
     expect(logoSquareSrc({ logo_url: '/logos/cob.png' })).toBeUndefined()
     expect(logoSquareSrc({ logo_url: '/_files/perso.png' })).toBeUndefined()
   })
   it('grand logo : fichier HD officiel, version sombre sur tuile noire', () => {
     expect(logoLargeSrc({ logo_url: '/logos/cob.png', company_logo_url: '/logos/cob-full.png' })).toBe('/logos/cob-full.png')
     expect(logoLargeSrc({ logo_url: '/logos/pbe.svg', logo_dark_url: '/logos/pbe-dark.svg', logo_bg: 'black', company_logo_url: '/logos/pbe-2000.png' })).toBe('/logos/pbe-dark.svg')
-    expect(tileLogo({ logo_url: '/logos/cac.png', company_logo_url: '/logos/cac-full.png' }, true)).toBe('/logos/cac-icone.png')
+    expect(tileLogo({ logo_url: '/logos/cac.png', company_logo_url: '/logos/cac-full.png' }, true)).toBe('/logos/cac-full.png')
+    expect(tileLogo({ logo_url: '/logos/pbe.svg', logo_bg: 'black' }, true)).toBe('/logos/pbe-carre-noir-1024.png')
   })
   it('nom court', () => {
     expect(teamShortName({ name: 'Parebrise Express', short_name: 'PBE' })).toBe('Parebrise Exp.')

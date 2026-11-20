@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LOGO_BG_LABEL, type LogoBg } from '@/lib/logoPlate'
+import { LOGO_BG_LABEL, LOGO_SMALL_LABEL, type LogoBg, type LogoSmall } from '@/lib/logoPlate'
 import { Lock, CheckCircle2, AlertTriangle, Images } from 'lucide-react'
 import { teamSeasonId } from '@/lib/clubs'
 import { OfficialTeamsButton } from '@/components/admin/OfficialTeamsDialog'
@@ -135,6 +135,7 @@ export function Teams() {
     { key: 'display_short', label: 'Nom court', help: 'Utilisé quand la place manque (cartes de match, ticker, match centre, visuels). Ex. « Parebrise Exp. », « AV Rabat ». Vide : nom court par défaut ou nom complet.' },
     { key: 'company', label: 'Entreprise / marque' }, { key: 'status', label: 'Statut', type: 'select', options: [{ value: 'active', label: 'Active' }, { value: 'pending', label: 'En attente' }, { value: 'inactive', label: 'Inactive' }] },
     { key: 'logo_url', label: 'Logo principal', type: 'image', full: true, help: 'Logo complet (souvent large) : en-tête de la page équipe, cartes, visuels. Les marges vides sont retirées automatiquement.' },
+    { key: 'logo_small', label: 'Recadrage du logo en petit', type: 'select', options: (Object.keys(LOGO_SMALL_LABEL) as LogoSmall[]).map((k) => ({ value: k, label: LOGO_SMALL_LABEL[k] })), help: 'Logo complet (par défaut) : le logo entier dans les petites tuiles. Symbole seul : le symbole recadré du logo officiel (CAC, Parebrise Express, Taqeef, G3C).' },
     { key: 'logo_square_url', label: 'Logo carré / icône', type: 'image', full: true, help: 'Version compacte lisible en petit (classements, cartes de match, listes, ticker, match centre). PNG transparent ou SVG, carré.' }, { key: 'company_logo_url', label: 'Logo entreprise', type: 'image', full: true },
     { key: 'logo_dark_url', label: 'Logo pour fond sombre (facultatif)', type: 'image', full: true, help: 'Version claire du logo (texte blanc), utilisée automatiquement sur fond noir ou couleur. SVG conseillé.' },
     { key: 'logo_bg', label: 'Fond de la tuile', type: 'select', options: (Object.keys(LOGO_BG_LABEL) as LogoBg[]).map((k) => ({ value: k, label: LOGO_BG_LABEL[k]! })), help: 'Fond de la tuile du logo partout sur le site : blanc, noir (logo clair, ex. Parebrise Express) ou couleur de l’équipe.' },

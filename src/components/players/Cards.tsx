@@ -4,6 +4,7 @@ import { usePlayerBadges } from '@/hooks/useStats'
 import { SEASON_2025_ID } from '@/api/seed/season2025'
 import type { PlayerXP, Ranked } from '@/lib/stats'
 import { IPG_RANKING, splitName, type IPGEntry } from '@/lib/ipg'
+import type { LiveIPG } from '@/lib/ipgLive'
 import { useSeason } from '@/hooks/useSeason'
 import type { Player, Team } from '@/types/entities'
 import { useRookie, useTeamSeniority } from '@/hooks/useSeniority'
@@ -68,6 +69,39 @@ export function IPGCard({ e, className }: { e: IPGEntry; className?: string }) {
         { label: 'IPG brut', value: Math.round(e.raw), tip: 'ipg_brut' },
       ]}
       backNote={bs?.unlocked.length ? undefined : 'IPG ramené sur 100 (le meilleur joueur = 100).'}
+      href={player ? `/joueurs/${player.id}` : undefined}
+    />
+  )
+}
+
+/** Carte d'un joueur au Top 25 IPG de la saison en cours (calculé) : rang et IPG en chiffre principal */
+export function LiveIPGCard({ e, className }: { e: LiveIPG; className?: string }) {
+  const L = useLookup()
+  const player = L.player.get(e.player_id)
+  const team = L.team.get(e.team_id)
+  const bs = usePlayerBadges().get(e.player_id)
+  const tier = useTeamSeniority(team?.id)?.tier
+  const rookie = useRookie()
+  return (
+    <PlayerCard
+      className={className}
+      tier={tier} medals={bs?.unlocked} badgeTotal={bs?.total}
+      firstName={player?.first_name ?? ''} lastName={player?.last_name ?? e.name} position={player?.position}
+      captain={!!player && (player.is_captain || team?.captain_player_id === player.id)}
+      team={team} photoUrl={player?.photo_url} cutoutUrl={player?.photo_card_mode === 'original' ? undefined : player?.photo_cutout_url}
+      rating={e.ipg.toFixed(1)} ratingLabel="IPG" rank={e.rank} rookie={player ? rookie(player) : undefined}
+      front={[{ label: 'MJ', value: e.matches }, { label: 'BUT', value: e.goals }, { label: 'PAS', value: e.assists, hint: 'Passes décisives' }, { label: 'BRUT', value: Math.round(e.raw), hint: 'IPG brut' }]}
+      backTitle="Indice de performance"
+      back={[
+        { label: 'Buts / passes', value: `${e.goals} / ${e.assists}`, tip: 'buts_passes' },
+        { label: 'Contribution aux buts', value: `${e.contribution.toFixed(1)} %`, tip: 'contribution' },
+        { label: 'Victoires de l’équipe', value: `${e.win_pct.toFixed(1)} %`, tip: 'victoires' },
+        { label: 'Buts / passes gagnants', value: `${e.clutch_goals} / ${e.clutch_assists}`, tip: 'gagnants' },
+        { label: 'Adversité', value: `${e.adversity.toFixed(0)} %`, tip: 'adversite' },
+        { label: 'Pénalité cartons', value: `−${e.card_penalty}`, tip: 'penalite_cartons' },
+        { label: 'IPG brut', value: e.raw.toFixed(1), tip: 'ipg_brut' },
+      ]}
+      backNote="IPG ramené sur 100 (le meilleur joueur = 100)."
       href={player ? `/joueurs/${player.id}` : undefined}
     />
   )

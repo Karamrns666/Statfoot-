@@ -45,7 +45,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     short: 'Indice sur 100 de la saison 2025 : le meilleur joueur vaut 100, les autres sont ramenés à cette échelle.',
     formula: 'IPG = IPG brut du joueur ÷ IPG brut le plus élevé × 100.',
     example: 'IPG brut 463,1 alors que le meilleur est à 568 → 463,1 ÷ 568 × 100 = 81,5.',
-    note: 'Classement fourni par la ligue pour 2025 (fichier IPG Top 25). Il n’est pas encore calculé automatiquement pour 2026/27 : « – » tant qu’il n’est pas publié.',
+    note: 'Saison 2025 : classement fourni par la ligue (fichier IPG Top 25). Saison 2026/27 : calculé automatiquement avec la même formule sur les matchs validés, mis à jour à chaque validation (Joueurs → Top 25 IPG).',
   },
   {
     id: 'ipg_brut', term: 'IPG brut', group: 'IPG (saison 2025)',
@@ -75,12 +75,12 @@ export const GLOSSARY: GlossaryEntry[] = [
   {
     id: 'adversite', term: 'Adversité', group: 'IPG (saison 2025)',
     short: 'Indicateur en % de la difficulté des matchs dans lesquels le joueur a été décisif.',
-    note: 'Valeur reprise telle quelle du fichier IPG 2025 de la ligue : sa méthode de calcul n’y est pas détaillée.',
+    note: '2025 : valeur du fichier de la ligue. 2026/27 : moyenne, sur les matchs où le joueur a marqué ou fait une passe décisive, du % de points obtenus par l’adversaire (points ÷ 3 × matchs) — méthode à confirmer par Ardentia.',
   },
   {
     id: 'penalite_cartons', term: 'Pénalité cartons', group: 'IPG (saison 2025)',
     short: 'Points retirés à l’IPG brut pour les cartons reçus.',
-    note: 'Valeur reprise telle quelle du fichier IPG 2025 de la ligue.',
+    note: '2025 : valeur du fichier de la ligue. 2026/27 : 1 point par carton jaune, 3 par carton rouge — barème à confirmer par Ardentia.',
   },
   {
     id: 'points', term: 'Points (classement)', group: 'Équipes et classements',

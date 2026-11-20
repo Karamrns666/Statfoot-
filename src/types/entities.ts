@@ -130,6 +130,8 @@ export interface Team extends BaseEntity {
   logo_dark_url?: string
   /** logo carré / icône (version compacte lisible en petit : classements, cartes de match, listes) */
   logo_square_url?: string
+  /** « Recadrage du logo en petit » : logo complet (défaut) ou symbole seul */
+  logo_small?: 'full' | 'symbol'
   /** nom court affiché quand la place manque (ex. « Parebrise Exp. ») — le code à 3 lettres reste short_name */
   display_short?: string
   /** photos collectives et posters (en-tête de la page équipe) */

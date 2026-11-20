@@ -6,13 +6,13 @@ import { phaseName } from '@/lib/competitionNames'
 import { LayoutGrid, ListOrdered, Search, Sparkles } from 'lucide-react'
 import { useData, useLookup } from '@/hooks/useData'
 import { useSeason } from '@/hooks/useSeason'
-import { useRace, useSeasonCompetitions } from '@/hooks/useStats'
+import { useRace } from '@/hooks/useStats'
 import { SEASON_2025_ID } from '@/api/seed/season2025'
 import { computePlayerXP } from '@/lib/xp'
 import { PageHeader, RankDelta, RookieBadge } from '@/components/league/Bits'
 import { FilterSelect } from '@/components/league/FilterSelect'
 import { PlayerAvatar, RoleBadge, TeamLogo } from '@/components/league/Identity'
-import { IPGCard, MaterialLegend, XPCard } from '@/components/players/Cards'
+import { IPGCard, LiveIPGCard, MaterialLegend, XPCard } from '@/components/players/Cards'
 import { Input } from '@/components/ui/input'
 import { SeasonNotStarted } from '@/components/league/SeasonNotStarted'
 import { Button } from '@/components/ui/button'
@@ -20,8 +20,10 @@ import { SortableTable } from '@/components/league/SortableTable'
 import { shotColumns } from '@/components/league/shotColumns'
 import { XPExplainer } from '@/components/players/XPExplainer'
 import type { PhaseFilter } from '@/lib/stats'
-import { playerName } from '@/lib/format'
+import { fmtDate, playerName } from '@/lib/format'
 import { IPG_RANKING } from '@/lib/ipg'
+import { computeSeasonIPG, top25 } from '@/lib/ipgLive'
+import { useSections } from '@/hooks/useSections'
 import { cn } from '@/lib/utils'
 
 type View = 'cartes' | 'classement' | 'ipg'
@@ -81,11 +83,11 @@ export default function Players() {
 
   return (
     <div>
-      <PageHeader title="Joueurs" subtitle={view === 'ipg' ? (scopeSeasonId === SEASON_2025_ID ? 'Indice de Performance Globale — les 25 joueurs les plus complets de la saison 2025-2026' : 'Indice de Performance Globale — calculé après le premier match de la saison') : 'Touchez une carte pour la retourner. Classement mis à jour après chaque match.'}>
+      <PageHeader title="Joueurs" subtitle={view === 'ipg' ? (scopeSeasonId === SEASON_2025_ID ? 'Indice de Performance Globale — les 25 joueurs les plus complets de la saison 2025-2026' : 'Indice de Performance Globale — les 25 meilleurs joueurs de la saison, du N°1 au 25e') : 'Touchez une carte pour la retourner. Classement mis à jour après chaque match.'}>
         <div className="glass flex rounded-xl p-1" role="tablist" aria-label="Affichage">
           {VIEWS.map((v) => (
-            <button key={v.value} role="tab" aria-selected={view === v.value} onClick={() => setView(v.value)} className={cn('flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold transition', view === v.value ? 'bg-neon text-night-950' : 'text-muted-foreground hover:text-white')}>
-              <v.icon className="size-4" />{v.label}
+            <button key={v.value} role="tab" aria-selected={view === v.value} onClick={() => setView(v.value)} className={cn('flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[13px] font-bold transition sm:px-3 sm:text-sm', view === v.value ? 'bg-neon text-night-950' : 'text-muted-foreground hover:text-white')}>
+              <v.icon className="hidden size-4 sm:block" />{v.label}
             </button>
           ))}
         </div>
@@ -160,27 +162,43 @@ function IPGView() {
   )
 }
 
-/** Saison en cours : uniquement les joueurs RÉELLEMENT inscrits ; IPG « – » tant qu'aucun match n'est joué, tri par équipe puis par nom */
+/** Saison en cours : Top 25 IPG calculé sur les matchs réels validés (formule existante), du N°1 au 25e. */
+type IPGSection = 'preseason' | 'master' | 'challenger'
 function SeasonIPG({ seasonId }: { seasonId: string | null }) {
-  const { db, league } = useData()
-  const L = useLookup()
-  const comps = useSeasonCompetitions()
-  const items = useMemo(() => {
-    const teamIds = new Set(comps.flatMap((c) => c.team_ids ?? []))
-    const xp = computePlayerXP(league, { seasonId })
-    return db.Player
-      .filter((p) => p.season_ids?.includes(seasonId ?? '') && teamIds.has(p.team_id) && p.status !== 'inactive')
-      .map((p) => ({ p, t: L.team.get(p.team_id), x: xp.get(p.id) }))
-      .filter((x) => x.x)
-      .sort((a, b) => (a.t?.name ?? '').localeCompare(b.t?.name ?? '') || `${a.p.last_name} ${a.p.first_name}`.localeCompare(`${b.p.last_name} ${b.p.first_name}`))
-  }, [db.Player, league, comps, seasonId, L.team])
-  if (!items.length) return <SeasonNotStarted what="Les effectifs et l’Indice de Performance Globale" />
+  const { league } = useData()
+  const sections = useSections(seasonId)
+  const [key, setKey] = useState<IPGSection>('preseason')
+  const keys: IPGSection[] = ['preseason', 'master', 'challenger']
+  const sec = sections[sections[key].available ? key : 'preseason']
+  // recalcul automatique dès qu'un match est validé ou corrigé (données en direct)
+  const res = useMemo(() => computeSeasonIPG(league, sec.scope), [league, sec])
+  const top = top25(res)
+  const date = res.updatedAt ? fmtDate(res.updatedAt, 'd MMMM yyyy') : undefined
   return (
-    <div className="space-y-5">
-      <p className="glass rounded-2xl px-4 py-3 text-sm text-muted-foreground"><b className="text-white">IPG <InfoTip id="ipg" /> « – » :</b> indice calculé après le premier match. {items.length} joueurs inscrits, classés par équipe puis par nom.</p>
-      <div className="grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3 sm:gap-x-4 lg:grid-cols-4 xl:grid-cols-5">
-        {items.map(({ p, t, x }) => <XPCard key={p.id} r={{ item: x!, rank: 0, previousRank: null, delta: null }} player={p} team={t} ipg="–" />)}
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Compétition">
+        {keys.map((k) => (
+          <button key={k} role="tab" aria-selected={sec.key === k} disabled={!sections[k].available} onClick={() => setKey(k)}
+            className={cn('rounded-full border px-3 py-1 text-sm font-bold transition', sec.key === k ? 'border-neon bg-neon/15 text-white' : 'border-white/15 text-muted-foreground hover:text-white', !sections[k].available && 'cursor-not-allowed opacity-40')}>
+            {sections[k].label}{!sections[k].available && ' · à venir'}
+          </button>
+        ))}
       </div>
+      {!res.matches ? (
+        <p className="glass rounded-2xl px-4 py-3 text-sm text-muted-foreground">Le Top 25 IPG <InfoTip id="ipg" /> sera disponible après le premier match validé de la compétition « {sec.label} ».</p>
+      ) : (<>
+        <p className="glass rounded-2xl px-4 py-3 text-sm text-muted-foreground">
+          <b className="text-white">Top 25 de l’Indice de Performance Globale</b> · calculé sur {res.matches} match{res.matches > 1 ? 's' : ''} joué{res.matches > 1 ? 's' : ''}{date ? ` · mis à jour le ${date}` : ''}{sec.key !== 'preseason' ? ` · ${sec.note}` : ''} · <Link to="/glossaire#ipg" className="font-bold text-sky-soft underline underline-offset-2">Comment est calculé l’IPG ?</Link>
+        </p>
+        <div className="grid grid-cols-3 items-end gap-3 sm:gap-6 lg:mx-auto lg:max-w-4xl" aria-label="Podium">
+          {[1, 0, 2].map((i) => top[i] && <LiveIPGCard key={top[i].player_id} e={top[i]} className={i === 0 ? '' : 'sm:scale-[.92] origin-bottom'} />)}
+        </div>
+        {top.length > 3 && (
+          <div className="grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3 sm:gap-x-4 lg:grid-cols-4 xl:grid-cols-5">
+            {top.slice(3).map((e) => <LiveIPGCard key={e.player_id} e={e} />)}
+          </div>
+        )}
+      </>)}
     </div>
   )
 }

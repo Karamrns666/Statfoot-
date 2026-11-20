@@ -181,10 +181,12 @@ function CardFront({ p }: { p: PlayerCardProps }) {
             <span className="relative min-w-0 max-w-[80%]"><span className="block truncate">{teamLabel}</span>{p.delta !== undefined && <span className="absolute left-full top-1/2 ml-1.5 -translate-y-1/2"><RankDelta delta={p.delta} /></span>}</span>
           </div>
         </div>
-        {/* tuile du logo de l'équipe (même tuile que tout le site, logo principal) entre le nom et les stats */}
+        {/* BANDEAU du logo de l'équipe (variante dédiée aux cartes) : ~76 % de la largeur, ~8,5 % de la hauteur de la
+            carte (rapport 6,1 : 1, proportionnel à la carte), sous le nom de l'équipe, juste au-dessus des stats ;
+            logo principal complet. Même rendu à l'écran et dans le PNG téléchargé (même composant). */}
         {ct && (
-          <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center py-[.35em]">
-            <div className="relative size-[3.6em] drop-shadow-[0_.25em_.6em_rgb(0_0_0/.3)]"><TeamLogo team={ct} fluid /></div>
+          <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center py-[.3em]">
+            <div className="aspect-[6.1/1] w-[76%] shrink-0" data-card-banner><TeamLogo team={ct} variant="banner" /></div>
           </div>
         )}
         <div className="relative mt-auto grid grid-cols-4 divide-x divide-white/15 border-t-[.22em] border-[#F05A22]" style={{ background: st.bar, color: st.barText }}>

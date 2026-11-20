@@ -36,11 +36,14 @@ function drawHeader(ctx: CanvasRenderingContext2D, cfg: VisualsConfig, Z: Record
 }
 
 /** Texte à gauche avec largeur maximale (raccourci « … ») centré verticalement sur cy. */
-function textAt(ctx: CanvasRenderingContext2D, cfg: VisualsConfig, z: Zone, text: string, x: number, cy: number, maxW: number, size: number, align: CanvasTextAlign = 'left', color?: string) {
+function textAt(ctx: CanvasRenderingContext2D, cfg: VisualsConfig, z: Zone, text: string, x: number, cy: number, maxW: number, size: number, align: CanvasTextAlign = 'left', color?: string, noCut = false) {
   ctx.save()
+  // réduit d'abord la taille (jusqu'à 55 %, ou sans limite pour une valeur) avant de couper avec « … »
+  const floor = noCut ? 8 : Math.max(12, Math.round(size * 0.55))
   ctx.font = fontOf(cfg, z, size)
+  while (size > floor && ctx.measureText(text).width > maxW) { size--; ctx.font = fontOf(cfg, z, size) }
   let t = text
-  while (t.length > 2 && ctx.measureText(t).width > maxW) t = `${t.slice(0, -2)}…`
+  while (!noCut && t.length > 2 && ctx.measureText(t).width > maxW) t = `${t.slice(0, -2)}…`
   ctx.textAlign = align; ctx.textBaseline = 'middle'; ctx.fillStyle = color ?? colorOf(cfg, z.color)
   ctx.shadowColor = 'rgba(0, 12, 48, .4)'; ctx.shadowBlur = 5; ctx.shadowOffsetY = 1
   ctx.fillText(t, x, cy + size * 0.05)
@@ -134,7 +137,24 @@ export async function renderWeeklyResults(rows: WeeklyResultRow[], cfg: VisualsC
 // ---------------------------------------------------------------------------
 //  Top 10
 // ---------------------------------------------------------------------------
-export async function renderTop10(entries: TopEntry[], cfg: VisualsConfig, opts: { title: string; subtitle: string; showZones?: boolean }) {
+/** Petite icône de ballon (dessinée, pas d'image) : distingue le Top 10 buteurs d'un coup d'œil. */
+function drawBall(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
+  ctx.save()
+  ctx.shadowColor = 'rgba(0, 12, 48, .35)'; ctx.shadowBlur = 4
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = '#FFFFFF'; ctx.fill()
+  ctx.shadowBlur = 0; ctx.lineWidth = Math.max(1.5, r * 0.09); ctx.strokeStyle = '#0B1B3F'; ctx.stroke()
+  const pent = (px: number, py: number, pr: number, rot: number) => {
+    ctx.beginPath()
+    for (let k = 0; k < 5; k++) { const a = rot + k * (Math.PI * 2 / 5); ctx[k ? 'lineTo' : 'moveTo'](px + pr * Math.cos(a), py + pr * Math.sin(a)) }
+    ctx.closePath(); ctx.fillStyle = '#0B1B3F'; ctx.fill()
+  }
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.clip()
+  pent(cx, cy, r * 0.36, -Math.PI / 2)
+  for (let k = 0; k < 5; k++) { const a = -Math.PI / 2 + k * (Math.PI * 2 / 5); pent(cx + r * 0.95 * Math.cos(a), cy + r * 0.95 * Math.sin(a), r * 0.3, a + Math.PI / 2) }
+  ctx.restore()
+}
+
+export async function renderTop10(entries: TopEntry[], cfg: VisualsConfig, opts: { title: string; subtitle: string; showZones?: boolean; icon?: 'ball' }) {
   const L = cfg.top10, Z = L.zones
   const { c, ctx } = await base(cfg, cfg.templates.top10)
   drawHeader(ctx, cfg, Z, opts.title, opts.subtitle)
@@ -156,24 +176,35 @@ export async function renderTop10(entries: TopEntry[], cfg: VisualsConfig, opts:
     drawText(ctx, cfg, e.name, { ...pill, size: pillSize })
     // valeur + logo du club sous la pastille
     const vz = Z.podiumValue, lg = vz.logo ?? 46, vy = vz.y + vz.h / 2
-    ctx.font = fontOf(cfg, vz, vz.size ?? 40); const vw = Math.min(ctx.measureText(e.display).width, card.w - lg - 40)
-    const x0 = card.x + (card.w - (vw + 10 + lg)) / 2
-    textAt(ctx, cfg, vz, e.display, x0, vy, card.w - lg - 40, vz.size ?? 40)
-    if (logos[i]) drawTile(ctx, logos[i]!, { x: x0 + vw + 10, y: vy - lg / 2, w: lg, h: lg }, logoPlate(e.team).bg)
+    const ic = opts.icon ? Math.round(lg * 0.72) : 0, icGap = ic ? 8 : 0
+    const room = card.w - lg - 40 - ic - icGap
+    ctx.font = fontOf(cfg, vz, vz.size ?? 40); const vw = Math.min(ctx.measureText(e.display).width, room)
+    const x0 = card.x + (card.w - (ic + icGap + vw + 10 + lg)) / 2
+    if (ic) drawBall(ctx, x0 + ic / 2, vy, ic / 2)
+    textAt(ctx, cfg, vz, e.display, x0 + ic + icGap, vy, room, vz.size ?? 40, 'left', undefined, true)
+    if (logos[i]) drawTile(ctx, logos[i]!, { x: x0 + ic + icGap + vw + 10, y: vy - lg / 2, w: lg, h: lg }, logoPlate(e.team).bg)
   }
   // bandes 4 à 10 : couleur principale du club, texte contrasté automatiquement
   const band = Z.band, rk = Z.bandRank, val = Z.bandValue, team = Z.bandTeam
   L.bands.forEach((y, k) => {
     const e = entries[k + 3]
-    const color = e?.team?.primary_color ?? '#123E8F'
+    // moins de 10 joueurs : les bandes vides ne sont pas dessinées (jamais de « 0 BUT »)
+    if (!e) return
+    const color = e.team?.primary_color ?? '#123E8F'
     const fg = contrastText(color)
     ctx.fillStyle = shade(color, 0.78); ctx.fillRect(rk.x, y, rk.w, band.h)
     ctx.fillStyle = color; ctx.fillRect(val.x + val.w + 1, y, band.x + band.w - (val.x + val.w + 1), band.h)
     ctx.fillStyle = '#FFFFFF'; ctx.fillRect(val.x, y, val.w + 1, band.h)
-    if (!e) return
     const cy = y + band.h / 2
     textAt(ctx, cfg, rk, String(e.rank), rk.x + rk.w / 2, cy, rk.w - 8, rk.size ?? 52, 'center', contrastText(shade(color, 0.78)))
-    textAt(ctx, cfg, val, e.display, val.x + val.w / 2, cy, val.w - 16, val.size ?? 44, 'center', colorOf(cfg, 'navy'))
+    if (opts.icon) {
+      // ballon + valeur centrés ensemble dans la case blanche, valeur jamais coupée
+      const ic = Math.round(band.h * 0.42), gap = 8, room = val.w - 16 - ic - gap
+      ctx.font = fontOf(cfg, val, val.size ?? 44); const w = Math.min(ctx.measureText(e.display).width, room)
+      const x0 = val.x + (val.w - (ic + gap + w)) / 2
+      drawBall(ctx, x0 + ic / 2, cy, ic / 2)
+      textAt(ctx, cfg, val, e.display, x0 + ic + gap, cy, room, val.size ?? 44, 'left', colorOf(cfg, 'navy'), true)
+    } else textAt(ctx, cfg, val, e.display, val.x + val.w / 2, cy, val.w - 16, val.size ?? 44, 'center', colorOf(cfg, 'navy'), true)
     let x = val.x + val.w + 16
     const lg = band.logo ?? 56
     if (logos[k + 3]) drawTile(ctx, logos[k + 3]!, { x, y: cy - lg / 2, w: lg, h: lg }, logoPlate(e.team).bg)

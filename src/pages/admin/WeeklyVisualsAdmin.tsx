@@ -16,7 +16,7 @@ import { toast } from '@/components/ui/toast'
 import { downloadBlob, weeklyPlan, type WeeklyVisual } from '@/lib/visuals'
 import { canvasToPng } from '@/lib/visuals/render'
 import { makeZip } from '@/lib/visuals/zip'
-import { competitionTitle, playedRounds } from '@/lib/visuals/weekly'
+import { competitionTitle, playedRounds, type TopPeriod } from '@/lib/visuals/weekly'
 
 export default function WeeklyVisualsAdmin() {
   const { db, league } = useData()
@@ -30,8 +30,10 @@ export default function WeeklyVisualsAdmin() {
   const [roundSel, setRoundSel] = useState('')
   const round = rounds.includes(Number(roundSel)) ? Number(roundSel) : rounds[0]
   const [zones, setZones] = useState(false)
+  // Top 10 : journée choisie (défaut) ou cumul depuis le début de la compétition
+  const [period, setPeriod] = useState<TopPeriod>('round')
   const [zip, setZip] = useState<string | null>(null)
-  const plan = useMemo(() => (comp && round != null ? weeklyPlan(league, comp.id, round, cfg, (id) => seniority.get(id)?.tier) : []), [league, comp, round, cfg, seniority])
+  const plan = useMemo(() => (comp && round != null ? weeklyPlan(league, comp.id, round, cfg, (id) => seniority.get(id)?.tier, period) : []), [league, comp, round, cfg, seniority, period])
 
   const downloadAll = async () => {
     const files: { name: string; data: Uint8Array }[] = []
@@ -42,7 +44,7 @@ export default function WeeklyVisualsAdmin() {
         const b = await canvasToPng(await v.render())
         files.push({ name: v.fileName, data: new Uint8Array(await b.arrayBuffer()) }, { name: v.fileName.replace(/\.png$/, '.txt'), data: new TextEncoder().encode(v.caption) })
       }
-      downloadBlob(makeZip(files), `mbl-${competitionTitle(comp).toLowerCase().replace(/[^a-z0-9]+/g, '-')}-j${round}-visuels.zip`)
+      downloadBlob(makeZip(files), `mbl-${competitionTitle(comp).toLowerCase().replace(/[^a-z0-9]+/g, '-')}-j${round}${period === 'cumul' ? '-cumul' : ''}-visuels.zip`)
     } catch (e) { toast.error(`ZIP impossible : ${(e as Error).message}`) } finally { setZip(null) }
   }
 
@@ -53,6 +55,11 @@ export default function WeeklyVisualsAdmin() {
           <div className="flex flex-wrap items-center gap-2">
             <FilterSelect value={comp?.id ?? ''} onChange={(v) => { setCompId(v); setRoundSel('') }} allLabel="Compétition" options={comps.map((c) => ({ value: c.id, label: competitionTitle(c) }))} />
             <FilterSelect value={String(round ?? '')} onChange={setRoundSel} allLabel="Journée" options={rounds.map((r) => ({ value: String(r), label: `Journée ${r}` }))} />
+            <div role="radiogroup" aria-label="Période des Top 10" className="flex rounded-lg border border-white/10 p-0.5 text-sm">
+              {([['round', 'Journée'], ['cumul', 'Cumul depuis le début']] as const).map(([k, l]) => (
+                <button key={k} role="radio" aria-checked={period === k} onClick={() => setPeriod(k)} className={period === k ? 'rounded-md bg-neon px-2.5 py-1 font-bold text-night-950' : 'rounded-md px-2.5 py-1 text-muted-foreground hover:text-white'}>{l}</button>
+              ))}
+            </div>
             <Button onClick={downloadAll} disabled={!plan.length || !!zip}>{zip ? <><Loader2 className="animate-spin" />{zip}</> : <><Archive />Télécharger tout (ZIP)</>}</Button>
             <label className="ml-auto flex cursor-pointer items-center gap-2 text-sm text-muted-foreground"><ScanLine className="size-4" />Aperçu des zones<Switch checked={zones} onCheckedChange={setZones} aria-label="Aperçu des zones" /></label>
           </div>

@@ -22,12 +22,12 @@ describe('visuels de la semaine', () => {
     expect(weeklyStandings(league, comp.id, last).map((r) => r.played).reduce((a, b) => a + b)).toBeGreaterThan(weeklyStandings(league, comp.id, prev).map((r) => r.played).reduce((a, b) => a + b))
   })
   it('top 10 : 10 max, trié, départage XP puis alphabétique, valeurs > 0, jamais le Match des capitaines', () => {
-    for (const kind of ['xp', 'assists', 'keepers'] as const) {
+    for (const kind of ['xp', 'goals', 'assists', 'keepers'] as const) {
       const top = weeklyTop(league, comp.id, last, kind)
       expect(top.length).toBeLessThanOrEqual(10)
       for (let i = 1; i < top.length; i++) {
         const a = top[i - 1], b = top[i]
-        expect(a.value > b.value || (a.value === b.value && (a.xp >= b.xp || kind === 'keepers'))).toBe(true)
+        expect(a.value > b.value || (a.value === b.value && (a.xp >= b.xp || kind === 'keepers' || kind === 'goals'))).toBe(true)
       }
       if (kind !== 'keepers') expect(top.every((e) => e.value > 0)).toBe(true)
     }

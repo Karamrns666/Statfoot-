@@ -5,7 +5,7 @@ import { LEAGUE } from '@/config/league'
 import { resolveVisualsConfig, type VisualsConfig } from './config'
 import { buildMvpModel, buildResultModel, captionText, matchVisualHash, type VisualData } from './model'
 import { canvasToPng, renderMvp, renderResult, renderStory } from './render'
-import { competitionTitle, roundMatches, TOP_LABEL, weeklyCaption, weeklyResults, weeklyStandings, weeklyTop, type TopKind } from './weekly'
+import { competitionTitle, roundMatches, TOP_CARD_LABEL, TOP_KINDS, TOP_LABEL, topCaptionLines, weeklyCaption, weeklyResults, weeklyStandings, weeklyTop, type TopPeriod } from './weekly'
 import { renderTop10, renderWeeklyResults, renderWeeklyStandings } from './weeklyRender'
 import type { SeniorityTier } from '@/lib/seniority'
 import { isPlayed } from '@/lib/standings'
@@ -64,8 +64,8 @@ export function downloadBlob(blob: Blob, name: string) {
 // ---------------------------------------------------------------------------
 export interface WeeklyVisual { key: string; label: string; fileName: string; caption: string; aspect: string; render: (opts?: { showZones?: boolean }) => Promise<HTMLCanvasElement> }
 
-/** Tous les visuels d'une journée : résultats, classement, 3 Top 10 (+ résultat et homme du match de chaque match). */
-export function weeklyPlan(league: LeagueData, competitionId: string, round: number, cfg: VisualsConfig, tierOf: (teamId: string) => SeniorityTier | undefined = () => undefined): WeeklyVisual[] {
+/** Tous les visuels d'une journée : résultats, classement, 4 Top 10 (+ résultat et homme du match de chaque match). */
+export function weeklyPlan(league: LeagueData, competitionId: string, round: number, cfg: VisualsConfig, tierOf: (teamId: string) => SeniorityTier | undefined = () => undefined, period: TopPeriod = 'round'): WeeklyVisual[] {
   const comp = league.competitions.find((c) => c.id === competitionId)
   const title = competitionTitle(comp)
   const slug = title.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-')
@@ -79,11 +79,14 @@ export function weeklyPlan(league: LeagueData, competitionId: string, round: num
       caption: weeklyCaption('classement', title, round, standings.slice(0, 3).map((r) => `${r.rank}. ${r.name} — ${r.points} pts`)),
       render: (o) => renderWeeklyStandings(standings, cfg, { title: 'CLASSEMENT', subtitle: `${title} · APRÈS LA J${round}`, showZones: o?.showZones, logo: divisionLogo(comp) }) },
   ]
-  for (const kind of ['xp', 'assists', 'keepers'] as TopKind[]) {
-    const top = weeklyTop(league, competitionId, round, kind)
-    out.push({ key: `top-${kind}`, label: kind === 'xp' ? 'Top 10 joueurs (XP)' : kind === 'assists' ? 'Top 10 passeurs' : 'Top 10 gardiens', aspect: '4 / 5', fileName: `mbl-${slug}-j${round}-${TOP_LABEL[kind].toLowerCase().replace(/ /g, '-')}.png`,
-      caption: weeklyCaption(kind, title, round, top.slice(0, 3).map((e) => `${e.rank}. ${e.player.first_name} ${e.player.last_name} (${e.team?.short_name ?? ''}) — ${e.display}`)),
-      render: (o) => renderTop10(top, cfg, { title: TOP_LABEL[kind], subtitle: `${title} · J${round}`, showZones: o?.showZones }) })
+  // Top 10 : journée choisie ou cumul depuis le début de la compétition ; buteurs juste avant passeurs
+  const when = period === 'cumul' ? `CUMUL J1 À J${round}` : `J${round}`
+  const name = comp?.name ?? title
+  for (const kind of TOP_KINDS) {
+    const top = weeklyTop(league, competitionId, round, kind, 10, period)
+    out.push({ key: `top-${kind}`, label: TOP_CARD_LABEL[kind], aspect: '4 / 5', fileName: `mbl-${slug}-${period === 'cumul' ? `cumul-j${round}` : `j${round}`}-${TOP_LABEL[kind].toLowerCase().replace(/ /g, '-')}.png`,
+      caption: weeklyCaption(kind, name, round, topCaptionLines(top), period),
+      render: (o) => renderTop10(top, cfg, { title: TOP_LABEL[kind], subtitle: `${title} · ${when}`, showZones: o?.showZones, icon: kind === 'goals' ? 'ball' : undefined }) })
   }
   for (const m of roundMatches(league, competitionId, round).filter(isPlayed)) {
     const plan = matchVisualPlan(league, m, cfg)

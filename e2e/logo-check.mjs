@@ -24,6 +24,17 @@ export async function checkLogos(page) {
       if (el.checkVisibility && !el.checkVisibility({ opacityProperty: true, visibilityProperty: true })) return false
       const r = el.getBoundingClientRect(); return r.width > 1 && r.height > 1
     }
+    // rectangle réellement visible : coupé par les conteneurs défilants / masqués (carrousels, tableaux à défilement)
+    const clipRect = (el, r) => {
+      let out = { left: r.left, right: r.right, top: r.top, bottom: r.bottom }
+      for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+        const cs = getComputedStyle(a)
+        if (cs.overflowX === 'visible' && cs.overflowY === 'visible') continue
+        const c = a.getBoundingClientRect()
+        out = { left: Math.max(out.left, c.left), right: Math.min(out.right, c.right), top: Math.max(out.top, c.top), bottom: Math.min(out.bottom, c.bottom) }
+      }
+      return out
+    }
     const label = (el) => el.getAttribute('aria-label') || el.dataset.teamLogo || '?'
     // tuile actuelle (data-team-logo) ; ancienne version du site : span role="img" contenant l'image du logo
     const logos = [...document.querySelectorAll('[data-team-logo], span[role="img"][aria-label]:has(> img)')].filter(visible)
@@ -35,11 +46,12 @@ export async function checkLogos(page) {
       const el = n.parentElement
       if (!el || !visible(el) || el.closest('[data-team-logo], span[role="img"]') || el.closest('[aria-hidden="true"]')) continue
       const rg = document.createRange(); rg.selectNodeContents(n)
-      for (const r of rg.getClientRects()) if (r.width > 1 && r.height > 1) texts.push({ r, t: n.textContent.trim().slice(0, 30), el })
+      for (const r0 of rg.getClientRects()) { const r = clipRect(el, r0); if (r.right - r.left > 1 && r.bottom - r.top > 1) texts.push({ r, t: n.textContent.trim().slice(0, 30), el }) }
     }
     const inter = (a, b) => Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) * Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top))
     for (const lg of logos) {
-      const lr = lg.getBoundingClientRect()
+      const lr = clipRect(lg, lg.getBoundingClientRect())
+      if (lr.right - lr.left < 4 || lr.bottom - lr.top < 4) continue
       const inner = { left: lr.left + 2, right: lr.right - 2, top: lr.top + 2, bottom: lr.bottom - 2 }
       for (const tx of texts) {
         // texte réellement visible à cet endroit (pas un texte d'un autre plan masqué par un fond opaque)

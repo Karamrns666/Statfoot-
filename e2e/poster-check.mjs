@@ -20,7 +20,7 @@ for (const [name, eng, ctxo] of VPS) {
   const pause = p.getByRole('button', { name: 'Mettre en pause' }); if (await pause.count()) await pause.click()
   await p.waitForTimeout(1800)
   const img = p.locator('.bb-panel picture img').last()
-  await img.scrollIntoViewIfNeeded(); await p.waitForTimeout(400)
+  await img.evaluate((el) => el.scrollIntoView({ block: 'center' })); await p.waitForTimeout(500)
   const r = await img.evaluate((el) => {
     const b = el.getBoundingClientRect(), nr = el.naturalWidth / el.naturalHeight, br = b.width / b.height
     // zone réellement occupée par l'image (object-fit: contain)

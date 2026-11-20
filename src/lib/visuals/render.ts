@@ -55,12 +55,40 @@ export function drawTile(ctx: CanvasRenderingContext2D, img: HTMLImageElement, z
   const s = Math.min(z.w, z.h), x = z.x + (z.w - s) / 2, y = z.y + (z.h - s) / 2
   ctx.save(); ctx.shadowColor = 'rgba(0, 0, 0, .28)'; ctx.shadowBlur = Math.max(4, s * 0.08)
   ctx.beginPath(); ctx.roundRect(x, y, s, s, s * 0.22); ctx.fillStyle = bg; ctx.fill(); ctx.restore()
-  const { w, h } = natural(img), wide = w / h > 2
-  // logo carré « pleine tuile » (fond et marge compris dans le fichier) : sans marge
+  // logo carré « pleine tuile » (fond et marge compris dans le fichier) : sans marge ; sinon marges vides retirées
   const bleed = isBleedSquare(img.src)
+  const box = bleed ? { sx: 0, sy: 0, w: natural(img).w, h: natural(img).h } : trimBox(img)
+  const { w, h } = box, wide = w / h > 2
   const px = bleed ? 0 : s * (wide ? 0.07 : 0.12), py = bleed ? 0 : s * 0.12
   const k = Math.min((s - 2 * px) / w, (s - 2 * py) / h)
-  ctx.drawImage(img, x + (s - w * k) / 2, y + (s - h * k) / 2, w * k, h * k)
+  ctx.drawImage(img, box.sx, box.sy, w, h, x + (s - w * k) / 2, y + (s - h * k) / 2, w * k, h * k)
+}
+
+/** Rectangle utile d'un logo (marges transparentes ou blanches retirées), mis en cache par image. */
+const trimCache = new WeakMap<HTMLImageElement, { sx: number; sy: number; w: number; h: number }>()
+function trimBox(img: HTMLImageElement) {
+  const hit = trimCache.get(img); if (hit) return hit
+  const { w: W, h: H } = natural(img)
+  let box = { sx: 0, sy: 0, w: W, h: H }
+  try {
+    const k = Math.min(1, 256 / Math.max(W, H)), cw = Math.max(1, Math.round(W * k)), ch = Math.max(1, Math.round(H * k))
+    const cv = document.createElement('canvas'); cv.width = cw; cv.height = ch
+    const c = cv.getContext('2d', { willReadFrequently: true })!
+    c.drawImage(img, 0, 0, cw, ch)
+    const d = c.getImageData(0, 0, cw, ch).data
+    let transparent = 0
+    for (let i = 3; i < d.length; i += 4) if (d[i] < 16) transparent++
+    const alphaOnly = transparent > (cw * ch) * 0.02
+    let x0 = cw, y0 = ch, x1 = -1, y1 = -1
+    for (let y = 0; y < ch; y++) for (let xx = 0; xx < cw; xx++) {
+      const i = (y * cw + xx) * 4
+      const empty = d[i + 3] < 16 || (!alphaOnly && d[i] > 242 && d[i + 1] > 242 && d[i + 2] > 242)
+      if (!empty) { if (xx < x0) x0 = xx; if (xx > x1) x1 = xx; if (y < y0) y0 = y; if (y > y1) y1 = y }
+    }
+    if (x1 >= x0 && y1 >= y0) box = { sx: Math.max(0, (x0 - 1) / k), sy: Math.max(0, (y0 - 1) / k), w: Math.min(W, (x1 - x0 + 3) / k), h: Math.min(H, (y1 - y0 + 3) / k) }
+  } catch { /* image d'une autre origine : pas de rognage */ }
+  trimCache.set(img, box)
+  return box
 }
 
 export function drawContain(ctx: CanvasRenderingContext2D, img: HTMLImageElement, z: Zone, valign: 'center' | 'bottom' = 'center') {

@@ -66,7 +66,7 @@ test('Top 10 buteurs : nom long, égalité, moins de 10 buteurs', async ({ page 
   const save = async (label, file) => {
     const fig = page.locator('figure', { has: page.locator('figcaption', { hasText: new RegExp(`^${label}$`) }) })
     await expect(fig.locator('img')).toBeVisible({ timeout: 30_000 })
-    const data = await fig.locator('img').evaluate(async (img) => { const b = await (await fetch(img.src)).blob(); return await new Promise((r) => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(b) }) })
+    const data = await fig.locator('img').evaluate(async (img) => { let b; for (let k = 0; k < 10 && !b; k++) { try { b = await (await fetch(img.src)).blob() } catch { await new Promise((r) => setTimeout(r, 500)) } }; return await new Promise((r) => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(b) }) })
     fs.mkdirSync(`test-results/visuels-${info.project.name}`, { recursive: true })
     fs.writeFileSync(`test-results/visuels-${info.project.name}/${file}`, Buffer.from(String(data).split(',')[1], 'base64'))
     return fig.locator('textarea').inputValue()
@@ -79,6 +79,8 @@ test('Top 10 buteurs : nom long, égalité, moins de 10 buteurs', async ({ page 
   await save('Top 10 passeurs', 'top10-passeurs.png')
   // cumul depuis le début de la compétition
   await page.getByRole('radio', { name: 'Cumul depuis le début' }).click()
+  await expect(page.locator('figure', { has: page.locator('figcaption', { hasText: /^Top 10 buteurs$/ }) }).locator('textarea')).toHaveValue(/cumul/)
+  await page.waitForTimeout(1500)
   const cumul = await save('Top 10 buteurs', 'top10-buteurs-cumul.png')
   expect(cumul.split('\n')[0]).toMatch(/cumul J1 à J\d+$/)
   // classement : toutes les équipes (1 image), puis 2 images si la compétition a une zone MASTER / CHALLENGER

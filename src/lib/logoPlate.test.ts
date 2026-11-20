@@ -62,7 +62,7 @@ describe('tuile logo unique', () => {
   it('grand logo : fichier HD officiel, version sombre sur tuile noire', () => {
     expect(logoLargeSrc({ logo_url: '/logos/cob.png', company_logo_url: '/logos/cob-full.png' })).toBe('/logos/cob-full.png')
     expect(logoLargeSrc({ logo_url: '/logos/pbe.svg', logo_dark_url: '/logos/pbe-dark.svg', logo_bg: 'black', company_logo_url: '/logos/pbe-2000.png' })).toBe('/logos/pbe-dark.svg')
-    expect(tileLogo({ logo_url: '/logos/cac.png', company_logo_url: '/logos/cac-full.png' }, true)).toBe('/logos/cac-full.png')
+    expect(tileLogo({ logo_url: '/logos/cac.png', company_logo_url: '/logos/cac-full.png' }, true)).toBe('/logos/cac.png')
     expect(tileLogo({ logo_url: '/logos/pbe.svg', logo_bg: 'black' }, true)).toBe('/logos/pbe-carre-noir-1024.png')
   })
   it('nom court', () => {

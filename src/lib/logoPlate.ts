@@ -71,7 +71,8 @@ export function logoSquareSrc(team?: Pick<Team, 'logo_url' | 'logo_square_url' |
 
 /** Image de la tuile pour les visuels dessinés (canvas) : petite tuile → logo carré, sinon logo principal HD. */
 export function tileLogo(team: Parameters<typeof logoLargeSrc>[0] & Pick<Team, 'logo_square_url' | 'logo_small'> | null | undefined, small: boolean): string | undefined {
-  return (small ? logoSquareSrc(team) : undefined) ?? logoLargeSrc(team)
+  // petite tuile : logo carré, sinon le logo de l'équipe (fichier carré officiel, symbole lisible), marges retirées au dessin
+  return small ? logoSquareSrc(team) ?? logoSrc(team) ?? logoLargeSrc(team) : logoLargeSrc(team)
 }
 
 /** Logo principal trop large pour une petite tuile (largeur > 1,6 × hauteur une fois les marges retirées) */

@@ -24,7 +24,7 @@ test('visuels de la semaine — données réelles', async ({ page, context }) =>
     const Season = await q('Season'), Competition = await q('Competition', '&data->>season_id=eq.season_2026')
     const Team = await q('Team', '&data->>season_id=eq.season_2026'), Match = await q('Match', '&data->>season_id=eq.season_2026')
     const ids = Match.map((m) => m.id).join(',')
-    const MatchEvent = await q('MatchEvent', `&data->>match_id=in.(${ids})`), Lineup = await q('Lineup', `&data->>match_id=in.(${ids})`)
+    const MatchEvent = await q('MatchEvent', `&data->>match_id=in.(${ids})&data->>type=in.(goal,own_goal,yellow_card,second_yellow,red_card,save,penalty_saved,shot_on_target,shot_off_target,penalty_missed,substitution,gk_change,shootout_scored,shootout_saved,shootout_missed)`), Lineup = await q('Lineup', `&data->>match_id=in.(${ids})`)
     const Player = await q('Player', '&data->>team_id=like.t26_*')
     return { Season, Competition, Team, Match, MatchEvent, Lineup, Player }
   })
@@ -49,7 +49,7 @@ test('visuels de la semaine — données réelles', async ({ page, context }) =>
   const save = async (label, file) => {
     const fig = page.locator('figure', { has: page.locator('figcaption', { hasText: new RegExp(`^${label.replace(/[()/]/g, '\\$&')}$`) }) })
     await expect(fig.locator('img')).toBeVisible({ timeout: 60_000 })
-    const url = await fig.locator('img').evaluate(async (img) => { const b = await (await fetch(img.src)).blob(); return await new Promise((r) => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(b) }) })
+    const url = await fig.locator('img').evaluate(async (img) => { let b; for (let k = 0; k < 10 && !b; k++) { try { b = await (await fetch(img.src)).blob() } catch { await new Promise((r) => setTimeout(r, 500)) } }; return await new Promise((r) => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(b) }) })
     fs.writeFileSync(`${OUT}/${file}`, Buffer.from(String(url).split(',')[1], 'base64'))
     const cap = await fig.locator('textarea').inputValue(); fs.writeFileSync(`${OUT}/${file.replace('.png', '.txt')}`, cap)
   }
@@ -58,6 +58,7 @@ test('visuels de la semaine — données réelles', async ({ page, context }) =>
   await save('Top 10 buteurs', 'top10-buteurs.png')
   await save('Top 10 passeurs', 'top10-passeurs.png')
   await page.getByRole('radio', { name: '2 images (MASTER + CHALLENGER)' }).click()
+  await page.waitForTimeout(1500)
   await save('Classement · 1/2 · zone MASTER', 'classement-2-images-1.png')
   await save('Classement · 2/2 · zone CHALLENGER', 'classement-2-images-2.png')
 })

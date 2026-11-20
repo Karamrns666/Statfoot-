@@ -48,7 +48,7 @@ export default function Media() {
       <div className="scrollbar-none -mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-1" role="tablist" aria-label="Équipe">
         <TeamChip active={team === 'mbl'} onClick={() => setTeam('mbl')} label="MBL" logo={<img src={MBL_LOGO} alt="" className="h-9 w-auto" />} />
         <TeamChip active={team === ''} onClick={() => setTeam('')} label="Toutes" logo={<span className="flex size-9 items-center justify-center rounded-full bg-white/10 font-display text-sm font-black">{seasonTeams.length}</span>} />
-        {seasonTeams.map((t) => <TeamChip key={t.id} active={team === t.id} onClick={() => setTeam(t.id)} label={t.name} logo={<TeamLogo team={t} size={36} />} />)}
+        {seasonTeams.map((t) => <TeamChip key={t.id} active={team === t.id} onClick={() => setTeam(t.id)} label={t.name} logo={<TeamLogo team={t} size="md" />} />)}
       </div>
 
       {/* types */}
@@ -75,7 +75,7 @@ export default function Media() {
                 <span className="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[11px] font-bold backdrop-blur">{k === 'video' ? <><Play className="size-3" />Vidéo</> : k === 'lien' ? <><ExternalLink className="size-3" />Lien</> : <><Image className="size-3" />Photo</>}</span>
                 {m.round && <span className="absolute right-2.5 top-2.5 rounded-full bg-neon px-2 py-0.5 font-display text-xs font-black">J{m.round}</span>}
                 <div className="absolute inset-x-0 bottom-0 p-3">
-                  <div className="flex -space-x-1.5">{m.team_ids?.slice(0, 2).map((t) => <TeamLogo key={t} team={L.team.get(t)} size={22} />)}</div>
+                  <div className="flex -space-x-1.5">{m.team_ids?.slice(0, 2).map((t) => <TeamLogo key={t} team={L.team.get(t)} size="xs" />)}</div>
                   <div className={cn('mt-1 line-clamp-2 font-display font-extrabold leading-tight', featured ? 'text-2xl sm:text-3xl' : 'text-base')}>{m.title}</div>
                   <div className="mt-0.5 text-[11px] text-muted-foreground">{fmtDate(m.date ?? m.created_date, 'd MMM yyyy')}</div>
                 </div>
@@ -93,7 +93,7 @@ export default function Media() {
             : kindOf(open) === 'lien'
               ? <div className="space-y-3"><div className="prose prose-invert max-w-none text-sm"><ReactMarkdown>{open.body ?? ''}</ReactMarkdown></div>{open.url && <a href={open.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-sm font-bold text-neon"><ExternalLink className="size-4" />Ouvrir le lien</a>}</div>
               : <img src={open.url} alt={open.title} className="max-h-[75vh] w-full rounded-xl object-contain" />)}
-          {open && <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">{open.team_ids?.map((t) => <span key={t} className="inline-flex items-center gap-1.5"><TeamLogo team={L.team.get(t)} size={16} />{L.team.get(t)?.name}</span>)}{open.round && <span>· Journée {open.round}</span>}<span>· {fmtDate(open.date ?? open.created_date, 'd MMMM yyyy')}</span></div>}
+          {open && <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">{open.team_ids?.map((t) => <span key={t} className="inline-flex items-center gap-1.5"><TeamLogo team={L.team.get(t)} size="xs" />{L.team.get(t)?.name}</span>)}{open.round && <span>· Journée {open.round}</span>}<span>· {fmtDate(open.date ?? open.created_date, 'd MMMM yyyy')}</span></div>}
         </DialogContent>
       </Dialog>
     </div>

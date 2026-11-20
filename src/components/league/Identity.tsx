@@ -1,40 +1,89 @@
+import { useLayoutEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTrimmedImage } from '@/hooks/useTrimmedImage'
-import { logoPlate, logoSrc } from '@/lib/logoPlate'
-import { useImageRatio, WIDE_LOGO } from '@/hooks/useImageRatio'
+import { isSmallLogo, LOGO_SIZES, logoLargeSrc, logoPlate, logoSize, logoSquareSrc, logoSrc, teamShortName, WIDE_FOR_TILE, type LogoSize } from '@/lib/logoPlate'
+import { useImageRatio } from '@/hooks/useImageRatio'
 import type { Player, Position, Team } from '@/types/entities'
 import { cn } from '@/lib/utils'
 import { initials, playerName } from '@/lib/format'
 import { teamLogoSvg } from '@/lib/logos'
 
-export function TeamLogo({ team, size = 32, className, fluid = false }: { team?: Team | null; size?: number; className?: string; /** remplit son conteneur carré (mode TV) : pas de taille minimale, marge interne en % */ fluid?: boolean }) {
-  const raw = logoSrc(team) || teamLogoSvg(team?.short_name ?? '?', team?.primary_color, team?.secondary_color)
-  // marges vides retirées (les logos larges remplissent leur cadre) ; fond choisi dans l'admin équipe ;
-  // version claire du logo sur fond sombre (Admin équipe → « Logo pour fond sombre »)
-  const src = useTrimmedImage(team?.logo_url ? raw : null) ?? raw
+/**
+ * LE logo d'équipe du site (seul composant autorisé) : tuile CARRÉE aux coins arrondis, identique pour toutes les
+ * équipes (même fond réglé dans l'admin, même bordure, même marge interne), logo centré en object-fit: contain.
+ * Tailles normalisées uniquement : xs 24 · sm 32 · md 40 · lg 64 · xl 96 · hero 160 (une valeur en px est ramenée
+ * à la plus proche). xs à md : logo carré / icône ; lg et plus : logo principal (HD).
+ * `fluid` : la tuile remplit son parent carré (mode TV, projection du tirage).
+ */
+export function TeamLogo({ team, size = 'sm', className, fluid = false }: { team?: Team | null; size?: LogoSize | number; className?: string; fluid?: boolean }) {
+  const s = logoSize(size), px = LOGO_SIZES[s]
+  const small = isSmallLogo(s) && !fluid
   const plate = logoPlate(team)
-  const brand = !!plate.bg
-  // logo large (largeur > 2 × hauteur) : cadre en pilule plus large au lieu d'un carré, le logo y remplit ~88 % de la largeur
-  const ratio = useImageRatio(team?.logo_url ? src : null)
-  const wide = (ratio ?? 1) > WIDE_LOGO
-  // cadre CARRÉ identique pour toutes les équipes : taille fixe (jamais écrasée par la largeur disponible),
-  // logo entier visible (object-fit: contain) avec une marge interne, sans déformation
-  if (fluid) {
-    // mode TV : remplit un parent CARRÉ en position relative ; tailles en position absolue (définies sur Safari iOS,
-    // contrairement à height: 100 % + aspect-ratio qui donnait une barre blanche étirée)
-    const pad = wide ? '6%' : brand ? '10%' : '0%'
-    return (
-      <span role="img" aria-label={team?.name ?? ''} style={{ position: 'absolute', inset: wide ? '24% 0' : 0, background: plate.bg ?? undefined }}
-        className={cn('block overflow-hidden', wide && brand ? 'rounded-full shadow-[0_2px_10px_rgba(0,0,0,.35)] ring-1 ring-black/5' : brand ? 'rounded-[22%] shadow-[0_2px_10px_rgba(0,0,0,.35)] ring-1 ring-black/5' : 'drop-shadow-[0_2px_8px_rgba(0,0,0,.5)]', className)}>
-        <img src={src} alt="" className="absolute max-w-none object-contain" style={{ left: pad, top: pad, width: `calc(100% - 2 * ${pad})`, height: `calc(100% - 2 * ${pad})` }} loading="lazy" draggable={false} />
-      </span>
-    )
-  }
-  const w = wide ? Math.round(size * 2) : size
+  const square = small ? logoSquareSrc(team) : undefined
+  const main = (small ? logoSrc(team) : logoLargeSrc(team)) || teamLogoSvg(team?.short_name ?? '?', team?.primary_color, team?.secondary_color)
+  const trimmed = useTrimmedImage(!square && team?.logo_url ? main : null) ?? main
+  const src = square ?? trimmed
+  // logo large (plus de 2 × plus large que haut) : marge latérale réduite pour qu'il occupe ~86 % de la largeur
+  const ratio = useImageRatio(src)
+  const wide = (ratio ?? 1) > 2
+  const radius = fluid ? '22%' : Math.round(px * 0.22)
+  const pad = Math.max(2, Math.round(px * 0.12)), padX = wide ? Math.max(2, Math.round(px * 0.07)) : pad
+  const box = fluid ? { position: 'absolute' as const, inset: 0, padding: wide ? '12% 7%' : '12%' } : { width: px, height: px, minWidth: px, padding: `${pad}px ${padX}px` }
   return (
-    <span role="img" aria-label={team?.name ?? ''} style={{ width: w, height: size, minWidth: w, padding: wide ? `${Math.round(size * 0.14)}px ${Math.round(w * 0.06)}px` : brand ? Math.max(2, Math.round(size * 0.1)) : 0, background: plate.bg ?? undefined }}
-      className={cn('inline-flex shrink-0 items-center justify-center overflow-hidden', wide && brand ? 'rounded-full shadow-[0_2px_10px_rgba(0,0,0,.35)] ring-1 ring-black/5' : brand ? 'rounded-[22%] shadow-[0_2px_10px_rgba(0,0,0,.35)] ring-1 ring-black/5' : 'drop-shadow-[0_2px_8px_rgba(0,0,0,.5)]', className)}>
-      <img src={src} alt="" className="block size-full max-w-none object-contain" loading="lazy" draggable={false} />
+    <span role="img" aria-label={team?.name ?? ''} title={team?.name} data-team-logo={team?.id ?? ''} data-logo-size={fluid ? 'fluid' : s} data-logo-kind={square ? 'square' : 'main'}
+      style={{ ...box, background: plate.bg, borderRadius: radius }}
+      className={cn('inline-flex shrink-0 items-center justify-center overflow-hidden shadow-[0_1px_6px_rgba(0,0,0,.28)] ring-1 ring-inset ring-black/10', className)}>
+      <img src={src} alt="" className="block size-full max-w-none object-contain" loading="lazy" decoding="async" draggable={false} />
+    </span>
+  )
+}
+
+/** Grand logo en filigrane (décor de fond de la page équipe) : sans tuile, opacité faible, jamais par-dessus un texte. */
+export function TeamLogoWatermark({ team, className }: { team?: Team | null; className?: string }) {
+  const p = logoPlate(team)
+  // filigrane sur fond sombre : version claire du logo si elle existe
+  const src = team?.logo_dark_url || logoLargeSrc(team)
+  if (!src) return null
+  return <img src={src} alt="" aria-hidden className={cn('pointer-events-none select-none object-contain', !team?.logo_dark_url && !p.dark && 'brightness-0 invert', className)} draggable={false} />
+}
+
+/** Équipe sans logo carré dont le logo principal est trop large pour une petite tuile (signalé dans l'admin). */
+export function useMissingSquareLogo(team?: Team | null): boolean {
+  const has = !!logoSquareSrc(team)
+  const main = !has && team?.logo_url ? logoSrc(team) ?? null : null
+  const trimmed = useTrimmedImage(main) ?? null
+  const ratio = useImageRatio(trimmed)
+  return !has && !!team?.logo_url && (ratio ?? 1) > WIDE_FOR_TILE
+}
+
+/**
+ * Nom d'équipe qui n'est jamais coupé par « … » : nom complet sur une ligne s'il tient ; sinon le nom court
+ * (Admin équipe → « Nom court ») ; sinon le nom passe sur 2 lignes. Nom complet toujours dans title / aria-label.
+ */
+export function FitName({ team, className, twoLines = true }: { team?: Team | null; className?: string; twoLines?: boolean }) {
+  const ref = useRef<HTMLSpanElement>(null)
+  const full = team?.name ?? 'À déterminer', short = teamShortName(team)
+  const [mode, setMode] = useState<'full' | 'short' | 'wrap'>('full')
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const fit = () => {
+      const span = el
+      // mesure du nom complet puis du nom court sur une ligne, sans modifier l'affichage tant que rien ne change
+      const measure = (t: string) => { const c = document.createElement('span'); c.textContent = t; c.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font:inherit;letter-spacing:inherit;text-transform:inherit'; span.appendChild(c); const w = c.getBoundingClientRect().width; c.remove(); return w }
+      const avail = span.getBoundingClientRect().width
+      if (!avail) return
+      const next = measure(full) <= avail + 0.5 ? 'full' : short !== full && measure(short) <= avail + 0.5 ? 'short' : 'wrap'
+      setMode((m) => (m === next ? m : next))
+    }
+    fit()
+    const ro = new ResizeObserver(fit); ro.observe(el)
+    return () => ro.disconnect()
+  }, [full, short])
+  return (
+    <span ref={ref} title={full} aria-label={full} data-team-name={team?.id ?? ''} data-name-mode={mode}
+      className={cn('relative block min-w-0 max-w-full', mode === 'wrap' ? cn('break-words leading-tight', twoLines && 'line-clamp-2') : 'whitespace-nowrap', className)}>
+      <span aria-hidden>{mode === 'short' ? short : full}</span>
     </span>
   )
 }

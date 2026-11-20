@@ -83,9 +83,9 @@ export default function MatchSheet() {
           <div className="text-right text-sm"><div><b>{comp?.name}</b> · {isKnockout(m) ? STAGE_LABELS[m.stage!] : `Journée ${m.round}`}</div><div>{fmtDateTime(m.date)}</div><div>{m.pitch}</div></div>
         </div>
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 py-4">
-          <div className="flex items-center gap-3"><TeamLogo team={L.team.get(m.home_team_id)} size={48} /><span className="title-caps text-xl">{L.team.get(m.home_team_id)?.name}</span></div>
+          <div className="flex items-center gap-3"><TeamLogo team={L.team.get(m.home_team_id)} size="md" /><span className="title-caps text-xl">{L.team.get(m.home_team_id)?.name}</span></div>
           <div className="text-center"><div className="num text-5xl">{m.home_score ?? '-'} - {m.away_score ?? '-'}</div><div className="text-xs">MT {m.home_ht_score ?? '-'}-{m.away_ht_score ?? '-'}{m.extra_time ? ' · après prolongation' : ''}{m.penalties ? ` · TAB ${m.home_pens}-${m.away_pens}` : ''}</div></div>
-          <div className="flex items-center justify-end gap-3"><span className="title-caps text-xl">{L.team.get(m.away_team_id)?.name}</span><TeamLogo team={L.team.get(m.away_team_id)} size={48} /></div>
+          <div className="flex items-center justify-end gap-3"><span className="title-caps text-xl">{L.team.get(m.away_team_id)?.name}</span><TeamLogo team={L.team.get(m.away_team_id)} size="md" /></div>
         </div>
         <div className="grid gap-3 text-sm sm:grid-cols-3">
           <label className="flex items-center gap-2">Statut

@@ -10,7 +10,7 @@ import { RANK_PENDING, rankLabel, useCompetitionRanking } from '@/hooks/useRanki
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CompetitionBadge, EmptyState, FormPills } from '@/components/league/Bits'
-import { PlayerAvatar, PlayerLink, TeamLogo } from '@/components/league/Identity'
+import { FitName, PlayerAvatar, PlayerLink, TeamLogo } from '@/components/league/Identity'
 import { LineupList } from '@/components/match/LineupList'
 import { SuspendedAbsents } from '@/components/reglement/SuspendedAbsents'
 import { ArtLink } from '@/components/reglement/ArtLink'
@@ -150,7 +150,7 @@ function TeamBlock({ id }: { id: string }) {
   const team = useLookup().team.get(id)
   return (
     <Link to={`/equipes/${id}`} className="flex min-w-0 flex-col items-center gap-2 text-center">
-      <TeamLogo team={team} size={72} className="sm:scale-[1.22] sm:my-2" />
+      <TeamLogo team={team} size="lg" className="sm:hidden" /><TeamLogo team={team} size="xl" className="hidden sm:inline-flex" />
       <div className="title-caps w-full text-base leading-tight [overflow-wrap:anywhere] [hyphens:auto] sm:text-2xl">{team?.name ?? 'À déterminer'}</div>
       {team?.company && team.company !== team.name && <div className="text-xs text-muted-foreground">{team.company}</div>}
     </Link>
@@ -261,7 +261,7 @@ function PreMatch({ match }: { match: Match }) {
         const t = L.team.get(tid), f = formOf(tid), r = ranking.byTeam.get(tid)
         return (
           <Card key={tid}>
-            <CardHeader className="flex-row items-center gap-3"><TeamLogo team={t} size={36} /><div><CardTitle>{t?.name}</CardTitle><div className="text-xs text-muted-foreground">{ranking.started ? rankLabel(r, true) : <>Rang – · <span className="text-white/60">{RANK_PENDING}</span></>}</div></div><div className="ml-auto"><FormPills form={f.map((x) => resultFor(x, tid)!)} size="md" /></div></CardHeader>
+            <CardHeader className="flex-row items-center gap-3"><TeamLogo team={t} size="md" /><div><CardTitle>{t?.name}</CardTitle><div className="text-xs text-muted-foreground">{ranking.started ? rankLabel(r, true) : <>Rang – · <span className="text-white/60">{RANK_PENDING}</span></>}</div></div><div className="ml-auto"><FormPills form={f.map((x) => resultFor(x, tid)!)} size="md" /></div></CardHeader>
             <CardContent className="space-y-1">
               {f.slice().reverse().map((x) => {
                 const opp = L.team.get(x.home_team_id === tid ? x.away_team_id : x.home_team_id), res = resultFor(x, tid)
@@ -269,7 +269,7 @@ function PreMatch({ match }: { match: Match }) {
                   <Link key={x.id} to={`/matchs/${x.id}`} className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-white/5">
                     <span className={cn('flex size-6 items-center justify-center rounded-full text-[11px] font-black text-night-950', res === 'W' ? 'bg-win' : res === 'L' ? 'bg-loss' : 'bg-draw')}>{res === 'W' ? 'V' : res === 'L' ? 'D' : 'N'}</span>
                     <span className="w-14 text-xs text-muted-foreground">{fmtDate(x.date, 'd MMM')}</span>
-                    <TeamLogo team={opp} size={18} /><span className="flex-1 truncate">{opp?.name}</span><span className="num">{x.home_score}-{x.away_score}</span>
+                    <TeamLogo team={opp} size="xs" /><span className="flex-1 truncate">{opp?.name}</span><span className="num">{x.home_score}-{x.away_score}</span>
                   </Link>
                 )
               })}
@@ -289,7 +289,7 @@ function PreMatch({ match }: { match: Match }) {
           {h2h.matches.slice().reverse().map((x) => (
             <Link key={x.id} to={`/matchs/${x.id}`} className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-white/5">
               <span className="w-24 text-xs text-muted-foreground">{fmtDate(x.date, 'd MMM yyyy')}</span>
-              <span className="flex-1 truncate text-right">{L.team.get(x.home_team_id)?.name}</span><span className="num rounded bg-white/10 px-2">{x.home_score}-{x.away_score}</span><span className="flex-1 truncate">{L.team.get(x.away_team_id)?.name}</span>
+              <FitName team={L.team.get(x.home_team_id)} className="flex-1 text-right" /><span className="num rounded bg-white/10 px-2">{x.home_score}-{x.away_score}</span><FitName team={L.team.get(x.away_team_id)} className="flex-1" />
             </Link>
           ))}
           {!h2h.matches.length && <p className="text-sm text-muted-foreground">Première confrontation.</p>}
@@ -324,7 +324,7 @@ function KeepersCard({ match, events }: { match: Match; events: MatchEvent[] }) 
           const p = L.player.get(k.player_id), t = L.team.get(k.team_id)
           return (
             <Link key={k.player_id} to={`/joueurs/${k.player_id}`} className="flex items-center gap-3 rounded-xl p-2 hover:bg-white/5">
-              <TeamLogo team={t} size={22} />
+              <TeamLogo team={t} size="xs" />
               <span className="min-w-0 flex-1 truncate text-sm font-semibold">{playerShort(p)}</span>
               <span className="text-center"><span className="num text-lg">{k.saves}</span><span className="block text-[10px] text-muted-foreground">arrêts</span></span>
               <span className="text-center"><span className="num text-lg">{k.conceded}</span><span className="block text-[10px] text-muted-foreground">encaissés</span></span>
@@ -348,7 +348,7 @@ function CardsCard({ events }: { events: MatchEvent[] }) {
         {cards.map((e) => (
           <div key={e.id} className="flex items-center gap-2">
             <span className={cn('inline-block h-4 w-3 rounded-sm', e.type === 'yellow_card' ? 'bg-yellow-400' : 'bg-red-500')} aria-label={e.type === 'yellow_card' ? 'Carton jaune' : 'Carton rouge'} />
-            <TeamLogo team={L.team.get(e.team_id)} size={16} />
+            <TeamLogo team={L.team.get(e.team_id)} size="xs" />
             <span className="flex-1">{e.card_target === 'official' ? `${e.player_name_free ?? 'Officiel'} (officiel)` : playerShort(L.player.get(e.player_id ?? '')) || e.player_name_free}{e.card_target === 'substitute' ? <span className="text-xs text-muted-foreground"> (banc)</span> : null}{e.type === 'second_yellow' ? <span className="text-xs text-red-300"> 2e avertissement</span> : null}</span>
             <span className="text-xs text-muted-foreground">{fmtMinute(e.minute, e.added_minute)}</span>
           </div>

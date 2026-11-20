@@ -96,7 +96,7 @@ export default function PlayersAdmin() {
             { label: '#', render: (p) => <span className="num">{p.number}</span> },
             { label: 'Joueur', render: (p) => <span className="flex items-center gap-2"><PlayerAvatar player={p} team={L.team.get(p.team_id)} size={28} /><span className="font-semibold">{playerName(p)}</span></span> },
             { label: 'Rôle', render: (p) => <RoleBadge position={p.position} captain={p.is_captain} /> },
-            { label: 'Équipe', render: (p) => <span className="flex items-center gap-1.5"><TeamLogo team={L.team.get(p.team_id)} size={18} />{L.team.get(p.team_id)?.short_name}</span>, className: 'hidden md:table-cell' },
+            { label: 'Équipe', render: (p) => <span className="flex items-center gap-1.5"><TeamLogo team={L.team.get(p.team_id)} size="xs" />{L.team.get(p.team_id)?.short_name}</span>, className: 'hidden md:table-cell' },
             { label: 'Documents', render: docBadge },
             { label: 'Salarié (2.3)', render: (p) => <span className={p.employment_verified ? 'text-xs font-bold text-win' : 'text-xs text-muted-foreground'} title={p.employment_proof ? 'Justificatif fourni' : 'Pas de justificatif'}>{p.employment_verified ? 'Vérifié' : 'À vérifier'}{p.employment_proof ? ' · justificatif' : ''}</span> },
             { label: 'Saison précédente', render: (p) => <SeasonLinkControl kind="player" item={p} />, className: 'hidden md:table-cell' },

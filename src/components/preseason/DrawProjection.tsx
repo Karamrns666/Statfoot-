@@ -88,7 +88,7 @@ export function DrawProjection({ comp, seasonName, onClose }: { comp: Competitio
           {current ? (
             <>
               <div className={cn('rounded-[2rem] bg-white p-[2.2vh] shadow-[0_30px_80px_-20px_rgb(0_0_0/.7)] transition-transform', spin && spin !== order[n] ? 'scale-95 opacity-90' : 'scale-100')}>
-                <TeamLogo team={curTeam} size={300} className="!size-[clamp(120px,28vh,320px)] !shadow-none !ring-0" />
+                <span className="relative block size-[clamp(120px,28vh,320px)]"><TeamLogo team={curTeam} fluid /></span>
               </div>
               <div className="title-caps mt-[3vh] text-[clamp(28px,4.6vw,88px)] leading-[.95]">{curTeam?.name}</div>
               <div className={cn('mt-[1.6vh] rounded-full px-5 py-1.5 font-display text-[clamp(14px,1.5vw,28px)] font-bold uppercase', caption.startsWith('Au repos') ? 'bg-white/15 text-white' : 'bg-[#F05A22] text-white')}>{caption}</div>
@@ -142,7 +142,7 @@ export function DrawProjection({ comp, seasonName, onClose }: { comp: Competitio
     const t = id ? L.team.get(id) : undefined
     return (
       <div className={cn('flex min-w-0 flex-1 items-center gap-[0.6vw]', right && 'flex-row-reverse text-right')}>
-        {t ? <TeamLogo team={t} size={40} className="!size-[clamp(22px,3.6vh,44px)]" /> : <span className="size-[clamp(22px,3.6vh,44px)] shrink-0 rounded-[22%] border border-dashed border-white/20" />}
+        {t ? <span className="relative block size-[clamp(24px,3.6vh,40px)] shrink-0"><TeamLogo team={t} fluid /></span> : <span className="size-[clamp(24px,3.6vh,40px)] shrink-0 rounded-[22%] border border-dashed border-white/20" />}
         <span className={cn('line-clamp-2 min-w-0 break-words font-display text-[clamp(11px,1.12vw,22px)] font-black uppercase leading-[1.02]', !t && 'text-white/25')}>{t?.name ?? '· · ·'}</span>
       </div>
     )

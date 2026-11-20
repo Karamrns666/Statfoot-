@@ -66,14 +66,14 @@ function GroupsEditor({ competitionId }: { competitionId: string }) {
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
         {groups.map((g) => (
           <Card key={g.id}><CardHeader className="flex-row items-center justify-between"><CardTitle>{g.name}</CardTitle><button className="text-red-400" onClick={() => base44.entities.Group.delete(g.id)} title="Supprimer"><Trash2 className="size-4" /></button></CardHeader>
-            <CardContent className="space-y-1">{(g.team_ids ?? []).map((t) => <div key={t} className="flex items-center gap-2 rounded bg-white/5 px-2 py-1 text-sm"><TeamLogo team={L.team.get(t)} size={18} /><span className="flex-1 truncate">{L.team.get(t)?.name}</span><button className="text-xs text-muted-foreground hover:text-red-400" onClick={() => assign(t, '')}>✕</button></div>)}</CardContent>
+            <CardContent className="space-y-1">{(g.team_ids ?? []).map((t) => <div key={t} className="flex items-center gap-2 rounded bg-white/5 px-2 py-1 text-sm"><TeamLogo team={L.team.get(t)} size="xs" /><span className="flex-1 truncate">{L.team.get(t)?.name}</span><button className="text-xs text-muted-foreground hover:text-red-400" onClick={() => assign(t, '')}>✕</button></div>)}</CardContent>
           </Card>
         ))}
       </div>
       <Card><CardHeader><CardTitle>Équipes sans groupe <Badge variant="warning">{pool.length}</Badge></CardTitle></CardHeader>
         <CardContent className="flex flex-wrap gap-2">
           {pool.map((t) => (
-            <div key={t} className="flex items-center gap-2 rounded-lg bg-white/5 px-2 py-1 text-sm"><TeamLogo team={L.team.get(t)} size={18} />{L.team.get(t)?.short_name}
+            <div key={t} className="flex items-center gap-2 rounded-lg bg-white/5 px-2 py-1 text-sm"><TeamLogo team={L.team.get(t)} size="xs" />{L.team.get(t)?.short_name}
               <select className="rounded bg-night-950 text-xs" value="" onChange={(e) => assign(t, e.target.value)} aria-label="Affecter"><option value="">→</option>{groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}</select>
             </div>
           ))}
@@ -127,7 +127,7 @@ function GroupDraw({ competitionId }: { competitionId: string }) {
           <div className="grid gap-3 md:grid-cols-4">
             {pots.map((p, i) => (
               <Card key={i}><CardHeader><CardTitle>Pot {i + 1}{i === 0 && <span className="ml-2 text-xs text-muted-foreground">têtes de série</span>}</CardTitle></CardHeader>
-                <CardContent className="space-y-1">{p.map((t) => <div key={t} className="flex items-center gap-2 rounded bg-white/5 px-2 py-1 text-sm"><TeamLogo team={L.team.get(t)} size={18} /><span className="flex-1 truncate">{L.team.get(t)?.name}</span>
+                <CardContent className="space-y-1">{p.map((t) => <div key={t} className="flex items-center gap-2 rounded bg-white/5 px-2 py-1 text-sm"><TeamLogo team={L.team.get(t)} size="xs" /><span className="flex-1 truncate">{L.team.get(t)?.name}</span>
                   <select className="rounded bg-night-950 text-xs" value={i} onChange={(e) => setPots(pots.map((x, j) => (j === +e.target.value ? [...x.filter((y) => y !== t), t] : x.filter((y) => y !== t))))} aria-label="Pot">{pots.map((_, j) => <option key={j} value={j}>Pot {j + 1}</option>)}</select></div>)}</CardContent></Card>
             ))}
           </div>
@@ -142,12 +142,12 @@ function GroupDraw({ competitionId }: { competitionId: string }) {
             {done && draw.status !== 'published' && <Button onClick={apply}><CheckCheck />Voir les résultats → appliquer aux groupes</Button>}
             <Button variant="ghost" onClick={async () => { await base44.entities.Draw.update(draw.id, { status: 'draft' }); toast.info('Tirage réinitialisé') }}><RotateCcw />Recommencer</Button>
           </div>
-          {spinning && <div className="glass flex items-center justify-center gap-3 rounded-2xl p-6 animate-pulse"><TeamLogo team={L.team.get(spinning)} size={56} /><span className="title-caps text-3xl">{L.team.get(spinning)?.name}</span></div>}
+          {spinning && <div className="glass flex items-center justify-center gap-3 rounded-2xl p-6 animate-pulse"><TeamLogo team={L.team.get(spinning)} size="lg" /><span className="title-caps text-3xl">{L.team.get(spinning)?.name}</span></div>}
           <div ref={visual} className="grid gap-3 rounded-2xl bg-night-900 p-4 md:grid-cols-4">
             <div className="title-caps md:col-span-4 text-2xl">Tirage — {comp.name}</div>
             {groups.map((g) => (
               <div key={g.id} className="glass rounded-xl p-3"><div className="title-caps mb-2 text-neon">{g.name}</div>
-                {(res.get(g.id) ?? []).map((t) => <div key={t} className="flex animate-[fadein_.5s_ease] items-center gap-2 py-1 text-sm"><TeamLogo team={L.team.get(t)} size={20} />{L.team.get(t)?.name}</div>)}
+                {(res.get(g.id) ?? []).map((t) => <div key={t} className="flex animate-[fadein_.5s_ease] items-center gap-2 py-1 text-sm"><TeamLogo team={L.team.get(t)} size="xs" />{L.team.get(t)?.name}</div>)}
               </div>
             ))}
           </div>

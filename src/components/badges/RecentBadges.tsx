@@ -29,7 +29,7 @@ export function BadgeUnlockedCard({ b, player, team, date }: { b: BadgeState; pl
       <div style={{ marginTop: 10, fontSize: 30, fontWeight: 800, color: accent }}>{RARITY_LABEL[m.rarity]}{m.level ? ` · palier ${ROMAN[m.level]}` : ''}</div>
       <div style={{ marginTop: 8, fontSize: 28, color: 'rgb(255 255 255 / .75)' }}>{b.def.description}</div>
       <div style={{ marginTop: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 22 }}>
-        {team && <TeamLogo team={team} size={88} />}
+        {team && <TeamLogo team={team} size="xl" />}
         <div style={{ textAlign: 'left' }}>
           <div className="font-display" style={{ fontSize: 52, fontWeight: 900, lineHeight: 1 }}>{playerName(player)}</div>
           <div style={{ fontSize: 26, color: 'rgb(255 255 255 / .7)' }}>{team?.name}{date ? ` · ${fmtDate(date, 'd MMMM yyyy')}` : ''}</div>

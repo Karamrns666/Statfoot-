@@ -95,7 +95,7 @@ export default function Home() {
       if (!r || !(value > 0)) return
       const p = L.player.get(r.item.player_id), t = team(r.item.team_id)
       if (!p) return
-      out.push({ key, kind: 'player', eyebrow, title: playerShort(p), value, unit, image: t?.logo_url, color: t?.primary_color, photo: p.photo_url, initials: initials(p), sub: t?.name, href: `/joueurs/${p.id}`, tone })
+      out.push({ key, kind: 'player', eyebrow, title: playerShort(p), value, unit, team: t, image: t?.logo_url, color: t?.primary_color, photo: p.photo_url, initials: initials(p), sub: t?.name, href: `/joueurs/${p.id}`, tone })
     }
     const xp1 = race(league, list, 'xp', sid)[0]; pushPlayer('xp', 'Meilleur joueur · classement XP', xp1, xp1?.item.xp ?? 0, 'XP', 'orange')
     const sc = race(league, list, 'top_scorer', sid)[0]; pushPlayer('scorer', 'Meilleur buteur', sc, sc?.item.goals ?? 0, 'BUTS', 'orange')
@@ -103,7 +103,7 @@ export default function Home() {
     const gk = race(league, list, 'golden_glove', sid)[0]; pushPlayer('keeper', 'Meilleur gardien', gk, gk?.item.saves ?? 0, 'ARRÊTS', 'white')
     const pushTeam = (key: string, eyebrow: string, id: string | undefined, value: ReactNode, unit: string, sub: string, tone: BillboardSlide['tone']) => {
       const t = team(id); if (!t) return
-      out.push({ key, kind: 'team', eyebrow, title: t.name, value, unit, image: t.logo_url, color: t.primary_color, sub, href: `/equipes/${t.id}`, tone })
+      out.push({ key, kind: 'team', eyebrow, title: t.name, value, unit, team: t, image: t.logo_url, color: t.primary_color, sub, href: `/equipes/${t.id}`, tone })
     }
     const tstats = [...teamStatsAll.values()].filter((t) => t.played > 0)
     const att = bestAttack(tstats)[0]
@@ -113,7 +113,7 @@ export default function Home() {
     const lastMotm = db.Match.filter((m) => m.season_id === sid && m.status === 'finished' && m.motm_player_id).sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''))[0]
     if (lastMotm) {
       const p = L.player.get(lastMotm.motm_player_id!), t = team(p?.team_id), h = team(lastMotm.home_team_id), aw = team(lastMotm.away_team_id)
-      if (p) out.push({ key: 'motm', kind: 'player', eyebrow: `Homme du dernier match${lastMotm.number ? ` · ${lastMotm.number}` : ''}`, title: playerShort(p), image: t?.logo_url, color: t?.primary_color, photo: p.photo_url, initials: initials(p), sub: `${h?.short_name ?? ''} ${lastMotm.home_score ?? ''} – ${lastMotm.away_score ?? ''} ${aw?.short_name ?? ''}`, href: `/matchs/${lastMotm.id}`, tone: 'orange' })
+      if (p) out.push({ key: 'motm', kind: 'player', eyebrow: `Homme du dernier match${lastMotm.number ? ` · ${lastMotm.number}` : ''}`, title: playerShort(p), team: t, image: t?.logo_url, color: t?.primary_color, photo: p.photo_url, initials: initials(p), sub: `${h?.short_name ?? ''} ${lastMotm.home_score ?? ''} – ${lastMotm.away_score ?? ''} ${aw?.short_name ?? ''}`, href: `/matchs/${lastMotm.id}`, tone: 'orange' })
     }
     return out
   }, [sid, comps, teamsInSeason, league, xpAll, teamStatsAll, L, season, notStarted, db.Match])
@@ -253,7 +253,7 @@ export default function Home() {
               <div key={k} className="flex gap-10" aria-hidden={k === 1}>
                 {db.Team.filter((t) => teamsInSeason.has(t.id)).map((t) => (
                   <Link key={t.id} to={`/equipes/${t.id}`} tabIndex={k === 1 ? -1 : undefined} className="flex w-24 flex-col items-center gap-2 opacity-80 transition hover:opacity-100">
-                    <TeamLogo team={t} size={64} />
+                    <TeamLogo team={t} size="lg" />
                     <span className="text-center text-xs font-semibold text-muted-foreground">{t.company}</span>
                   </Link>
                 ))}

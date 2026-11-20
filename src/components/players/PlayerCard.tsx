@@ -2,16 +2,14 @@
 // note (XP ou IPG), rôle, logo du club, nom et stats principales. La couleur suit le badge d'ancienneté
 // du club (Platinum nacré · Gold · Silver) ; en haut à droite, jusqu'à 3 badges de performance, du plus
 // rare au plus courant. Verso blanc, retournement 3D au clic (ou Entrée / Espace).
-import { logoPlate, logoSrc } from '@/lib/logoPlate'
 import { useBakedPhoto } from '@/hooks/useBakedPhoto'
-import { useTrimmedImage } from '@/hooks/useTrimmedImage'
 import { InfoTip } from '@/components/league/InfoTip'
 import type { GlossaryId } from '@/lib/glossary'
 import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { RotateCw } from 'lucide-react'
 import type { Position, Team } from '@/types/entities'
-import { isBrandLogo, teamLogoSvg } from '@/lib/logos'
+import { TeamLogo } from '@/components/league/Identity'
 import { cn } from '@/lib/utils'
 import { RankDelta } from '@/components/league/Bits'
 import { BadgeEmblem } from '@/components/badges/BadgeEmblem'
@@ -136,24 +134,11 @@ export function PlayerCard(p: PlayerCardProps) {
   )
 }
 
-function cardLogo(p: PlayerCardProps) {
-  return logoSrc(p.team) || (p.teamName ? teamLogoSvg(p.teamName.replace(/[^A-Za-zÀ-ÿ ]/g, '').split(/\s+/).map((w) => w[0]).join('').slice(0, 3).toUpperCase(), '#6CB4CC', '#0B2E73') : undefined)
-}
-
-/**
- * Logo d'équipe à taille VISUELLE égale : marges retirées, puis même surface pour tous les logos
- * (un logo très large devient moins haut, un logo carré plus haut), dans la limite du cartouche.
- */
-function TrimmedLogo({ src, alt }: { src: string; alt: string }) {
-  const t = useTrimmedImage(src)
-  const [ratio, setRatio] = useState(1)
-  const AREA = 15, MAX_H = 2.9, MAX_W = 10.4 // en em
-  let h = Math.min(MAX_H, Math.sqrt(AREA / ratio)), w = h * ratio
-  // logo large (> 2 × plus large que haut) : toute la largeur du cartouche, pour rester lisible
-  if (ratio > 2) { w = Math.min(MAX_W, MAX_H * ratio); h = w / ratio }
-  if (w > MAX_W) { w = MAX_W; h = w / ratio }
-  return <img src={t} alt={alt} draggable={false} onLoad={(e) => { const i = e.currentTarget; if (i.naturalWidth && i.naturalHeight) setRatio(i.naturalWidth / i.naturalHeight) }}
-    className="block object-contain" style={{ width: `${w}em`, height: `${h}em` }} />
+/** équipe du joueur (ou équipe minimale à partir du nom, logo généré aux initiales) pour la tuile TeamLogo */
+function cardTeam(p: PlayerCardProps): Team | undefined {
+  if (p.team) return p.team
+  if (!p.teamName) return undefined
+  return { id: '', name: p.teamName, short_name: p.teamName.replace(/[^A-Za-zÀ-ÿ ]/g, '').split(/\s+/).map((w) => w[0]).join('').slice(0, 3).toUpperCase(), primary_color: '#6CB4CC', secondary_color: '#0B2E73' } as Team
 }
 
 function CardFront({ p }: { p: PlayerCardProps }) {
@@ -162,8 +147,7 @@ function CardFront({ p }: { p: PlayerCardProps }) {
   const st = SENIORITY_STYLE[tier]
   const medals = sortByRarity(p.medals ?? []).slice(0, 3)
   const color = p.team?.primary_color ?? '#0B2E73'
-  const logo = cardLogo(p)
-  const plate = p.team?.logo_url ? logoPlate(p.team) : { bg: logo && isBrandLogo(logo) ? '#FFFFFF' : null, dark: false }
+  const ct = cardTeam(p)
   const teamLabel = p.team?.name ?? p.teamName ?? ''
   return (
     <TierSurface tier={tier} className="group-focus-visible:outline-2 group-focus-visible:outline-neon">
@@ -197,12 +181,10 @@ function CardFront({ p }: { p: PlayerCardProps }) {
             <span className="relative min-w-0 max-w-[80%]"><span className="block truncate">{teamLabel}</span>{p.delta !== undefined && <span className="absolute left-full top-1/2 ml-1.5 -translate-y-1/2"><RankDelta delta={p.delta} /></span>}</span>
           </div>
         </div>
-        {/* grand cartouche du logo de l'équipe (remplit l'espace entre le nom et les stats) */}
-        {logo && (
-          <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center px-[9%] py-[.35em]">
-            <div className={cn('flex h-[3.5em] w-full items-center justify-center overflow-hidden rounded-[.7em] px-[.6em] py-[.2em]', plate.bg ? 'shadow-[0_.25em_.8em_rgb(0_0_0/.3)] ring-1 ring-black/5' : 'bg-white/10 ring-1 ring-white/20')} style={{ background: plate.bg ?? undefined }}>
-              <TrimmedLogo src={logo} alt={teamLabel} />
-            </div>
+        {/* tuile du logo de l'équipe (même tuile que tout le site, logo principal) entre le nom et les stats */}
+        {ct && (
+          <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center py-[.35em]">
+            <div className="relative size-[3.6em] drop-shadow-[0_.25em_.6em_rgb(0_0_0/.3)]"><TeamLogo team={ct} fluid /></div>
           </div>
         )}
         <div className="relative mt-auto grid grid-cols-4 divide-x divide-white/15 border-t-[.22em] border-[#F05A22]" style={{ background: st.bar, color: st.barText }}>
@@ -221,13 +203,13 @@ function CardFront({ p }: { p: PlayerCardProps }) {
 function CardBack({ p }: { p: PlayerCardProps }) {
   const st = SENIORITY_STYLE[p.tier ?? 'silver']
   const medals = p.medals ?? []
-  const logo = cardLogo(p)
+  const ct = cardTeam(p)
   const teamLabel = p.team?.name ?? p.teamName ?? ''
   return (
     <div className="pcard-face pcard-back pcard-shape overflow-hidden rounded-b-2xl" style={{ background: st.frame, padding: 3 }}>
       <div className="pcard-shape flex h-full flex-col rounded-b-[13px] bg-white px-[8%] pb-[6%] pt-[12%] text-ink">
         <div className="flex items-center gap-[.6em]">
-          {logo && <img src={logo} alt="" className={cn('size-[2.8em] object-contain', isBrandLogo(logo) && 'rounded-[22%] ring-1 ring-black/10')} />}
+          {ct && <div className="relative size-[2.8em] shrink-0"><TeamLogo team={ct} fluid /></div>}
           <div className="min-w-0">
             <div className="truncate font-display text-[1.8em] font-black uppercase leading-none">{p.lastName}</div>
             <div className="truncate text-[.95em] text-ink/70">{p.firstName} · {teamLabel}</div>

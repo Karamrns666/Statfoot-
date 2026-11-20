@@ -107,7 +107,7 @@ function LinkDialog(props: Props & { open: boolean; onOpenChange: (o: boolean) =
                 const x = s.item as Team & Player
                 return (
                   <li key={x.id} className="flex items-center gap-2 rounded-xl border border-white/10 p-2 text-sm">
-                    {isTeam && <TeamLogo team={x as Team} size={28} />}
+                    {isTeam && <TeamLogo team={x as Team} size="sm" />}
                     <span className="min-w-0 flex-1"><span className="block truncate font-semibold">{isTeam ? x.name : `${x.first_name} ${x.last_name}`}</span><span className="text-xs text-muted-foreground">{seasonName(s.seasonId)}{!isTeam ? ` · ${db.Team.find((t) => t.id === x.team_id)?.name ?? ''}` : ''}</span></span>
                     <Badge variant={s.score >= 0.85 ? 'success' : 'outline'}>{Math.round(s.score * 100)} %</Badge>
                     <Button size="sm" onClick={() => approve(x.id)}><Check />Approuver</Button>

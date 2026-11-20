@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { ChevronRight, Star } from 'lucide-react'
 import type { Match, Team } from '@/types/entities'
 import { useLookup } from '@/hooks/useData'
-import { TeamLogo } from '@/components/league/Identity'
+import { FitName, TeamLogo } from '@/components/league/Identity'
 import { fmtHour } from '@/lib/matchTime'
 import { STAGE_LABELS } from '@/lib/schedule'
 import { cn } from '@/lib/utils'
@@ -52,8 +52,8 @@ function LiveMinute({ match }: { match: Match }) {
 function TeamLine({ team, score, winner, loser, live, fav, onFav }: { team?: Team; score: number | null; winner?: boolean; loser?: boolean; live?: boolean; fav?: boolean; onFav?: () => void }) {
   return (
     <div className="flex items-center gap-2.5 py-0.5">
-      <TeamLogo team={team} size={24} />
-      <span className={cn('min-w-0 flex-1 truncate text-[15px]', winner ? 'font-bold text-white' : loser ? 'text-muted-foreground' : 'font-semibold')}>{team?.name ?? 'À déterminer'}</span>
+      <TeamLogo team={team} size="xs" />
+      <FitName team={team} className={cn('flex-1 text-[15px]', winner ? 'font-bold text-white' : loser ? 'text-muted-foreground' : 'font-semibold')} />
       {onFav && team && (
         <button type="button" onClick={onFav} aria-pressed={fav} aria-label={fav ? `Retirer ${team.name} des favoris` : `Ajouter ${team.name} aux favoris`} className="hit pointer-events-auto relative z-10 cursor-pointer rounded p-1 text-white/25 hover:text-award-gold">
           <Star className={cn('size-4', fav && 'fill-award-gold text-award-gold')} />

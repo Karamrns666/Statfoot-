@@ -23,7 +23,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { FilterSelect } from '@/components/league/FilterSelect'
-import { TeamLogo } from '@/components/league/Identity'
+import { FitName, TeamLogo } from '@/components/league/Identity'
 import { toast } from '@/components/ui/toast'
 import { DivisionMark, PreseasonTable } from '@/components/preseason/PreseasonTable'
 import { DrawProjection } from '@/components/preseason/DrawProjection'
@@ -219,10 +219,10 @@ function ActionCard({ v, seasonName }: { v: PreseasonView; seasonName: string })
                   {pending.pairs.map((p, i) => (
                     <tr key={i} className="border-t border-white/5">
                       <td className="num py-1.5">{i + 1}</td>
-                      <td><span className="flex items-center gap-2"><TeamLogo team={L.team.get(p.home)} size={22} />{name(p.home)}</span></td>
+                      <td><span className="flex items-center gap-2"><TeamLogo team={L.team.get(p.home)} size="xs" />{name(p.home)}</span></td>
                       <td className="num text-center">{before.get(p.home) ?? 0}</td>
                       <td className="text-center text-muted-foreground">–</td>
-                      <td><span className="flex items-center gap-2"><TeamLogo team={L.team.get(p.away)} size={22} />{name(p.away)}</span></td>
+                      <td><span className="flex items-center gap-2"><TeamLogo team={L.team.get(p.away)} size="xs" />{name(p.away)}</span></td>
                       <td className="num text-center">{before.get(p.away) ?? 0}</td>
                       <td className="text-muted-foreground">{p.reason}{p.manual && <span className="ml-1 text-amber-300">· modifié : {p.manual.motif}</span>}</td>
                     </tr>
@@ -319,7 +319,7 @@ function TiebreakDialog({ v, onClose }: { v: PreseasonView; onClose: () => void 
         <ol className="max-h-[50dvh] space-y-1 overflow-y-auto pr-1">
           {list.map((id, i) => (
             <li key={id} className="flex items-center gap-2 rounded-lg bg-white/[.03] px-2 py-1 text-sm">
-              <span className="num w-6 text-right text-muted-foreground">{i + 1}</span><TeamLogo team={L.team.get(id)} size={20} /><span className="flex-1 truncate">{L.team.get(id)?.name}</span>
+              <span className="num w-6 text-right text-muted-foreground">{i + 1}</span><TeamLogo team={L.team.get(id)} size="xs" /><FitName team={L.team.get(id)} className="flex-1" />
               <button onClick={() => move(i, -1)} className="cursor-pointer rounded p-1 hover:bg-white/10" aria-label="Monter"><ArrowUp className="size-4" /></button>
               <button onClick={() => move(i, 1)} className="cursor-pointer rounded p-1 hover:bg-white/10" aria-label="Descendre"><ArrowDown className="size-4" /></button>
             </li>

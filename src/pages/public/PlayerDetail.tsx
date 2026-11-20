@@ -138,7 +138,7 @@ export default function PlayerDetail() {
             </div>
             <h1 className="title-caps mt-2 text-4xl sm:text-6xl">{p.first_name} <span className="text-neon">{p.last_name}</span></h1>
             <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-sm text-muted-foreground sm:justify-start">
-              <Link to={`/equipes/${t?.id}`} className="flex items-center gap-2 hover:text-neon"><TeamLogo team={t} size={22} />{t?.name}</Link>
+              <Link to={`/equipes/${t?.id}`} className="flex items-center gap-2 hover:text-neon"><TeamLogo team={t} size="xs" />{t?.name}</Link>
               {p.number != null && <span>n°{p.number}</span>}{p.birth_date && <span>{ageAt(p.birth_date)} ans</span>}
             </div>
             {titles.length > 0 && <div className="mt-3 flex flex-wrap justify-center gap-2 sm:justify-start">{titles.slice(0, 3).map((x) => <span key={x.key} className="rounded-full bg-award-gold/15 px-3 py-1 text-xs font-bold text-award-gold">★ {x.label}</span>)}</div>}
@@ -262,7 +262,7 @@ export default function PlayerDetail() {
         <h2 className="px-2 pt-2 font-display text-2xl font-black">Détail de l’XP</h2>
         <SortableTable rows={xpRows} rowKey={(r) => r.m.id} initial={{ key: 'date', dir: 'asc' }} columns={[
           { key: 'date', label: 'Date', first: 'asc', className: 'whitespace-nowrap text-xs text-muted-foreground', sort: (r) => r.m.date ?? '', render: (r) => <Link to={`/matchs/${r.m.id}`} className="tap-sm inline-block hover:text-neon">{fmtDate(r.m.date, 'dd/MM')} · J{r.m.round}</Link> },
-          { key: 'opp', label: 'Adversaire', sort: (r) => r.opp?.name, render: (r) => <span className="flex items-center gap-2 text-sm"><TeamLogo team={r.opp} size={18} /><span className="truncate">{r.opp?.name}</span>{r.oppRank ? <span className="text-xs text-muted-foreground">({ordinal(r.oppRank)})</span> : null}</span> },
+          { key: 'opp', label: 'Adversaire', sort: (r) => r.opp?.name, render: (r) => <span className="flex items-center gap-2 text-sm"><TeamLogo team={r.opp} size="xs" /><span className="truncate">{r.opp?.name}</span>{r.oppRank ? <span className="text-xs text-muted-foreground">({ordinal(r.oppRank)})</span> : null}</span> },
           { key: 'goals', label: 'B', title: 'Buts', headClassName: 'text-center', className: 'num text-center', sort: (r) => r.goals, render: (r) => r.goals },
           { key: 'assists', label: 'PD', title: 'Passes décisives', headClassName: 'text-center', className: 'num text-center', sort: (r) => r.assists, render: (r) => r.assists },
           { key: 'mult', label: 'Import.', title: "Multiplicateur selon le rang de l'adversaire", headClassName: 'text-center', className: 'text-center text-xs', sort: (r) => r.mult || null, render: (r) => (r.mult ? `×${String(r.mult).replace('.', ',')}` : '—') },

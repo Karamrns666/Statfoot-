@@ -105,7 +105,7 @@ export default function DisciplineAdmin() {
               const pv = pvs.find((x) => x.id === c.pv_id)
               return (
                 <li key={c.id} className="flex flex-wrap items-center gap-x-3 gap-y-1.5 py-2.5 text-sm">
-                  <TeamLogo team={L.team.get(c.team_id)} size={26} />
+                  <TeamLogo team={L.team.get(c.team_id)} size="xs" />
                   <span className="min-w-0 flex-1"><b>{p?.first_name} {p?.last_name}</b> <span className="text-muted-foreground">· {fmtDate(c.decided_at, 'd MMM')}</span><span className="block text-xs text-muted-foreground">{c.incident}</span></span>
                   <Badge variant={c.decision === 'suspension' ? 'destructive' : 'secondary'}>{sanctionLabel(c.decision ?? 'warning', c.decision_matches ?? 0)}</Badge>
                   {c.decision === 'suspension' && r && <span className={cn('text-xs font-semibold', r.served.length >= r.matches ? 'text-win' : 'text-red-300')}>{r.served.length >= r.matches ? 'purgée' : `${r.matches - r.served.length} à purger`}</span>}
@@ -188,7 +188,7 @@ function CaseCard({ c, seasonId }: { c: DisciplineCase; seasonId: string }) {
   return (
     <article className="rounded-2xl border border-white/10 bg-night-900/50 p-4">
       <header className="flex flex-wrap items-start gap-3">
-        <TeamLogo team={t} size={36} />
+        <TeamLogo team={t} size="md" />
         <div className="min-w-0 flex-1">
           <h3 className="font-display text-lg font-black uppercase leading-tight">{p?.first_name} {p?.last_name} <span className="text-sm font-semibold normal-case text-muted-foreground">· {t?.name}</span></h3>
           <p className="text-sm text-muted-foreground">{m ? <Link to={`/admin/matchs/${m.id}`} className="hover:text-neon">{L.team.get(m.home_team_id)?.short_name}–{L.team.get(m.away_team_id)?.short_name}, {fmtDate(m.date, 'd MMM')}</Link> : 'Hors match'} · {c.incident}</p>
@@ -221,7 +221,7 @@ function CaseCard({ c, seasonId }: { c: DisciplineCase; seasonId: string }) {
             <p className="flex items-center gap-1.5 text-xs font-bold uppercase text-muted-foreground"><Users className="size-3.5" />Capitaines qui votent <ArtLink art={COUNCIL.artVoters} /></p>
             <p className="mt-1 text-sm">{voters.voters ? <>Équipe en <DivisionMark div={voters.division!} size={16} className="text-xs" /> : votent les capitaines <DivisionMark div={voters.voters} size={16} className="text-xs" /> ({captains.length}).</> : <span className="text-amber-200">Les divisions ne sont pas encore formées (pré-saison) : à défaut, tous les autres capitaines ({captains.length}).</span>}</p>
             <ul className="mt-2 grid max-h-48 gap-x-3 gap-y-1 overflow-auto text-sm sm:grid-cols-2">
-              {captains.map(({ team, cap }) => <li key={team!.id} className="flex min-w-0 items-center gap-1.5"><TeamLogo team={team} size={18} /><span className="truncate">{cap ? `${cap.first_name} ${cap.last_name}` : <span className="text-amber-300">capitaine non désigné</span>}</span><span className="shrink-0 text-xs text-muted-foreground">{team!.short_name}</span></li>)}
+              {captains.map(({ team, cap }) => <li key={team!.id} className="flex min-w-0 items-center gap-1.5"><TeamLogo team={team} size="xs" /><span className="truncate">{cap ? `${cap.first_name} ${cap.last_name}` : <span className="text-amber-300">capitaine non désigné</span>}</span><span className="shrink-0 text-xs text-muted-foreground">{team!.short_name}</span></li>)}
             </ul>
           </div>
         </div>

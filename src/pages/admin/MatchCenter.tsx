@@ -252,7 +252,7 @@ export default function MatchCenter() {
               <button key={s} disabled={!canWrite || !isPlaying(period)} onClick={() => { vibrate(); mutateLive((x, t) => setPossession(x, s, t)) }} aria-pressed={active}
                 className={cn('flex min-h-16 flex-col items-center justify-center rounded-2xl px-2 py-2 font-display font-bold uppercase transition cursor-pointer disabled:cursor-default', team ? '' : 'border-2', active ? 'ring-4 ring-white ring-offset-2 ring-offset-night-950' : team ? '' : 'border-white/10 text-muted-foreground')}
                 style={team ? sideStyle(s === 'home' ? colors.home : colors.away, { dim: !active && !!ls?.possession?.current }) : active ? { background: '#ffffff22' } : undefined}>
-                <span className="flex items-center gap-1.5 text-sm sm:text-base">{team && <TeamLogo team={team} size={22} />}{s === 'dead' ? 'Ballon mort' : team?.short_name}</span>
+                <span className="flex items-center gap-1.5 text-sm sm:text-base">{team && <TeamLogo team={team} size="xs" />}{s === 'dead' ? 'Ballon mort' : team?.short_name}</span>
                 <span className="num text-lg">{fmtClock(msv)}{s !== 'dead' && <span className="ml-1 text-sm opacity-80">{s === 'home' ? pos.home_pct : pos.away_pct}%</span>}</span>
               </button>
             )
@@ -317,7 +317,7 @@ function ScoreSide({ team, scorers, xp, align = 'left', color }: { color?: SideC
   const L = useLookup()
   return (
     <div className="flex min-w-0 flex-col items-center gap-1 text-center">
-      <TeamLogo team={team} size={64} />
+      <TeamLogo team={team} size="lg" />
       <div className="title-caps max-w-full rounded-lg px-2 py-0.5 text-base leading-tight sm:text-xl" style={color ? sideStyle(color) : undefined}>{team?.name}</div>
       <ul className={cn('w-full space-y-0.5 text-[11px] sm:text-xs', align === 'right' ? 'text-right' : 'text-left')}>
         {scorers.map((e) => (
@@ -415,7 +415,7 @@ function SummaryPanel({ match, events, canEdit, onEdit, onDelete }: { match: Mat
             return (
               <div key={e.id} className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 py-0.5 text-sm">
                 <div className="text-right">{home && txt}</div>
-                <div className="flex items-center gap-1"><span className="num flex min-w-14 items-center justify-center gap-1 rounded-md px-1 py-0.5 text-xs" style={sideStyle(sideColor(match, colors, e.team_id))}><TeamLogo team={L.team.get(e.team_id)} size={14} />{fmtMinute(e.minute, e.added_minute)}</span></div>
+                <div className="flex items-center gap-1"><span className="num flex min-w-14 items-center justify-center gap-1 rounded-md px-1 py-0.5 text-xs" style={sideStyle(sideColor(match, colors, e.team_id))}><TeamLogo team={L.team.get(e.team_id)} size="xs" />{fmtMinute(e.minute, e.added_minute)}</span></div>
                 <div className="flex items-center gap-1">{!home && txt}
                   {canEdit && <span className={cn('ml-auto flex gap-0.5', home && 'order-first mr-auto ml-0')}>
                     <button className="flex size-10 items-center justify-center rounded-lg text-muted-foreground hover:bg-white/5 hover:text-white lg:size-8" onClick={() => onEdit(e)} title="Corriger" aria-label="Corriger"><Pencil className="size-3.5" /></button>
@@ -444,7 +444,7 @@ function XPPanel({ lines, validated }: { lines: ReturnType<typeof matchXPLines>;
       <div className="max-h-96 space-y-1 overflow-y-auto">
         {sorted.map(({ pid, ls, total }) => (
           <details key={pid} className="rounded-lg bg-white/[.03] px-2 py-1">
-            <summary className="flex cursor-pointer list-none items-center gap-2 text-sm"><TeamLogo team={L.team.get(L.player.get(pid)?.team_id ?? '')} size={16} /><span className="flex-1 truncate">{playerShort(L.player.get(pid))}</span><span className={cn('num text-base', total >= 0 ? 'text-neon' : 'text-sky-400')}>{total > 0 ? '+' : ''}{total}</span></summary>
+            <summary className="flex cursor-pointer list-none items-center gap-2 text-sm"><TeamLogo team={L.team.get(L.player.get(pid)?.team_id ?? '')} size="xs" /><span className="flex-1 truncate">{playerShort(L.player.get(pid))}</span><span className={cn('num text-base', total >= 0 ? 'text-neon' : 'text-sky-400')}>{total > 0 ? '+' : ''}{total}</span></summary>
             <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">{ls.map((l, i) => <li key={i} className="flex justify-between"><span>{XP_LABELS[l.key]}{l.count > 1 ? ` ×${l.count}` : ''}{l.detail ? ` · ${l.detail}` : ''}</span><span className="text-white">{l.points > 0 ? '+' : ''}{l.points}</span></li>)}</ul>
           </details>
         ))}

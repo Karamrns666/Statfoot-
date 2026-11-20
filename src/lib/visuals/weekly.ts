@@ -7,6 +7,7 @@ import { matchXPLines, xpConfig, type XPData } from '@/lib/xp'
 import { keeperMatchStats } from '@/lib/matchEngine'
 import type { LeagueData } from '@/lib/stats'
 import { shortName } from './model'
+import { logoPlate, tileLogo } from '@/lib/logoPlate'
 
 const upper = (s: string) => s.toLocaleUpperCase('fr-FR')
 
@@ -24,7 +25,7 @@ export function roundMatches(league: Pick<LeagueData, 'matches'>, competitionId:
 // ---------------------------------------------------------------------------
 //  Résultats de la journée
 // ---------------------------------------------------------------------------
-export interface WeeklyResultRow { tag: string; home: { name: string; logo?: string; color?: string }; away: { name: string; logo?: string; color?: string }; score: string; sub?: string }
+export interface WeeklyResultRow { tag: string; home: { name: string; logo?: string; logoBg?: string; color?: string }; away: { name: string; logo?: string; logoBg?: string; color?: string }; score: string; sub?: string }
 export function weeklyResults(league: LeagueData, competitionId: string, round: number): WeeklyResultRow[] {
   const T = new Map(league.teams.map((t) => [t.id, t]))
   return roundMatches(league, competitionId, round).map((m) => {
@@ -34,8 +35,8 @@ export function weeklyResults(league: LeagueData, competitionId: string, round: 
     const pitch = m.pitch?.match(/\d+/)?.[0]
     return {
       tag: pitch ? `T${pitch}` : time || '—',
-      home: { name: upper(h?.short_name || h?.name || '?'), logo: h?.logo_url, color: h?.primary_color },
-      away: { name: upper(a?.short_name || a?.name || '?'), logo: a?.logo_url, color: a?.primary_color },
+      home: { name: upper(h?.short_name || h?.name || '?'), logo: tileLogo(h, true), logoBg: logoPlate(h).bg, color: h?.primary_color },
+      away: { name: upper(a?.short_name || a?.name || '?'), logo: tileLogo(a, true), logoBg: logoPlate(a).bg, color: a?.primary_color },
       score: played ? `${m.home_score ?? 0} - ${m.away_score ?? 0}` : time || 'vs',
       sub: m.forfeit_team_id ? 'T.V.' : m.penalties && m.home_pens != null && m.away_pens != null ? `t.a.b. ${m.home_pens}-${m.away_pens}` : undefined,
     }
@@ -45,12 +46,12 @@ export function weeklyResults(league: LeagueData, competitionId: string, round: 
 // ---------------------------------------------------------------------------
 //  Classement après la journée
 // ---------------------------------------------------------------------------
-export interface WeeklyStandingRow extends StandingRow { name: string; short: string; logo?: string; color?: string }
+export interface WeeklyStandingRow extends StandingRow { name: string; short: string; logo?: string; logoBg?: string; color?: string }
 export function weeklyStandings(league: LeagueData, competitionId: string, round: number): WeeklyStandingRow[] {
   const T = new Map(league.teams.map((t) => [t.id, t]))
   return competitionStandings(league, competitionId, { beforeRound: round + 1 }).map((r) => {
     const t = T.get(r.team_id)
-    return { ...r, name: upper(t?.name ?? '?'), short: upper(t?.short_name ?? ''), logo: t?.logo_url, color: t?.primary_color }
+    return { ...r, name: upper(t?.name ?? '?'), short: upper(t?.short_name ?? ''), logo: tileLogo(t, true), logoBg: logoPlate(t).bg, color: t?.primary_color }
   })
 }
 

@@ -18,7 +18,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { TeamLogo } from '@/components/league/Identity'
+import { FitName, TeamLogo } from '@/components/league/Identity'
 import { StandingsTable } from '@/components/standings/StandingsTable'
 import { toast } from '@/components/ui/toast'
 import { maxRoundsFor, seededRng, selectionFixtures } from '@/lib/draw'
@@ -140,7 +140,7 @@ function DrawPanel({ comp }: { comp: Competition }) {
                   return (
                     <button key={t.id} type="button" onClick={() => toggle(t.id)} aria-pressed={on} className={cn('flex cursor-pointer items-center gap-2 rounded-lg border px-2 py-1.5 text-left text-sm transition', on ? 'border-neon/60 bg-neon/10' : 'border-white/10 hover:bg-white/5')}>
                       <span className={cn('flex size-4 shrink-0 items-center justify-center rounded border', on ? 'border-neon bg-neon' : 'border-white/30')}>{on && <Check className="size-3 text-white" />}</span>
-                      <TeamLogo team={t} size={20} /><span className="truncate">{t.name}</span>
+                      <TeamLogo team={t} size="xs" /><FitName team={t} />
                     </button>
                   )
                 })}
@@ -205,7 +205,7 @@ function FixturesGrid({ draw, revealAll }: { draw: Draw; revealAll?: boolean }) 
           <div className="mb-1 text-center font-display text-lg font-black text-neon">J{r}</div>
           {fx.map((f, i) => ({ f, i })).filter(({ f }) => f.round === r).map(({ f, i }) => (
             <div key={i} className={cn('flex items-center gap-1 rounded px-1.5 py-1 text-xs', i < shown ? 'bg-white/5' : 'text-transparent')}>
-              {i < shown ? <><TeamLogo team={L.team.get(f.home_team_id)} size={14} /><span className="truncate">{L.team.get(f.home_team_id)?.short_name}</span><span className="text-muted-foreground">–</span><span className="truncate">{L.team.get(f.away_team_id)?.short_name}</span><TeamLogo team={L.team.get(f.away_team_id)} size={14} /></> : '???'}
+              {i < shown ? <><TeamLogo team={L.team.get(f.home_team_id)} size="xs" /><span className="truncate">{L.team.get(f.home_team_id)?.short_name}</span><span className="text-muted-foreground">–</span><span className="truncate">{L.team.get(f.away_team_id)?.short_name}</span><TeamLogo team={L.team.get(f.away_team_id)} size="xs" /></> : '???'}
             </div>
           ))}
         </div>
@@ -317,9 +317,9 @@ function Ceremony({ draw, title, onClose }: { draw: Draw; title: string; onClose
           <div key={n} className="flex animate-[fadein_.6s_ease] flex-col items-center">
             <div className="mb-6 rounded-full bg-neon/20 px-4 py-1 font-display text-xl font-bold uppercase text-neon">Journée {last.round}</div>
             <div className="flex items-center gap-6 sm:gap-16">
-              <div className="flex flex-col items-center gap-3"><TeamLogo team={L.team.get(last.home_team_id)} size={160} className="size-28 sm:size-40" /><div className="title-caps text-2xl sm:text-4xl">{L.team.get(last.home_team_id)?.name}</div></div>
+              <div className="flex flex-col items-center gap-3"><span className="relative size-28 sm:size-40"><TeamLogo team={L.team.get(last.home_team_id)} fluid /></span><div className="title-caps text-2xl sm:text-4xl">{L.team.get(last.home_team_id)?.name}</div></div>
               <div className="title-caps text-4xl text-neon sm:text-7xl">VS</div>
-              <div className="flex flex-col items-center gap-3"><TeamLogo team={L.team.get(last.away_team_id)} size={160} className="size-28 sm:size-40" /><div className="title-caps text-2xl sm:text-4xl">{L.team.get(last.away_team_id)?.name}</div></div>
+              <div className="flex flex-col items-center gap-3"><span className="relative size-28 sm:size-40"><TeamLogo team={L.team.get(last.away_team_id)} fluid /></span><div className="title-caps text-2xl sm:text-4xl">{L.team.get(last.away_team_id)?.name}</div></div>
             </div>
           </div>
         ) : locked ? <div className="title-caps text-4xl text-win">Tirage publié</div> : <div className="title-caps text-4xl text-muted-foreground">Prêt pour la révélation</div>}

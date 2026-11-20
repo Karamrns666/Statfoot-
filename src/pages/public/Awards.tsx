@@ -12,7 +12,7 @@ import { useData, useLookup } from '@/hooks/useData'
 import { useSeason } from '@/hooks/useSeason'
 import { useEffectiveSeason, usePlayerXP, useRace } from '@/hooks/useStats'
 import { PageHeader, RankDelta, RookieBadge, EmptyState } from '@/components/league/Bits'
-import { PlayerAvatar, RoleBadge, TeamLogo } from '@/components/league/Identity'
+import { FitName, PlayerAvatar, RoleBadge, TeamLogo } from '@/components/league/Identity'
 import { AWARD_STYLE, TrophyBadge } from '@/components/awards/TrophyBadge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -84,7 +84,7 @@ function PlayerRace({ scope, raceKey, category }: { scope: XPScope; raceKey: Rac
                   <Link key={r.item.player_id} to={`/joueurs/${r.item.player_id}`} className="flex items-center gap-3 rounded-lg px-2 py-2.5 hover:bg-white/[.03]">
                     <div className="w-8 text-center"><div className="num text-xl" style={{ color: r.rank === 1 ? st.color : undefined }}>{r.rank}</div><RankDelta delta={r.delta} /></div>
                     <PlayerAvatar player={p} team={t} size={38} />
-                    <div className="min-w-0 flex-1"><div className="truncate font-semibold">{playerName(p)}</div><div className="flex items-center gap-1.5 text-xs text-muted-foreground"><TeamLogo team={t} size={14} />{t?.short_name}{p && rookie(p) && <RookieBadge />}</div></div>
+                    <div className="min-w-0 flex-1"><div className="truncate font-semibold">{playerName(p)}</div><div className="flex items-center gap-1.5 text-xs text-muted-foreground"><TeamLogo team={t} size="xs" />{t?.short_name}{p && rookie(p) && <RookieBadge />}</div></div>
                     {raceKey === 'golden_glove'
                       ? <div className="grid grid-cols-4 gap-2 text-center text-[10px] uppercase text-muted-foreground"><div><div className="num text-base text-white">{r.item.gk_matches}</div>MJ</div><div><div className="num text-base text-white">{r.item.clean_sheets}</div>CS</div><div><div className="num text-base text-white">{r.item.saves}</div>Arr.</div><div><div className="num text-base text-white">{r.item.conceded}</div>BC</div></div>
                       : <div className="hidden gap-3 text-center text-[10px] uppercase text-muted-foreground sm:flex"><div><div className="num text-base text-white">{r.item.matches}</div>MJ</div><div><div className="num text-base text-white">{r.item.goals}</div>Buts</div><div><div className="num text-base text-white">{r.item.assists}</div>Passes</div></div>}
@@ -110,7 +110,7 @@ function HeroCard({ r, raceKey, color }: { r: Ranked<PlayerXP>; raceKey: RaceKey
       <div className="mt-2 flex flex-col items-center text-center">
         <PlayerAvatar player={p} team={t} size={112} />
         <div className="title-caps mt-4 text-3xl leading-none">{p?.first_name}<br /><span style={{ color }}>{p?.last_name}</span></div>
-        <div className="mt-2 flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground"><TeamLogo team={t} size={20} />{t?.name}{p && <RoleBadge position={p.position} captain={p.is_captain} />}</div>
+        <div className="mt-2 flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground"><TeamLogo team={t} size="xs" />{t?.name}{p && <RoleBadge position={p.position} captain={p.is_captain} />}</div>
         {p && rookie(p) && <div className="mt-2"><RookieBadge /></div>}
         <div className="mt-4 grid w-full grid-cols-4 gap-2 rounded-2xl bg-black/20 p-3 text-center">
           {raceKey === 'golden_glove'
@@ -144,7 +144,7 @@ function TeamRace({ section }: { section: Section }) {
         <div className="grid gap-4 lg:grid-cols-5">
           <Link to={`/equipes/${t?.id}`} className="relative flex flex-col items-center overflow-hidden rounded-3xl border p-6 text-center lg:col-span-2" style={{ borderColor: `${st.color}55`, background: `radial-gradient(ellipse 80% 70% at 50% 0%, ${st.color}33, transparent 70%), linear-gradient(180deg,#0D2B66,#04163D)` }}>
             <span className="num self-start text-5xl" style={{ color: st.color }}>#1</span>
-            <TeamLogo team={t} size={120} />
+            <TeamLogo team={t} size="xl" />
             <div className="title-caps mt-3 text-3xl">{t?.name}</div>
             <div className="text-sm text-muted-foreground">{t?.company}</div>
             <div className="mt-4 grid w-full grid-cols-4 gap-2 rounded-2xl bg-black/20 p-3">{[['MJ', top.played], ['V', top.won], ['DIFF', top.gd], ['PTS', top.points]].map(([l, v]) => <div key={l}><div className="num text-2xl">{v}</div><div className="text-[10px] uppercase text-muted-foreground">{l}</div></div>)}</div>
@@ -152,7 +152,7 @@ function TeamRace({ section }: { section: Section }) {
           <Card className="lg:col-span-3"><CardContent className="divide-y divide-white/5 p-2 sm:p-3">
             {valid.slice(0, 5).map((r) => { const tt = L.team.get(r.team_id); return (
               <Link key={r.team_id} to={`/equipes/${r.team_id}`} className="flex items-center gap-3 px-2 py-3 hover:bg-white/[.03]">
-                <span className="num w-8 text-center text-xl">{r.rank}</span><TeamLogo team={tt} size={34} /><span className="flex-1 truncate font-semibold">{tt?.name}</span>
+                <span className="num w-8 text-center text-xl">{r.rank}</span><TeamLogo team={tt} size="sm" /><FitName team={tt} className="flex-1 font-semibold" />
                 <span className="text-xs text-muted-foreground">{r.played} MJ · {r.gd > 0 ? '+' : ''}{r.gd}</span><span className="num w-14 text-right text-2xl" style={{ color: st.color }}>{r.points}</span>
               </Link>) })}
           </CardContent></Card>
@@ -215,7 +215,7 @@ export function Palmares({ scope }: { scope?: NonNullable<Award['scope']> } = {}
                     <div className="title-caps mt-3 text-sm" style={{ color: st.color }}>{AWARD_LABELS[a.category]}</div>
                     {a.not_awarded ? <div className="mt-1 text-sm text-muted-foreground">Non attribué</div> : <>
                       <div className="mt-1 font-semibold">{p ? playerName(p) : t?.name}</div>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground"><TeamLogo team={t} size={14} />{p ? t?.short_name : t?.company}</div>
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground"><TeamLogo team={t} size="xs" />{p ? t?.short_name : t?.company}</div>
                     </>}
                   </div>
                 )

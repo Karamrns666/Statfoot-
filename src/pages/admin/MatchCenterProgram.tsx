@@ -77,7 +77,7 @@ export default function MatchCenterProgram() {
           {(['top_scorer', 'top_assist'] as const).map((k) => (
             <Card key={k}><CardHeader><CardTitle>{k === 'top_scorer' ? 'Top 10 buteurs' : 'Top 10 passeurs'}</CardTitle></CardHeader>
               <CardContent className="space-y-1">{race(league, x, k, seasonId).slice(0, 10).map((r) => (
-                <div key={r.item.player_id} className="flex items-center gap-2 text-sm"><span className="num w-5 text-muted-foreground">{r.rank}</span><TeamLogo team={L.team.get(r.item.team_id)} size={16} /><span className="flex-1 truncate">{playerShort(L.player.get(r.item.player_id))}</span><span className="num text-lg text-neon">{k === 'top_scorer' ? r.item.goals : r.item.assists}</span></div>
+                <div key={r.item.player_id} className="flex items-center gap-2 text-sm"><span className="num w-5 text-muted-foreground">{r.rank}</span><TeamLogo team={L.team.get(r.item.team_id)} size="xs" /><span className="flex-1 truncate">{playerShort(L.player.get(r.item.player_id))}</span><span className="num text-lg text-neon">{k === 'top_scorer' ? r.item.goals : r.item.assists}</span></div>
               ))}</CardContent></Card>
           ))}
         </div>
@@ -103,9 +103,9 @@ function ProgramCard({ m }: { m: Match }) {
         <span className={cn('rounded-full px-2 py-0.5 font-bold uppercase', isLive ? 'bg-red-500 text-white animate-pulse' : m.status === 'live' ? 'bg-amber-400/20 text-amber-200' : m.status === 'finished' ? 'bg-white/10' : 'bg-neon/10 text-neon')}>{label}</span>
       </div>
       <div className="mt-2 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-        <div className="flex items-center gap-2 truncate"><TeamLogo team={L.team.get(m.home_team_id)} size={28} /><span className="truncate font-semibold">{L.team.get(m.home_team_id)?.short_name ?? '?'}</span></div>
+        <div className="flex items-center gap-2 truncate"><TeamLogo team={L.team.get(m.home_team_id)} size="sm" /><span className="truncate font-semibold">{L.team.get(m.home_team_id)?.short_name ?? '?'}</span></div>
         <span className="num text-3xl">{m.status === 'scheduled' ? 'vs' : fmtScore(m)}</span>
-        <div className="flex items-center justify-end gap-2 truncate"><span className="truncate font-semibold">{L.team.get(m.away_team_id)?.short_name ?? '?'}</span><TeamLogo team={L.team.get(m.away_team_id)} size={28} /></div>
+        <div className="flex items-center justify-end gap-2 truncate"><span className="truncate font-semibold">{L.team.get(m.away_team_id)?.short_name ?? '?'}</span><TeamLogo team={L.team.get(m.away_team_id)} size="sm" /></div>
       </div>
       {ls && (pos.home_ms + pos.away_ms) > 0 && <div className="mt-2 flex h-1.5 overflow-hidden rounded-full bg-white/10"><div style={{ width: `${pos.home_pct}%`, background: L.team.get(m.home_team_id)?.primary_color }} /><div style={{ width: `${pos.away_pct}%`, background: L.team.get(m.away_team_id)?.primary_color }} /></div>}
       <div className="mt-1.5 text-[11px] text-muted-foreground">Opérateur : {ls?.lock_user_name ?? op?.full_name ?? '—'}</div>

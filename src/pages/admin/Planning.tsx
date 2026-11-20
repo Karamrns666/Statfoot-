@@ -127,8 +127,8 @@ function PlanCard({ m, name, dragging, movable, onStart, onEnd, onOpen }: { m: M
       className={cn('w-full cursor-grab rounded-xl border bg-night-900/80 p-2 text-left text-sm shadow-sm transition hover:border-neon/60 active:cursor-grabbing', m.published === false ? 'border-dashed border-amber-300/50' : 'border-white/15', dragging && 'opacity-40', !movable && 'cursor-not-allowed opacity-70')}
     >
       <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground"><b className="num text-foreground">{m.number ?? '—'}</b>{comp?.name} · {m.round && m.round > 4 && comp?.format === 'swiss' ? 'Rattrapage' : `J${m.round}`}{m.published === false && <Badge variant="warning" className="ml-auto px-1.5 py-0 text-[10px]">Non publié</Badge>}</div>
-      <div className="mt-1 flex min-w-0 items-center gap-1.5 font-semibold"><TeamLogo team={L.team.get(m.home_team_id)} size={18} /><span className="truncate">{name(m.home_team_id)}</span></div>
-      <div className="flex min-w-0 items-center gap-1.5 font-semibold"><TeamLogo team={L.team.get(m.away_team_id)} size={18} /><span className="truncate">{name(m.away_team_id)}</span></div>
+      <div className="mt-1 flex min-w-0 items-center gap-1.5 font-semibold"><TeamLogo team={L.team.get(m.home_team_id)} size="xs" /><span className="truncate">{name(m.home_team_id)}</span></div>
+      <div className="flex min-w-0 items-center gap-1.5 font-semibold"><TeamLogo team={L.team.get(m.away_team_id)} size="xs" /><span className="truncate">{name(m.away_team_id)}</span></div>
     </button>
   )
 }

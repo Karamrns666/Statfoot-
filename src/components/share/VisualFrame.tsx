@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import type { Team } from '@/types/entities'
 import { useData } from '@/hooks/useData'
+import { teamShortName } from '@/lib/logoPlate'
 import { TeamLogo } from '@/components/league/Identity'
 import { ARDENTIA_LOGO_LIGHT, MBL_LOGO } from '@/components/layout/Logo'
 
@@ -34,8 +35,9 @@ export function VisualTeam({ team, big }: { team?: Team; big?: boolean }) {
   const s = big ? 300 : 200
   return (
     <div className="flex flex-col items-center gap-4" style={{ width: s + 40 }}>
-      <TeamLogo team={team} size={s} />
-      <div className="title-caps text-white" style={{ fontSize: big ? 52 : 40 }}>{team?.short_name}</div>
+      {/* visuel exporté (1080 px) : tuile identique au site, à l'échelle du visuel */}
+      <div className="relative" style={{ width: s, height: s }}><TeamLogo team={team} fluid /></div>
+      <div className="title-caps text-center text-white" style={{ fontSize: big ? 52 : 40, lineHeight: 1 }}>{teamShortName(team)}</div>
     </div>
   )
 }

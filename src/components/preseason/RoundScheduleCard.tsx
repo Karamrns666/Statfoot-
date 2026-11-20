@@ -70,7 +70,7 @@ export function RoundScheduleCard({ v }: { v: PreseasonView }) {
     return (
       <tr className="border-t border-white/5">
         <td className="num py-1.5 font-bold">{m.number ?? '—'}</td>
-        <td><span className="flex items-center gap-1.5"><TeamLogo team={L.team.get(m.home_team_id)} size={20} />{name(m.home_team_id)}<span className="text-muted-foreground">–</span>{name(m.away_team_id)}<TeamLogo team={L.team.get(m.away_team_id)} size={20} /></span></td>
+        <td><span className="flex items-center gap-1.5"><TeamLogo team={L.team.get(m.home_team_id)} size="xs" />{name(m.home_team_id)}<span className="text-muted-foreground">–</span>{name(m.away_team_id)}<TeamLogo team={L.team.get(m.away_team_id)} size="xs" /></span></td>
         <td><Input aria-label={`Date ${m.number}`} type="date" value={day} onChange={(e) => set(e.target.value, time || DEFAULT_SLOTS[0], m.pitch)} className="h-9 w-40" /></td>
         <td><select aria-label={`Heure ${m.number}`} className={sel} value={time} disabled={!day} onChange={(e) => set(day, e.target.value, m.pitch)}>
           {!time && <option value="">—</option>}

@@ -111,7 +111,7 @@ export default function MatchesAdmin() {
                 <TableRow key={m.id}>
                   <TableCell className="text-xs"><div>{fmtDate(m.date, 'EEE d MMM')}</div><div className="text-muted-foreground">{fmtDate(m.date, 'HH:mm')} · {m.pitch}</div></TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-1.5 text-sm"><TeamLogo team={L.team.get(m.home_team_id)} size={18} /><span className="font-semibold">{L.team.get(m.home_team_id)?.short_name ?? sourceLabel(m.home_source, groupName)}</span><span className="text-muted-foreground">vs</span><span className="font-semibold">{L.team.get(m.away_team_id)?.short_name ?? sourceLabel(m.away_source, groupName)}</span><TeamLogo team={L.team.get(m.away_team_id)} size={18} /></div>
+                    <div className="flex items-center gap-1.5 text-sm"><TeamLogo team={L.team.get(m.home_team_id)} size="xs" /><span className="font-semibold">{L.team.get(m.home_team_id)?.short_name ?? sourceLabel(m.home_source, groupName)}</span><span className="text-muted-foreground">vs</span><span className="font-semibold">{L.team.get(m.away_team_id)?.short_name ?? sourceLabel(m.away_source, groupName)}</span><TeamLogo team={L.team.get(m.away_team_id)} size="xs" /></div>
                   </TableCell>
                   <TableCell className="num text-center text-base">{m.status === 'finished' || m.status === 'live' ? fmtScore(m) : '—'}</TableCell>
                   <TableCell className="hidden text-xs md:table-cell">{c?.name} · {isKnockout(m) ? STAGE_LABELS[m.stage!] : `J${m.round}`}</TableCell>

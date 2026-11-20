@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 const cache = new Map<string, Promise<string>>()
 
 const SCAN = 128 // détection des marges sur une copie réduite (rapide même sur téléphone)
-const OUT = 384 // logo rogné : 384 px max (net à l’écran et dans les PNG exportés)
+const OUT = 640 // logo rogné : 640 px max (tuile hero 160 px nette sur écran haute densité) (net à l’écran et dans les PNG exportés)
 const idle = (fn: () => void) => ((window as unknown as { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => void }).requestIdleCallback ?? ((f: () => void) => setTimeout(f, 1)))(fn, { timeout: 1500 })
 
 function trim(url: string): Promise<string> {

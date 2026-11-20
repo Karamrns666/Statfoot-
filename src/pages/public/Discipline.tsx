@@ -88,7 +88,7 @@ export default function Discipline() {
             <tbody>{fair.map((r, i) => (
               <tr key={r.team_id} className="border-t border-white/5">
                 <td className="num py-2">{i + 1}</td>
-                <td><Link to={`/equipes/${r.team_id}`} className="flex items-center gap-2 hover:text-neon"><TeamLogo team={L.team.get(r.team_id)} size={22} /><span className="font-semibold">{L.team.get(r.team_id)?.name}</span></Link></td>
+                <td><Link to={`/equipes/${r.team_id}`} className="flex items-center gap-2 hover:text-neon"><TeamLogo team={L.team.get(r.team_id)} size="xs" /><span className="font-semibold">{L.team.get(r.team_id)?.name}</span></Link></td>
                 <td className="num text-center text-muted-foreground">{r.played}</td>
                 <td className="num text-center text-amber-300">{r.yellow}</td>
                 <td className="num text-center text-red-300">{r.red}</td>

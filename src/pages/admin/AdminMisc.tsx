@@ -102,7 +102,7 @@ export function StatsAdmin() {
         <TabsContent value="teams">
           <Button variant="outline" size="sm" className="mb-2" onClick={() => downloadCsv('equipes.csv', tx.map((t) => ({ equipe: L.team.get(t.team_id)?.name, mj: t.played, v: t.won, n: t.drawn, d: t.lost, bp: t.gf, bc: t.ga, diff: t.gd, pts: t.points, tirs: fmtShots(t.shot, 'shots'), tirs_cadres: fmtShots(t.shot, 'on_target'), precision: fmtAccuracy(t.shot), tirs_par_but: fmtShotsPerGoal(t.shot) })))}><Download />Export CSV</Button>
           <div className="glass rounded-2xl p-2"><SortableTable rows={tx} rowKey={(t) => t.team_id} initial={{ key: 'points', dir: 'desc' }} columns={[
-            { key: 'team', label: 'Équipe', sort: (t) => L.team.get(t.team_id)?.name, render: (t) => <span className="flex items-center gap-2"><TeamLogo team={L.team.get(t.team_id)} size={18} />{L.team.get(t.team_id)?.name}</span> },
+            { key: 'team', label: 'Équipe', sort: (t) => L.team.get(t.team_id)?.name, render: (t) => <span className="flex items-center gap-2"><TeamLogo team={L.team.get(t.team_id)} size="xs" />{L.team.get(t.team_id)?.name}</span> },
             { key: 'mj', label: 'MJ', headClassName: 'text-center', className: 'num text-center', sort: (t) => t.played, render: (t) => t.played },
             { key: 'vnd', label: 'V-N-D', title: 'Trié par victoires', headClassName: 'text-center', className: 'num text-center', sort: (t) => t.won, render: (t) => `${t.won}-${t.drawn}-${t.lost}` },
             { key: 'gf', label: 'BP', headClassName: 'text-center', className: 'num text-center', sort: (t) => t.gf, render: (t) => t.gf },

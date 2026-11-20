@@ -124,11 +124,11 @@ export default function QuickEntry() {
         {m.status === 'finished' && <Button variant="outline" onClick={async () => { await reopenMatch(m, user); toast.info('Match rouvert') }}>Rouvrir le match</Button>}
       </>}>
       <div className="mb-4 flex items-center justify-center gap-4">
-        <TeamLogo team={L.team.get(m.home_team_id)} size={48} /><span className="num text-5xl">{score(m.home_team_id)} - {score(m.away_team_id)}</span><TeamLogo team={L.team.get(m.away_team_id)} size={48} />
+        <TeamLogo team={L.team.get(m.home_team_id)} size="md" /><span className="num text-5xl">{score(m.home_team_id)} - {score(m.away_team_id)}</span><TeamLogo team={L.team.get(m.away_team_id)} size="md" />
       </div>
       <div className="grid gap-4 xl:grid-cols-2">
         {[m.home_team_id, m.away_team_id].map((tid) => (
-          <Card key={tid} className="min-w-0"><CardHeader><CardTitle className="flex items-center gap-2"><TeamLogo team={L.team.get(tid)} size={24} />{L.team.get(tid)?.name}</CardTitle></CardHeader>
+          <Card key={tid} className="min-w-0"><CardHeader><CardTitle className="flex items-center gap-2"><TeamLogo team={L.team.get(tid)} size="xs" />{L.team.get(tid)?.name}</CardTitle></CardHeader>
             <CardContent className="px-1 sm:px-3">
               <Table>
                 <TableHeader><TableRow><TableHead>Joueur</TableHead><TableHead className="text-center">A joué</TableHead>{COLS.map((c) => <TableHead key={c.k} className="text-center">{c.l}</TableHead>)}</TableRow></TableHeader>

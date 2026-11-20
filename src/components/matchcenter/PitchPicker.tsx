@@ -36,7 +36,7 @@ export function TeamBand({ match, teamId, children, className }: { match: Match;
   const t = L.team.get(teamId)
   return (
     <div className={cn('flex min-h-11 items-center gap-2 rounded-xl px-2.5', className)} style={sideStyle(sideColor(match, colors, teamId))}>
-      <TeamLogo team={t} size={24} />
+      <TeamLogo team={t} size="xs" />
       <span className="truncate font-display text-lg font-black uppercase">{t?.short_name ?? t?.name}</span>
       {children}
     </div>

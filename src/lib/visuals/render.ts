@@ -48,6 +48,18 @@ export function loadImage(url?: string): Promise<HTMLImageElement | null> {
 }
 const natural = (i: HTMLImageElement) => ({ w: i.naturalWidth || i.width || 512, h: i.naturalHeight || i.height || 512 })
 
+/** Tuile logo d'équipe, identique au site : carré aux coins arrondis (22 %), fond de l'équipe, marge 12 % (7 % sur les
+ *  côtés pour un logo large), logo centré sans déformation. */
+export function drawTile(ctx: CanvasRenderingContext2D, img: HTMLImageElement, z: { x: number; y: number; w: number; h: number }, bg = '#FFFFFF') {
+  const s = Math.min(z.w, z.h), x = z.x + (z.w - s) / 2, y = z.y + (z.h - s) / 2
+  ctx.save(); ctx.shadowColor = 'rgba(0, 0, 0, .28)'; ctx.shadowBlur = Math.max(4, s * 0.08)
+  ctx.beginPath(); ctx.roundRect(x, y, s, s, s * 0.22); ctx.fillStyle = bg; ctx.fill(); ctx.restore()
+  const { w, h } = natural(img), wide = w / h > 2
+  const px = s * (wide ? 0.07 : 0.12), py = s * 0.12
+  const k = Math.min((s - 2 * px) / w, (s - 2 * py) / h)
+  ctx.drawImage(img, x + (s - w * k) / 2, y + (s - h * k) / 2, w * k, h * k)
+}
+
 export function drawContain(ctx: CanvasRenderingContext2D, img: HTMLImageElement, z: Zone, valign: 'center' | 'bottom' = 'center') {
   const pad = z.pad ?? 0
   const { w, h } = natural(img)
@@ -226,7 +238,7 @@ export async function renderResult(model: ResultModel, cfg: VisualsConfig, opts:
   if (bg) ctx.drawImage(bg, 0, 0, VISUAL_SIZE, VISUAL_SIZE)
   drawText(ctx, cfg, model.competition, Z.competition)
   for (const [img, z, short] of [[hl, Z.homeLogo, model.home.short], [al, Z.awayLogo, model.away.short]] as const) {
-    if (img) drawContain(ctx, img, z)
+    if (img) drawTile(ctx, img, z, z === Z.homeLogo ? model.home.logoBg : model.away.logoBg)
     else drawText(ctx, cfg, short, { ...z, font: 'display', size: 64, min: 24, color: 'white' })
   }
   // score très grand dans les blocs orange latéraux (« 07 »), tirs au but entre parenthèses dessous (« (14) »)
@@ -328,8 +340,8 @@ export async function renderMvp(model: MvpModel, cfg: VisualsConfig, variant: 'm
     const tw = Math.min(ctx.measureText(fit.text).width, textZone.w)
     const total = tw + 2 * (L + gap)
     const x0 = z.x + (z.w - total) / 2
-    if (hl) drawContain(ctx, hl, { x: x0, y: z.y + (z.h - L) / 2, w: L, h: L })
-    if (al) drawContain(ctx, al, { x: x0 + total - L, y: z.y + (z.h - L) / 2, w: L, h: L })
+    if (hl) drawTile(ctx, hl, { x: x0, y: z.y + (z.h - L) / 2, w: L, h: L }, model.scoreLine.homeLogoBg)
+    if (al) drawTile(ctx, al, { x: x0 + total - L, y: z.y + (z.h - L) / 2, w: L, h: L }, model.scoreLine.awayLogoBg)
     drawText(ctx, cfg, fit.text, { ...z, x: x0 + L + gap, w: tw, size: fit.size, min: fit.size }, { shadow: true })
   }
   drawText(ctx, cfg, Z.barLabel.text ?? 'HOMME DU MATCH', Z.barLabel)
@@ -356,7 +368,7 @@ export async function renderMvp(model: MvpModel, cfg: VisualsConfig, variant: 'm
     const tw = ctx.measureText(fit.text).width
     const total = tw + (tl ? L + gap : 0)
     const x0 = z.x + (z.w - total) / 2
-    if (tl) drawContain(ctx, tl, { x: x0, y: z.y + (z.h - L) / 2, w: L, h: L })
+    if (tl) drawTile(ctx, tl, { x: x0, y: z.y + (z.h - L) / 2, w: L, h: L }, model.team.logoBg)
     drawText(ctx, cfg, fit.text, { ...z, x: x0 + (tl ? L + gap : 0), w: tw + 2, size: fit.size, min: fit.size }, { shadow: true })
   }
   // pastilles de stats

@@ -79,7 +79,7 @@ export function LineupEditor({ match, teamId, onValidated, readOnly }: { match: 
   }
   return (
     <div className="glass rounded-2xl p-3">
-      <div className="mb-2 flex items-center gap-2"><TeamLogo team={team} size={28} /><span className="title-caps text-lg">{team?.name}</span>
+      <div className="mb-2 flex items-center gap-2"><TeamLogo team={team} size="sm" /><span className="title-caps text-lg">{team?.name}</span>
         <Badge variant={starters.size === max ? 'success' : 'warning'} className="ml-auto">{starters.size}/{max} titulaires</Badge>
         {existing?.validated && <Badge variant="success"><CheckCircle2 className="size-3" />Validée</Badge>}</div>
       <div className="space-y-1">

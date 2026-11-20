@@ -16,11 +16,11 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { FilterSelect } from '@/components/league/FilterSelect'
-import { TeamLogo } from '@/components/league/Identity'
+import { TeamLogo, useMissingSquareLogo } from '@/components/league/Identity'
 import { toast } from '@/components/ui/toast'
 import { computeAwards, generalStandings } from '@/lib/stats'
 import { fmtDate } from '@/lib/format'
-import type { Competition, Season } from '@/types/entities'
+import type { Competition, Season, Team as TeamT } from '@/types/entities'
 
 const STATUS_VARIANT = { draft: 'outline', active: 'success', finished: 'secondary', archived: 'outline', upcoming: 'outline', closed: 'secondary' } as const
 const STATUS_FR: Record<string, string> = { draft: 'Brouillon', active: 'Active', finished: 'Terminée', archived: 'Archivée', upcoming: 'À venir', closed: 'Clôturée' }
@@ -72,7 +72,7 @@ function CloseSeasonDialog({ season, onClose }: { season: Season; onClose: () =>
         <div>
           <div className="mb-2 text-xs font-bold uppercase text-muted-foreground">Classement général final → répartition {phaseName('gold')} / {phaseName('silver')} de la saison suivante</div>
           <div className="max-h-64 space-y-1 overflow-y-auto">
-            {table.map((r) => <div key={r.team_id} className="flex items-center gap-2 text-sm"><span className="num w-6">{r.rank}</span><TeamLogo team={L.team.get(r.team_id)} size={18} /><span className="flex-1">{L.team.get(r.team_id)?.name}</span><span className="num">{r.points} pts</span><Badge variant={r.rank <= (season.gold_size ?? 10) ? 'gold' : 'secondary'}>{r.rank <= (season.gold_size ?? 10) ? 'Chapeaux 1–3' : 'Chapeaux 3–5'}</Badge></div>)}
+            {table.map((r) => <div key={r.team_id} className="flex items-center gap-2 text-sm"><span className="num w-6">{r.rank}</span><TeamLogo team={L.team.get(r.team_id)} size="xs" /><span className="flex-1">{L.team.get(r.team_id)?.name}</span><span className="num">{r.points} pts</span><Badge variant={r.rank <= (season.gold_size ?? 10) ? 'gold' : 'secondary'}>{r.rank <= (season.gold_size ?? 10) ? 'Chapeaux 1–3' : 'Chapeaux 3–5'}</Badge></div>)}
           </div>
           <p className="mt-2 text-xs text-muted-foreground">Le classement final sert de base aux chapeaux du tirage de la saison suivante (têtes de série).</p>
         </div>
@@ -131,11 +131,13 @@ export function Teams() {
   const mediaTeam = mediaFor ? db.Team.find((t) => t.id === mediaFor) : undefined
   const comp = db.Competition.find((c) => c.id === competitionId)
   const fields: Field[] = [
-    { key: 'name', label: 'Nom', required: true }, { key: 'short_name', label: 'Nom court (3 lettres)', required: true },
+    { key: 'name', label: 'Nom', required: true }, { key: 'short_name', label: 'Code (3 lettres)', required: true },
+    { key: 'display_short', label: 'Nom court', help: 'Utilisé quand la place manque (cartes de match, ticker, match centre, visuels). Ex. « Parebrise Exp. », « AV Rabat ». Vide : nom court par défaut ou nom complet.' },
     { key: 'company', label: 'Entreprise / marque' }, { key: 'status', label: 'Statut', type: 'select', options: [{ value: 'active', label: 'Active' }, { value: 'pending', label: 'En attente' }, { value: 'inactive', label: 'Inactive' }] },
-    { key: 'logo_url', label: 'Logo équipe', type: 'image', full: true }, { key: 'company_logo_url', label: 'Logo entreprise', type: 'image', full: true },
+    { key: 'logo_url', label: 'Logo principal', type: 'image', full: true, help: 'Logo complet (souvent large) : en-tête de la page équipe, cartes, visuels. Les marges vides sont retirées automatiquement.' },
+    { key: 'logo_square_url', label: 'Logo carré / icône', type: 'image', full: true, help: 'Version compacte lisible en petit (classements, cartes de match, listes, ticker, match centre). PNG transparent ou SVG, carré.' }, { key: 'company_logo_url', label: 'Logo entreprise', type: 'image', full: true },
     { key: 'logo_dark_url', label: 'Logo pour fond sombre (facultatif)', type: 'image', full: true, help: 'Version claire du logo (texte blanc), utilisée automatiquement sur fond noir ou couleur. SVG conseillé.' },
-    { key: 'logo_bg', label: 'Fond du logo (cartes, classements, visuels)', type: 'select', options: (Object.keys(LOGO_BG_LABEL) as LogoBg[]).map((k) => ({ value: k, label: LOGO_BG_LABEL[k] })), help: 'Noir pour un logo clair sur fond sombre (ex. Parebrise Express). Les marges vides autour du logo sont retirées automatiquement.' },
+    { key: 'logo_bg', label: 'Fond de la tuile', type: 'select', options: (Object.keys(LOGO_BG_LABEL) as LogoBg[]).map((k) => ({ value: k, label: LOGO_BG_LABEL[k]! })), help: 'Fond de la tuile du logo partout sur le site : blanc, noir (logo clair, ex. Parebrise Express) ou couleur de l’équipe.' },
     { key: 'primary_color', label: 'Couleur principale', type: 'color' }, { key: 'secondary_color', label: 'Couleur secondaire', type: 'color' },
     { key: 'division_id', label: 'Série', type: 'select', options: db.Division.map((d) => ({ value: d.id, label: d.name })) },
     { key: 'group_id', label: 'Groupe', type: 'select', options: db.Group.map((g) => ({ value: g.id, label: g.name })) },
@@ -152,7 +154,7 @@ export function Teams() {
         afterSave={async (v) => { const id = v.id as string; const t = db.Team.find((x) => x.id === id); if (!v.club_id && !t?.club_id) { const club = `club_${id}`; await base44.entities.Team.update(id, { club_id: club, season_id: (v.season_id as string) ?? seasonId }); if (!db.Club.some((c) => c.id === club)) await base44.entities.Club.create({ id: club, name: v.name as string, logo_url: v.logo_url as string | undefined } as never) } }}
         rowActions={(t) => <Button size="sm" variant="outline" className="h-8" onClick={() => setMediaFor(t.id)}><Images />Photos & poster{t.media?.length ? ` (${t.media.length})` : ''}</Button>}
         columns={[
-          { label: 'Équipe', render: (t) => <span className="flex items-center gap-2"><TeamLogo team={t} size={28} /><span><span className="font-semibold">{t.name}</span><span className="ml-2 text-xs text-muted-foreground">{t.short_name}</span></span></span> },
+          { label: 'Équipe', render: (t) => <span className="flex items-center gap-2"><TeamLogo team={t} size="sm" /><span><span className="font-semibold">{t.name}</span><span className="ml-2 text-xs text-muted-foreground">{t.short_name}</span><MissingSquareFlag team={t} /></span></span> },
           { label: 'Entreprise', render: (t) => <span className="flex items-center gap-2">{t.company_logo_url && <img src={t.company_logo_url} className="size-5 rounded" alt="" />}{t.company}</span>, className: 'hidden md:table-cell' },
           { label: 'Couleurs', render: (t) => t.primary_color ? <span className="flex gap-1"><span className="size-4 rounded" style={{ background: t.primary_color }} /><span className="size-4 rounded ring-1 ring-white/20" style={{ background: t.secondary_color }} /></span> : <span className="rounded bg-amber-400/15 px-1.5 py-0.5 text-[11px] font-semibold text-amber-200" title="Utilisée dans le match centre et le mode TV ; couleur par défaut en attendant">Couleur à renseigner</span> },
           { label: 'Série', render: (t) => db.Division.find((d) => d.id === t.division_id)?.name ?? '—', className: 'hidden xl:table-cell' },
@@ -165,4 +167,10 @@ export function Teams() {
       {mediaTeam && <TeamMediaManager team={mediaTeam} open onOpenChange={(o) => !o && setMediaFor(null)} />}
     </AdminPage>
   )
+}
+
+/** Équipe dont le logo principal est trop large pour les petites tuiles et sans logo carré : à fournir. */
+function MissingSquareFlag({ team }: { team: TeamT }) {
+  if (!useMissingSquareLogo(team)) return null
+  return <span className="ml-2 inline-flex rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-300 ring-1 ring-amber-400/30" title="Le logo principal est large : ajoutez un « Logo carré / icône » pour les classements et cartes de match">logo carré manquant</span>
 }

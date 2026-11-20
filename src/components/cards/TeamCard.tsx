@@ -4,9 +4,7 @@
 import { useMemo, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import type { Team } from '@/types/entities'
-import { teamLogoSvg } from '@/lib/logos'
-import { logoPlate, logoSrc } from '@/lib/logoPlate'
-import { useTrimmedImage } from '@/hooks/useTrimmedImage'
+import { TeamLogo } from '@/components/league/Identity'
 import { SENIORITY_LABEL, SENIORITY_STYLE, type SeniorityTier } from '@/lib/seniority'
 import { useData } from '@/hooks/useData'
 import { useSeasonCompetitions } from '@/hooks/useStats'
@@ -36,10 +34,6 @@ export interface TeamCardProps {
 export function TeamCard(p: TeamCardProps) {
   const st = SENIORITY_STYLE[p.tier]
   const shine = useCardShine<HTMLDivElement>()
-  const logo = logoSrc(p.team) || teamLogoSvg(p.team.short_name, p.team.primary_color, p.team.secondary_color)
-  const plate = logoPlate(p.team)
-  const brand = !!plate.bg
-  const trimmed = useTrimmedImage(logoSrc(p.team) || null)
   const stats = [
     { label: 'PTS', value: p.points ?? 0, hint: 'Points' },
     { label: 'BUTS', value: p.goals ?? 0, hint: 'Buts marqués' },
@@ -58,9 +52,8 @@ export function TeamCard(p: TeamCardProps) {
           {/* logo en grand */}
           <div className="relative flex items-center justify-center">
             <div className="pointer-events-none absolute inset-0" style={{ background: `radial-gradient(60% 55% at 50% 50%, ${p.team.primary_color ?? '#0B2E73'}55, transparent 75%)` }} aria-hidden />
-            <img src={trimmed ?? logo} alt="" draggable={false}
-              className={cn('relative aspect-square w-[78%] object-contain', brand ? 'rounded-[20%] p-[10%] shadow-[0_.5em_1.2em_rgb(0_0_0/.35)]' : 'drop-shadow-[0_.5em_.8em_rgb(0_0_0/.45)]')}
-              style={{ background: plate.bg ?? undefined, ...(brand && p.tier === 'platinum' ? { boxShadow: '0 0 0 2px rgb(230 236 245 / .9), 0 0 1.2em rgb(167 139 250 / .55)' } : {}) }} />
+            {/* tuile logo identique au reste du site (logo principal, fond réglé dans l'admin) */}
+            <div className="relative aspect-square w-[78%] drop-shadow-[0_.5em_1.2em_rgb(0_0_0/.35)]"><TeamLogo team={p.team} fluid /></div>
           </div>
           <div className="flex min-w-0 flex-col py-[.75em] pr-[.85em] text-left">
             <div className="flex justify-end">

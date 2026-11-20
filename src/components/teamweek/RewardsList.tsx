@@ -30,7 +30,7 @@ export function RewardsList({ seasonId, period, competitionId, compact }: { seas
           <Link key={r.key} to={href} className={cn('glass group relative overflow-hidden rounded-2xl transition hover:-translate-y-0.5', compact ? 'flex items-center gap-3 p-3' : 'flex flex-col items-center p-4 text-center')} style={{ borderColor: `${st.color}55` }}>
             <span className="absolute inset-x-0 top-0 h-1" style={{ background: st.color }} />
             <div className={cn('flex items-center gap-1.5 text-xs font-bold', compact && 'w-32 shrink-0')} style={{ color: st.color }}><st.icon className="size-4" />{REWARD_LABEL[r.key]}</div>
-            {p ? <PlayerAvatar player={p} team={t} size={compact ? 36 : 64} className={cn(!compact && 'mt-3')} /> : <TeamLogo team={t} size={compact ? 36 : 64} className={cn(!compact && 'mt-3')} />}
+            {p ? <PlayerAvatar player={p} team={t} size={compact ? 36 : 64} className={cn(!compact && 'mt-3')} /> : <TeamLogo team={t} size={compact ? 'md' : 'lg'} className={cn(!compact && 'mt-3')} />}
             <div className={cn('min-w-0', compact ? 'flex-1' : 'mt-2 w-full')}>
               <div className="truncate font-display text-lg font-black leading-tight">{p ? playerName(p) : t?.name}</div>
               <div className="truncate text-[11px] text-muted-foreground">{p ? `${t?.name ?? ''} · ` : ''}{r.detail}</div>

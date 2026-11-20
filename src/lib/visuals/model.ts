@@ -7,14 +7,15 @@ import { matchXPLines, xpConfig, type XPData } from '@/lib/xp'
 import { playerMatchShots } from '@/lib/shots'
 import { fmtMinute } from '@/lib/matchEngine'
 import { fmtDate, fmtTime } from '@/lib/format'
+import { logoPlate, teamShortName, tileLogo } from '@/lib/logoPlate'
 
 export interface ScorerLine { text: string }
 /** Ligne du visuel résultat : « A.MAZRHI » + cartons + un ballon par but ; ligne « (C.S.C) » côté bénéficiaire. */
 export interface ResultRow { name: string; goals: number; yellow: number; red: number; og?: boolean }
 export interface ResultModel {
   competition: string
-  home: { name: string; short: string; logo?: string }
-  away: { name: string; short: string; logo?: string }
+  home: { name: string; short: string; logo?: string; logoBg?: string }
+  away: { name: string; short: string; logo?: string; logoBg?: string }
   homeScore: number; awayScore: number
   /** « t.a.b. 4-3 » ou « FORFAIT — JOUEUR NON SALARIÉ (ART. 2.3) » */
   sub?: string
@@ -28,9 +29,9 @@ export interface ResultModel {
 }
 export interface MvpModel {
   competition: string
-  scoreLine: { home: string; away: string; homeShort?: string; awayShort?: string; homeLogo?: string; awayLogo?: string; score: string }
+  scoreLine: { home: string; away: string; homeShort?: string; awayShort?: string; homeLogo?: string; awayLogo?: string; homeLogoBg?: string; awayLogoBg?: string; score: string }
   firstName: string; lastName: string
-  team: { name: string; logo?: string }
+  team: { name: string; logo?: string; logoBg?: string }
   photo?: { url: string; cutout: boolean }
   captain: boolean
   keeper: boolean
@@ -127,8 +128,8 @@ export function buildResultModel({ match: m, teams, players, competition, events
   const pens = m.penalties && m.home_pens != null && m.away_pens != null ? `T.A.B. ${m.home_pens}-${m.away_pens}` : undefined
   return {
     competition: competitionLabel(m, competition),
-    home: { name: upper(h?.name ?? 'Domicile'), short: h?.short_name ?? '', logo: h?.logo_url },
-    away: { name: upper(a?.name ?? 'Extérieur'), short: a?.short_name ?? '', logo: a?.logo_url },
+    home: { name: upper(h?.name ?? 'Domicile'), short: teamShortName(h).toLocaleUpperCase('fr-FR'), logo: tileLogo(h, false), logoBg: logoPlate(h).bg },
+    away: { name: upper(a?.name ?? 'Extérieur'), short: teamShortName(a).toLocaleUpperCase('fr-FR'), logo: tileLogo(a, false), logoBg: logoPlate(a).bg },
     homeScore: hs, awayScore: as,
     sub: forfeit ? forfeitText(m, true) || 'FORFAIT' : pens,
     forfeit,
@@ -193,9 +194,9 @@ export function buildMvpModel(d: VisualData & { xp: XPData }, playerId: string):
   const photo = p.photo_card_mode !== 'original' && p.photo_cutout_url ? { url: p.photo_cutout_url, cutout: true } : p.photo_url ? { url: p.photo_url, cutout: false } : undefined
   return {
     competition: competitionLabel(m, competition),
-    scoreLine: { home: r.home.name, away: r.away.name, homeShort: r.home.short.toLocaleUpperCase('fr-FR'), awayShort: r.away.short.toLocaleUpperCase('fr-FR'), homeLogo: r.home.logo, awayLogo: r.away.logo, score: `${r.homeScore} - ${r.awayScore}` },
+    scoreLine: { home: r.home.name, away: r.away.name, homeShort: r.home.short.toLocaleUpperCase('fr-FR'), awayShort: r.away.short.toLocaleUpperCase('fr-FR'), homeLogo: r.home.logo, awayLogo: r.away.logo, homeLogoBg: r.home.logoBg, awayLogoBg: r.away.logoBg, score: `${r.homeScore} - ${r.awayScore}` },
     firstName: upper(p.first_name), lastName: upper(p.last_name),
-    team: { name: upper(team?.name ?? ''), logo: team?.logo_url },
+    team: { name: upper(team?.name ?? ''), logo: tileLogo(team, true), logoBg: logoPlate(team).bg },
     photo, captain, keeper, stats, xp,
   }
 }

@@ -8,7 +8,7 @@ import { useLookup } from '@/hooks/useData'
 import { useEffectiveSeason } from '@/hooks/useStats'
 import { usePreseason, type PreseasonView } from '@/hooks/usePreseason'
 import { EmptyState, PageHeader } from '@/components/league/Bits'
-import { TeamLogo } from '@/components/league/Identity'
+import { FitName, TeamLogo } from '@/components/league/Identity'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DivisionMark, PreseasonTable } from '@/components/preseason/PreseasonTable'
 import { CRITERION_LABEL, preseasonRanking, teamPath } from '@/lib/preseason'
@@ -108,11 +108,11 @@ function Rounds({ v }: { v: PreseasonView }) {
                   <tr key={m.id} className="border-t border-white/5">
                     <td className="num whitespace-nowrap px-2 py-2 font-bold">{m.number ?? i + 1}</td>
                     <td className="whitespace-nowrap px-2 text-xs text-muted-foreground">{fmtWhen(m)}</td>
-                    <td className="text-right"><Link to={`/equipes/${m.home_team_id}`} className="inline-flex items-center gap-2 font-semibold hover:text-neon">{L.team.get(m.home_team_id)?.name}<TeamLogo team={L.team.get(m.home_team_id)} size={24} /></Link></td>
+                    <td className="text-right"><Link to={`/equipes/${m.home_team_id}`} className="inline-flex items-center gap-2 font-semibold hover:text-neon">{L.team.get(m.home_team_id)?.name}<TeamLogo team={L.team.get(m.home_team_id)} size="xs" /></Link></td>
                     <td className="num px-2 text-center text-muted-foreground">{before.get(m.home_team_id) ?? 0}</td>
                     <td className="px-2 text-center"><Link to={`/matchs/${m.id}`} className={cn('num inline-block min-w-16 rounded-lg px-2 py-0.5 text-lg font-black', p.played ? 'bg-white text-[#0B2E73]' : 'text-muted-foreground')}>{p.played ? `${p.hs} - ${p.as}` : 'vs'}</Link></td>
                     <td className="num px-2 text-center text-muted-foreground">{before.get(m.away_team_id) ?? 0}</td>
-                    <td><Link to={`/equipes/${m.away_team_id}`} className="inline-flex items-center gap-2 font-semibold hover:text-neon"><TeamLogo team={L.team.get(m.away_team_id)} size={24} />{L.team.get(m.away_team_id)?.name}</Link></td>
+                    <td><Link to={`/equipes/${m.away_team_id}`} className="inline-flex items-center gap-2 font-semibold hover:text-neon"><TeamLogo team={L.team.get(m.away_team_id)} size="xs" />{L.team.get(m.away_team_id)?.name}</Link></td>
                     <td className="px-2 text-muted-foreground">{m.pairing_reason ?? '—'}</td>
                   </tr>
                 )
@@ -173,8 +173,8 @@ export function TeamPathCard({ v, teamId, compact = false }: { v: PreseasonView;
   return (
     <article className="glass rounded-2xl p-4">
       <div className="flex items-center gap-3">
-        <TeamLogo team={t} size={compact ? 32 : 40} />
-        <div className="min-w-0 flex-1"><Link to={`/equipes/${teamId}`} className="block truncate font-display text-lg font-black hover:text-neon">{t?.name}</Link>
+        <TeamLogo team={t} size={compact ? 'sm' : 'md'} />
+        <div className="min-w-0 flex-1"><Link to={`/equipes/${teamId}`} className="block font-display text-lg font-black hover:text-neon"><FitName team={t} /></Link>
           <div className="text-xs text-muted-foreground">{row ? `${row.rank}e · ${row.points} pts${row.played ? ` · force ${row.force}` : ''}` : '—'}</div></div>
         {row && row.played > 0 && <DivisionMark div={row.rank <= m ? 'master' : 'challenger'} size={26} className="text-xs" label={!compact} />}
       </div>

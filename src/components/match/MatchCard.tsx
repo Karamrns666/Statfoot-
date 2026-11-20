@@ -4,7 +4,7 @@ import { MapPin, Clock } from 'lucide-react'
 import type { Match } from '@/types/entities'
 import { useLookup } from '@/hooks/useData'
 import { CompetitionBadge } from '@/components/league/Bits'
-import { TeamLogo } from '@/components/league/Identity'
+import { FitName, TeamLogo } from '@/components/league/Identity'
 import { fmtRelativeDay, STATUS_LABEL } from '@/lib/format'
 import { fmtDay, fmtHour } from '@/lib/matchTime'
 import { STAGE_LABELS } from '@/lib/schedule'
@@ -31,8 +31,8 @@ export function MatchCard({ match, compact = false }: { match: Match; compact?: 
       </div>
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
         <div className="flex min-w-0 flex-col items-center gap-1.5 text-center">
-          <TeamLogo team={home} size={compact ? 36 : 44} />
-          <span className={cn('w-full truncate text-xs sm:text-sm font-semibold', aw && 'text-muted-foreground')}>{home?.name ?? 'À déterminer'}</span>
+          <TeamLogo team={home} size="md" />
+          <FitName team={home} className={cn('w-full text-xs sm:text-sm font-semibold', aw && 'text-muted-foreground')} />
         </div>
         <div className="flex flex-col items-center">
           {showScore ? (
@@ -47,8 +47,8 @@ export function MatchCard({ match, compact = false }: { match: Match; compact?: 
           {done && <ForfeitBadge match={match} link={false} className="mt-1 max-w-[9rem]" />}
         </div>
         <div className="flex min-w-0 flex-col items-center gap-1.5 text-center">
-          <TeamLogo team={away} size={compact ? 36 : 44} />
-          <span className={cn('w-full truncate text-xs sm:text-sm font-semibold', hw && 'text-muted-foreground')}>{away?.name ?? 'À déterminer'}</span>
+          <TeamLogo team={away} size="md" />
+          <FitName team={away} className={cn('w-full text-xs sm:text-sm font-semibold', hw && 'text-muted-foreground')} />
         </div>
       </div>
       {!compact && (

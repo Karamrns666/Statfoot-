@@ -56,10 +56,15 @@ export default function TeamDetail() {
   return (
     <div className="space-y-8">
       <TeamBanner team={team}>
-        <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-white/85">
-          {team.company_logo_url && <img src={team.company_logo_url} alt={team.company ?? ''} className={team.company_logo_url.startsWith('/logos/') ? 'h-9 w-auto rounded-lg bg-white' : 'size-6 rounded'} />}<span>{team.company}</span><SeniorityBadge teamId={team.id} size="md" showSeasons /><CompetitionBadge competition={cup} /><TeamRank teamId={team.id} competitionId={cup?.id} />
+        <div className="mt-3 flex flex-col gap-2 text-sm text-white/85 sm:flex-row sm:flex-wrap sm:items-center">
+          {team.company && team.company !== team.name && <span className="font-semibold text-white">{team.company}</span>}
+          <div className="flex flex-wrap items-center gap-2"><SeniorityBadge teamId={team.id} size="md" showSeasons /><CompetitionBadge competition={cup} /><TeamRank teamId={team.id} competitionId={cup?.id} /></div>
         </div>
-        <div className="mt-3"><FormPills form={teamForm(matches, team.id)} size="md" /></div>
+        {teamForm(matches, team.id).length > 0 && (
+          <div className="mt-3 flex items-center gap-2 text-xs text-white/70" title="Résultats des derniers matchs : V victoire, N nul, D défaite (le plus récent à droite)">
+            <span>Derniers matchs</span><FormPills form={teamForm(matches, team.id)} size="md" />
+          </div>
+        )}
         <ClubHistory team={team} />
       </TeamBanner>
       <section className="flex flex-col items-center gap-4 sm:flex-row sm:items-end" aria-label="Carte de l'équipe">

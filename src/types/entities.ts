@@ -128,6 +128,10 @@ export interface Team extends BaseEntity {
   logo_bg?: 'auto' | 'white' | 'black' | 'transparent' | 'team'
   /** logo pour fond sombre (texte clair) : utilisé automatiquement sur une pastille noire / couleur ou sur le fond du site */
   logo_dark_url?: string
+  /** logo carré / icône (version compacte lisible en petit : classements, cartes de match, listes) */
+  logo_square_url?: string
+  /** nom court affiché quand la place manque (ex. « Parebrise Exp. ») — le code à 3 lettres reste short_name */
+  display_short?: string
   /** photos collectives et posters (en-tête de la page équipe) */
   media?: TeamMedia[]
   /** image affichée en en-tête */

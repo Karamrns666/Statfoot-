@@ -49,7 +49,7 @@ export function TeamOfWeekPitch({ result, size = 'md', link = true, className }:
               </div>
               {s.rating > 0 && <span className="absolute -right-2 -top-1 rounded-md px-1.5 font-display text-[13px] font-black leading-5 text-ink shadow" style={{ background: ratingColor(s.rating) }}>{fmtRating(s.rating)}</span>}
               {s.player_id === best && <Crown className="absolute -left-2 -top-2 size-5 fill-award-gold text-award-gold drop-shadow" aria-label="Joueur de la journée" />}
-              <TeamLogo team={t} size={size === 'sm' ? 16 : 22} className="absolute -bottom-1 -right-2" />
+              <TeamLogo team={t} size="xs" className="absolute -bottom-2 -right-4" />
             </div>
             <span className={cn('mt-1.5 max-w-full truncate rounded bg-night-950/80 px-1.5 font-bold leading-5', size === 'sm' ? 'text-[11px]' : 'text-sm')}>{p ? `${p.first_name.charAt(0)}. ${p.last_name}` : '—'}</span>
             {size !== 'sm' && <span className="mt-0.5 max-w-full truncate rounded bg-night-950/60 px-1 text-[11px] leading-4 text-white/80">{s.position === 'GK' ? 'Gardien · ' : ''}{t?.short_name}{s.goals ? ` · ${s.goals}⚽` : ''}{s.assists ? ` ${s.assists}🅰` : ''}{s.position === 'GK' && s.saves ? ` · ${s.saves} arr.` : ''}</span>}

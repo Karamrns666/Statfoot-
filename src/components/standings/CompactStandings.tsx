@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useLookup } from '@/hooks/useData'
-import { TeamLogo } from '@/components/league/Identity'
+import { FitName, TeamLogo } from '@/components/league/Identity'
 import { FormPills } from '@/components/league/Bits'
 import type { Result } from '@/lib/stats'
 import { cn } from '@/lib/utils'
@@ -50,8 +50,8 @@ export function CompactStandings({ rows, accent, background, cutAfter, highlight
                 <td className="num relative text-center text-base font-black">{a && <span className="absolute inset-y-1 left-0 w-1 rounded-full" style={{ background: a }} />}{r.rank}</td>
                 <td className="overflow-hidden px-1">
                   <Link to={`/equipes/${r.team_id}`} className="flex min-w-0 items-center gap-2 font-semibold hover:text-neon">
-                    <TeamLogo team={t} size={24} />
-                    <span className="min-w-0 truncate">{t?.name ?? '—'}</span>
+                    <TeamLogo team={t} size="xs" />
+                    <FitName team={t} />
                   </Link>
                 </td>
                 <td className="num text-center text-muted-foreground">{r.played}</td>

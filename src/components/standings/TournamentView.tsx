@@ -7,7 +7,7 @@ import { computeStandings, isKnockout, isPlayed, winnerOf } from '@/lib/standing
 import { sourceLabel, STAGE_LABELS } from '@/lib/schedule'
 import { StandingsTable } from './StandingsTable'
 import { Card, CardContent } from '@/components/ui/card'
-import { TeamLogo } from '@/components/league/Identity'
+import { FitName, TeamLogo } from '@/components/league/Identity'
 import { cn } from '@/lib/utils'
 
 export function TournamentView({ comp }: { comp: Competition }) {
@@ -75,8 +75,8 @@ function BracketMatch({ m, groupName }: { m: Match; groupName: (id: string) => s
     const pens = side === 'home' ? m.home_pens : m.away_pens
     return (
       <div className={cn('flex items-center gap-2 px-3 py-1.5', played && w && w !== id && 'opacity-55')}>
-        {t ? <TeamLogo team={t} size={22} /> : <span className="size-[22px] rounded-full bg-white/10" />}
-        <span className={cn('min-w-0 flex-1 truncate text-sm', w === id && 'font-black')}>{t?.name ?? sourceLabel(side === 'home' ? m.home_source : m.away_source, groupName)}</span>
+        {t ? <TeamLogo team={t} size="xs" /> : <span className="size-6 shrink-0 rounded-[5px] bg-white/10" />}
+        {t ? <FitName team={t} className={cn('flex-1 text-sm', w === id && 'font-black')} /> : <span className="min-w-0 flex-1 truncate text-sm">{sourceLabel(side === 'home' ? m.home_source : m.away_source, groupName)}</span>}
         {played && <span className="num text-base font-black">{score}{m.penalties && pens != null && <span className="ml-1 text-[11px] font-bold text-muted-foreground">({pens})</span>}</span>}
       </div>
     )

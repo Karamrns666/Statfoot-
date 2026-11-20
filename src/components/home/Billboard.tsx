@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button'
 import { MBL_LOGO, OrganizedBy } from '@/components/layout/Logo'
 import { isBrandLogo } from '@/lib/logos'
 import { cn } from '@/lib/utils'
+import { TeamLogo } from '@/components/league/Identity'
+import type { Team } from '@/types/entities'
 
 export type BillboardKind = 'player' | 'team' | 'match' | 'info'
 export interface BillboardSlide {
@@ -23,6 +25,8 @@ export interface BillboardSlide {
   sub?: ReactNode
   href?: string
   tone?: 'orange' | 'sky' | 'white' | 'red'
+  /** équipe (ou club du joueur) : son logo est affiché par la tuile TeamLogo du site */
+  team?: Team
   /** logo d'équipe (équipe, ou club du joueur) */
   image?: string
   /** couleur principale de l'équipe (halo, anneau) */
@@ -80,7 +84,16 @@ function Visual({ s, tone }: { s: BillboardSlide; tone: string }) {
             ? <img src={s.photo} alt="" className="size-full object-cover" />
             : <div className="flex size-full items-center justify-center font-display text-5xl font-black text-white sm:text-6xl" style={{ background: `radial-gradient(circle at 30% 25%, ${ring}, #04163D 78%)` }}>{s.initials}</div>}
         </div>
-        {s.image && <img src={s.image} alt="" className={cn('absolute -bottom-1 -right-1 size-11 object-contain sm:size-14', isBrandLogo(s.image) ? 'rounded-[22%] bg-white p-0.5 shadow-lg' : 'drop-shadow-lg')} />}
+        {s.team ? <TeamLogo team={s.team} size="md" className="absolute -bottom-3 -right-7" />
+          : s.image && <img src={s.image} alt="" className={cn('absolute -bottom-1 -right-1 size-10 object-contain', isBrandLogo(s.image) ? 'rounded-[22%] bg-white p-0.5 shadow-lg' : 'drop-shadow-lg')} />}
+      </div>
+    )
+  }
+  if (s.kind === 'team' && s.team) {
+    return (
+      <div className="bb-pop relative shrink-0">
+        <div className="absolute -inset-6 rounded-full opacity-60 blur-2xl" style={{ background: ring }} />
+        <TeamLogo team={s.team} size="xl" className="relative sm:hidden" /><TeamLogo team={s.team} size="hero" className="relative hidden sm:inline-flex" />
       </div>
     )
   }
@@ -238,7 +251,7 @@ export function Billboard({ slides: content, leagueName, seasonLabel, logoUrl, p
         <div className="relative z-10 border-b border-white/10 bg-night-950/40 px-4 py-2 sm:px-6"><Tagline className="mx-auto max-w-3xl" /></div>
 
         {/* panneau */}
-        <div className="bb-panel relative z-10 grid h-[320px] grid-rows-[minmax(0,1fr)] px-5 py-7 sm:aspect-[16/9] sm:h-auto sm:px-10 sm:py-9" aria-live={hover || paused ? 'polite' : 'off'}>
+        <div className="bb-panel relative z-10 grid h-[320px] grid-rows-[minmax(0,1fr)] px-5 py-7 sm:aspect-[16/9] sm:h-auto sm:max-h-[calc(100svh-9rem)] sm:px-10 sm:py-9" aria-live={hover || paused ? 'polite' : 'off'}>
           {prev !== null && render(prev, 'out')}
           {n > 0 && render(idx, 'in')}
           {prev !== null && (

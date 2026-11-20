@@ -55,7 +55,7 @@ export default function TeamOfWeekPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5 text-sm font-bold text-award-gold"><Crown className="size-4 fill-award-gold" />Joueur de la journée</div>
                   <div className="truncate font-display text-2xl font-black">{playerName(p)}</div>
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><TeamLogo team={t} size={16} />{t?.name} · {best.goals} but{best.goals > 1 ? 's' : ''}, {best.assists} passe{best.assists > 1 ? 's' : ''}</div>
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><TeamLogo team={t} size="xs" />{t?.name} · {best.goals} but{best.goals > 1 ? 's' : ''}, {best.assists} passe{best.assists > 1 ? 's' : ''}</div>
                 </div>
                 <div className="rounded-lg px-2.5 py-1 font-display text-3xl font-black text-ink" style={{ background: ratingColor(best.rating) }}>{fmtRating(best.rating)}</div>
               </Link>
@@ -70,7 +70,7 @@ export default function TeamOfWeekPage() {
                     <Link to={`/joueurs/${s.player_id}`} className="flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-white/5">
                       <RoleBadge position={s.position} />
                       <span className="min-w-0 flex-1 truncate font-semibold">{playerName(p)}</span>
-                      <span className="hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex"><TeamLogo team={t} size={16} />{t?.short_name}</span>
+                      <span className="hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex"><TeamLogo team={t} size="xs" />{t?.short_name}</span>
                       <span className="w-20 text-right text-xs text-muted-foreground">{s.position === 'GK' ? `${s.saves} arr.${s.clean_sheet ? ' · CS' : ''}` : `${s.goals} B · ${s.assists} PD`}</span>
                       <span className="w-12 rounded-md text-center font-display text-lg font-black text-ink" style={{ background: ratingColor(s.rating) }}>{fmtRating(s.rating)}</span>
                     </Link>

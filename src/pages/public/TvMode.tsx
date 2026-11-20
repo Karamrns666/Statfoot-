@@ -150,9 +150,9 @@ function MatchTab({ m, active, onClick }: { m: Match; active: boolean; onClick: 
           {m.status === 'live' && <span className="size-2.5 rounded-full bg-red-500 animate-pulse-live" />}{m.number ? `${m.number} · ` : ''}{m.pitch ?? 'Terrain'}
         </div>
         <div className="flex items-center gap-2 font-display text-[clamp(1.1rem,1.6vw,2rem)] font-black">
-          <TeamLogo team={h} size={28} />{h?.short_name}
+          <TeamLogo team={h} size="sm" />{h?.short_name}
           <span className="num rounded-md bg-black/40 px-2">{m.status === 'scheduled' ? fmtHour(m.date) : `${m.home_score ?? 0}-${m.away_score ?? 0}`}</span>
-          {a?.short_name}<TeamLogo team={a} size={28} />
+          {a?.short_name}<TeamLogo team={a} size="sm" />
         </div>
         {m.forfeit_team_id && <ForfeitBadge match={m} link={false} className="mt-1" />}
       </div>
@@ -215,7 +215,7 @@ function Board({ m, now }: { m: Match; now: number }) {
 function TeamSide({ team, color }: { team?: Team; color?: SideColor }) {
   return (
     <div className="flex min-w-0 flex-col items-center gap-[1.2vh] text-center">
-      <div className="relative aspect-square h-[clamp(3.5rem,min(11vw,15vh),13rem)] w-[clamp(3.5rem,min(11vw,15vh),13rem)] shrink-0"><TeamLogo team={team} size={220} fluid /></div>
+      <div className="relative aspect-square h-[clamp(3.5rem,min(11vw,15vh),13rem)] w-[clamp(3.5rem,min(11vw,15vh),13rem)] shrink-0"><TeamLogo team={team} size="hero" fluid /></div>
       <div className="title-caps line-clamp-2 max-w-full text-[clamp(1.3rem,min(3vw,5vh),3.8rem)] leading-[.95]">{team?.name}</div>
       {color && <div className="h-[.6vh] min-h-1 w-3/4 rounded-full" style={{ background: color.outline ? '#FFFFFF' : color.bg }} aria-hidden />}
     </div>
@@ -293,7 +293,7 @@ function GoalFlash({ team }: { team?: Team }) {
   return (
     <div className="tv-goal pointer-events-none fixed inset-0 z-10 flex items-center justify-center" role="status">
       <div className="flex items-center gap-[2vw] rounded-[3vw] px-[4vw] py-[2vh] shadow-2xl" style={{ background: `linear-gradient(135deg, ${team?.primary_color ?? '#F85A00'}, #04163D)` }}>
-        <div className="relative aspect-square h-[clamp(4rem,10vw,12rem)] w-[clamp(4rem,10vw,12rem)] shrink-0"><TeamLogo team={team} size={160} fluid /></div>
+        <div className="relative aspect-square h-[clamp(4rem,10vw,12rem)] w-[clamp(4rem,10vw,12rem)] shrink-0"><TeamLogo team={team} size="hero" fluid /></div>
         <div className="title-caps text-[clamp(4rem,12vw,14rem)] leading-none">But !</div>
       </div>
     </div>

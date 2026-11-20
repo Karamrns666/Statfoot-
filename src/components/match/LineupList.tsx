@@ -7,7 +7,7 @@ import type { Lineup, MatchEvent, Player, Team } from '@/types/entities'
 import { participants, playerBadges } from '@/lib/matchEngine'
 import { playerName } from '@/lib/format'
 import { useLookup } from '@/hooks/useData'
-import { PlayerAvatar, RoleBadge, TeamLogo } from '@/components/league/Identity'
+import { PlayerAvatar, RoleBadge, FitName, TeamLogo } from '@/components/league/Identity'
 import { PLAYERS_ON_PITCH } from '@/config/rules'
 
 function highlights(events: MatchEvent[], pid: string) {
@@ -35,8 +35,8 @@ export function LineupList({ lineup, team, events = [] }: { lineup?: Lineup; tea
   const L = useLookup()
   const header = (
     <div className="mb-3 flex items-center gap-2">
-      <TeamLogo team={team} size={28} />
-      <span className="title-caps min-w-0 flex-1 truncate text-lg">{team?.name}</span>
+      <TeamLogo team={team} size="sm" />
+      <FitName team={team} className="title-caps flex-1 text-lg" />
     </div>
   )
   if (!lineup) return <div className="glass rounded-2xl p-4">{header}<p className="text-sm text-muted-foreground">Composition non communiquée</p></div>

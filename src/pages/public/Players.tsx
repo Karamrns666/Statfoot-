@@ -123,7 +123,7 @@ export default function Players() {
                     <PlayerAvatar player={p} team={L.team.get(p.team_id)} size={36} />
                     <div className="min-w-0"><div className="flex items-center gap-2 font-semibold">{playerName(p)}</div><div className="flex items-center gap-1.5"><RoleBadge position={p.position} captain={p.is_captain || L.team.get(p.team_id)?.captain_player_id === p.id} />{rookie(p) && <RookieBadge />}</div></div>
                   </Link>) } },
-                { key: 'team', label: 'Équipe', headClassName: 'hidden sm:table-cell', className: 'hidden sm:table-cell', sort: (r) => L.team.get(r.item.team_id)?.name, render: (r) => { const t = L.team.get(r.item.team_id); return <span className="flex items-center gap-2 text-sm"><TeamLogo team={t} size={20} />{t?.name}</span> } },
+                { key: 'team', label: 'Équipe', headClassName: 'hidden sm:table-cell', className: 'hidden sm:table-cell', sort: (r) => L.team.get(r.item.team_id)?.name, render: (r) => { const t = L.team.get(r.item.team_id); return <span className="flex items-center gap-2 text-sm"><TeamLogo team={t} size="xs" />{t?.name}</span> } },
                 { key: 'mj', label: 'MJ', title: 'Matchs joués', headClassName: 'text-center', className: 'num text-center text-base', sort: (r) => r.item.matches, render: (r) => r.item.matches },
                 { key: 'goals', label: 'Buts', headClassName: 'text-center', className: 'num text-center text-base', sort: (r) => r.item.goals, render: (r) => r.item.goals },
                 { key: 'assists', label: 'Passes', headClassName: 'text-center', className: 'num text-center text-base', sort: (r) => r.item.assists, render: (r) => r.item.assists },

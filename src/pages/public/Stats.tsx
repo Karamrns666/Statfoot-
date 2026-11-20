@@ -30,7 +30,7 @@ export default function Stats() {
   const ts = [...useTeamStats(scope).values()].filter((t) => t.played > 0)
   const xp = usePlayerXP(scope)
   const players = useMemo(() => [...xp.values()].filter((p) => p.matches > 0).sort((a, b) => b.goals - a.goals || b.assists - a.assists || b.xp - a.xp), [xp])
-  const teamCol: SortColumn<TeamStats> = { key: 'team', label: 'Équipe', sort: (t) => L.team.get(t.team_id)?.name, render: (t) => <Link to={`/equipes/${t.team_id}`} className="flex items-center gap-2 hover:text-neon"><TeamLogo team={L.team.get(t.team_id)} size={20} /><span className="font-semibold">{L.team.get(t.team_id)?.name}</span></Link> }
+  const teamCol: SortColumn<TeamStats> = { key: 'team', label: 'Équipe', sort: (t) => L.team.get(t.team_id)?.name, render: (t) => <Link to={`/equipes/${t.team_id}`} className="flex items-center gap-2 hover:text-neon"><TeamLogo team={L.team.get(t.team_id)} size="xs" /><span className="font-semibold">{L.team.get(t.team_id)?.name}</span></Link> }
   const goalsByTeam = [...ts].sort((a, b) => b.gf - a.gf).map((t) => ({ name: L.team.get(t.team_id)?.short_name, gf: t.gf }))
   return (
     <div className="space-y-8">
@@ -78,7 +78,7 @@ export default function Stats() {
       </CardContent></Card>
       <Card><CardHeader><CardTitle>Joueurs</CardTitle></CardHeader><CardContent className="max-h-[70vh] overflow-y-auto px-1 sm:px-4">
         <SortableTable rows={players} rowKey={(p) => p.player_id} initial={{ key: 'goals', dir: 'desc' }} columns={[
-          { key: 'name', label: 'Joueur', sort: (p) => playerName(L.player.get(p.player_id)), render: (p) => <Link to={`/joueurs/${p.player_id}`} className="flex items-center gap-2 hover:text-neon"><TeamLogo team={L.team.get(p.team_id)} size={20} /><span className="font-semibold">{playerName(L.player.get(p.player_id))}</span></Link> },
+          { key: 'name', label: 'Joueur', sort: (p) => playerName(L.player.get(p.player_id)), render: (p) => <Link to={`/joueurs/${p.player_id}`} className="flex items-center gap-2 hover:text-neon"><TeamLogo team={L.team.get(p.team_id)} size="xs" /><span className="font-semibold">{playerName(L.player.get(p.player_id))}</span></Link> },
           { key: 'played', label: 'MJ', title: 'Matchs joués', headClassName: 'text-center', className: 'num text-center', sort: (p) => p.matches, render: (p) => p.matches },
           { key: 'goals', label: 'Buts', headClassName: 'text-center', className: 'num text-center', sort: (p) => p.goals, render: (p) => p.goals },
           { key: 'assists', label: 'Passes', title: 'Passes décisives', headClassName: 'text-center', className: 'num text-center', sort: (p) => p.assists, render: (p) => p.assists },

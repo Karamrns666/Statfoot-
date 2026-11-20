@@ -3,9 +3,10 @@
 //  • template-top10.png : podium (3 cartes + pastilles nom) et 7 bandes (rangs 4 à 10).
 // Toutes les zones viennent de src/config/visuals.json (semaine / top10), modifiables et visibles en « aperçu des zones ».
 import { colorOf, WEEKLY_H, WEEKLY_W, type VisualsConfig, type Zone } from './config'
-import { drawContain, drawText, drawZones, ensureVisualFonts, fitText, fontOf, loadImage, newCanvas } from './render'
+import { drawContain, drawText, drawTile, drawZones, ensureVisualFonts, fitText, fontOf, loadImage, newCanvas } from './render'
 import { contrastText, shade, type TopEntry, type WeeklyResultRow, type WeeklyStandingRow } from './weekly'
 import type { SeniorityTier } from '@/lib/seniority'
+import { logoPlate, tileLogo } from '@/lib/logoPlate'
 
 const withAlpha = (ctx: CanvasRenderingContext2D, a: number | undefined, f: () => void) => { ctx.save(); ctx.globalAlpha = a ?? 1; f(); ctx.restore() }
 const rowY = (cfg: VisualsConfig, z: Zone, i: number) => ({ ...z, y: z.y + i * cfg.semaine.options.step })
@@ -78,7 +79,7 @@ export async function renderWeeklyStandings(rows: (WeeklyStandingRow & { tier?: 
     const lg = Z.row.logo ?? 40
     let x = row.x
     const img = logos[i]
-    if (img) { ctx.save(); ctx.beginPath(); ctx.roundRect(x, cy - lg / 2, lg, lg, 8); ctx.fillStyle = '#FFFFFF'; ctx.fill(); ctx.restore(); drawContain(ctx, img, { x: x + 2, y: cy - lg / 2 + 2, w: lg - 4, h: lg - 4 }) }
+    if (img) drawTile(ctx, img, { x, y: cy - lg / 2, w: lg, h: lg }, r.logoBg)
     x += lg + (Z.row.gap ?? 12)
     const stats = `MJ ${r.played} · DIFF ${r.gd > 0 ? '+' : ''}${r.gd}`
     ctx.font = fontOf(cfg, Z.rowStats, Z.rowStats.size ?? 22); const sw = ctx.measureText(stats).width
@@ -119,9 +120,9 @@ export async function renderWeeklyResults(rows: WeeklyResultRow[], cfg: VisualsC
     textAt(ctx, cfg, row0, r.score, cx, cy, scoreW - 10, Math.min(row0.size ?? 30, 30), 'center', colorOf(cfg, 'navy'))
     if (r.sub) textAt(ctx, cfg, Z.rowStats, r.sub, cx, row.y + row.h + 9, scoreW + 60, 14, 'center')
     const hx = cx - scoreW / 2 - gap - lg, ax = cx + scoreW / 2 + gap
-    for (const [img, x] of [[imgs[i * 2], hx], [imgs[i * 2 + 1], ax]] as const) {
-      ctx.save(); ctx.beginPath(); ctx.roundRect(x, cy - lg / 2, lg, lg, 8); ctx.fillStyle = '#FFFFFF'; ctx.fill(); ctx.restore()
-      if (img) drawContain(ctx, img, { x: x + 2, y: cy - lg / 2 + 2, w: lg - 4, h: lg - 4 })
+    for (const [img, x, bgc] of [[imgs[i * 2], hx, r.home.logoBg], [imgs[i * 2 + 1], ax, r.away.logoBg]] as const) {
+      if (img) drawTile(ctx, img, { x, y: cy - lg / 2, w: lg, h: lg }, bgc)
+      else { ctx.save(); ctx.beginPath(); ctx.roundRect(x, cy - lg / 2, lg, lg, lg * 0.22); ctx.fillStyle = '#FFFFFF'; ctx.fill(); ctx.restore() }
     }
     textAt(ctx, cfg, row0, r.home.name, hx - gap, cy, nameMax, nameSize, 'right')
     textAt(ctx, cfg, row0, r.away.name, ax + lg + gap, cy, nameMax, nameSize, 'left')
@@ -138,7 +139,7 @@ export async function renderTop10(entries: TopEntry[], cfg: VisualsConfig, opts:
   const { c, ctx } = await base(cfg, cfg.templates.top10)
   drawHeader(ctx, cfg, Z, opts.title, opts.subtitle)
   const photos = await Promise.all(entries.slice(0, 3).map((e) => loadImage(e.player.photo_card_mode !== 'original' && e.player.photo_cutout_url ? e.player.photo_cutout_url : e.player.photo_url)))
-  const logos = await Promise.all(entries.map((e) => loadImage(e.team?.logo_url)))
+  const logos = await Promise.all(entries.map((e) => loadImage(tileLogo(e.team, true))))
   // podium : 2e à gauche, 1er au centre, 3e à droite
   const slots: [number, Zone, Zone][] = [[0, Z.card1, Z.pill1], [1, Z.card2, Z.pill2], [2, Z.card3, Z.pill3]]
   const pillSize = Math.min(...slots.filter(([i]) => entries[i]).map(([i, , pz]) => fitText(ctx, cfg, entries[i].name, pz).size), Z.pill1.size ?? 30)
@@ -158,7 +159,7 @@ export async function renderTop10(entries: TopEntry[], cfg: VisualsConfig, opts:
     ctx.font = fontOf(cfg, vz, vz.size ?? 40); const vw = Math.min(ctx.measureText(e.display).width, card.w - lg - 40)
     const x0 = card.x + (card.w - (vw + 10 + lg)) / 2
     textAt(ctx, cfg, vz, e.display, x0, vy, card.w - lg - 40, vz.size ?? 40)
-    if (logos[i]) { ctx.save(); ctx.beginPath(); ctx.roundRect(x0 + vw + 10, vy - lg / 2, lg, lg, 10); ctx.fillStyle = '#FFFFFF'; ctx.fill(); ctx.restore(); drawContain(ctx, logos[i]!, { x: x0 + vw + 12, y: vy - lg / 2 + 2, w: lg - 4, h: lg - 4 }) }
+    if (logos[i]) drawTile(ctx, logos[i]!, { x: x0 + vw + 10, y: vy - lg / 2, w: lg, h: lg }, logoPlate(e.team).bg)
   }
   // bandes 4 à 10 : couleur principale du club, texte contrasté automatiquement
   const band = Z.band, rk = Z.bandRank, val = Z.bandValue, team = Z.bandTeam
@@ -175,7 +176,7 @@ export async function renderTop10(entries: TopEntry[], cfg: VisualsConfig, opts:
     textAt(ctx, cfg, val, e.display, val.x + val.w / 2, cy, val.w - 16, val.size ?? 44, 'center', colorOf(cfg, 'navy'))
     let x = val.x + val.w + 16
     const lg = band.logo ?? 56
-    if (logos[k + 3]) { ctx.save(); ctx.beginPath(); ctx.roundRect(x, cy - lg / 2, lg, lg, 10); ctx.fillStyle = '#FFFFFF'; ctx.fill(); ctx.restore(); drawContain(ctx, logos[k + 3]!, { x: x + 3, y: cy - lg / 2 + 3, w: lg - 6, h: lg - 6 }) }
+    if (logos[k + 3]) drawTile(ctx, logos[k + 3]!, { x, y: cy - lg / 2, w: lg, h: lg }, logoPlate(e.team).bg)
     x += lg + (band.gap ?? 14)
     const tname = (e.team?.short_name ?? '').toLocaleUpperCase('fr-FR')
     ctx.font = fontOf(cfg, team, team.size ?? 22); const tw = ctx.measureText(tname).width

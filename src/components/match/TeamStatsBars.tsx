@@ -23,11 +23,11 @@ export function TeamStatsBars({ match, events, live, now, manual, compact }: { m
     <Card>
       <CardContent className={cn('space-y-3 pt-4', compact && 'p-3')}>
         <div className="flex items-center justify-between gap-2">
-          <span className="flex items-center gap-2 text-sm font-bold"><TeamLogo team={L.team.get(match.home_team_id)} size={22} />{L.team.get(match.home_team_id)?.short_name}</span>
+          <span className="flex items-center gap-2 text-sm font-bold"><TeamLogo team={L.team.get(match.home_team_id)} size="xs" />{L.team.get(match.home_team_id)?.short_name}</span>
           <div className="flex gap-1 rounded-lg bg-night-950/50 p-1 text-xs">
             {(['all', '1H', '2H'] as const).map((p) => <button key={p} onClick={() => setPeriod(p)} className={cn('rounded-md px-2.5 py-1 font-semibold cursor-pointer', period === p ? 'bg-neon/20 text-neon' : 'text-muted-foreground')}>{p === 'all' ? 'Match' : p === '1H' ? '1re MT' : '2e MT'}</button>)}
           </div>
-          <span className="flex items-center gap-2 text-sm font-bold">{L.team.get(match.away_team_id)?.short_name}<TeamLogo team={L.team.get(match.away_team_id)} size={22} /></span>
+          <span className="flex items-center gap-2 text-sm font-bold">{L.team.get(match.away_team_id)?.short_name}<TeamLogo team={L.team.get(match.away_team_id)} size="xs" /></span>
         </div>
         {keys.map((l) => {
           const hv = stats.home[l.key], av = stats.away[l.key], tot = hv + av || 1

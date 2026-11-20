@@ -101,9 +101,9 @@ function MatchRow({ m }: { m: Match }) {
   return (
     <Link to={m.status === 'scheduled' || m.status === 'live' ? `/admin/match-center/${m.id}` : `/admin/matchs/${m.id}/feuille`} className="flex items-center gap-2 rounded-lg bg-white/[.03] px-3 py-2 text-sm hover:bg-white/[.07]">
       <span className="w-20 text-xs text-muted-foreground">{fmtDate(m.date, 'd MMM')} {fmtTime(m.date)}</span>
-      <TeamLogo team={L.team.get(m.home_team_id)} size={18} /><span className="font-semibold">{L.team.get(m.home_team_id)?.short_name}</span>
+      <TeamLogo team={L.team.get(m.home_team_id)} size="xs" /><span className="font-semibold">{L.team.get(m.home_team_id)?.short_name}</span>
       <span className="num flex-1 text-center">{m.status === 'scheduled' ? 'vs' : fmtScore(m)}</span>
-      <span className="font-semibold">{L.team.get(m.away_team_id)?.short_name}</span><TeamLogo team={L.team.get(m.away_team_id)} size={18} />
+      <span className="font-semibold">{L.team.get(m.away_team_id)?.short_name}</span><TeamLogo team={L.team.get(m.away_team_id)} size="xs" />
       {m.status === 'live' && <span className="ml-1 size-2 rounded-full bg-red-500 animate-pulse-live" />}
     </Link>
   )

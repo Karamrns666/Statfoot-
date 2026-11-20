@@ -1,3 +1,4 @@
 # vérification finale (cartes, logos, Top 25 IPG) après mise en production
+sleep 180
 mkdir -p final-out
 node e2e/final-planche.mjs > final-out/run.txt 2>&1

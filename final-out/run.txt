@@ -1,0 +1,46 @@
+équipes 21 · joueurs 261 · matchs 20 (validés 10, terminés 10)
+telephone carte ALD Mehdi Sounni
+telephone carte ARW Mohammed Rharmili
+telephone carte AVC Hatime Lahbouki
+telephone carte AVR Rachid Outrhous
+telephone carte ATW Nabil Naji
+telephone carte BMC Anas Oubaali
+telephone carte CAC Mohammed Tahiri
+telephone carte COB Hicham Douraibi
+telephone carte CAM Ayoub Aaniba
+telephone carte CTR Youssef Manssor
+telephone carte DST Abdessamad Nafil
+telephone carte G3C Jaouad Laanaya
+telephone carte JTI Amine Baout
+telephone carte LHJ Abdelbassir Mellouk
+telephone carte MJM Mohamed Antaki
+telephone carte MPT Mouad Mansor
+telephone carte MIC Adil Amad
+telephone carte PBE Salah Eddin Ait Taleb
+telephone carte PHP Younes Arrami
+telephone carte MID Ismail Tragha
+telephone carte WAF Souhail Ezziany
+telephone erreurs JavaScript : 0 
+Top 25 : 25 cartes ; texte : Top 25 de l’Indice de Performance Globale · calculé sur 10 matchs joués · mis à jour le 20 novembre 2026 · Comment est calculé l’IPG ?
+ordinateur carte ALD Mehdi Sounni
+ordinateur carte ARW Mohammed Rharmili
+ordinateur carte AVC Hatime Lahbouki
+ordinateur carte AVR Rachid Outrhous
+ordinateur carte ATW Nabil Naji
+ordinateur carte BMC Anas Oubaali
+ordinateur carte CAC Mohammed Tahiri
+ordinateur carte COB Hicham Douraibi
+ordinateur carte CAM Ayoub Aaniba
+ordinateur carte CTR Youssef Manssor
+ordinateur carte DST Abdessamad Nafil
+ordinateur carte G3C Jaouad Laanaya
+ordinateur carte JTI Amine Baout
+ordinateur carte LHJ Abdelbassir Mellouk
+ordinateur carte MJM Mohamed Antaki
+ordinateur carte MPT Mouad Mansor
+ordinateur carte MIC Adil Amad
+ordinateur carte PBE Salah Eddin Ait Taleb
+ordinateur carte PHP Younes Arrami
+ordinateur carte MID Ismail Tragha
+ordinateur carte WAF Souhail Ezziany
+ordinateur erreurs JavaScript : 0 

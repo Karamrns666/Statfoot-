@@ -67,8 +67,8 @@ test('Top 10 buteurs : nom long, égalité, moins de 10 buteurs', async ({ page 
     const fig = page.locator('figure', { has: page.locator('figcaption', { hasText: new RegExp(`^${label}$`) }) })
     await expect(fig.locator('img')).toBeVisible({ timeout: 30_000 })
     const data = await fig.locator('img').evaluate(async (img) => { const b = await (await fetch(img.src)).blob(); return await new Promise((r) => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(b) }) })
-    fs.mkdirSync(`screenshots/${info.project.name}`, { recursive: true })
-    fs.writeFileSync(`screenshots/${info.project.name}/${file}`, Buffer.from(String(data).split(',')[1], 'base64'))
+    fs.mkdirSync(`test-results/visuels-${info.project.name}`, { recursive: true })
+    fs.writeFileSync(`test-results/visuels-${info.project.name}/${file}`, Buffer.from(String(data).split(',')[1], 'base64'))
     return fig.locator('textarea').inputValue()
   }
   const caption = await save('Top 10 buteurs', 'top10-buteurs.png')

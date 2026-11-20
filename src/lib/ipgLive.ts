@@ -54,7 +54,7 @@ export function computeSeasonIPG(data: XPData, scope: XPScope): LiveIPGResult {
   for (const e of data.events) if (ids.has(e.match_id)) { const l = evBy.get(e.match_id) ?? []; l.push(e); evBy.set(e.match_id, l) }
   for (const m of M) {
     if (m.forfeit_team_id) continue
-    const evs = (evBy.get(m.id) ?? []).filter((e) => e.type === 'goal' && e.period !== 'shootout')
+    const evs = (evBy.get(m.id) ?? []).filter((e) => e.type === 'goal' && e.period !== 'PENS')
     const decisive = new Map<string, Set<string>>() // joueur → équipes adverses
     for (const e of evs) {
       const gf = e.team_id === m.home_team_id ? m.home_score ?? 0 : m.away_score ?? 0

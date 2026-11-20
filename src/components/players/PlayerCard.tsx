@@ -185,8 +185,9 @@ function CardFront({ p }: { p: PlayerCardProps }) {
             carte (rapport 6,1 : 1, proportionnel à la carte), sous le nom de l'équipe, juste au-dessus des stats ;
             logo principal complet. Même rendu à l'écran et dans le PNG téléchargé (même composant). */}
         {ct && (
-          <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center py-[.3em]">
-            <div className="aspect-[6.1/1] w-[76%] shrink-0" data-card-banner><TeamLogo team={ct} variant="banner" /></div>
+          <div className="relative z-10 flex min-h-[1.4em] flex-1 items-center justify-center py-[.3em]">
+            {/* mini-cartes : le bandeau se tasse en hauteur (max-h-full) plutôt que de monter sur le nom */}
+            <div className="aspect-[6.1/1] max-h-full w-[76%] shrink-0" data-card-banner><TeamLogo team={ct} variant="banner" /></div>
           </div>
         )}
         <div className="relative mt-auto grid grid-cols-4 divide-x divide-white/15 border-t-[.22em] border-[#F05A22]" style={{ background: st.bar, color: st.barText }}>

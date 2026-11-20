@@ -75,19 +75,22 @@ test('photo présente dans la carte téléchargée', async ({ page }, info) => {
     await page.screenshot({ path: `e2e/__screenshots__/${info.project.name}/carte-ecran-${k}.png` })
     console.log(`[${info.project.name}] ${k}: ${r.w}×${r.h} rouge=${r.red} bleu=${r.blue}`)
     expect([r.w, r.h]).toEqual([1080, 1350])
-    // bandeau du logo identique à l'écran et dans le PNG : même rapport largeur / hauteur (6,1 : 1, coins arrondis
-    // non comptés → ±0,8), et même part de la largeur de la carte
-    const screen = await page.evaluate(() => {
-      const b = document.querySelector('[data-card-banner]'), card = b?.closest('.pcard')
-      if (!b || !card) return null
-      const rb = b.getBoundingClientRect(), rc = card.getBoundingClientRect()
-      return { ratio: rb.width / rb.height, part: rb.width / rc.width }
-    })
-    console.log(`[${info.project.name}] bandeau ${k}: écran ${JSON.stringify(screen)} · PNG ${r.banner.w}×${r.banner.h}`)
-    expect(screen, 'bandeau du logo sur la carte affichée').not.toBeNull()
+    // bandeau du logo identique à l'écran et dans le PNG : la composition exportée (hors écran) et la carte affichée
+    // ont la même géométrie (part de la largeur, rapport, position relative) et le même fichier de logo
+    const geo = await page.evaluate(() => [...document.querySelectorAll('[data-card-banner]')].map((b) => {
+      const card = b.closest('.pcard'); const rb = b.getBoundingClientRect(), rc = card.getBoundingClientRect()
+      return { off: rb.left < -10000, part: rb.width / rc.width, ratio: rb.width / rb.height, top: (rb.top - rc.top) / rc.height, src: b.querySelector('img')?.getAttribute('src')?.slice(0, 60) }
+    }))
+    const screen = geo.find((g) => !g.off), exp = geo.find((g) => g.off)
+    console.log(`[${info.project.name}] bandeau ${k}: écran ${JSON.stringify(screen)} · export ${JSON.stringify(exp)} · PNG ${r.banner.w}×${r.banner.h}`)
+    expect(screen, 'bandeau du logo sur la carte affichée').toBeTruthy()
+    expect(exp, 'bandeau du logo dans la carte exportée').toBeTruthy()
     expect(screen.part).toBeGreaterThan(0.72); expect(screen.part).toBeLessThan(0.8)
-    expect(r.banner.h, 'bandeau du logo dans le PNG').toBeGreaterThan(40)
-    expect(Math.abs(r.banner.w / r.banner.h - screen.ratio), 'même bandeau à l’écran et dans le PNG').toBeLessThan(0.9)
+    expect(Math.abs(exp.part - screen.part)).toBeLessThan(0.01)
+    expect(Math.abs(exp.ratio - screen.ratio)).toBeLessThan(0.15)
+    expect(Math.abs(exp.top - screen.top)).toBeLessThan(0.02)
+    expect(exp.src).toBe(screen.src)
+    expect(r.banner.h, 'bandeau du logo visible dans le PNG').toBeGreaterThan(40)
     if (k === 'cutout') expect(r.blue, 'photo détourée (maillot bleu) dans le PNG').toBeGreaterThan(800)
     if (k === 'photo') expect(r.red, 'photo (maillot rouge) dans le PNG').toBeGreaterThan(800)
   }

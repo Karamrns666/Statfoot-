@@ -37,14 +37,14 @@ export async function checkLogos(page) {
     }
     const label = (el) => el.getAttribute('aria-label') || el.dataset.teamLogo || '?'
     // tuile actuelle (data-team-logo) ; ancienne version du site : span role="img" contenant l'image du logo
-    const logos = [...document.querySelectorAll('[data-team-logo], span[role="img"][aria-label]:has(> img)')].filter(visible)
+    const logos = [...document.querySelectorAll('[data-team-logo], [data-team-banner], span[role="img"][aria-label]:has(> img)')].filter(visible)
     // 1. chevauchement logo ↔ texte / badge (glyphes réels via Range)
     const texts = []
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {
       if (!n.textContent.trim()) continue
       const el = n.parentElement
-      if (!el || !visible(el) || el.closest('[data-team-logo], span[role="img"]') || el.closest('[aria-hidden="true"]')) continue
+      if (!el || !visible(el) || el.closest('[data-team-logo], [data-team-banner], span[role="img"]') || el.closest('[aria-hidden="true"]')) continue
       const rg = document.createRange(); rg.selectNodeContents(n)
       for (const r0 of rg.getClientRects()) { const r = clipRect(el, r0); if (r.right - r.left > 1 && r.bottom - r.top > 1) texts.push({ r, t: n.textContent.trim().slice(0, 30), el }) }
     }

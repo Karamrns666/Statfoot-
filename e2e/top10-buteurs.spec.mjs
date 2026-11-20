@@ -14,8 +14,8 @@ test('Top 10 buteurs : nom long, égalité, moins de 10 buteurs', async ({ page 
     const get = (n) => JSON.parse(localStorage.getItem(K + n) || '[]')
     const set = (n, v) => localStorage.setItem(K + n, JSON.stringify(v))
     const seasons = get('Season')
-    const season = (seasons.find((x) => x.is_active) ?? seasons[0]).id
-    const comps = get('Competition').filter((c) => c.season_id === season && ['league_phase', 'gold', 'silver'].includes(c.phase))
+    const season = (seasons.find((x) => x.is_active) ?? seasons[0])?.id
+    const comps = get('Competition').filter((c) => (!season || c.season_id === season) && ['league_phase', 'gold', 'silver'].includes(c.phase))
     const matches = get('Match')
     const played = (m) => ['finished', 'forfeit'].includes(m.status) || m.home_score != null
     const comp = comps.find((c) => matches.some((m) => m.competition_id === c.id && played(m) && m.round != null))

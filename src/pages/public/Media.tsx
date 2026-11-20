@@ -5,12 +5,12 @@ import { useData, useLookup } from '@/hooks/useData'
 import { useSeason } from '@/hooks/useSeason'
 import { useEffectiveSeason } from '@/hooks/useStats'
 import { PageHeader, EmptyState } from '@/components/league/Bits'
-import { TeamLogo } from '@/components/league/Identity'
+import { FitName, TeamLogo } from '@/components/league/Identity'
 import { MBL_LOGO } from '@/components/layout/Logo'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { fmtDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
-import type { Media as M } from '@/types/entities'
+import type { Media as M, Team } from '@/types/entities'
 
 type Kind = 'tout' | 'photo' | 'video' | 'lien'
 const KINDS: { v: Kind; label: string; icon: typeof Image }[] = [{ v: 'tout', label: 'Tout', icon: Image }, { v: 'photo', label: 'Photo', icon: Image }, { v: 'video', label: 'Vidéo', icon: Play }, { v: 'lien', label: 'Lien', icon: Link2 }]
@@ -48,7 +48,7 @@ export default function Media() {
       <div className="scrollbar-none -mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-1" role="tablist" aria-label="Équipe">
         <TeamChip active={team === 'mbl'} onClick={() => setTeam('mbl')} label="MBL" logo={<img src={MBL_LOGO} alt="" className="h-9 w-auto" />} />
         <TeamChip active={team === ''} onClick={() => setTeam('')} label="Toutes" logo={<span className="flex size-9 items-center justify-center rounded-full bg-white/10 font-display text-sm font-black">{seasonTeams.length}</span>} />
-        {seasonTeams.map((t) => <TeamChip key={t.id} active={team === t.id} onClick={() => setTeam(t.id)} label={t.name} logo={<TeamLogo team={t} size="md" />} />)}
+        {seasonTeams.map((t) => <TeamChip key={t.id} active={team === t.id} onClick={() => setTeam(t.id)} label={t.name} team={t} logo={<TeamLogo team={t} size="md" />} />)}
       </div>
 
       {/* types */}
@@ -100,11 +100,12 @@ export default function Media() {
   )
 }
 
-function TeamChip({ active, onClick, label, logo }: { active: boolean; onClick: () => void; label: string; logo: ReactNode }) {
+function TeamChip({ active, onClick, label, logo, team }: { active: boolean; onClick: () => void; label: string; logo: ReactNode; team?: Team }) {
   return (
     <button role="tab" aria-selected={active} onClick={onClick} title={label} className={cn('flex w-20 shrink-0 cursor-pointer flex-col items-center gap-1.5 rounded-xl border px-1.5 py-2 transition', active ? 'border-neon bg-neon/15' : 'border-white/10 bg-white/[.03] hover:bg-white/[.07]')}>
       {logo}
-      <span className={cn('w-full truncate text-center text-[11px] font-semibold', active ? 'text-white' : 'text-muted-foreground')}>{label}</span>
+      {team ? <FitName team={team} className={cn('w-full text-center text-[11px] font-semibold', active ? 'text-white' : 'text-muted-foreground')} />
+        : <span className={cn('w-full truncate text-center text-[11px] font-semibold', active ? 'text-white' : 'text-muted-foreground')}>{label}</span>}
     </button>
   )
 }

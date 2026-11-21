@@ -24,7 +24,7 @@ describe('Top 10 gardiens par XP', () => {
     // A_GK 0 (clean sheet) ; C_GK et D_GK −10 (1 encaissé, nom) ; B_GK −20
     expect(ids(top)).toEqual(['A_GK', 'C_GK', 'D_GK', 'B_GK'])
     expect(top.map((e) => e.display)).toEqual(['0 XP', '−10 XP', '−10 XP', '−20 XP'])
-    expect(top[3].detail).toBe('0 arrêt · 2 encaissés')
+    expect(top[3].detail).toBe('1 arrêt · 2 encaissés')
     // un arrêt de plus départage D_GK devant C_GK
     const saves = makeLeague({ lineups: LU, xpRules: rules({ goal_conceded_gk: -10 }), events: [...events, ev({ match_id: 'M2', type: 'save', player_id: 'D_GK', team_id: 'D' })] })
     expect(ids(weeklyTop(saves, 'lp', 1, 'keepers')).slice(1, 3)).toEqual(['D_GK', 'C_GK'])

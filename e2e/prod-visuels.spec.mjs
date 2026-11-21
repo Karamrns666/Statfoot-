@@ -26,7 +26,8 @@ test('visuels de la semaine — données réelles', async ({ page, context }) =>
     const ids = Match.map((m) => m.id).join(',')
     const MatchEvent = await q('MatchEvent', `&data->>match_id=in.(${ids})&data->>type=in.(goal,own_goal,yellow_card,second_yellow,red_card,save,penalty_saved,shot_on_target,shot_off_target,penalty_missed,substitution,gk_change,shootout_scored,shootout_saved,shootout_missed)`), Lineup = await q('Lineup', `&data->>match_id=in.(${ids})`)
     const Player = await q('Player', '&data->>team_id=like.t26_*')
-    return { Season, Competition, Team, Match, MatchEvent, Lineup, Player }
+    const XPRule = await q('XPRule')
+    return { Season, Competition, Team, Match, MatchEvent, Lineup, Player, XPRule }
   })
   await prod.close()
   console.log(Object.entries(data).map(([k, v]) => `${k} ${v.length}`).join(' · '))
@@ -62,6 +63,18 @@ test('visuels de la semaine — données réelles', async ({ page, context }) =>
   const pre = data.Competition.find((c) => c.phase === 'league_phase')
   const gk = data.MatchEvent.filter((e) => e.type === 'gk_change').map((e) => { const m = data.Match.find((x) => x.id === e.match_id); const p = data.Player.find((x) => x.id === e.player_id); return `${m?.number} J${m?.round} ${m?.competition_id === pre?.id ? 'pré-saison' : ''} — ${e.team_id} — entre : ${p?.first_name} ${p?.last_name} à ${e.minute}' ${e.period ?? ''}` })
   fs.writeFileSync(`${OUT}/changements-gardien.txt`, gk.join('\n') || 'aucun')
+  // feuilles de match des gardiens titulaires de la J1 (contrôle à la main)
+  const sheet = []
+  for (const m of data.Match.filter((x) => x.competition_id === pre?.id && x.round === 1)) for (const tid of [m.home_team_id, m.away_team_id]) {
+    const lu = data.Lineup.find((l) => l.match_id === m.id && l.team_id === tid); const gkId = lu?.goalkeeper_id; if (!gkId) continue
+    const p = data.Player.find((x) => x.id === gkId), ev = data.MatchEvent.filter((e) => e.match_id === m.id)
+    const opp = tid === m.home_team_id ? m.away_team_id : m.home_team_id
+    const mine = ev.filter((e) => e.player_id === gkId || e.related_player_id === gkId).map((e) => `${e.type}${e.related_player_id === gkId && e.player_id !== gkId ? '(passe)' : ''} ${e.minute ?? ''}' ${e.period ?? ''}`)
+    const against = ev.filter((e) => (e.type === 'goal' && e.team_id === opp) || (e.type === 'own_goal' && e.team_id === tid)).map((e) => `${e.minute}' ${e.period ?? ''}`)
+    const chg = ev.filter((e) => e.type === 'gk_change' && e.team_id === tid).map((e) => `changement ${e.minute}' ${e.period ?? ''}`)
+    sheet.push(`${m.number} ${m.home_score}-${m.away_score} · ${tid} · ${p?.first_name} ${p?.last_name} · HdM ${m.motm_player_id === gkId ? 'oui' : 'non'} · ${mine.filter((x) => x.startsWith('save')).length} arrêts · encaissés : ${against.join(', ') || '—'} · autres : ${mine.filter((x) => !x.startsWith('save')).join(', ') || '—'} ${chg.join(', ')}`)
+  }
+  fs.writeFileSync(`${OUT}/gardiens-feuilles.txt`, sheet.join('\n') + `\nRègles XP en ligne : ${JSON.stringify(data.XPRule.map((r) => [r.key, r.value, r.season_id]))}`)
   await page.getByRole('radio', { name: '2 images (MASTER + CHALLENGER)' }).click()
   await page.waitForTimeout(1500)
   await save('Classement · 1/2 · zone MASTER', 'classement-2-images-1.png')

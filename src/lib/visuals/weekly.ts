@@ -84,8 +84,17 @@ export const TOP_KINDS: TopKind[] = ['xp', 'goals', 'assists', 'keepers']
 export const TOP_LABEL: Record<TopKind, string> = { xp: 'TOP 10 JOUEURS', goals: 'TOP 10 BUTEURS', assists: 'TOP 10 PASSEURS', keepers: 'TOP 10 GARDIENS' }
 export const TOP_CARD_LABEL: Record<TopKind, string> = { xp: 'Top 10 joueurs (XP)', goals: 'Top 10 buteurs', assists: 'Top 10 passeurs', keepers: 'Top 10 gardiens' }
 // unités au singulier / pluriel (jamais tronquées : « 3 PASSES » plutôt que « 3 PASSES D. »)
-export const TOP_UNIT: Record<TopKind, [string, string]> = { xp: ['XP', 'XP'], goals: ['BUT', 'BUTS'], assists: ['PASSE', 'PASSES'], keepers: ['ARRÊT', 'ARRÊTS'] }
-export interface TopEntry { player: Player; team?: Team; value: number; xp: number; rank: number; display: string; name: string }
+export const TOP_UNIT: Record<TopKind, [string, string]> = { xp: ['XP', 'XP'], goals: ['BUT', 'BUTS'], assists: ['PASSE', 'PASSES'], keepers: ['XP', 'XP'] }
+export interface TopEntry { player: Player; team?: Team; value: number; xp: number; rank: number; display: string; name: string
+  /** gardiens : détail en petit (« 13 arrêts · 2 encaissés ») et arrêts pour le texte de publication */
+  detail?: string; saves?: number }
+/** « +330 XP », « −20 XP » (vrai signe moins), « 0 XP » */
+export const fmtXP = (v: number) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v)} XP`
+const plural = (n: number, one: string, many: string) => `${n} ${Math.abs(n) > 1 ? many : one}`
+/** Matchs avec changement de gardien pris en compte dans un Top 10 gardiens (à signaler) */
+export function keeperChanges(league: LeagueData, competitionId: string, round: number, period: TopPeriod = 'round') {
+  return topMatches(league, competitionId, round, period).filter((m) => league.events.some((e) => e.match_id === m.id && e.type === 'gk_change'))
+}
 /** « journée » : uniquement la journée choisie ; « cumul » : de la 1re journée de la compétition à la journée choisie */
 export type TopPeriod = 'round' | 'cumul'
 
@@ -109,16 +118,24 @@ export function weeklyTop(league: LeagueData & XPData, competitionId: string, ro
   const xp = new Map<string, number>(), kxp = new Map<string, number>(), assists = new Map<string, number>(), saves = new Map<string, number>(), goals = new Map<string, number>()
   const add = (m: Map<string, number>, k: string, v: number) => m.set(k, (m.get(k) ?? 0) + v)
   const teamOf = new Map<string, string>()
+  // gardiens : XP des matchs où le joueur a gardé le but (répartition du match centre : chaque gardien a ses propres
+  // lignes XP, y compris en cas de changement de gardien), arrêts, buts encaissés pendant qu'il était dans les buts
+  const gkXP = new Map<string, number>(), conceded = new Map<string, number>(), cleanSheets = new Map<string, number>()
   for (const m of ms) {
     const cfg = xpConfig(league.xpRules, m.season_id)
-    for (const l of matchXPLines(league, m, cfg)) { add(xp, l.player_id, l.points); if (KEEPER_KEYS.has(l.key)) add(kxp, l.player_id, l.points) }
+    const lines = matchXPLines(league, m, cfg)
+    for (const l of lines) { add(xp, l.player_id, l.points); if (KEEPER_KEYS.has(l.key)) add(kxp, l.player_id, l.points) }
     const evs = league.events.filter((e) => e.match_id === m.id && e.period !== 'PENS')
     for (const e of evs) if (e.type === 'goal' && e.related_player_id && e.related_player_id !== e.player_id) { add(assists, e.related_player_id, 1); teamOf.set(e.related_player_id, e.team_id) }
     // buts : type « goal » seulement (CSC exclus), hors tirs au but (PENS) et hors tapis vert (forfait)
     if (!m.forfeit_team_id) for (const e of evs) if (e.type === 'goal' && e.player_id) { add(goals, e.player_id, 1); teamOf.set(e.player_id, e.team_id) }
     for (const tid of [m.home_team_id, m.away_team_id]) {
       const lu = league.lineups.find((l) => l.match_id === m.id && l.team_id === tid)
-      for (const k of keeperMatchStats(m, lu, evs, tid)) { add(saves, k.player_id, k.saves); teamOf.set(k.player_id, tid); if (!kxp.has(k.player_id)) kxp.set(k.player_id, 0) }
+      for (const k of keeperMatchStats(m, lu, evs, tid)) {
+        add(saves, k.player_id, k.saves); add(conceded, k.player_id, k.conceded); add(cleanSheets, k.player_id, k.clean_sheet ? 1 : 0)
+        add(gkXP, k.player_id, lines.filter((l) => l.player_id === k.player_id).reduce((a, l) => a + l.points, 0))
+        teamOf.set(k.player_id, tid); if (!kxp.has(k.player_id)) kxp.set(k.player_id, 0)
+      }
     }
   }
   const nameOf = (pid: string) => `${P.get(pid)!.last_name} ${P.get(pid)!.first_name}`
@@ -130,10 +147,16 @@ export function weeklyTop(league: LeagueData & XPData, competitionId: string, ro
     list = [...goals.entries()].filter(([pid, v]) => P.has(pid) && v > 0)
       .map(([pid, v]) => ({ pid, v, x: xp.get(pid) ?? 0, mj: st.get(pid)?.matches ?? 1, ot: st.get(pid)?.shot.on_target ?? 0, a: assists.get(pid) ?? 0, name: nameOf(pid) }))
       .sort((a, b) => b.v - a.v || a.mj - b.mj || b.ot - a.ot || b.a - a.a || a.name.localeCompare(b.name, 'fr'))
+  } else if (kind === 'keepers') {
+    // gardiens ayant joué dans les buts, classés par XP (barème existant) ; XP négatifs après les positifs ;
+    // départage : plus d'arrêts, moins de buts encaissés, plus de clean sheets, puis nom
+    list = [...gkXP.entries()].filter(([pid]) => P.has(pid))
+      .map(([pid, v]) => ({ pid, v, x: v, s: saves.get(pid) ?? 0, c: conceded.get(pid) ?? 0, cs: cleanSheets.get(pid) ?? 0, name: nameOf(pid) }))
+      .sort((a, b) => b.v - a.v || b.s - a.s || a.c - b.c || b.cs - a.cs || a.name.localeCompare(b.name, 'fr'))
   } else {
-    const src = kind === 'xp' ? xp : kind === 'assists' ? assists : saves
-    const tie = kind === 'keepers' ? kxp : xp
-    list = [...src.entries()].filter(([pid, v]) => P.has(pid) && (kind === 'keepers' ? v > 0 || (kxp.get(pid) ?? 0) > 0 : v > 0))
+    const src = kind === 'xp' ? xp : assists
+    const tie = xp
+    list = [...src.entries()].filter(([pid, v]) => P.has(pid) && v > 0)
       .map(([pid, v]) => ({ pid, v, t: tie.get(pid) ?? 0, x: xp.get(pid) ?? 0, name: nameOf(pid) }))
       .sort((a, b) => b.v - a.v || b.t - a.t || b.x - a.x || a.name.localeCompare(b.name, 'fr'))
   }
@@ -144,19 +167,23 @@ export function weeklyTop(league: LeagueData & XPData, competitionId: string, ro
     const p = P.get(e.pid)!
     const team = T.get(teamOf.get(e.pid) ?? p.team_id) ?? T.get(p.team_id)
     const value = e.v
-    return { player: p, team, value, xp: e.x, rank, name: shortName(p), display: kind === 'xp' ? `${value > 0 ? '+' : ''}${value} XP` : `${value} ${Math.abs(value) > 1 ? many : one}` }
+    if (kind === 'keepers') {
+      const sv = saves.get(e.pid) ?? 0, cc = conceded.get(e.pid) ?? 0
+      return { player: p, team, value, xp: e.x, rank, name: shortName(p), display: fmtXP(value), saves: sv, detail: `${plural(sv, 'arrêt', 'arrêts')} · ${plural(cc, 'encaissé', 'encaissés')}` }
+    }
+    return { player: p, team, value, xp: e.x, rank, name: shortName(p), display: kind === 'xp' ? fmtXP(value) : `${value} ${Math.abs(value) > 1 ? many : one}` }
   })
 }
 
 /** Lignes du texte de publication d'un Top 10 : « 1. A. Mazrhi (Attijariwafa bank) – 4 buts » */
 export function topCaptionLines(top: TopEntry[], n = 3) {
-  return top.slice(0, n).map((e) => `${e.rank}. ${e.player.first_name.trim().charAt(0)}. ${e.player.last_name.trim().replace(/\S+/g, (w) => w.charAt(0) + w.slice(1).toLocaleLowerCase('fr-FR'))} (${e.team?.name ?? ''}) – ${e.display.toLocaleLowerCase('fr-FR')}`)
+  return top.slice(0, n).map((e) => `${e.rank}. ${e.player.first_name.trim().charAt(0)}. ${e.player.last_name.trim().replace(/\S+/g, (w) => w.charAt(0) + w.slice(1).toLocaleLowerCase('fr-FR'))} (${e.team?.name ?? ''}) – ${e.saves != null ? `${e.display} (${plural(e.saves, 'arrêt', 'arrêts')})` : e.display.toLocaleLowerCase('fr-FR')}`)
 }
 
 /** Textes de publication des visuels de la semaine. */
 export function weeklyCaption(kind: 'resultats' | 'classement' | TopKind, comp: string, round: number, lines: string[] = [], period: TopPeriod = 'round') {
   const when = period === 'cumul' ? `cumul J1 à J${round}` : `J${round}`
-  const head = kind === 'resultats' ? `⚽ RÉSULTATS | ${comp} · J${round}` : kind === 'classement' ? `📊 CLASSEMENT | ${comp} · après la J${round}` : `${kind === 'goals' ? '⚽' : '🏅'} ${TOP_LABEL[kind]} | ${comp} · ${when}`
+  const head = kind === 'resultats' ? `⚽ RÉSULTATS | ${comp} · J${round}` : kind === 'classement' ? `📊 CLASSEMENT | ${comp} · après la J${round}` : `${kind === 'goals' ? '⚽' : kind === 'keepers' ? '🧤' : '🏅'} ${TOP_LABEL[kind]} | ${comp} · ${when}`
   return [head, ...lines, '', '#MoroccoBusinessLeague #MBL #Ardentia #FootEntreprise'].join('\n')
 }
 

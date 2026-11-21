@@ -226,7 +226,9 @@ export async function renderTop10(entries: TopEntry[], cfg: VisualsConfig, opts:
     drawText(ctx, cfg, String(e.rank), { ...Z.podiumRank, x: card.x + 8, y: card.y + 8 }, { shadow: true })
     drawText(ctx, cfg, e.name, { ...pill, x: pill.x + 8, w: pill.w - 16, size: pillSize(i, pill), min: 12 })
     // valeur + logo du club sous la pastille
-    const vz = Z.podiumValue, lg = vz.logo ?? 46, vy = vz.y + vz.h / 2
+    // gardiens : valeur un peu remontée, détail (arrêts · encaissés) en petit dessous, dans la carte
+    const vz = Z.podiumValue, lg = vz.logo ?? 46, vy = vz.y + vz.h / 2 - (e.detail ? 9 : 0)
+    if (e.detail) textAt(ctx, cfg, { ...vz, font: 'text', weight: 600 }, e.detail, card.x + card.w / 2, vy + lg / 2 + 13, card.w - 24, 19, 'center', '#FFFFFF')
     const ic = opts.icon ? Math.round(lg * 0.72) : 0, icGap = ic ? 8 : 0
     const room = card.w - lg - 40 - ic - icGap
     ctx.font = fontOf(cfg, vz, vz.size ?? 40); const vw = Math.min(ctx.measureText(e.display).width, room)
@@ -260,7 +262,8 @@ export async function renderTop10(entries: TopEntry[], cfg: VisualsConfig, opts:
     const lg = band.logo ?? 56
     if (logos[k + 3]) drawTile(ctx, logos[k + 3]!, { x, y: cy - lg / 2, w: lg, h: lg }, logoPlate(e.team).bg)
     x += lg + (band.gap ?? 14)
-    const tname = (e.team?.short_name ?? '').toLocaleUpperCase('fr-FR')
+    // gardiens : « 13 arrêts · 2 encaissés » à droite (à la place du code équipe, déjà donné par le logo)
+    const tname = e.detail ?? (e.team?.short_name ?? '').toLocaleUpperCase('fr-FR')
     ctx.font = fontOf(cfg, team, team.size ?? 22); const tw = ctx.measureText(tname).width
     textAt(ctx, cfg, band, e.name, x, cy, band.x + band.w - x - tw - 30, band.size ?? 44, 'left', fg)
     withAlpha(ctx, team.opacity, () => textAt(ctx, cfg, team, tname, band.x + band.w - 16, cy, tw + 2, team.size ?? 22, 'right', fg))

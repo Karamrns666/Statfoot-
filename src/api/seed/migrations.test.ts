@@ -110,3 +110,22 @@ describe('règlement v11 publié (affichage uniquement)', () => {
     expect(applyReglementV11({ ...db, Rulebook: out.Rulebook } as never)).toEqual({})
   })
 })
+
+describe('règlement v11 : intérimaires et stagiaires (Art. 2.3)', () => {
+  it('paragraphe ajouté juste après « Statut de salarié », une seule fois, rien d’autre ne change', async () => {
+    const { applyReglementV11Interim, INTERIM_PARAGRAPH } = await import('./migrations')
+    const before = 'A\n\n**Statut de salarié :** les joueurs doivent être salariés.\n\n**Réserve pour joueur non salarié :** 3-0.\n'
+    const db = { Rulebook: [{ id: 'rulebook_v11', version: 'v11', content: before }, { id: 'rulebook_v9', version: 'v9', content: before }] }
+    const out = applyReglementV11Interim(db as never)
+    const after = out.Rulebook![0].content!
+    expect(after).toBe('A\n\n**Statut de salarié :** les joueurs doivent être salariés.\n\n' + INTERIM_PARAGRAPH + '\n\n**Réserve pour joueur non salarié :** 3-0.\n')
+    expect(out.Rulebook![1]).toBe(db.Rulebook[1])
+    expect(applyReglementV11Interim(out as never)).toEqual({})
+  })
+  it('le texte livré de la v11 contient déjà le paragraphe au bon endroit', async () => {
+    const { buildRulebooks } = await import('./rulebook')
+    const c = buildRulebooks().find((b) => b.version === 'v11')!.content!
+    const a = c.indexOf('**Statut de salarié :**'), b = c.indexOf('**Intérimaires et stagiaires :**'), r = c.indexOf('**Réserve pour joueur non salarié :**')
+    expect(a).toBeGreaterThan(-1); expect(b).toBeGreaterThan(a); expect(r).toBeGreaterThan(b)
+  })
+})

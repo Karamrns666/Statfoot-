@@ -46,6 +46,8 @@ Un joueur peut être ajouté ou retiré de la liste de l'équipe sur demande éc
 
 **Statut de salarié :** les joueurs doivent obligatoirement être salariés de l'entreprise qu'ils représentent. Ardentia peut demander à tout moment un justificatif (attestation de travail ou document équivalent).
 
+**Intérimaires et stagiaires :** les intérimaires et les stagiaires de l'entreprise peuvent également faire partie de l'équipe, sous réserve de la validation préalable d'Ardentia.
+
 **Réserve pour joueur non salarié :** si une réserve est déposée contre une équipe ayant fait jouer un joueur qui n'est pas salarié de l'entreprise qu'elle représente, et que cette réserve est confirmée par Ardentia, l'équipe fautive perd le match sur le score de 3-0 (voir Article 17.4).
 
 ## 2.4 Procédure de remplacement

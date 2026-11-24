@@ -534,7 +534,20 @@ export function applyLogoPbeV2(db: Rules6Data & { Club?: Club[] }): Rules6Data &
   return out
 }
 
-const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams, applyHideSeason2025, applyLogoRevisions, applyRemoveCanpack2026, applyTierCorrections2026, applyTagline2026, applyRulesEmployees2026, applyLogoBgPbe, applyReglementV11, applyLogoPbeV2]
+/** Règlement v11 (affichage) : ajout du paragraphe « Intérimaires et stagiaires » à l'Art. 2.3, juste après « Statut de
+ *  salarié ». Seul le texte affiché sur /reglement change. */
+export const INTERIM_PARAGRAPH = "**Intérimaires et stagiaires :** les intérimaires et les stagiaires de l'entreprise peuvent également faire partie de l'équipe, sous réserve de la validation préalable d'Ardentia."
+export function applyReglementV11Interim(db: Rules6Data): Rules6Data {
+  const row = db.Rulebook?.find((r) => r.version === 'v11')
+  if (!row?.content || row.content.includes('Intérimaires et stagiaires')) return {}
+  const anchor = row.content.match(/\*\*Statut de salarié :\*\*[^\n]*\n/)
+  if (!anchor) return {}
+  const i = anchor.index! + anchor[0].length
+  const content = `${row.content.slice(0, i)}\n${INTERIM_PARAGRAPH}\n${row.content.slice(i)}`
+  return { Rulebook: db.Rulebook!.map((r) => (r === row ? { ...r, content } : r)) }
+}
+
+const STEPS = [applyRules6v6, applyLot1, applyReglementV4, applyRenameCompetitions, applySplitSharedTeams, applyClubs, applyCaptains, applyOfficialTeams2026, applyDisciplineV8, applyReglementV9, applyRemoveSimulation2026, applyOfficialJ1, applyPlayersSeasonTeams, applyHideSeason2025, applyLogoRevisions, applyRemoveCanpack2026, applyTierCorrections2026, applyTagline2026, applyRulesEmployees2026, applyLogoBgPbe, applyReglementV11, applyLogoPbeV2, applyReglementV11Interim]
 const VERSION_FLAG = 'data-version'
 
 /** Enchaîne les étapes de migration ; chacune lit le résultat de la précédente. */

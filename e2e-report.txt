@@ -1,0 +1,255 @@
+
+Running 175 tests using 2 workers
+
+[chromium-mobile] console warning: Service Worker registration blocked by Playwright
+[chromium-mobile] console warning: Service Worker registration blocked by Playwright
+  ✓    1 [chromium-mobile] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 360 px (1.8s)
+  ✓    3 [chromium-mobile] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 390 px (1.3s)
+[chromium-mobile] DIAG {"states":["ready","ready"],"load":"600x900","draw":"ok","getImageData":"ok","toDataURL":7578,"fetch":"200 image/png"}
+  ✓    4 [chromium-mobile] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 430 px (1.2s)
+[chromium-mobile] cutout: 1080×1350 rouge=1143 bleu=19413
+[chromium-mobile] bandeau cutout: écran {"off":false,"part":0.7396065848214286,"ratio":6.100690448791714,"top":0.7395271077143539,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAACYCAYAAA"} · export {"off":true,"part":0.7530776515151515,"ratio":6.100882240122746,"top":0.7423925554853039,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAACYCAYAAA"} · PNG 656×127
+[chromium-mobile] console warning: Service Worker registration blocked by Playwright
+  ✓    5 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page / (2.4s)
+[chromium-mobile] photo: 1080×1350 rouge=14282 bleu=68
+[chromium-mobile] bandeau photo: écran {"off":false,"part":0.7396065848214286,"ratio":6.100690448791714,"top":0.7395271077143539,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABkCAYAAA"} · export {"off":true,"part":0.7530776515151515,"ratio":6.100882240122746,"top":0.7423925554853039,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABkCAYAAA"} · PNG 498×82
+[chromium-mobile] console warning: Service Worker registration blocked by Playwright
+  ✓    6 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /matchs (2.1s)
+  ✓    7 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /classement (2.2s)
+[chromium-mobile] none: 1080×1350 rouge=1143 bleu=68
+[chromium-mobile] bandeau none: écran {"off":false,"part":0.7396065848214286,"ratio":6.100690448791714,"top":0.7395271077143539,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABlCAYAAA"} · export {"off":true,"part":0.7530776515151515,"ratio":6.100882240122746,"top":0.7423925554853039,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABlCAYAAA"} · PNG 498×82
+  ✓    2 [chromium-mobile] › e2e/card-png.spec.mjs:16:1 › photo présente dans la carte téléchargée (12.3s)
+  -    9 [chromium-mobile] › e2e/logos.spec.mjs:14:3 › logos d’équipes › toutes les pages
+  ✓    8 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /pre-saison (2.2s)
+  ✓   11 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /equipes (2.2s)
+  ✓   12 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /joueurs (2.1s)
+  ✓   10 [chromium-mobile] › e2e/matchday-subs.spec.mjs:8:1 › match complet avec allers-retours de remplacements (7.5s)
+  -   14 [chromium-mobile] › e2e/prod-visuels.spec.mjs:11:1 › visuels de la semaine — données réelles
+  ✓   13 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /trophees (2.2s)
+  ✓   15 [chromium-mobile] › e2e/reglement-interim.spec.mjs:5:1 › Art. 2.3 : intérimaires et stagiaires (1.6s)
+  -   17 [chromium-mobile] › e2e/top10-buteurs.spec.mjs:9:1 › Top 10 buteurs : nom long, égalité, moins de 10 buteurs
+  ✓   16 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /statistiques (2.2s)
+  ✓   19 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /historique (2.1s)
+  ✓   18 [chromium-mobile] › e2e/tv.spec.mjs:5:3 › mode TV portrait (3.5s)
+  ✓   20 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /reglement (2.1s)
+  ✓   22 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /badges (2.0s)
+  ✓   21 [chromium-mobile] › e2e/tv.spec.mjs:5:3 › mode TV paysage (3.6s)
+  ✓   23 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /glossaire (2.3s)
+  ✓   24 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture / (2.4s)
+  ✓   25 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /match-des-capitaines (2.1s)
+  ✓   26 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /classement (2.1s)
+  ✓   27 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /equipe-type (2.1s)
+  ✓   28 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /pre-saison (2.1s)
+  ✓   29 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /discipline (2.2s)
+  ✓   30 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /equipes (2.1s)
+  ✓   31 [chromium-mobile] › e2e/layout.spec.mjs:6:3 › mise en page /media (2.2s)
+  ✓   32 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /joueurs (2.0s)
+[chromium-desktop] console warning: Service Worker registration blocked by Playwright
+[chromium-desktop] console warning: Service Worker registration blocked by Playwright
+  ✓   33 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /trophees (2.1s)
+[chromium-desktop] DIAG {"states":["ready","ready"],"load":"600x900","draw":"ok","getImageData":"ok","toDataURL":7578,"fetch":"200 image/png"}
+  ✓   35 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /badges (2.2s)
+[chromium-desktop] cutout: 1080×1350 rouge=1143 bleu=19413
+[chromium-desktop] bandeau cutout: écran {"off":false,"part":0.7396065848214286,"ratio":6.100690448791714,"top":0.7395271077143539,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAACYCAYAAA"} · export {"off":true,"part":0.7530776515151515,"ratio":6.100882240122746,"top":0.7423925554853039,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAACYCAYAAA"} · PNG 656×127
+[chromium-desktop] console warning: Service Worker registration blocked by Playwright
+  ✓   36 [chromium-mobile] › e2e/visual.spec.mjs:7:3 › capture /glossaire (2.1s)
+[chromium-desktop] photo: 1080×1350 rouge=14282 bleu=68
+[chromium-desktop] bandeau photo: écran {"off":false,"part":0.7396065848214286,"ratio":6.100690448791714,"top":0.7395271077143539,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABkCAYAAA"} · export {"off":true,"part":0.7530776515151515,"ratio":6.100882240122746,"top":0.7423925554853039,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABkCAYAAA"} · PNG 498×82
+[chromium-desktop] console warning: Service Worker registration blocked by Playwright
+  ✓   37 [chromium-desktop] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 360 px (1.6s)
+  ✓   38 [chromium-desktop] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 390 px (1.2s)
+  ✓   39 [chromium-desktop] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 430 px (1.2s)
+[chromium-desktop] none: 1080×1350 rouge=1143 bleu=68
+[chromium-desktop] bandeau none: écran {"off":false,"part":0.7396065848214286,"ratio":6.100690448791714,"top":0.7395271077143539,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABlCAYAAA"} · export {"off":true,"part":0.7530776515151515,"ratio":6.100882240122746,"top":0.7423925554853039,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABlCAYAAA"} · PNG 498×82
+  ✓   34 [chromium-desktop] › e2e/card-png.spec.mjs:16:1 › photo présente dans la carte téléchargée (11.2s)
+  ✓   40 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page / (2.5s)
+  ✓   42 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /matchs (2.3s)
+  ✓   43 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /classement (2.2s)
+  ✓   44 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /pre-saison (2.1s)
+  ✓   45 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /equipes (2.1s)
+  ✓   46 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /joueurs (2.2s)
+  ✓   47 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /trophees (2.1s)
+  ✓   48 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /statistiques (2.1s)
+  ✓   49 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /historique (2.1s)
+  ✓   50 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /reglement (2.0s)
+  ✓   51 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /badges (2.1s)
+  ✓   52 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /glossaire (2.1s)
+  ✓   53 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /match-des-capitaines (2.0s)
+  ✓   54 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /equipe-type (2.0s)
+  ✓   55 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /discipline (2.0s)
+  ✓   56 [chromium-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /media (2.1s)
+  -   57 [chromium-desktop] › e2e/matchday-subs.spec.mjs:8:1 › match complet avec allers-retours de remplacements
+Season 2 · Competition 1 · Team 21 · Match 20 · MatchEvent 576 · Lineup 20 · Player 261 · XPRule 50
+  ✓   58 [chromium-desktop] › e2e/prod-visuels.spec.mjs:11:1 › visuels de la semaine — données réelles (14.7s)
+  ✓   59 [chromium-desktop] › e2e/reglement-interim.spec.mjs:5:1 › Art. 2.3 : intérimaires et stagiaires (1.4s)
+⚽ TOP 10 BUTEURS | Pré-saison · J1
+1. M. Benabdellah El Ouazzani (Distra) – 3 buts
+2. J. Ext1 (BMCI) – 2 buts
+3. J. Dom2 (Distra) – 2 buts
+
+#MoroccoBusinessLeague #MBL #Ardentia #FootEntreprise
+  ✓   60 [chromium-desktop] › e2e/top10-buteurs.spec.mjs:9:1 › Top 10 buteurs : nom long, égalité, moins de 10 buteurs (7.6s)
+  ✓   61 [chromium-desktop] › e2e/tv.spec.mjs:5:3 › mode TV portrait (3.3s)
+  ✓   62 [chromium-desktop] › e2e/tv.spec.mjs:5:3 › mode TV paysage (3.3s)
+  ✓   63 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture / (2.4s)
+  ✓   64 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /classement (2.1s)
+  ✓   65 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /pre-saison (2.2s)
+  ✓   66 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /equipes (2.2s)
+  ✓   67 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /joueurs (2.1s)
+  ✓   68 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /trophees (2.0s)
+  ✓   69 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /badges (2.2s)
+  ✓   70 [chromium-desktop] › e2e/visual.spec.mjs:7:3 › capture /glossaire (2.1s)
+[webkit-iphone] console warning: Service Worker registration blocked by Playwright
+[webkit-iphone] console warning: Service Worker registration blocked by Playwright
+[webkit-iphone] DIAG {"states":["ready","ready"],"load":"600x900","draw":"ok","getImageData":"ok","toDataURL":2002,"fetch":"200 image/png"}
+[webkit-iphone] cutout: 1080×1350 rouge=696 bleu=19415
+[webkit-iphone] bandeau cutout: écran {"off":false,"part":0.7396065848214286,"ratio":6.100690448791714,"top":0.739479340816814,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAACYCAYAAA"} · export {"off":true,"part":0.7530776515151515,"ratio":6.100882240122746,"top":0.7420358931958563,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAACYCAYAAA"} · PNG 656×123
+[webkit-iphone] console warning: Service Worker registration blocked by Playwright
+[webkit-iphone] photo: 1080×1350 rouge=13909 bleu=66
+[webkit-iphone] bandeau photo: écran {"off":false,"part":0.7396065848214286,"ratio":6.100690448791714,"top":0.739479340816814,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABkCAYAAA"} · export {"off":true,"part":0.7530776515151515,"ratio":6.100882240122746,"top":0.7420358931958563,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABkCAYAAA"} · PNG 498×81
+[webkit-iphone] console warning: Service Worker registration blocked by Playwright
+[webkit-iphone] none: 1080×1350 rouge=696 bleu=66
+[webkit-iphone] bandeau none: écran {"off":false,"part":0.7396065848214286,"ratio":6.100690448791714,"top":0.739479340816814,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABlCAYAAA"} · export {"off":true,"part":0.7530776515151515,"ratio":6.100882240122746,"top":0.7420358931958563,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABlCAYAAA"} · PNG 498×81
+  ✓   71 [webkit-iphone] › e2e/card-png.spec.mjs:16:1 › photo présente dans la carte téléchargée (40.8s)
+  ✓   72 [webkit-iphone] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 360 px (2.3s)
+  ✓   73 [webkit-iphone] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 390 px (2.5s)
+  ✓   74 [webkit-iphone] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 430 px (2.6s)
+  ✓   75 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page / (4.3s)
+  ✓   76 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /matchs (2.7s)
+  ✓   77 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /classement (2.5s)
+  ✓   78 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /pre-saison (2.4s)
+  ✓   79 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /equipes (11.7s)
+  ✓   80 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /joueurs (2.7s)
+  ✓   81 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /trophees (3.9s)
+  ✓   82 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /statistiques (2.5s)
+  ✓   83 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /historique (2.8s)
+  ✓   84 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /reglement (2.7s)
+  ✓   85 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /badges (2.6s)
+  ✓   86 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /glossaire (2.5s)
+  ✓   87 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /match-des-capitaines (2.8s)
+  ✓   88 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /equipe-type (2.3s)
+  ✓   89 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /discipline (2.4s)
+  ✓   90 [webkit-iphone] › e2e/layout.spec.mjs:6:3 › mise en page /media (2.7s)
+  -   91 [webkit-iphone] › e2e/logos.spec.mjs:14:3 › logos d’équipes › toutes les pages
+  ✓   92 [webkit-iphone] › e2e/matchday-subs.spec.mjs:8:1 › match complet avec allers-retours de remplacements (22.9s)
+  -   93 [webkit-iphone] › e2e/prod-visuels.spec.mjs:11:1 › visuels de la semaine — données réelles
+  ✓   94 [webkit-iphone] › e2e/reglement-interim.spec.mjs:5:1 › Art. 2.3 : intérimaires et stagiaires (2.5s)
+  -   95 [webkit-iphone] › e2e/top10-buteurs.spec.mjs:9:1 › Top 10 buteurs : nom long, égalité, moins de 10 buteurs
+  ✓   96 [webkit-iphone] › e2e/tv.spec.mjs:5:3 › mode TV portrait (4.1s)
+  ✓   97 [webkit-iphone] › e2e/tv.spec.mjs:5:3 › mode TV paysage (4.0s)
+  ✓   98 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture / (5.4s)
+  ✓   99 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /classement (2.8s)
+  ✓  100 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /pre-saison (2.4s)
+  -  101 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /equipes
+  ✓  102 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /joueurs (2.5s)
+  ✓  103 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /trophees (2.4s)
+  ✓  104 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /badges (2.9s)
+  ✓  105 [webkit-iphone] › e2e/visual.spec.mjs:7:3 › capture /glossaire (2.7s)
+[webkit-ipad] console warning: Service Worker registration blocked by Playwright
+[webkit-ipad] console warning: Service Worker registration blocked by Playwright
+[webkit-ipad] DIAG {"states":["ready","ready"],"load":"600x900","draw":"ok","getImageData":"ok","toDataURL":2002,"fetch":"200 image/png"}
+[webkit-ipad] cutout: 1080×1350 rouge=696 bleu=19415
+[webkit-ipad] bandeau cutout: écran {"off":false,"part":0.7396065848214286,"ratio":6.100690448791714,"top":0.739479340816814,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAACYCAYAAA"} · export {"off":true,"part":0.7530776515151515,"ratio":6.100882240122746,"top":0.7421169528070943,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAACYCAYAAA"} · PNG 656×123
+[webkit-ipad] console warning: Service Worker registration blocked by Playwright
+[webkit-ipad] console warning: The resource http://localhost:4173/fonts/big-shoulders-display-var.woff was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it wasn't prel
+[webkit-ipad] console warning: The resource http://localhost:4173/fonts/manrope-var.woff was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it wasn't preloaded for noth
+[webkit-ipad] photo: 1080×1350 rouge=13909 bleu=66
+[webkit-ipad] bandeau photo: écran {"off":false,"part":0.7396065848214286,"ratio":6.100690448791714,"top":0.739479340816814,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABkCAYAAA"} · export {"off":true,"part":0.7530776515151515,"ratio":6.100882240122746,"top":0.7421169528070943,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABkCAYAAA"} · PNG 498×81
+[webkit-ipad] console warning: Service Worker registration blocked by Playwright
+[webkit-ipad] none: 1080×1350 rouge=696 bleu=66
+[webkit-ipad] bandeau none: écran {"off":false,"part":0.7396065848214286,"ratio":6.100690448791714,"top":0.739479340816814,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABlCAYAAA"} · export {"off":true,"part":0.7530776515151515,"ratio":6.100882240122746,"top":0.7421169528070943,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABlCAYAAA"} · PNG 498×81
+  ✓  106 [webkit-ipad] › e2e/card-png.spec.mjs:16:1 › photo présente dans la carte téléchargée (20.4s)
+  ✓  107 [webkit-ipad] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 360 px (1.9s)
+  ✓  108 [webkit-ipad] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 390 px (1.9s)
+  ✓  109 [webkit-ipad] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 430 px (1.9s)
+  ✓  110 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page / (3.5s)
+  ✓  111 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /matchs (2.6s)
+  ✓  112 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /classement (2.6s)
+  ✓  113 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /pre-saison (2.4s)
+  ✓  114 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /equipes (9.8s)
+  ✓  115 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /joueurs (2.9s)
+  ✓  116 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /trophees (5.1s)
+  ✓  117 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /statistiques (2.6s)
+  ✓  118 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /historique (2.6s)
+  ✓  119 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /reglement (2.9s)
+  ✓  120 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /badges (2.6s)
+  ✓  121 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /glossaire (2.6s)
+  ✓  122 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /match-des-capitaines (2.7s)
+  ✓  123 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /equipe-type (2.4s)
+  ✓  124 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /discipline (2.4s)
+  ✓  125 [webkit-ipad] › e2e/layout.spec.mjs:6:3 › mise en page /media (2.5s)
+  -  126 [webkit-ipad] › e2e/logos.spec.mjs:14:3 › logos d’équipes › toutes les pages
+  ✓  127 [webkit-ipad] › e2e/matchday-subs.spec.mjs:8:1 › match complet avec allers-retours de remplacements (19.6s)
+  -  128 [webkit-ipad] › e2e/prod-visuels.spec.mjs:11:1 › visuels de la semaine — données réelles
+  ✓  129 [webkit-ipad] › e2e/reglement-interim.spec.mjs:5:1 › Art. 2.3 : intérimaires et stagiaires (2.0s)
+  -  130 [webkit-ipad] › e2e/top10-buteurs.spec.mjs:9:1 › Top 10 buteurs : nom long, égalité, moins de 10 buteurs
+  ✓  131 [webkit-ipad] › e2e/tv.spec.mjs:5:3 › mode TV portrait (4.3s)
+  ✓  132 [webkit-ipad] › e2e/tv.spec.mjs:5:3 › mode TV paysage (3.6s)
+  ✓  133 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture / (5.1s)
+  ✓  134 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /classement (2.8s)
+  ✓  135 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /pre-saison (2.5s)
+  -  136 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /equipes
+  ✓  137 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /joueurs (2.6s)
+  ✓  138 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /trophees (2.7s)
+  ✓  139 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /badges (3.3s)
+  ✓  140 [webkit-ipad] › e2e/visual.spec.mjs:7:3 › capture /glossaire (3.3s)
+[firefox-desktop] console warning: Service Worker registration blocked by Playwright
+[firefox-desktop] console warning: Service Worker registration blocked by Playwright
+[firefox-desktop] DIAG {"states":["ready","ready"],"load":"600x900","draw":"ok","getImageData":"ok","toDataURL":2646,"fetch":"200 image/png"}
+[firefox-desktop] cutout: 1080×1350 rouge=1180 bleu=19359
+[firefox-desktop] bandeau cutout: écran {"off":false,"part":0.7395832879202706,"ratio":6.098157993029637,"top":0.7393896179656998,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAACYCAYAAA"} · export {"off":true,"part":0.7530807957504735,"ratio":6.099815508796477,"top":0.7423438234983445,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAACYCAYAAA"} · PNG 656×124
+[firefox-desktop] console warning: Service Worker registration blocked by Playwright
+[firefox-desktop] photo: 1080×1350 rouge=14329 bleu=64
+[firefox-desktop] bandeau photo: écran {"off":false,"part":0.7395832879202706,"ratio":6.098157993029637,"top":0.7393896179656998,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABkCAYAAA"} · export {"off":true,"part":0.7530807957504735,"ratio":6.099815508796477,"top":0.7423438234983445,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABkCAYAAA"} · PNG 498×82
+[firefox-desktop] console warning: Service Worker registration blocked by Playwright
+[firefox-desktop] none: 1080×1350 rouge=1180 bleu=64
+[firefox-desktop] bandeau none: écran {"off":false,"part":0.7395832879202706,"ratio":6.098157993029637,"top":0.7393896179656998,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABlCAYAAA"} · export {"off":true,"part":0.7530807957504735,"ratio":6.099815508796477,"top":0.7423438234983445,"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABlCAYAAA"} · PNG 498×82
+  ✓  141 [firefox-desktop] › e2e/card-png.spec.mjs:16:1 › photo présente dans la carte téléchargée (11.8s)
+  ✓  142 [firefox-desktop] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 360 px (1.3s)
+  ✓  143 [firefox-desktop] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 390 px (1.3s)
+  ✓   41 [chromium-desktop] › e2e/logos.spec.mjs:14:3 › logos d’équipes › toutes les pages (6.5m)
+  ✓  144 [firefox-desktop] › e2e/home-standings.spec.mjs:6:3 › classement accueil sans défilement interne — 430 px (1.4s)
+  -  145 [firefox-desktop] › e2e/logos.spec.mjs:14:3 › logos d’équipes › toutes les pages
+  -  146 [firefox-desktop] › e2e/matchday-subs.spec.mjs:8:1 › match complet avec allers-retours de remplacements
+  -  147 [firefox-desktop] › e2e/prod-visuels.spec.mjs:11:1 › visuels de la semaine — données réelles
+  ✓  148 [firefox-desktop] › e2e/reglement-interim.spec.mjs:5:1 › Art. 2.3 : intérimaires et stagiaires (2.3s)
+  -  150 [firefox-desktop] › e2e/top10-buteurs.spec.mjs:9:1 › Top 10 buteurs : nom long, égalité, moins de 10 buteurs
+  ✓  149 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page / (4.0s)
+  ✓  151 [firefox-desktop] › e2e/tv.spec.mjs:5:3 › mode TV portrait (3.9s)
+  ✓  152 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /matchs (2.4s)
+  ✓  154 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /classement (2.3s)
+  ✓  153 [firefox-desktop] › e2e/tv.spec.mjs:5:3 › mode TV paysage (3.6s)
+  ✓  155 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /pre-saison (2.6s)
+  ✓  156 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture / (3.0s)
+  ✓  157 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /equipes (2.5s)
+  ✓  158 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /classement (2.6s)
+  ✓  159 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /joueurs (2.6s)
+  ✓  160 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /pre-saison (3.1s)
+  ✓  161 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /trophees (2.2s)
+  ✓  162 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /equipes (2.3s)
+  ✓  163 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /statistiques (2.5s)
+  ✓  164 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /joueurs (2.3s)
+  ✓  165 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /historique (2.4s)
+  ✓  166 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /trophees (2.1s)
+  ✓  167 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /reglement (3.2s)
+  ✓  168 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /badges (2.4s)
+  ✓  170 [firefox-desktop] › e2e/visual.spec.mjs:7:3 › capture /glossaire (2.6s)
+  ✓  169 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /badges (2.8s)
+  ✓  171 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /glossaire (2.4s)
+  ✓  172 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /match-des-capitaines (2.3s)
+  ✓  173 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /equipe-type (2.3s)
+  ✓  174 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /discipline (2.3s)
+  ✓  175 [firefox-desktop] › e2e/layout.spec.mjs:6:3 › mise en page /media (2.5s)
+
+  Slow test file: [chromium-desktop] › e2e/logos.spec.mjs (6.5m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  16 skipped
+  159 passed (8.1m)
+exit=0
+LIGHTHOUSE build / Performance 44 · Accessibility 100 · Best Practices 100 · SEO 100
+LIGHTHOUSE build /classement Performance 73 · Accessibility 100 · Best Practices 100 · SEO 100
+LIGHTHOUSE build /joueurs Performance 73 · Accessibility 100 · Best Practices 100 · SEO 100
+LIGHTHOUSE build /trophees Performance 76 · Accessibility 100 · Best Practices 100 · SEO 100
+LIGHTHOUSE prod / Performance 47 · Accessibility 94 · Best Practices 100 · SEO 100
+LIGHTHOUSE prod /classement Performance 71 · Accessibility 97 · Best Practices 100 · SEO 100
+LIGHTHOUSE prod /joueurs Performance 48 · Accessibility 97 · Best Practices 96 · SEO 100
